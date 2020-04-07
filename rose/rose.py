@@ -451,7 +451,7 @@ class Car(Agent):
         def check_conflict_cluster_yield():
             # for each agent that winner sent out conflict request to, is yield max action safe? 
             for agent in self.conflict_requests_sent_to:
-                chk_valid = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(agent, agent.state))
+                chk_valid = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
                 if not chk_valid: return False
             return True
 
@@ -464,11 +464,13 @@ class Car(Agent):
             for acc_val in ctrl_acc:
                 # check safety of ctrl action
                 ctrl = {'acceleration': acc_val, 'steer':'straight'}
-                valid_actions_chk = self.check_valid_actions(self, ctrl, winning_agent, winning_agent.intention)
+                #valid_actions_chk = self.check_valid_actions(self, ctrl, winning_agent, winning_agent.intention)
+                next_st = self.query_occupancy(ctrl)[-1]
+                valid_action_check = self.check_safe_config(self, winning_agent, st_1=next_st, st_2=winning_agent.state)
                 if valid_actions_chk: return ctrl
 
             print("Warning: max deceleration of agent not enough!")
-            return self.get_backup_plan_ctrl(self, self.state)
+            return self.get_backup_plan_ctrl()
 
         '''# check farthest straight agent can go forward (assuming agent in front already took its turn)
         def max_forward_ctrl():
@@ -652,7 +654,8 @@ class Car(Agent):
             return True
         return False
     
-    def get_backup_plan_ctrl(self, agent, state): 
+    def get_backup_plan_ctrl(self, state=None):
+        if state is None: state = self.state
         acc = agent.a_min if state.v+agent.a_min > 0 else -state.v 
         return {'acceleration':acc, 'steer':'straight'}
 
@@ -667,7 +670,7 @@ class Car(Agent):
         # see whether agent intention conflicts with another agent's back-up plan
         def intention_bp_conflict(agent):
             # get acceleration needed to come to a stop (if not enough, maximal)
-            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, self.get_backup_plan_ctrl(agent, agent.state))
+            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, self.get_backup_plan_ctrl())
             return not chk_valid_actions
 
         # first check if agent is longitudinally equal or ahead of other agent
