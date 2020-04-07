@@ -956,6 +956,12 @@ class Bundle:
         tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         return self.tube_list.index(tile[tube_idx])
 
+    def is_leftmost_lane(self, tile):
+        return self.tile_to_relative_width(tile) == self.width - 1
+
+    def is_rightmost_lane(self, tile):
+        return self.tile_to_relative_width(tile) == 0
+
 def get_comparator(cond):
     if cond == 'equal':
         return lambda curr, nxt: nxt is curr
@@ -1000,6 +1006,16 @@ class Map:
         self.IO_map = self.get_IO_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
+
+    def directed_tile_to_bundle(self, tile, heading=None):
+        bundles = self.tile_to_bundle_map[tile]
+        if heading is None:
+            assert len(bundles) == 1
+            bundle = bundles[0]
+        else:
+            bundle_idx = np.nonzero([b.direction == heading for b in bundles])[0][0]
+            bundle = bundles[bundle_idx]
+        return bundle
 
     def get_tile_to_traffic_light_map(self):
         tile_to_traffic_light_map = dict()
@@ -1803,12 +1819,12 @@ class QuasiSimultaneousGame(Game):
         self.env_step()
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.05)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
-#    game.animate(frequency=0.1)
+#    game.play(outfile=output_filename, t_end=100)
+    game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
     #num_agents = 5
