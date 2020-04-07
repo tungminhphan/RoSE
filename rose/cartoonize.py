@@ -148,7 +148,7 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    the_map = Map('./maps/t_junction', default_spawn_probability=0.1)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
     #the_map = Map('map5', default_spawn_probability=0.05)
     output_filename = os.getcwd()+'/saved_traces/game.p'
     traces_to_animation(the_map, output_filename)

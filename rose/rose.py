@@ -206,7 +206,7 @@ class Car(Agent):
         self.received_conflict_requests_from = []
     
     # conflict resolution, returns True if winner and false if not winner
-    def check_conflict_resolution_winner(self):
+    def check_conflict_resolution_winner(self, specify_agent=False):
         # collect all agents in send and receive requests and find the winner
         conflict_cluster = list(set(self.send_conflict_requests_to + self.received_conflict_requests_from + [self]))
 
@@ -220,7 +220,11 @@ class Car(Agent):
         # resolve ties with max values with agent ID comparison
         ind_max = np.argmax(np.array([agent.get_id() for agent in max_agent_list]))
         agent_winner = max_agent_list[ind_max]
-        return agent_winner.get_id() == self.get_id()
+        if specify_agent: 
+            return agent_winner.get_id() == self.get_id(), agent_winner
+        else:
+            return agent_winner.get_id() == self.get_id()
+
     # update token count according to which action agent took and whether 
     # it aligns with agent intention
     def update_token_count():
@@ -415,6 +419,106 @@ class Car(Agent):
         if state is None: state = self.state
         return Car.get_all_class_ctrl(state, self.acc_vals, inverse=inverse)
 
+    #=== method for action selection strategy==========================#
+    # defines which action to select given precedence list and whether or not
+    # agent won in its conflict cluster
+    def action_selection_strategy(self, precedence_list):
+        # figure out whether agent is sender, receiver, both or neither
+        def get_agent_type(): 
+            if len(self.received_conflict_requests_from) > 0:
+                return "receiver"
+            if len(self.send_conflict_requests_to) > 0:
+                return "sender"
+            if not self.received_conflict_requests_from and not self.send_conflict_requests_to: 
+                return "none"
+
+        # figure out whether intended action conflicts with agents that have
+        # higher precedence
+        def check_conflict_with_higher_precedence_agents(higher_precedence_agents):
+            my_occ = self.query_occupancy(self.intention)
+            # presumably agents with higher precedence are only ones in agent bubble
+            for agent in higher_precedence_agents:
+                # check whether intention overlaps with agents of higher precedence
+                # and intended action has final config that preserves back-up plan
+                grid_pt = [(agent.state.x, agent.state.y)]
+                occupancy_overlap = self.check_occupancy_intersection(my_occ, grid_pt)
+                safe_config = self.check_config_safety(self, agent, my_occ[-1], agent.state)
+                if occupancy_overlap or not safe_config: 
+                    return False
+            return True
+        
+        # if winner and assuming that losing agents yield maximally, is action safe? 
+        def check_conflict_cluster_yield():
+            # for each agent that winner sent out conflict request to, is yield max action safe? 
+            for agent in self.conflict_requests_sent_to:
+                chk_valid = self.check_valid_actions(self, agent, self.intention, agent.get_backup_plan_ctrl(agent, agent.state))
+                if not chk_valid: return False
+            return True
+
+        # check max amount another agent needs to yield for another agent to change lanes
+        def check_min_dec_yield_req(winning_agent):
+            # if agent is receiver of winning agent's request, need to determine how much to yield 
+            # to that agent, so keep on reducing acceleration until it is safe
+            ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
+            for acc_val in ctrl_acc:
+                # check safety of ctrl action
+                ctrl = {'acceleration': acc_val, 'steer':'straight'}
+                valid_actions_chk = self.check_valid_actions(self, winning_agent, ctrl, winning_agent.intention)
+                if valid_actions_chk: return ctrl
+
+            print("Warning: max deceleration of agent not enough!")
+            return self.get_backup_plan_ctrl(self, self.state)
+
+        # check farthest straight agent can go forward (assuming agent in front already took its turn)
+        def max_forward_ctrl():
+            lead_agent = self.find_lead_agent()
+            x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+            # try all acceleration values
+            ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
+            for acc_val in ctrl_acc:
+                ctrl = {'acceleration': acc_val, 'steer':'straight'}
+                next_st = self.query_occupancy(ctrl)[-1]
+                safe_chk = self.check_safe_config(self, lead_agent, st_1=next_st, st_2=lead_agent.state)
+                if safe_chk: return ctrl
+            return self.get_backup_plan_ctrl(self, self.state)
+        
+        # check whether received request from winning agent 
+        def chk_receive_request_from_winning_agent(winning_agent):
+            for agent in self.received_conflict_requests_from:
+                if winning_agent.get_id() == agent.get_id():
+                    return True
+            return False
+
+        # switch statements that define the outcome of the decision tree
+        agent_type = get_agent_type()
+        # True means no conflict with agents in bubble with higher precedence
+        bubble_chk = not check_conflict_with_higher_precedence_agents()
+        # True means winner of conflict cluster
+        cluster_chk, winning_agent = self.check_conflict_resolution_winner(specify_agent=True)
+        chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
+
+        # list of all possible scenarios and what action to take
+        if agent_type is None and bubble_chk:
+            pass
+        elif agent_type is None and not bubble_chk:
+            pass
+        elif agent_type is 'sender' and bubble_chk and not cluster_chk:
+            pass
+        elif agent_type is 'sender' and bubble_chk and cluster_chk:
+            pass
+        elif agent_type is 'sender' and not bubble_chk and not cluster_chk:
+            pass
+        elif agent_type is 'sender' and not bubble_chk and cluster_chk:
+            pass
+        elif agent_type is 'receiver' and bubble_chk and not cluster_chk:
+            pass
+        elif agent_type is 'receiver' and bubble_chk and cluster_chk:
+            pass
+        elif agent_type is 'receiver' and not bubble_chk and not cluster_chk:
+            pass
+        elif agent_type is 'receiver' and not bubble_chk and cluster_chk:
+            pass
+
     #=== methods for car bubble =======================================#
     # get agent bubble (list of grid points)
     def get_bubble(self, the_map=None):
@@ -474,56 +578,71 @@ class Car(Agent):
         dx_behind = self.compute_dx(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
+    
+    # check if a set of actions is valid for a pair of agents
+    def check_valid_actions(self, ag_1, ag_2, ctrl_1, ctrl_2):
+        # get occupancy for both actions
+        occ_1 = ag_1.query_occupancy(ctrl_1)
+        occ_2 = ag_2.query_occuapncy(ctrl_2)
+        # check occupancy intersection
+        chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
+        chk_safe_end_config = self.check_safe_config(ag_1, ag_2, occ_1[-1], occ_2[-1])
+        # return if occupancies don't intersect and safe end config
+        return not chk_occupancy_intersection and chk_safe_end_config
+
+    def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None): 
+        if st_1 is None: st_1 = ag_1.state
+        if st_2 is None: st_2 = ag_2.state
+
+        # check agents are in the same lane
+        def check_same_lane(ag_1, ag_2): 
+            #__import__('ipdb').set_trace(context=21)
+            width_1, bundle_1 = ag_1.get_width_along_bundle()
+            width_2, bundle_2 = ag_2.get_width_along_bundle()
+            return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
+            
+        # returns agent_lead, agent_behind in that order
+        def sort_agents(ag_1, ag_2):
+            l_1 = ag_1.get_length_along_bundle()[0]
+            l_2 = ag_2.get_length_along_bundle()[0]
+            if l_1 > l_2:
+                return ag_1, ag_2, st_1, st_2
+            elif l_2 > l_1:
+                return ag_2, ag_1, st_2, st_1
+            else: 
+                return None, None
+            
+        # first check same lane
+        same_lane_chk = check_same_lane(ag_1, ag_2)
+        # TODO: if not in same lane, then agents are in safe config relative to each other?
+        if not same_lane_chk: return True
+        # then check which agent is lead and which one is behind
+        ag_lead, ag_behind, st_lead, st_behind = sort_agents(ag_1, ag_2)
+        # if None, agents are on top of each other 
+        if ag_lead is None: return False
+
+        gap_req = self.compute_gap_req(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
+        gap_curr = np.linalg.norm(np.array([st_lead.x-st_behind.x, st_lead.y-st_behind.y]))
+        return gap_curr >= gap_req
+
+    def occupancy_intersection(self, occ_a, occ_b):
+        # convert list of agent states to grid points if not already list of tuples
+        if len(occ_a)>1: occ_a = occ_a[1:]
+        if len(occ_b)>1: occ_b = occ_b[1:]
+        if not isinstance(occ_a[0], tuple): occ_a = [(state.x, state.y) for state in occ_a]
+        if not isinstance(occ_b[0], tuple): occ_b = [(state.x, state.y) for state in occ_b]
+        occ_all = occ_a + occ_b
+        if len(occ_all) != len(set(occ_all)):
+            return True
+        return False
+    
+    def get_backup_plan_ctrl(self, agent, state): 
+        acc = agent.a_min if state.v+agent.a_min > 0 else -state.v 
+        return {'acceleration':acc, 'steer':'straight'}
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
     def check_to_send_conflict_request(self, agent):
         # check if gap between two agents is large enough for stopping!
-        def check_safe_config(ag_1, ag_2, st_1=None, st_2=None): 
-            if st_1 is None: st_1 = ag_1.state
-            if st_2 is None: st_2 = ag_2.state
-
-            # check agents are in the same lane
-            def check_same_lane(ag_1, ag_2): 
-                #__import__('ipdb').set_trace(context=21)
-                width_1, bundle_1 = ag_1.get_width_along_bundle()
-                width_2, bundle_2 = ag_2.get_width_along_bundle()
-                return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
-            
-            # returns agent_lead, agent_behind in that order
-            def sort_agents(ag_1, ag_2):
-                l_1 = ag_1.get_length_along_bundle()[0]
-                l_2 = ag_2.get_length_along_bundle()[0]
-                if l_1 > l_2:
-                    return ag_1, ag_2, st_1, st_2
-                elif l_2 > l_1:
-                    return ag_2, ag_1, st_2, st_1
-                else: 
-                    return None, None
-            
-            # first check same lane
-            same_lane_chk = check_same_lane(ag_1, ag_2)
-            # TODO: if not in same lane, then agents are in safe config relative to each other?
-            if not same_lane_chk: return True
-            # then check which agent is lead and which one is behind
-            ag_lead, ag_behind, st_lead, st_behind = sort_agents(ag_1, ag_2)
-            # if None, agents are on top of each other 
-            if ag_lead is None: return False
-
-            gap_req = self.compute_gap_req(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
-            gap_curr = np.linalg.norm(np.array([st_lead.x-st_behind.x, st_lead.y-st_behind.y]))
-            return gap_curr >= gap_req
-
-        def occupancy_intersection(occ_a, occ_b):
-            # convert list of agent states to grid points if not already list of tuples
-            if len(occ_a)>1: occ_a = occ_a[1:]
-            if len(occ_b)>1: occ_b = occ_b[1:]
-            if not isinstance(occ_a[0], tuple): occ_a = [(state.x, state.y) for state in occ_a]
-            if not isinstance(occ_b[0], tuple): occ_b = [(state.x, state.y) for state in occ_b]
-            occ_all = occ_a + occ_b
-            if len(occ_all) != len(set(occ_all)):
-                return True
-            return False
-
         # TODO: see whether end state after these actions still have a back-up plan
         def intentions_conflict(agent):
             occ_a = self.query_occupancy(ctrl=self.intention)
@@ -531,24 +650,19 @@ class Car(Agent):
             if occ_a is None or occ_b is None: 
                 print("error: agent intention not allowed")
                 return True
-            chk_safe_end_state_config = check_safe_config(self, agent, st_1=occ_a[-1], st_2=occ_b[-1])
-            return occupancy_intersection(occ_a, occ_b) or not chk_safe_end_state_config
+            chk_safe_end_state_config = self.check_safe_config(self, agent, st_1=occ_a[-1], st_2=occ_b[-1])
+            return self.occupancy_intersection(occ_a, occ_b) or not chk_safe_end_state_config
     
         # see whether agent intention conflicts with another agent's back-up plan
         def intention_bp_conflict(agent):
             # get acceleration needed to come to a stop (if not enough, maximal)
-            def get_backup_plan_ctrl(agent, state): 
-                acc = agent.a_min if state.v+agent.a_min > 0 else -state.v 
-                return {'acceleration':acc, 'steer':'straight'}
-
             occ_a = self.query_occupancy(ctrl=self.intention)
-            occ_b = agent.query_occupancy(ctrl=get_backup_plan_ctrl(agent, agent.state))
+            occ_b = agent.query_occupancy(ctrl=self.get_backup_plan_ctrl(agent, agent.state))
             if occ_a is None or occ_b is None: 
                 print("error: intention is not allowed")
                 return True
-
-            chk_safe_end_state_config = check_safe_config(self, agent, st_1=occ_a[-1], st_2=occ_b[-1])
-            return occupancy_intersection(occ_a, occ_b) or not chk_safe_end_state_config
+            chk_safe_end_state_config = self.check_safe_config(self, agent, st_1=occ_a[-1], st_2=occ_b[-1])
+            return self.occupancy_intersection(occ_a, occ_b) or not chk_safe_end_state_config
 
         # first check if agent is longitudinally equal or ahead of other agent
         chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
@@ -836,15 +950,15 @@ class Game:
         self.env_step()
     
     # check that all agents in the current config have a backup plan
-    def check_config_safety(self):
+    def check_all_config_safety(self):
         for agent in agent_set():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
-            lead_agent = plant.find_lead_agent()
+            lead_agent = self.find_lead_agent()
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
+                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) >= gap_curr):
                     return False
         # all agents have backup plan
         return True
@@ -1803,7 +1917,7 @@ class QuasiSimultaneousGame(Game):
         self.env_step()
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.05)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
