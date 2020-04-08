@@ -1014,6 +1014,7 @@ class Map:
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
+        st()
 
 #    def check_if_right_turn_tile(self, tile):
 #        legal_orientations = self.legal_orientations[tile]
@@ -1045,9 +1046,9 @@ class Map:
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
         try:
             next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
-            return next_bundle.is_rightmost_lane(next_tile)
+            return next_bundle.is_rightmost_lane(next_tile), (next_tile, next_direction)
         except:
-            return False
+            return False, None
 
     def check_if_left_turn_tile(self, tile, direction):
         assert direction in self.legal_orientations[tile]
@@ -1059,30 +1060,32 @@ class Map:
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
         try:
             next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
-            return next_bundle.is_leftmost_lane(next_tile)
+            return next_bundle.is_leftmost_lane(next_tile), (next_tile, next_direction)
         except:
-            return False
+            return False, None
 
-    # assuming agents can only legally make a right turn from the right most lane
+    # assuming agents can only legally make a right turn from the rightmost lane into rightmost lane
     def find_right_turn_tiles(self):
-        right_turn_tiles = []
+        right_turn_tiles = dict()
         for bundle in self.bundles:
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
-                if self.check_if_right_turn_tile(tile, direction):
-                    right_turn_tiles.append(tile)
+                check, nxt = self.check_if_right_turn_tile(tile, direction)
+                if check:
+                    right_turn_tiles[(tile, direction)] = nxt
         return right_turn_tiles
 
-    # assuming agents can only legally make left turns from leftmost lane at the first opportunity
+    # assuming agents can only legally make a left turn from the leftmost lane into leftmost lane
     def find_left_turn_tiles(self):
-        left_turn_tiles = []
+        left_turn_tiles = dict()
         for bundle in self.bundles:
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((bundle.width-1, idx))
-                if self.check_if_left_turn_tile(tile, direction):
-                    left_turn_tiles.append(tile)
+                check, nxt = self.check_if_left_turn_tile(tile, direction)
+                if check:
+                    left_turn_tiles[(tile, direction)] = nxt
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
