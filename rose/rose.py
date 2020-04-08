@@ -920,16 +920,22 @@ class Bundle:
     def get_id(self):
         return id(self)
 
+    def relative_coordinates_to_tile(self, rel_xy):
+        x, y = rel_xy
+        dvec = DIRECTION_TO_VECTOR[self.direction]
+        tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
+        tile = [None] * 2
+        tile[tube_idx] = self.tube_list[x]
+        tile[1-tube_idx] = self.length_list[y]
+        return tuple(tile)
+
     def reconstruct_tiles(self):
         dvec = DIRECTION_TO_VECTOR[self.direction]
         tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         tiles = []
-        for tube in self.tube_list:
-            for stp in self.length_list:
-                tile = [None, None]
-                tile[tube_idx] = tube
-                tile[1-tube_idx] = stp
-                tile = tuple(tile)
+        for x in range(len(self.tube_list)):
+            for y in range(len(self.length_list)):
+                tile = self.relative_coordinates_to_tile((x,y))
                 tiles.append(tile)
         return tiles
 
@@ -992,7 +998,7 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key] = [item]
 
 class Map:
-    def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=False):
+    def __init__(self, csv_filename, default_spawn_probability=0, random_traffic_lights_init=False):
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
         self.drivable_nodes = list(self.grid.keys())
@@ -1006,6 +1012,66 @@ class Map:
         self.IO_map = self.get_IO_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
+        self.right_turn_tiles = self.find_right_turn_tiles()
+        st()
+
+    def check_if_right_turn_tile(self, tile):
+        legal_orientations = self.legal_orientations[tile]
+        if len(legal_orientations) > 1:
+            return False
+        else:
+            direction = legal_orientations[0]
+            direction_degrees = Car.convert_orientation(direction)
+            next_direction_degrees = (direction_degrees - 90)%360
+            next_direction = Car.convert_orientation(next_direction_degrees)
+            forward = DIRECTION_TO_VECTOR[direction]
+            right = rotate_vector(forward, -np.pi/2)
+            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
+            if not (next_tile in self.legal_orientations):
+                return False
+            else:
+                next_legal_orientations = self.legal_orientations[next_tile]
+                if next_legal_orientations is None or len(legal_orientations) > 1:
+                    return False
+                else:
+                    return next_legal_orientations[0] == next_direction
+
+    def check_if_left_turn_tile(self, tile, direction):
+        assert direction in self.legal_orientations[tile]
+        direction_degrees = Car.convert_orientation(direction)
+        next_direction_degrees = (direction_degrees + 90)%360
+        next_direction = Car.convert_orientation(next_direction_degrees)
+        forward = DIRECTION_TO_VECTOR[direction]
+        left = rotate_vector(forward, -np.pi/2)
+        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
+        if not (next_tile in self.legal_orientations):
+            return False
+        else:
+            next_legal_orientations = self.legal_orientations[next_tile]
+            if next_legal_orientations is None or len(legal_orientations) > 1:
+                return False
+            else:
+                return next_legal_orientations[0] == next_direction
+
+    # assuming agents can only legally make a right turn from the right most lane
+    def find_right_turn_tiles(self):
+        right_turn_tiles = []
+        for bundle in self.bundles:
+            for idx in range(bundle.length):
+                tile = bundle.relative_coordinates_to_tile((0, idx))
+                if self.check_if_right_turn_tile(tile):
+                    right_turn_tiles.append(tile)
+        return right_turn_tiles
+
+    # assuming agents can only legally make left turns from leftmost lane at the first opportunity
+    def find_left_turn_tiles(self):
+        left_turn_tiles = []
+        for bundle in self.bundles:
+            for idx in range(bundle.length):
+                tile = bundle.relative_coordinates_to_tile((idx, bundle.width-1))
+                if self.check_if_left_turn_tile(tile):
+                    left_turn_tiles.append(tile)
+        return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
         bundles = self.tile_to_bundle_map[tile]
@@ -1819,7 +1885,8 @@ class QuasiSimultaneousGame(Game):
         self.env_step()
 
 if __name__ == '__main__':
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
+#    the_map = Map('./maps/straight_road', default_spawn_probability=0.001)
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.001)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
