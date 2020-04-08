@@ -1013,28 +1013,41 @@ class Map:
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.right_turn_tiles = self.find_right_turn_tiles()
-        st()
+        self.left_turn_tiles = self.find_left_turn_tiles()
 
-    def check_if_right_turn_tile(self, tile):
-        legal_orientations = self.legal_orientations[tile]
-        if len(legal_orientations) > 1:
+#    def check_if_right_turn_tile(self, tile):
+#        legal_orientations = self.legal_orientations[tile]
+#        if len(legal_orientations) > 1:
+#            return False
+#        else:
+#            direction = legal_orientations[0]
+#            direction_degrees = Car.convert_orientation(direction)
+#            next_direction_degrees = (direction_degrees - 90)%360
+#            next_direction = Car.convert_orientation(next_direction_degrees)
+#            forward = DIRECTION_TO_VECTOR[direction]
+#            right = rotate_vector(forward, -np.pi/2)
+#            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
+#            if not (next_tile in self.legal_orientations):
+#                return False
+#            else:
+#                next_legal_orientations = self.legal_orientations[next_tile]
+#                if next_legal_orientations is None or len(legal_orientations) > 1:
+#                    return False
+#                else:
+#                    return next_legal_orientations[0] == next_direction
+    def check_if_right_turn_tile(self, tile, direction):
+        assert direction in self.legal_orientations[tile]
+        direction_degrees = Car.convert_orientation(direction)
+        next_direction_degrees = (direction_degrees - 90)%360
+        next_direction = Car.convert_orientation(next_direction_degrees)
+        forward = DIRECTION_TO_VECTOR[direction]
+        right = rotate_vector(forward, -np.pi/2)
+        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
+        try:
+            next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
+            return next_bundle.is_rightmost_lane(next_tile)
+        except:
             return False
-        else:
-            direction = legal_orientations[0]
-            direction_degrees = Car.convert_orientation(direction)
-            next_direction_degrees = (direction_degrees - 90)%360
-            next_direction = Car.convert_orientation(next_direction_degrees)
-            forward = DIRECTION_TO_VECTOR[direction]
-            right = rotate_vector(forward, -np.pi/2)
-            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
-            if not (next_tile in self.legal_orientations):
-                return False
-            else:
-                next_legal_orientations = self.legal_orientations[next_tile]
-                if next_legal_orientations is None or len(legal_orientations) > 1:
-                    return False
-                else:
-                    return next_legal_orientations[0] == next_direction
 
     def check_if_left_turn_tile(self, tile, direction):
         assert direction in self.legal_orientations[tile]
@@ -1042,24 +1055,22 @@ class Map:
         next_direction_degrees = (direction_degrees + 90)%360
         next_direction = Car.convert_orientation(next_direction_degrees)
         forward = DIRECTION_TO_VECTOR[direction]
-        left = rotate_vector(forward, -np.pi/2)
-        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
-        if not (next_tile in self.legal_orientations):
+        left = rotate_vector(forward, np.pi/2)
+        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
+        try:
+            next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
+            return next_bundle.is_leftmost_lane(next_tile)
+        except:
             return False
-        else:
-            next_legal_orientations = self.legal_orientations[next_tile]
-            if next_legal_orientations is None or len(legal_orientations) > 1:
-                return False
-            else:
-                return next_legal_orientations[0] == next_direction
 
     # assuming agents can only legally make a right turn from the right most lane
     def find_right_turn_tiles(self):
         right_turn_tiles = []
         for bundle in self.bundles:
+            direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
-                if self.check_if_right_turn_tile(tile):
+                if self.check_if_right_turn_tile(tile, direction):
                     right_turn_tiles.append(tile)
         return right_turn_tiles
 
@@ -1067,13 +1078,15 @@ class Map:
     def find_left_turn_tiles(self):
         left_turn_tiles = []
         for bundle in self.bundles:
+            direction = bundle.direction
             for idx in range(bundle.length):
-                tile = bundle.relative_coordinates_to_tile((idx, bundle.width-1))
-                if self.check_if_left_turn_tile(tile):
+                tile = bundle.relative_coordinates_to_tile((bundle.width-1, idx))
+                if self.check_if_left_turn_tile(tile, direction):
                     left_turn_tiles.append(tile)
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
+        assert tile in self.tile_to_bundle_map
         bundles = self.tile_to_bundle_map[tile]
         if heading is None:
             assert len(bundles) == 1
