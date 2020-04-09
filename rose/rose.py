@@ -833,7 +833,7 @@ class Game:
     def play_step(self):
         self.sys_step()
         self.env_step()
-    
+
     # check that all agents in the current config have a backup plan
     def check_config_safety(self):
         for agent in agent_set():
@@ -1019,30 +1019,58 @@ class Map:
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.bundle_graph = self.get_bundle_graph()
-        self.directed_tile_to_turns((23,9), 'east')
+#        self.directed_tile_to_turns(((23,9), 'east'))
+#        self.get_bundle_plan(((23,9), 'east'), ((49, 88), 'north'))
 
+    def get_bundle_plan(self, source, sink):
+        planning_graph = self.bundle_graph.copy()
+        original_edges = list(planning_graph.edges)
 
-    def directed_tile_to_turns(self, tile, direction):
-        directed_tile = (tile, direction)
+        for edge in original_edges:
+            end_node = edge[1]
+            if self.check_directed_tile_reachability(end_node, sink):
+                planning_graph.add_edge(end_node, sink)
+
+        if self.check_directed_tile_reachability(source, sink):
+            planning_graph.add_edge(source, sink)
+
+        turns = self.directed_tile_to_turns(source)
+        for turn in turns:
+            planning_graph.add_edge(source, turn)
+
+        plan = nx.astar_path(planning_graph, source, sink)
+        return plan
+
+    def directed_tile_to_relative_bundle_tile(self, directed_tile):
+        tile, direction = directed_tile
         bundle = self.directed_tile_to_bundle(tile, direction)
         rel_tile = bundle.tile_to_relative_position(tile)
+        return rel_tile
+
+    def check_directed_tile_reachability(self, dtile_start, dtile_final):
+        bundle_start = self.directed_tile_to_bundle(dtile_start[0], dtile_start[1])
+        bundle_final = self.directed_tile_to_bundle(dtile_final[0], dtile_final[1])
+        if bundle_start != bundle_final:
+            return False
+        else:
+            rel_tile_start = self.directed_tile_to_relative_bundle_tile(dtile_start)
+            rel_tile_final = self.directed_tile_to_relative_bundle_tile(dtile_final)
+            length_diff = rel_tile_final[1] - rel_tile_start[1]
+            width_diff = abs(rel_tile_final[0]- rel_tile_start[0])
+            return length_diff > width_diff
+
+    def directed_tile_to_turns(self, directed_tile):
+        turns = []
+        bundle = self.directed_tile_to_bundle(directed_tile[0], directed_tile[1])
+
         for turn in self.right_turn_tiles[bundle]:
-            turn_tile, _ = turn
-            rel_turn_tile = bundle.tile_to_relative_position(turn_tile)
-            length_diff = rel_turn_tile[1] - rel_tile[1]
-            width_diff = abs(rel_turn_tile[0]- rel_tile[0])
-            if length_diff < width_diff:
-                st()
+            if self.check_directed_tile_reachability(directed_tile, turn):
+                turns.append(turn)
 
         for turn in self.left_turn_tiles[bundle]:
-            turn_tile, _ = turn
-            rel_turn_tile = bundle.tile_to_relative_position(turn_tile)
-            width_diff = abs(rel_turn_tile[0]- rel_tile[0])
-            length_diff = rel_turn_tile[1] - rel_tile[1]
-            width_diff = abs(rel_tile[0] - rel_turn_tile[0])
-            if length_diff < width_diff:
-                st()
-
+            if self.check_directed_tile_reachability(directed_tile, turn):
+                turns.append(turn)
+        return turns
 
     def get_bundle_graph(self):
         '''
@@ -1052,21 +1080,19 @@ class Map:
         bundle_graph = nx.DiGraph()
         for bundle in self.right_turn_tiles:
             for from_tile in self.right_turn_tiles[bundle]:
-                from_xy, from_direction = from_tile
-                from_bundle = self.directed_tile_to_bundle(from_xy, from_direction)
                 to_tile = self.right_turn_tiles[bundle][from_tile]
-                to_xy, to_direction = to_tile
-                to_bundle = self.directed_tile_to_bundle(to_xy, to_direction)
-                bundle_graph.add_edge(from_bundle, to_bundle, via=[from_tile, to_tile])
+                bundle_graph.add_edge(from_tile, to_tile)
+                turns = self.directed_tile_to_turns(to_tile)
+                for turn in turns:
+                    bundle_graph.add_edge(to_tile, turn)
 
         for bundle in self.left_turn_tiles:
             for from_tile in self.left_turn_tiles[bundle]:
-                from_xy, from_direction = from_tile
-                from_bundle = self.directed_tile_to_bundle(from_xy, from_direction)
                 to_tile = self.left_turn_tiles[bundle][from_tile]
-                to_xy, to_direction = to_tile
-                to_bundle = self.directed_tile_to_bundle(to_xy, to_direction)
-                bundle_graph.add_edge(from_bundle, to_bundle, via=[from_tile, to_tile])
+                bundle_graph.add_edge(from_tile, to_tile)
+                turns = self.directed_tile_to_turns(to_tile)
+                for turn in turns:
+                    bundle_graph.add_edge(to_tile, turn)
 
         return bundle_graph
 
