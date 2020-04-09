@@ -875,22 +875,20 @@ class Game:
         agents = []
         # save all the agent states
         for agent in self.agent_set:
+            agent_param = {"v_min":agent.v_min, "v_max":agent.v_max, "a_min":agent.a_min, "a_max":agent.a_max}
             agents.append((agent.state.x, agent.state.y, \
-                agent.state.heading, agent.agent_color, agent.get_bubble(), agent.supervisor.goals))
+                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble(), agent.supervisor.goals, agent_param))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_hstate()[0], traffic_light.htimer))
+                lights.append((x, y, traffic_light.get_hstate()[0], traffic_light.htimer, traffic_light.durations))
             for tile in traffic_light.vtiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer)) 
-        # save agent and traffic light parameters
-        agent_param = {}
-        if self.agent_set: 
-            agent_param = {"v_min": self.agent_set[0].v_min, "v_max": self.agent_set[0].v_max, "a_min":self.agent_set[0].a_min, "a_max":self.agent_set[0].a_max}
+                lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer, traffic_light.durations)) 
+
         # return dict with all the info
-        return {"lights": lights, "agents": agents, "agent_param": agent_param, "light_param": traffic_light.durations}
+        return {"lights": lights, "agents": agents}
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
             traces.update(new_entry)
@@ -1822,6 +1820,9 @@ class TrafficLight:
             self.hstate = next(self.states)
         self.htiles = htiles
         self.vtiles = vtiles
+    
+    def get_id(self):
+        return id(self)
 
     def check_light_N_turns_from_now(self, N):
         dummy_traffic_light = cp.deepcopy(self)
@@ -1976,16 +1977,69 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     print("starting")
     game.play(outfile=output_filename, t_end=1)
 
-# restart scenario from saved traces at given t_index
-def start_game_from_trace(filename, t_index):
-    def get_traffic_light_from_xy():
-        pass
 
+def make_game_from_traces(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
 
-    the_map = Map()
+    map_name = traces['map_name']
+    the_map = Map(map_name, default_spawn_probability=0.05)
+    return Game(game_map=the_map)
 
+# restart scenario from saved traces at given t_index
+def start_game_from_trace(game, filename, t_index):
+    # make a car from trace
+    # car_trace = (x, y, heading, v, agent_color, bubble, goals, param)
+    def make_car(game, car_trace):
+        x, y, heading, v, agent_color, bubble, goal, param = car_trace
+        ss = get_default_car_ss()
+        spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
+        end = goal
+        car = Car(x=x,y=y,heading=heading,v=v,v_min=param['v_min'],v_max=param['v_max'], a_min=param['a_min'],a_max=param['a_max'])
+        car.set_controller(spec_struct_controller)
+        supervisor = GoalExit(game=game, goals=[end])
+        car.set_supervisor(supervisor)
+        return car
+
+    # traffic light trace (x, y, state, traffic_light.htimer, traffic_light.durations)
+    def get_traffic_light_from_xy(the_map, xy):
+        # if traffic light has tile with xy position
+        for traffic_light in the_map.traffic_lights:
+            for tile in traffic_light.htiles:
+                if xy == tile.xy: return traffic_light
+            for tile in traffic_light.vtiles:
+                if xy == tile.xy: return traffic_light
+        return None
+
+    # load the file 
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+
+    traffic_light_traces = traces[t_index]['lights']
+    agent_traces = traces[t_index]['agents']
+
+    #map_name = traces['map_name']
+    #the_map = Map(map_name, default_spawn_probability=0.05)
+    #game = Game(game_map=the_map)
+
+    # reset all the traffic lights according to traces
+    traffic_light_reset_dict = {traffic_light.get_id(): False for traffic_light in the_map.traffic_lights}
+    for traffic_light_node in traffic_light_traces:
+        x, y, state, htimer, durations = traffic_light_node
+        traffic_light = get_traffic_light_from_xy(the_map, (x,y))
+
+        # set traffic lights that haven't been set yet
+        if not traffic_light_reset_dict[traffic_light.get_id()]:
+            #traffic_light.set_traffic_light(traffic_light_node)
+            traffic_light_reset_dict[traffic_light.get_id()] = True
+
+    # intialize all the cars according to traces
+    for agent_trace in agent_traces:
+        ag = make_car(game, agent_trace)
+        game.add_agent(ag)
+
+    # start the game
+    game.play(t_end=10)
     pass
 
 
@@ -1993,8 +2047,8 @@ if __name__ == '__main__':
     the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
     output_filename = '/game.p'
 
-    game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=10)
+    #game = QuasiSimultaneousGame(game_map=the_map)
+    #game.play(outfile=output_filename, t_end=10)
 #    game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
@@ -2011,3 +2065,9 @@ if __name__ == '__main__':
     #game = Game(game_map=the_map)
     #num_agents = 5
     #play_fixed_agent_game_karena_debug(num_agents, game)
+
+
+    # testing the setting up a scenario from a certain state code
+    traces_file = os.getcwd()+'/saved_traces'+output_filename
+    game = make_game_from_traces(traces_file)
+    start_game_from_trace(game, traces_file, 5)

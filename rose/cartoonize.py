@@ -89,10 +89,10 @@ def plot_map(map):
 
 def draw_car(agent_state_tuple):
     # global params
-    x, y, theta, color, bubble, goals = agent_state_tuple
+    x, y, theta, v, color, bubble, goals, param = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
-    car_fig = car_fig.rotate(theta_d, expand = False)
+    car_fig = car_fig.rotate(theta_d, expand=False)
     ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y, y+1, x, x+1])
 
     for grid in bubble:
