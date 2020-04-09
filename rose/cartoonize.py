@@ -16,16 +16,18 @@ for color in car_colors:
 
 
 # animate the files completely
-def traces_to_animation(the_map, filename):
+def traces_to_animation(filename):
     # extract out traces from pickle file
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
 
+    the_map = Map(traces['map_name'])
     global ax
     fig, ax = plt.subplots()
 
+    t_end = len(traces.keys())-1
     # plot out agents and traffic lights
-    for t in range(max(traces.keys())+1): 
+    for t in range(t_end): 
         print(t)
         ax.cla()
         agents = traces[t]['agents']
@@ -87,7 +89,7 @@ def plot_map(map):
 
 def draw_car(agent_state_tuple):
     # global params
-    x, y, theta, color, bubble = agent_state_tuple
+    x, y, theta, color, bubble, goals = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
     car_fig = car_fig.rotate(theta_d, expand = False)
@@ -148,12 +150,5 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-    #the_map = Map('map5', default_spawn_probability=0.05)
-    output_filename = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(the_map, output_filename)
-
-    #filename = os.getcwd()+'/saved_bubbles/v_n0_2_a_n2_2.p'
-    #with open(filename, 'rb') as pckl_file:
-    #    data = pickle.load(pckl_file)
-    #plot_bubble(data[0])
+    traces_file = os.getcwd()+'/saved_traces/game.p'
+    traces_to_animation(traces_file)

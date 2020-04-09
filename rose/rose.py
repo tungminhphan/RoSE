@@ -429,7 +429,7 @@ class Car(Agent):
                 return "receiver"
             if len(self.send_conflict_requests_to) > 0:
                 return "sender"
-            if not self.received_conflict_requests_from and not self.send_conflict_requests_to: 
+            else:
                 return "none"
 
         # figure out whether intended action conflicts with agents that have
@@ -446,18 +446,10 @@ class Car(Agent):
                 if occupancy_overlap or not safe_config: 
                     return False
             return True
-        
-        # if winner and assuming that losing agents yield maximally, is action safe? 
-        def check_conflict_cluster_yield():
-            # for each agent that winner sent out conflict request to, is yield max action safe? 
-            for agent in self.conflict_requests_sent_to:
-                chk_valid = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
-                if not chk_valid: return False
-            return True
 
         # TODO: need to change assuming other agent has already gone
         # check max amount another agent needs to yield for another agent to change lanes
-        def check_min_dec_yield_req(winning_agent):
+        def check_max_dec_yield_req(winning_agent):
             # if agent is receiver of winning agent's request, need to determine how much to yield 
             # to that agent, so keep on reducing acceleration until it is safe
             ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
@@ -471,19 +463,6 @@ class Car(Agent):
 
             print("Warning: max deceleration of agent not enough!")
             return self.get_backup_plan_ctrl()
-
-        '''# check farthest straight agent can go forward (assuming agent in front already took its turn)
-        def max_forward_ctrl():
-            lead_agent = self.find_lead_agent()
-            x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-            # try all acceleration values
-            ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
-            for acc_val in ctrl_acc:
-                ctrl = {'acceleration': acc_val, 'steer':'straight'}
-                next_st = self.query_occupancy(ctrl)[-1]
-                safe_chk = self.check_safe_config(self, lead_agent, st_1=next_st, st_2=lead_agent.state)
-                if safe_chk: return ctrl
-            return self.get_backup_plan_ctrl(self, self.state)'''
         
         # check whether received request from winning agent 
         def chk_receive_request_from_winning_agent(winning_agent):
@@ -503,36 +482,51 @@ class Car(Agent):
         # list of all possible scenarios and what action to take
         if agent_type is None and bubble_chk:
             # take intended action (all checks pass)
+            ctrl = self.intention
+            self.token_count = 0 
             pass
         elif agent_type is None and not bubble_chk:
             # take straight action, best safe one that aligns with intention
+            self.token_count = self.token_count+1
             pass
         elif agent_type is 'sender' and bubble_chk and not cluster_chk:
             # take straight action, best safe one that aligns with intention
+            self.token_count = self.token_count+1
             pass
         elif agent_type is 'sender' and bubble_chk and cluster_chk:
             # take intended action as long as it safe w.r.t. agents behind in precedence too
+            ctrl = self.intention
+            self.token_count = 0 
             pass
         elif agent_type is 'sender' and not bubble_chk and not cluster_chk:
             # take straight action, best safe one that aligns with intention
+            self.token_count = self.token_count+1
             pass
         elif agent_type is 'sender' and not bubble_chk and cluster_chk:
             # take straight action, best safe one that aligns with intention
+            self.token_count = self.token_count+1
             pass
-        elif agent_type is 'receiver' and bubble_chk and not cluster_chk:
+        elif agent_type is 'receiver' or agent_type and bubble_chk and not cluster_chk:
             # yield as much as needed for conflict winner to move
+            ctrl = self.check_max_dec_yield_req(winning_agent)
+            self.token_count = self.token_count+1
             pass
         elif agent_type is 'receiver' and bubble_chk and cluster_chk:
-            # take intended action as long as safe w.r.t. agents behind in precedence too
+            # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
+            ctrl = self.intention
+            self.token_count = 0 
             pass
         elif agent_type is 'receiver' and not bubble_chk and not cluster_chk:
             # yield as much as needed for conflict winner to move
+            ctrl = self.check_max_dec_yield_req(winning_agent)
+            self.token_count = self.token_count+1
             pass
         elif agent_type is 'receiver' and not bubble_chk and cluster_chk:
             # take straight action, best safe one that aligns with intention
+            self.token_count = self.token_count+1
             pass
         else: 
-            print("Invalid combination of inputs to action selection strategy")
+            print("Error: invalid combination of inputs to action selection strategy!")
 
     #=== methods for car bubble =======================================#
     # get agent bubble (list of grid points)
@@ -656,7 +650,7 @@ class Car(Agent):
     
     def get_backup_plan_ctrl(self, state=None):
         if state is None: state = self.state
-        acc = agent.a_min if state.v+agent.a_min > 0 else -state.v 
+        acc = self.a_min if state.v+self.a_min > 0 else -state.v 
         return {'acceleration':acc, 'steer':'straight'}
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
@@ -882,16 +876,21 @@ class Game:
         # save all the agent states
         for agent in self.agent_set:
             agents.append((agent.state.x, agent.state.y, \
-                agent.state.heading, agent.agent_color, agent.get_bubble()))
+                agent.state.heading, agent.agent_color, agent.get_bubble(), agent.supervisor.goals))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_hstate()[0]))
+                lights.append((x, y, traffic_light.get_hstate()[0], traffic_light.htimer))
             for tile in traffic_light.vtiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_vstate()[0]))
-        return {"lights": lights, "agents": agents}
+                lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer)) 
+        # save agent and traffic light parameters
+        agent_param = {}
+        if self.agent_set: 
+            agent_param = {"v_min": self.agent_set[0].v_min, "v_max": self.agent_set[0].v_max, "a_min":self.agent_set[0].a_min, "a_max":self.agent_set[0].a_max}
+        # return dict with all the info
+        return {"lights": lights, "agents": agents, "agent_param": agent_param, "light_param": traffic_light.durations}
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
             traces.update(new_entry)
@@ -1024,7 +1023,8 @@ class Game:
             if write_bool:
                 snapshot = self.save_snapshot()
                 traces[self.time] = snapshot
-            self.check_conflict_requests_karena_debug()
+                traces["map_name"] = self.map.map_name 
+            #self.check_conflict_requests_karena_debug()
 
             self.play_step()
             game.time_forward()
@@ -1139,6 +1139,7 @@ def append_or_create_new_list(dictionary, key, item):
 
 class Map:
     def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=False):
+        self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
         self.drivable_nodes = list(self.grid.keys())
@@ -1975,12 +1976,25 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     print("starting")
     game.play(outfile=output_filename, t_end=1)
 
-if __name__ == '__main__':
-    the_map = Map('./maps/straight_road', default_spawn_probability=0)
-    output_filename = 'game.p'
+# restart scenario from saved traces at given t_index
+def start_game_from_trace(filename, t_index):
+    def get_traffic_light_from_xy():
+        pass
 
-    #game = QuasiSimultaneousGame(game_map=the_map)
-    #game.play(outfile=output_filename, t_end=100)
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+
+    the_map = Map()
+
+    pass
+
+
+if __name__ == '__main__':
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
+    output_filename = '/game.p'
+
+    game = QuasiSimultaneousGame(game_map=the_map)
+    game.play(outfile=output_filename, t_end=10)
 #    game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
@@ -1994,6 +2008,6 @@ if __name__ == '__main__':
     #        plant.supervisor.game.update_occupancy_dict()
     #    return world_changing_function
 
-    game = Game(game_map=the_map)
-    num_agents = 5
-    play_fixed_agent_game_karena_debug(num_agents, game)
+    #game = Game(game_map=the_map)
+    #num_agents = 5
+    #play_fixed_agent_game_karena_debug(num_agents, game)
