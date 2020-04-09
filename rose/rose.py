@@ -589,7 +589,6 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
-        #st()
         return list(set(bubble))
 
     # compute number of tiles when applying brakes maximally
@@ -962,6 +961,11 @@ class Bundle:
         tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         return self.tube_list.index(tile[tube_idx])
 
+    def tile_to_relative_position(self, tile):
+        width = self.tile_to_relative_width(tile)
+        length = self.tile_to_relative_length(tile)
+        return width, length
+
     def is_leftmost_lane(self, tile):
         return self.tile_to_relative_width(tile) == self.width - 1
 
@@ -1014,28 +1018,58 @@ class Map:
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
-        st()
+        self.bundle_graph = self.get_bundle_graph()
+        self.directed_tile_to_turns((23,9), 'east')
 
-#    def check_if_right_turn_tile(self, tile):
-#        legal_orientations = self.legal_orientations[tile]
-#        if len(legal_orientations) > 1:
-#            return False
-#        else:
-#            direction = legal_orientations[0]
-#            direction_degrees = Car.convert_orientation(direction)
-#            next_direction_degrees = (direction_degrees - 90)%360
-#            next_direction = Car.convert_orientation(next_direction_degrees)
-#            forward = DIRECTION_TO_VECTOR[direction]
-#            right = rotate_vector(forward, -np.pi/2)
-#            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
-#            if not (next_tile in self.legal_orientations):
-#                return False
-#            else:
-#                next_legal_orientations = self.legal_orientations[next_tile]
-#                if next_legal_orientations is None or len(legal_orientations) > 1:
-#                    return False
-#                else:
-#                    return next_legal_orientations[0] == next_direction
+
+    def directed_tile_to_turns(self, tile, direction):
+        directed_tile = (tile, direction)
+        bundle = self.directed_tile_to_bundle(tile, direction)
+        rel_tile = bundle.tile_to_relative_position(tile)
+        for turn in self.right_turn_tiles[bundle]:
+            turn_tile, _ = turn
+            rel_turn_tile = bundle.tile_to_relative_position(turn_tile)
+            length_diff = rel_turn_tile[1] - rel_tile[1]
+            width_diff = abs(rel_turn_tile[0]- rel_tile[0])
+            if length_diff < width_diff:
+                st()
+
+        for turn in self.left_turn_tiles[bundle]:
+            turn_tile, _ = turn
+            rel_turn_tile = bundle.tile_to_relative_position(turn_tile)
+            width_diff = abs(rel_turn_tile[0]- rel_tile[0])
+            length_diff = rel_turn_tile[1] - rel_tile[1]
+            width_diff = abs(rel_tile[0] - rel_turn_tile[0])
+            if length_diff < width_diff:
+                st()
+
+
+    def get_bundle_graph(self):
+        '''
+        constructs bundle graph
+
+        '''
+        bundle_graph = nx.DiGraph()
+        for bundle in self.right_turn_tiles:
+            for from_tile in self.right_turn_tiles[bundle]:
+                from_xy, from_direction = from_tile
+                from_bundle = self.directed_tile_to_bundle(from_xy, from_direction)
+                to_tile = self.right_turn_tiles[bundle][from_tile]
+                to_xy, to_direction = to_tile
+                to_bundle = self.directed_tile_to_bundle(to_xy, to_direction)
+                bundle_graph.add_edge(from_bundle, to_bundle, via=[from_tile, to_tile])
+
+        for bundle in self.left_turn_tiles:
+            for from_tile in self.left_turn_tiles[bundle]:
+                from_xy, from_direction = from_tile
+                from_bundle = self.directed_tile_to_bundle(from_xy, from_direction)
+                to_tile = self.left_turn_tiles[bundle][from_tile]
+                to_xy, to_direction = to_tile
+                to_bundle = self.directed_tile_to_bundle(to_xy, to_direction)
+                bundle_graph.add_edge(from_bundle, to_bundle, via=[from_tile, to_tile])
+
+        return bundle_graph
+
     def check_if_right_turn_tile(self, tile, direction):
         assert direction in self.legal_orientations[tile]
         direction_degrees = Car.convert_orientation(direction)
@@ -1068,24 +1102,26 @@ class Map:
     def find_right_turn_tiles(self):
         right_turn_tiles = dict()
         for bundle in self.bundles:
+            right_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
                 check, nxt = self.check_if_right_turn_tile(tile, direction)
                 if check:
-                    right_turn_tiles[(tile, direction)] = nxt
+                    right_turn_tiles[bundle][(tile, direction)] = nxt
         return right_turn_tiles
 
     # assuming agents can only legally make a left turn from the leftmost lane into leftmost lane
     def find_left_turn_tiles(self):
         left_turn_tiles = dict()
         for bundle in self.bundles:
+            left_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((bundle.width-1, idx))
                 check, nxt = self.check_if_left_turn_tile(tile, direction)
                 if check:
-                    left_turn_tiles[(tile, direction)] = nxt
+                    left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
