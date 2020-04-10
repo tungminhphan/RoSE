@@ -176,6 +176,7 @@ class Agent:
         # check for collision with any of the other agents
         collision_chk = self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
+        self.supervisor.game.update_occupancy_dict()
         # check whether the updated joint state is safe
         joint_state_safety_chk = self.check_joint_state_safety()
         #print(not collision_chk, joint_state_safety_chk)
@@ -224,7 +225,7 @@ class Car(Agent):
         # TODO: change intention usingg intention generator
         #actions = [{"acceleration": 1, "steer": 'left-lane'}, {"acceleration":1, "steer":'right-lane'}, {'acceleration':0, 'steer':'left-lane'}, 
         #{'acceleration':0, 'steer':'right-lane'}, {'acceleration':1, 'steer':'straight'}]
-        self.intention = None
+        self.intention = {'acceleration':1, 'steer':'straight'}
         self.send_conflict_requests_to = [] # list of agents
         self.received_conflict_requests_from = [] # list of agents
         self.agent_max_braking_not_enough = None
@@ -2324,18 +2325,8 @@ class QuasiSimultaneousGame(Game):
     def resolve_precedence(self):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
-    # choose a random valid intention for each agent
-    def set_random_agent_intentions(self):
-        for agent in self.agent_set:
-            all_ctrl = agent.get_all_ctrl(state=agent.state)
-            if  random.uniform(0,1) < 0.95:
-                agent.intention = agent.get_max_forward_ctrl()
-            else: 
-                agent.intention = random.choice(all_ctrl)
-
     def sys_step(self):
-        # set agent intentions
-        self.set_random_agent_intentions()
+
         # call resolve_conflicts
         self.send_and_receive_conflict_requests()
         self.resolve_precedence()
@@ -2434,12 +2425,12 @@ class IntentionProposer:
         pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
+    the_map = Map('./maps/straight_road_short', default_spawn_probability=0.1)
 #    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=50)
     #game.animate(frequency=0.01)
 
 
