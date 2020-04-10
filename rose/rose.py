@@ -29,7 +29,6 @@ Intersection = namedtuple('Intersection', ['tiles', 'pcorner', 'mcorner', 'heigh
 Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
 DIRECTION_TO_VECTOR = {'east': [0,1], 'west': [0,-1], 'north': [-1,0], 'south': [1,0]}
 
-
 def rotate_vector(vec, theta):
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
@@ -1089,12 +1088,29 @@ class Map:
         for bundle in self.left_turn_tiles:
             for from_tile in self.left_turn_tiles[bundle]:
                 to_tile = self.left_turn_tiles[bundle][from_tile]
-                bundle_graph.add_edge(from_tile, to_tile)
+
+                precrossing_tile = self.get_precrossing_left_turn_tile(from_tile)
+                if precrossing_tile:
+                    bundle_graph.add_edge((precrossing_tile, from_tile), to_tile)
+                else:
+                    bundle_graph.add_edge(from_tile, to_tile)
                 turns = self.directed_tile_to_turns(to_tile)
                 for turn in turns:
                     bundle_graph.add_edge(to_tile, turn)
 
         return bundle_graph
+
+    def get_precrossing_left_turn_tile(self, left_turn_tile):
+        tile_xy, tile_direction = left_turn_tile
+        backward = -np.array(DIRECTION_TO_VECTOR[tile_direction])
+        new_tile = tuple(np.array(tile_xy)+backward)
+        while True:
+            if new_tile not in self.legal_orientations or self.legal_orientations[new_tile] is None:
+                return None
+            elif len(self.legal_orientations[new_tile]) > 1:
+                new_tile = tuple(np.array(new_tile)+backward)
+            else:
+                return new_tile, tile_direction
 
     def check_if_right_turn_tile(self, tile, direction):
         assert direction in self.legal_orientations[tile]
