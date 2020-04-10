@@ -1019,7 +1019,7 @@ class Map:
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.bundle_graph = self.get_bundle_graph()
 #        self.directed_tile_to_turns(((23,9), 'east'))
-#        self.get_bundle_plan(((23,9), 'east'), ((49, 88), 'north'))
+#        print(self.get_bundle_plan(((23,9), 'east'), ((49, 88), 'north')))
 
     def get_bundle_plan(self, source, sink):
         planning_graph = self.bundle_graph.copy()
@@ -1047,6 +1047,11 @@ class Map:
         return rel_tile
 
     def check_directed_tile_reachability(self, dtile_start, dtile_final):
+        if not isinstance(dtile_start[1], str):
+            dtile_start = dtile_start[1]
+        if not isinstance(dtile_final[1], str):
+            dtile_final = dtile_final[0]
+
         bundle_start = self.directed_tile_to_bundle(dtile_start[0], dtile_start[1])
         bundle_final = self.directed_tile_to_bundle(dtile_final[0], dtile_final[1])
         if bundle_start != bundle_final:
@@ -1067,8 +1072,14 @@ class Map:
                 turns.append(turn)
 
         for turn in self.left_turn_tiles[bundle]:
-            if self.check_directed_tile_reachability(directed_tile, turn):
-                turns.append(turn)
+            precrossing_tile = self.get_precrossing_left_turn_tile(turn)
+            if precrossing_tile is None:
+                turn_node = turn
+                precrossing_tile = turn_node
+            else:
+                turn_node = (precrossing_tile, turn)
+            if self.check_directed_tile_reachability(directed_tile, precrossing_tile):
+                turns.append(turn_node)
         return turns
 
     def get_bundle_graph(self):
@@ -1167,7 +1178,7 @@ class Map:
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
-        assert tile in self.tile_to_bundle_map
+        assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
         bundles = self.tile_to_bundle_map[tile]
         if heading is None:
             assert len(bundles) == 1
