@@ -121,6 +121,7 @@ class Agent:
 
     def run(self):
         assert self.controller, "Agent has no controller"
+        self.set_intention()
         self.controller.run_on(self)
         if self.supervisor:
             self.supervisor.run()
@@ -188,14 +189,32 @@ class Car(Agent):
         # attributes relating to conflict stuff
         # TODO: change intention usingg intention generator
         actions = [{"acceleration": 0, "steer": 'right-lane'}, {"acceleration": 0, "steer":'straight'}, {'acceleration':0, 'steer':'left-lane'}]
-        self.intention = random.choice(actions)
         self.send_conflict_requests_to = [] # list of agents
         self.received_conflict_requests_from = [] # list of agents
         self.token_count = 0
+        self.intention = None
 
-    def set_intention(self, action):
-        self.intention = action
-    
+    def get_intention(self):
+        return self.intention
+
+    # only works when used with specification structure controller
+    def set_intention(self):
+        scores = []
+        all_ctrls = self.get_all_ctrl()
+        for ctrl in all_ctrls:
+            score = 0
+            for oracle in self.controller.specification_structure.oracle_set:
+                o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
+                o_tier = self.controller.specification_structure.tier[oracle]
+                try:
+                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                except:
+                    pass
+            scores.append(score)
+
+        choice = random.choice(np.where(scores == np.max(scores))[0])
+        self.intention = all_ctrls[choice]
+
     def set_token_count(self, cnt):
         self.token_count = cnt
 
@@ -203,7 +222,7 @@ class Car(Agent):
     def reset_conflict_lists(self):
         self.send_conflict_reqeusts_to = []
         self.received_conflict_requests_from = []
-    
+
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self):
         # collect all agents in send and receive requests and find the winner
@@ -1137,7 +1156,10 @@ class Map:
             return False, None
 
     def check_if_left_turn_tile(self, tile, direction):
-        assert direction in self.legal_orientations[tile]
+        try:
+            assert direction in self.legal_orientations[tile]
+        except:
+            return False, None
         direction_degrees = Car.convert_orientation(direction)
         next_direction_degrees = (direction_degrees + 90)%360
         next_direction = Car.convert_orientation(next_direction_degrees)
@@ -1766,23 +1788,8 @@ class SpecificationStructureController(Controller):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
     def run_on(self, plant):
-        #print("choosing action for agent " + str(plant.state.__tuple__()))
-        #print(plant.supervisor.game.occupancy_dict.keys())
-        scores = []
-        all_ctrls = plant.get_all_ctrl()
-        for ctrl in all_ctrls:
-            score = 0
-            for oracle in self.specification_structure.oracle_set:
-                o_score = oracle.evaluate(ctrl, plant, self.game)
-                o_tier = self.specification_structure.tier[oracle]
-                try:
-                    score += int(o_score) * self.specification_structure.tier_weights[o_tier]
-                except:
-                    pass
-            scores.append(score)
-
-        choice = random.choice(np.where(scores == np.max(scores))[0])
-        plant.apply(all_ctrls[choice])
+        choice = plant.get_intention()
+        plant.apply(choice)
 
 class SupervisoryController():
     def _init__(self):
@@ -2079,18 +2086,15 @@ class QuasiSimultaneousGame(Game):
         self.sys_step()
         self.env_step()
 
-class IntentionProposer:
-    def __init__(self):
-        pass
-
 if __name__ == '__main__':
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
+#    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
 #    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
 #    game.play(outfile=output_filename, t_end=100)
-    game.animate(frequency=0.01)
+    game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
     #num_agents = 5
