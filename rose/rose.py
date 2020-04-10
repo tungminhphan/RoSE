@@ -796,17 +796,16 @@ class Game:
                     else:
                         draw_str = self.map.grid[node]
                     artist.draw(node_x, node_y, draw_str)
+
                 for traffic_light in self.map.traffic_lights:
-                    traffic_light.run()
                     drawables = traffic_light.get_drawables()
                     for drawable in drawables:
                         x, y = drawable.xy
                         artist.draw(x, y, drawable.drawstr)
-                self.spawn_agents()
+
                 for agent in self.agent_set:
-                    agent.run()
                     artist.draw(agent.state.x, agent.state.y, agent.get_symbol())
-                artist.enable_window_moving()
+
                 stdscr.clear()
                 # update states
                 self.play_step()
@@ -1991,12 +1990,12 @@ class QuasiSimultaneousGame(Game):
 
 if __name__ == '__main__':
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.001)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.001)
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
 #    game.play(outfile=output_filename, t_end=100)
-    game.animate(frequency=0.1)
+    game.animate(frequency=0.01)
 
     #game = Game(game_map=the_map)
     #num_agents = 5
