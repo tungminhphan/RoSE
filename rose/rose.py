@@ -548,8 +548,8 @@ class Car(Agent):
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
         # print all flags for debugging
-        print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
+        #print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
+        #print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
 
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
@@ -2425,12 +2425,12 @@ class IntentionProposer:
         pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/straight_road_short', default_spawn_probability=0.1)
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.1)
 #    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
 
