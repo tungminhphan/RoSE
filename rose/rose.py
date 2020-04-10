@@ -147,6 +147,8 @@ class Agent:
     def apply(self, ctrl):
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # check for collision
+        # check for safe configuration
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -670,12 +672,12 @@ class Car(Agent):
             return not chk_valid_actions
         
         # check whether your action requires other agent to do something other than would it might want? 
-        def intention_forward_action_conflict(agent):
-            forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
-            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
-            return not chk_valid_actions
+        #def intention_forward_action_conflict(agent):
+        #    forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
+        #    chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
+        #    return not chk_valid_actions
 
-        return intentions_conflict(agent) or intention_forward_action_conflict(agent)
+        return intentions_conflict(agent) #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
     def get_default_bubble(self, vel):
@@ -1030,7 +1032,7 @@ class Game:
                 traces[self.time] = snapshot
                 traces["map_name"] = self.map.map_name 
                 traces["spawn_probability"] = self.map.default_spawn_probability
-            self.check_conflict_requests_karena_debug()
+            #self.check_conflict_requests_karena_debug()
 
             self.play_step()
             self.time_forward()
@@ -1710,6 +1712,7 @@ class SpecificationStructureController(Controller):
                     pass
             scores.append(score)
 
+        # action selection strategy action
         choice = random.choice(np.where(scores == np.max(scores))[0])
         plant.apply(all_ctrls[choice])
 
@@ -1952,6 +1955,9 @@ class QuasiSimultaneousGame(Game):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
     def sys_step(self):
+        # set agent intentions
+        # call resolve_conflicts
+        self.send_and_receive_conflict_requests()
         self.resolve_precedence()
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
@@ -2047,13 +2053,13 @@ if __name__ == '__main__':
     the_map = Map('./maps/straight_road', default_spawn_probability=0.05)
     output_filename = '/game.p'
 
-    #game = QuasiSimultaneousGame(game_map=the_map)
-    #game.play(outfile=output_filename, t_end=10)
-#    game.animate(frequency=0.1)
+    game = QuasiSimultaneousGame(game_map=the_map)
+    game.play(outfile=output_filename, t_end=10)
+    #game.animate(frequency=0.1)
 
-    game = Game(game_map=the_map)
-    num_agents = 5
-    play_fixed_agent_game_karena_debug(num_agents, game)
+    #game = Game(game_map=the_map)
+    #num_agents = 5
+    #play_fixed_agent_game_karena_debug(num_agents, game)
 
     #def world_changer(func):
     #    def world_changing_function(*args, **kwargs):
