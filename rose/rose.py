@@ -1599,9 +1599,12 @@ class BundleProgressOracle(Oracle):
             last_state = tile_sequence_chain[-1][-1][-1]
             backup_xy = last_state
             backup_dir = state.heading
-            return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
+            try:
+                return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
+            except:
+                return False
 
-        current_subgoal = plant.supervisor.current_plan[1]
+        current_subgoal = plant.supervisor.subgoals[0]
         if not isinstance(current_subgoal[1], str):
             current_subgoal = current_subgoal[0]
         subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
@@ -1854,13 +1857,25 @@ class BundleGoalExit(SupervisoryController):
         source = ((self.plant.state.x, self.plant.state.y), self.plant.state.heading)
         target = ((next_goal[0], next_goal[1]), next_goal[2])
         next_plan = self.game.map.get_bundle_plan(source, target)
+        self.subgoals = self.get_subgoals(next_plan)
         return next_goal, next_plan
 
+    def get_subgoals(self, plan):
+        subgoals = []
+        for node in plan:
+            if isinstance(node[1], str):
+                subgoals.append(node)
+            else:
+                for subnode in node:
+                    subgoals.append(subnode)
+        subgoals = subgoals[1:] # remove first node
+        return subgoals
+
+
     def check_subgoals(self):
-        return True
-#        if self.subgoals is None:
-#            st()
-#            print(self.current_plan)
+        if self.plant:
+            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0:
+                self.subgoals = self.subgoals[1:]
 
     def check_goals(self):
         self.check_subgoals()
