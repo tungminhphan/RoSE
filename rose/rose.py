@@ -2084,7 +2084,7 @@ class IntentionProposer:
         pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
 #    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
