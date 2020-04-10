@@ -1060,7 +1060,7 @@ class Map:
             rel_tile_final = self.directed_tile_to_relative_bundle_tile(dtile_final)
             length_diff = rel_tile_final[1] - rel_tile_start[1]
             width_diff = abs(rel_tile_final[0]- rel_tile_start[0])
-            return length_diff > width_diff
+            return length_diff >= width_diff
 
     def directed_tile_to_turns(self, directed_tile):
         turns = []
@@ -1596,8 +1596,8 @@ class BundleProgressOracle(Oracle):
     def evaluate(self, ctrl_action, plant, game):
         def backup_plan_is_ok_from_state(state, current_subgoal):
             tile_sequence_chain = plant.query_backup_plan(state=state)
-            last_state = tile_sequence_chain[-1][-1][-1]
-            backup_xy = last_state
+            last_xy = tile_sequence_chain[-1][-1][-1]
+            backup_xy = last_xy
             backup_dir = state.heading
             try:
                 return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
@@ -1605,8 +1605,6 @@ class BundleProgressOracle(Oracle):
                 return False
 
         current_subgoal = plant.supervisor.subgoals[0]
-        if not isinstance(current_subgoal[1], str):
-            current_subgoal = current_subgoal[0]
         subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
 
         current_xy = plant.state.x, plant.state.y
@@ -1622,7 +1620,10 @@ class BundleProgressOracle(Oracle):
         except:
             return False
 
-        if queried_bundle == subgoal_bundle:
+        if current_bundle != subgoal_bundle:
+            backup_plan_ok = backup_plan_is_ok_from_state(queried_state, current_subgoal)
+            return (queried_xy, queried_dir) == current_subgoal and backup_plan_ok
+        elif queried_bundle == subgoal_bundle:
             rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
             rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
             rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
@@ -1644,7 +1645,8 @@ class BundleProgressOracle(Oracle):
             maintains = latt_maintains and long_maintains
 
             backup_plan_ok = backup_plan_is_ok_from_state(queried_state, current_subgoal)
-            return improves and maintains and backup_plan_ok
+            progress_up = improves and maintains and backup_plan_ok
+            return progress_up
         else:
             return False
 
@@ -1874,7 +1876,7 @@ class BundleGoalExit(SupervisoryController):
 
     def check_subgoals(self):
         if self.plant:
-            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0:
+            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.subgoals[0][0][0], self.subgoals[0][0][1]]))) == 0:
                 self.subgoals = self.subgoals[1:]
 
     def check_goals(self):
@@ -2005,7 +2007,7 @@ def get_default_car_ss():
     legal_orientation_oracle = LegalOrientationOracle()
     progress_oracle = BundleProgressOracle()
     oracle_set = [static_obstacle_oracle, traffic_light_oracle, legal_orientation_oracle, progress_oracle, backup_plan_safety_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 1, 2, 3, 1])
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 1])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -2034,7 +2036,10 @@ class QuasiSimultaneousGame(Game):
             bundle_to_agent_precedence[bundle] = dict()
         for agent in self.agent_set:
             x, y, heading = agent.state.x, agent.state.y, agent.state.heading
-            bundles = self.map.tile_to_bundle_map[(x,y)]
+            try:
+                bundles = self.map.tile_to_bundle_map[(x,y)]
+            except:
+                bundles = []
             for bundle in bundles:
                 if bundle.direction == heading:
                     longitudinal_precedence = bundle.tile_to_relative_length((x,y))
@@ -2079,8 +2084,8 @@ class IntentionProposer:
         pass
 
 if __name__ == '__main__':
-#    the_map = Map('./maps/straight_road', default_spawn_probability=0.001)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
+    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
+#    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
