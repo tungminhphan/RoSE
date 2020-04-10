@@ -192,6 +192,7 @@ class Car(Agent):
         self.intention = random.choice(actions)
         self.send_conflict_requests_to = [] # list of agents
         self.received_conflict_requests_from = [] # list of agents
+        self.agent_max_braking_not_enough = None
         self.token_count = 0
 
     def set_intention(self, action):
@@ -224,11 +225,6 @@ class Car(Agent):
             return agent_winner.get_id() == self.get_id(), agent_winner
         else:
             return agent_winner.get_id() == self.get_id()
-
-    # update token count according to which action agent took and whether 
-    # it aligns with agent intention
-    def update_token_count():
-        pass
 
     def get_length_along_bundle(self):
         assert self.supervisor, 'Supervisory controller required!'
@@ -557,8 +553,17 @@ class Car(Agent):
         # check whether agent is in conflict with other agents in its bubble
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
-                chk_to_send_request = self.check_to_send_conflict_request(agent)
-                if chk_to_send_request: send_requests_list.append(agent)
+                # first check if agent is longitudinally equal or ahead of other agent
+                chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
+                if chk_lon:
+                    # send request to agent behind if intentions conflict 
+                    chk_to_send_request = self.check_to_send_conflict_request(agent)
+                    if chk_to_send_request: send_requests_list.append(agent)
+                    # check whether max yield is not enough; if not, set flag
+                    chk_max_braking_not_enough = self.intention_bp_conflict(agent)
+                    if chk_max_braking_not_enough: 
+                        self.agent_max_braking_not_enough = agent
+                        return []
 
         return send_requests_list
     
@@ -652,6 +657,12 @@ class Car(Agent):
         if state is None: state = self.state
         acc = self.a_min if state.v+self.a_min > 0 else -state.v 
         return {'acceleration':acc, 'steer':'straight'}
+    
+    # checks if maximal yield action by receiver is enough...
+    def intention_bp_conflict(self, agent):
+        # get acceleration needed to come to a stop (if not enough, maximal)
+        chk_valid_actions = self.check_valid_actions(self, self.intention, agent, self.get_backup_plan_ctrl())
+        return not chk_valid_actions
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
     def check_to_send_conflict_request(self, agent):
@@ -660,19 +671,14 @@ class Car(Agent):
         def intentions_conflict(agent):
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
             return not chk_valid_actions
-    
-        # see whether agent intention conflicts with another agent's back-up plan
-        def intention_bp_conflict(agent):
-            # get acceleration needed to come to a stop (if not enough, maximal)
-            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, self.get_backup_plan_ctrl())
+        
+        # check whether your action requires other agent to do something other than would it might want? 
+        def intention_forward_action_conflict(agent):
+            forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
+            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
             return not chk_valid_actions
 
-        # first check if agent is longitudinally equal or ahead of other agent
-        chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
-        if not chk_lon: return False
-
-        return intentions_conflict(agent) or intention_bp_conflict(agent)
-
+        return intentions_conflict(agent) or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
     def get_default_bubble(self, vel):
@@ -937,7 +943,7 @@ class Game:
                     artist.draw_set(draw_set)
                 stdscr.refresh()
                 time.sleep(frequency)
-                game.time_forward()
+                self.time_forward()
         finally:
             curses.nocbreak()
             stdscr.keypad(False)
@@ -971,7 +977,7 @@ class Game:
 
     # code for fixing the agent states 
     def fix_agent_states_karena_debug(self, states, intentions=None):
-        print(len(states), len(intentions))
+        #print(len(states), len(intentions))
         for i, agent in enumerate(self.agent_set):
             st = agent.hack_state(agent.state, x=states[i][0], y=states[i][1], heading=states[i][2], v=states[i][3])
             agent.state = st
@@ -991,6 +997,10 @@ class Game:
         for agent in self.agent_set: 
             print("NEW AGENT")
             print(agent.state.__tuple__())
+            ag = agent.agent_max_braking_not_enough
+            if ag is not None: 
+                print("maximal yielding flag")
+                print(agent.agent_max_braking_not_enough.state.__tuple__())
             print("send conflict requests to")
             for ag in agent.send_conflict_requests_to:
                 print(ag.state.__tuple__())
@@ -1022,10 +1032,11 @@ class Game:
                 snapshot = self.save_snapshot()
                 traces[self.time] = snapshot
                 traces["map_name"] = self.map.map_name 
-            #self.check_conflict_requests_karena_debug()
+                traces["spawn_probability"] = self.map.default_spawn_probability
+            self.check_conflict_requests_karena_debug()
 
             self.play_step()
-            game.time_forward()
+            self.time_forward()
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
@@ -1752,7 +1763,7 @@ class GoalExit(SupervisoryController):
         next_goal = self.goals
         source = (self.plant.state.x, self.plant.state.y, self.plant.state.heading)
         target = next_goal
-        next_plan = nx.astar_path(game.map.road_map, source, target)
+        next_plan = nx.astar_path(self.game.map.road_map, source, target)
         return next_goal, next_plan
     def check_goals(self):
         if self.plant:
@@ -1977,17 +1988,8 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     print("starting")
     game.play(outfile=output_filename, t_end=1)
 
-
-def make_game_from_traces(filename):
-    with open(filename, 'rb') as pckl_file:
-        traces = pickle.load(pckl_file)
-
-    map_name = traces['map_name']
-    the_map = Map(map_name, default_spawn_probability=0.05)
-    return Game(game_map=the_map)
-
 # restart scenario from saved traces at given t_index
-def start_game_from_trace(game, filename, t_index):
+def start_game_from_trace(filename, t_index):
     # make a car from trace
     # car_trace = (x, y, heading, v, agent_color, bubble, goals, param)
     def make_car(game, car_trace):
@@ -2018,9 +2020,10 @@ def start_game_from_trace(game, filename, t_index):
     traffic_light_traces = traces[t_index]['lights']
     agent_traces = traces[t_index]['agents']
 
-    #map_name = traces['map_name']
-    #the_map = Map(map_name, default_spawn_probability=0.05)
-    #game = Game(game_map=the_map)
+    map_name = traces['map_name']
+    spawn_prob = traces['spawn_probability']
+    the_map = Map(map_name, default_spawn_probability=spawn_prob)
+    game = Game(game_map=the_map)
 
     # reset all the traffic lights according to traces
     traffic_light_reset_dict = {traffic_light.get_id(): False for traffic_light in the_map.traffic_lights}
@@ -2040,7 +2043,6 @@ def start_game_from_trace(game, filename, t_index):
 
     # start the game
     game.play(t_end=10)
-    pass
 
 
 if __name__ == '__main__':
@@ -2051,9 +2053,9 @@ if __name__ == '__main__':
     #game.play(outfile=output_filename, t_end=10)
 #    game.animate(frequency=0.1)
 
-    #game = Game(game_map=the_map)
-    #num_agents = 5
-    #play_fixed_agent_game_karena_debug(num_agents, game)
+    game = Game(game_map=the_map)
+    num_agents = 5
+    play_fixed_agent_game_karena_debug(num_agents, game)
 
     #def world_changer(func):
     #    def world_changing_function(*args, **kwargs):
@@ -2068,6 +2070,5 @@ if __name__ == '__main__':
 
 
     # testing the setting up a scenario from a certain state code
-    traces_file = os.getcwd()+'/saved_traces'+output_filename
-    game = make_game_from_traces(traces_file)
-    start_game_from_trace(game, traces_file, 5)
+    #traces_file = os.getcwd()+'/saved_traces'+output_filename
+    #start_game_from_trace(traces_file, 5)
