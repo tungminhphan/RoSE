@@ -445,7 +445,7 @@ class Car(Agent):
 
         # TODO: need to change assuming other agent has already gone
         # check max amount another agent needs to yield for another agent to change lanes
-        def check_max_dec_yield_req(winning_agent):
+        def check_min_dec_yield_req(winning_agent):
             # if agent is receiver of winning agent's request, need to determine how much to yield 
             # to that agent, so keep on reducing acceleration until it is safe
             ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
@@ -480,49 +480,46 @@ class Car(Agent):
             # take intended action (all checks pass)
             ctrl = self.intention
             self.token_count = 0 
-            pass
         elif agent_type is None and not bubble_chk:
-            # take straight action, best safe one that aligns with intention
+            # TODO: take straight action, best safe one that aligns with intention
             self.token_count = self.token_count+1
-            pass
+            ctrl = self.get_backup_plan_ctrl()
         elif agent_type is 'sender' and bubble_chk and not cluster_chk:
-            # take straight action, best safe one that aligns with intention
+            # TODO: take straight action, best safe one that aligns with intention
             self.token_count = self.token_count+1
-            pass
+            ctrl = self.get_backup_plan_ctrl()
         elif agent_type is 'sender' and bubble_chk and cluster_chk:
             # take intended action as long as it safe w.r.t. agents behind in precedence too
             ctrl = self.intention
             self.token_count = 0 
-            pass
         elif agent_type is 'sender' and not bubble_chk and not cluster_chk:
-            # take straight action, best safe one that aligns with intention
+            # TODO: take straight action, best safe one that aligns with intention
             self.token_count = self.token_count+1
-            pass
+            ctrl = self.get_backup_plan_ctrl()
         elif agent_type is 'sender' and not bubble_chk and cluster_chk:
-            # take straight action, best safe one that aligns with intention
+            # TODO: take straight action, best safe one that aligns with intention
             self.token_count = self.token_count+1
-            pass
+            ctrl = self.get_backup_plan_ctrl()
         elif agent_type is 'receiver' or agent_type and bubble_chk and not cluster_chk:
             # yield as much as needed for conflict winner to move
-            ctrl = self.check_max_dec_yield_req(winning_agent)
+            # assumes winner has already taken its action!!!
+            ctrl = self.check_min_dec_yield_req(winning_agent)
             self.token_count = self.token_count+1
-            pass
         elif agent_type is 'receiver' and bubble_chk and cluster_chk:
             # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
             ctrl = self.intention
             self.token_count = 0 
-            pass
         elif agent_type is 'receiver' and not bubble_chk and not cluster_chk:
             # yield as much as needed for conflict winner to move
             ctrl = self.check_max_dec_yield_req(winning_agent)
             self.token_count = self.token_count+1
-            pass
         elif agent_type is 'receiver' and not bubble_chk and cluster_chk:
-            # take straight action, best safe one that aligns with intention
+            # TODO: take straight action, best safe one that aligns with intention
             self.token_count = self.token_count+1
-            pass
         else: 
             print("Error: invalid combination of inputs to action selection strategy!")
+        
+        return ctrl
 
     #=== methods for car bubble =======================================#
     # get agent bubble (list of grid points)
@@ -888,10 +885,10 @@ class Game:
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_hstate()[0], traffic_light.htimer, traffic_light.durations))
+                lights.append((x, y, traffic_light.get_hstate()[0], traffic_light.htimer, 'horizontal', traffic_light.durations))
             for tile in traffic_light.vtiles:
                 x, y = tile.xy
-                lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer, traffic_light.durations)) 
+                lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer, 'vertical', traffic_light.durations)) 
 
         # return dict with all the info
         return {"lights": lights, "agents": agents}
@@ -2028,7 +2025,8 @@ def start_game_from_trace(filename, t_index):
     # reset all the traffic lights according to traces
     traffic_light_reset_dict = {traffic_light.get_id(): False for traffic_light in the_map.traffic_lights}
     for traffic_light_node in traffic_light_traces:
-        x, y, state, htimer, durations = traffic_light_node
+        # orientation is horizontal or vertical 
+        x, y, state, htimer, orientation, durations = traffic_light_node
         traffic_light = get_traffic_light_from_xy(the_map, (x,y))
 
         # set traffic lights that haven't been set yet
