@@ -140,15 +140,48 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
+    # check for collision with occupancy dict
+    def check_collision(self, ctrl):
+        # collect all grid points from occupancy dict except for own agent
+        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
+        occ = self.query_occupancy(ctrl)
+        if occ is None: 
+            print(self.state.__tuple__())
+            print(ctrl)
+            print("Invalid action chosen!!!!!")
+            return True
+        else:
+            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+        return len(gridpts_intersect) > 0
+    
+    def check_joint_state_safety(self):
+        for gridpt, agent in self.supervisor.game.occupancy_dict.items():
+            x, y, v = agent.state.x, agent.state.y, agent.state.v
+            #print("checking agent")
+            #print(agent.state)
+            lead_agent = agent.find_lead_agent()
+            if lead_agent:
+                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
+                # not safe if gap is not large enough for any one of the agents
+                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                    return False
+        return True
+
     def query_next_state(self, ctrl):
         assert ctrl in self.get_all_ctrl()
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
+        # check for collision with any of the other agents
+        collision_chk = self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
-        self.supervisor.game.update_occupancy_dict()
-        # check for collision
-        # check for safe configuration
+        # check whether the updated joint state is safe
+        joint_state_safety_chk = self.check_joint_state_safety()
+        #print(not collision_chk, joint_state_safety_chk)
+        return not collision_chk, joint_state_safety_chk
+        
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -190,8 +223,9 @@ class Car(Agent):
         self.default_bubbles = self.get_default_bubbles()
         # attributes relating to conflict stuff
         # TODO: change intention usingg intention generator
-        actions = [{"acceleration": 0, "steer": 'right-lane'}, {"acceleration": 0, "steer":'straight'}, {'acceleration':0, 'steer':'left-lane'}]
-        self.intention = random.choice(actions)
+        #actions = [{"acceleration": 1, "steer": 'left-lane'}, {"acceleration":1, "steer":'right-lane'}, {'acceleration':0, 'steer':'left-lane'}, 
+        #{'acceleration':0, 'steer':'right-lane'}, {'acceleration':1, 'steer':'straight'}]
+        self.intention = None
         self.send_conflict_requests_to = [] # list of agents
         self.received_conflict_requests_from = [] # list of agents
         self.agent_max_braking_not_enough = None
@@ -416,11 +450,47 @@ class Car(Agent):
     def get_all_ctrl(self, state=None,inverse=False):
         if state is None: state = self.state
         return Car.get_all_class_ctrl(state, self.acc_vals, inverse=inverse)
+    
+  # gets the agents with higher precedence, 
+  # assuming ego and all agents in agent_set belong to the same bundle
+    def get_agents_with_higher_precedence_in_bubble(self):
+        def get_agents_with_higher_precedence(agent_set):
+            higher_pred = []
+            ego_tile = self.state.x, self.state.y
+            ego_heading = self.state.heading
+            bundle = self.supervisor.game.map.get_bundle_from_directed_tile(ego_tile, ego_heading)
+            ego_score = bundle.tile_to_relative_length(ego_tile)
+            for agent in agent_set:
+                agent_tile = agent.state.x, agent.state.y
+                agent_score = bundle.tile_to_relative_length(agent_tile)
+                if agent_score > ego_score:
+                    higher_pred.append(agent)
+            return higher_pred
+        agents_in_bubble = self.find_agents_in_bubble()
+        return get_agents_with_higher_precedence(agents_in_bubble)
+
+    # check farthest straight agent can go forward (assuming agent in front already took its turn)
+    def get_max_forward_ctrl(self):
+        #print(self.state)
+        #print(self.supervisor.game.occupancy_dict)
+        lead_agent = self.find_lead_agent()
+        if lead_agent is None: 
+            ctrl = {'acceleration': self.a_max, 'steer': 'straight'}
+            return ctrl
+        x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+        # try all acceleration values
+        ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
+        for acc_val in ctrl_acc:
+            ctrl = {'acceleration': acc_val, 'steer':'straight'}
+            next_st = self.query_occupancy(ctrl)[-1]
+            safe_chk = self.check_safe_config(self, lead_agent, st_1=next_st, st_2=lead_agent.state)
+            if safe_chk: return ctrl
+        return self.get_backup_plan_ctrl(self, self.state)        
 
     #=== method for action selection strategy==========================#
     # defines which action to select given precedence list and whether or not
     # agent won in its conflict cluster
-    def action_selection_strategy(self, precedence_list):
+    def action_selection_strategy(self):
         # figure out whether agent is sender, receiver, both or neither
         def get_agent_type(): 
             if len(self.received_conflict_requests_from) > 0:
@@ -432,18 +502,18 @@ class Car(Agent):
 
         # figure out whether intended action conflicts with agents that have
         # higher precedence
-        def check_conflict_with_higher_precedence_agents(higher_precedence_agents):
+        def check_conflict_with_higher_precedence_agents():
             my_occ = self.query_occupancy(self.intention)
             # presumably agents with higher precedence are only ones in agent bubble
-            for agent in higher_precedence_agents:
+            for agent in self.get_agents_with_higher_precedence_in_bubble():
                 # check whether intention overlaps with agents of higher precedence
                 # and intended action has final config that preserves back-up plan
                 grid_pt = [(agent.state.x, agent.state.y)]
                 occupancy_overlap = self.check_occupancy_intersection(my_occ, grid_pt)
-                safe_config = self.check_config_safety(self, agent, my_occ[-1], agent.state)
+                safe_config = self.check_safe_config(self, agent, my_occ[-1], agent.state)
                 if occupancy_overlap or not safe_config: 
-                    return False
-            return True
+                    return True
+            return False
 
         # TODO: need to change assuming other agent has already gone
         # check max amount another agent needs to yield for another agent to change lanes
@@ -477,49 +547,63 @@ class Car(Agent):
         cluster_chk, winning_agent = self.check_conflict_resolution_winner(specify_agent=True)
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
-        # list of all possible scenarios and what action to take
-        if agent_type is None and bubble_chk:
-            # take intended action (all checks pass)
-            ctrl = self.intention
-            self.token_count = 0 
-        elif agent_type is None and not bubble_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_backup_plan_ctrl()
-        elif agent_type is 'sender' and bubble_chk and not cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_backup_plan_ctrl()
-        elif agent_type is 'sender' and bubble_chk and cluster_chk:
-            # take intended action as long as it safe w.r.t. agents behind in precedence too
-            ctrl = self.intention
-            self.token_count = 0 
-        elif agent_type is 'sender' and not bubble_chk and not cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_backup_plan_ctrl()
-        elif agent_type is 'sender' and not bubble_chk and cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_backup_plan_ctrl()
-        elif agent_type is 'receiver' or agent_type and bubble_chk and not cluster_chk:
-            # yield as much as needed for conflict winner to move
-            # assumes winner has already taken its action!!!
-            ctrl = self.check_min_dec_yield_req(winning_agent)
-            self.token_count = self.token_count+1
-        elif agent_type is 'receiver' and bubble_chk and cluster_chk:
-            # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
-            ctrl = self.intention
-            self.token_count = 0 
-        elif agent_type is 'receiver' and not bubble_chk and not cluster_chk:
-            # yield as much as needed for conflict winner to move
-            ctrl = self.check_max_dec_yield_req(winning_agent)
-            self.token_count = self.token_count+1
-        elif agent_type is 'receiver' and not bubble_chk and cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
+        # print all flags for debugging
+        print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
+        print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
+
+        # check out whether the maximal yielding is not enough!
+        if self.agent_max_braking_not_enough is not None:
+            # TODO: make less conservative?? also update token count or not? 
+            ctrl = self.get_max_forward_ctrl()
         else: 
-            print("Error: invalid combination of inputs to action selection strategy!")
+            # list of all possible scenarios and what action to take
+            if agent_type is 'none' and bubble_chk:
+                # take intended action (all checks pass)
+                ctrl = self.intention
+                self.token_count = 0 
+            elif agent_type is 'none' and not bubble_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_max_forward_ctrl()
+            elif agent_type is 'sender' and bubble_chk and not cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_backup_plan_ctrl()
+            elif agent_type is 'sender' and bubble_chk and cluster_chk:
+                # take intended action as long as it safe w.r.t. agents behind in precedence too
+                ctrl = self.intention
+                self.token_count = 0 
+            elif agent_type is 'sender' and not bubble_chk and not cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_max_forward_ctrl()
+            elif agent_type is 'sender' and not bubble_chk and cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_max_forward_ctrl()
+            elif agent_type is 'receiver' or agent_type and bubble_chk and not cluster_chk:
+                # yield as much as needed for conflict winner to move
+                # assumes winner has already taken its action!!!
+                ctrl = self.check_min_dec_yield_req(winning_agent)
+                self.token_count = self.token_count+1
+            elif agent_type is 'receiver' and bubble_chk and cluster_chk:
+                # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
+                ctrl = self.intention
+                self.token_count = 0 
+            elif agent_type is 'receiver' and not bubble_chk and not cluster_chk:
+                # yield as much as needed for conflict winner to move
+                ctrl = self.check_max_dec_yield_req(winning_agent)
+                self.token_count = self.token_count+1
+            elif agent_type is 'receiver' and not bubble_chk and cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                ctrl = self.get_max_forward_ctrl()
+                self.token_count = self.token_count+1
+            else: 
+                print(agent_type)
+                print(bubble_chk)
+                print(cluster_chk)
+                print("Error: invalid combination of inputs to action selection strategy!")
+                ctrl = None
         
         return ctrl
 
@@ -580,7 +664,7 @@ class Car(Agent):
             # as soon as agent found in nearest tile, return lead vehicle
             if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict: 
                 agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                if agent.state.heading == self.state.heading and agent.get_id() != self.get_id(): 
+                if (agent.state.heading == self.state.heading) and (agent.get_id() != self.get_id()): 
                     return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
     
@@ -598,8 +682,8 @@ class Car(Agent):
         occ_2 = ag_2.query_occupancy(ctrl_2)
         # if invalid actions, print an error
         if occ_1 is None or occ_2 is None: 
-            print("error: agent intention not allowed")
-            return True
+            #print("error: agent intention not allowed")
+            return False
         # check occupancy intersection
         chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
         chk_safe_end_config = self.check_safe_config(ag_1, ag_2, occ_1[-1], occ_2[-1])
@@ -959,20 +1043,6 @@ class Game:
     def play_step(self):
         self.sys_step()
         self.env_step()
-    
-    # check that all agents in the current config have a backup plan
-    def check_all_config_safety(self):
-        for agent in agent_set():
-            x, y, v = agent.state.x, agent.state.y, agent.state.v
-            lead_agent = self.find_lead_agent()
-            if lead_agent:
-                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
-                # not safe if gap is not large enough for any one of the agents
-                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) >= gap_curr):
-                    return False
-        # all agents have backup plan
-        return True
 
     # code for fixing the agent states 
     def fix_agent_states_karena_debug(self, states, intentions=None):
@@ -1188,6 +1258,14 @@ class Map:
             for tile in bundle.tiles:
                 append_or_create_new_list(tile_to_bundle_map, tile, bundle)
         return tile_to_bundle_map
+    
+    def get_bundle_from_directed_tile(self, tile, dir):
+        bundle_list = self.tile_to_bundle_map[tile]
+        for bundle in bundle_list: 
+            if bundle.direction == dir: 
+                return bundle
+        # if looped through and none found no bundle exists
+        return None
 
     def cluster_projections_to_bundles(self, cluster_projections):
         all_projections = list(cluster_projections.keys())
@@ -1713,8 +1791,9 @@ class SpecificationStructureController(Controller):
             scores.append(score)
 
         # action selection strategy action
-        choice = random.choice(np.where(scores == np.max(scores))[0])
-        plant.apply(all_ctrls[choice])
+        ctrl = plant.action_selection_strategy()
+        collision_chk, safe_state_chk = plant.apply(ctrl)
+        #choice = random.choice(np.where(scores == np.max(scores))[0])
 
 class SupervisoryController():
     def _init__(self):
@@ -1954,8 +2033,18 @@ class QuasiSimultaneousGame(Game):
     def resolve_precedence(self):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
+    # choose a random valid intention for each agent
+    def set_random_agent_intentions(self):
+        for agent in self.agent_set:
+            all_ctrl = agent.get_all_ctrl(state=agent.state)
+            if  random.uniform(0,1) < 0.95:
+                agent.intention = agent.get_max_forward_ctrl()
+            else: 
+                agent.intention = random.choice(all_ctrl)
+
     def sys_step(self):
         # set agent intentions
+        self.set_random_agent_intentions()
         # call resolve_conflicts
         self.send_and_receive_conflict_requests()
         self.resolve_precedence()
@@ -2054,7 +2143,7 @@ if __name__ == '__main__':
     output_filename = '/game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=10)
+    game.play(outfile=output_filename, t_end=20)
     #game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)

@@ -27,7 +27,7 @@ def traces_to_animation(filename):
 
     t_end = len(traces.keys())-1
     # plot out agents and traffic lights
-    for t in range(t_end): 
+    for t in range(t_end-1): 
         print(t)
         ax.cla()
         agents = traces[t]['agents']
