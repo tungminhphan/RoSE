@@ -284,8 +284,8 @@ class Car(Agent):
             backup_plan = self.get_maximum_braking_controls()
         if not state:
             state = self.state
+        tile_sequence_chain = [(0, [(state.x, state.y)])]
         step = 1
-        tile_sequence_chain = []
         while not backup_plan['stopping_condition'](state):
             occupancy_list = Car.query_class_occupancy(backup_plan['controls'], state, backup_plan['v_min'], backup_plan['v_max'], inverse=False)
             required_tiles = [(state.x, state.y) for state in occupancy_list]
@@ -1594,17 +1594,56 @@ class BundleProgressOracle(Oracle):
     def __init__(self):
         super(BundleProgressOracle, self).__init__()
     def evaluate(self, ctrl_action, plant, game):
-        def get_dist_to_plan(xy, plan):
-            all_dist = [np.sum(np.abs(xy-np.array([p[0], p[1]]))) for p in plan]
-            closest_p = np.argmin(all_dist)
-            return len(plan)-closest_p-1 + all_dist[closest_p]*100
-        current_plan = plant.supervisor.current_plan
-        final_state = plant.query_occupancy(ctrl_action)[-1]
-        current_xy = np.array([plant.state.x, plant.state.y])
-        queried_xy = np.array([final_state.x, final_state.y])
-        current_dist = get_dist_to_plan(current_xy, current_plan)
-        queried_dist = get_dist_to_plan(queried_xy, current_plan)
-        return queried_dist < current_dist
+        def backup_plan_is_ok_from_state(state, current_subgoal):
+            tile_sequence_chain = plant.query_backup_plan(state=state)
+            last_state = tile_sequence_chain[-1][-1][-1]
+            backup_xy = last_state
+            backup_dir = state.heading
+            return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
+
+        current_subgoal = plant.supervisor.current_plan[1]
+        if not isinstance(current_subgoal[1], str):
+            current_subgoal = current_subgoal[0]
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_xy, current_dir)
+
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle(queried_xy, queried_dir)
+        except:
+            return False
+
+        if queried_bundle == subgoal_bundle:
+            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+            dlong_curr = rel_goal[1]-rel_curr[1]
+            dlong_next = rel_goal[1]-rel_next[1]
+            if dlong_next < 0:
+                return False
+
+            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+            dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+            latt_improves = dlatt_next < dlatt_curr
+            long_improves = dlong_next < dlong_curr
+            improves = latt_improves or long_improves
+
+            latt_maintains = dlatt_next <= dlatt_curr
+            long_maintains = dlong_next <= dlong_curr
+            maintains = latt_maintains and long_maintains
+
+            backup_plan_ok = backup_plan_is_ok_from_state(queried_state, current_subgoal)
+            return improves and maintains and backup_plan_ok
+        else:
+            return False
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
@@ -1759,15 +1798,6 @@ class SupervisoryController():
         plant.supervisor = self
         self.plant = plant
         self.current_goal, self.current_plan = self.get_next_goal_and_plan()
-        self.current_bundle_plan = self.get_current_bundle_plan()
-
-    def get_current_bundle_plan(self):
-        bundles = []
-        for node in self.current_plan:
-            x,y,heading = node
-            bundle = self.game.map.tile_to_bundle_map[x,y]
-            bundles.append(bundle)
-        separated_bundles = [grouped[0] for grouped in separate_list(bundles, 'equal')]
 
     def get_next_goal_and_plan(self):
         raise NotImplementedError\
@@ -1787,7 +1817,7 @@ class GoalExit(SupervisoryController):
         next_goal = self.goals
         source = (self.plant.state.x, self.plant.state.y, self.plant.state.heading)
         target = next_goal
-        next_plan = nx.astar_path(game.map.road_map, source, target)
+        next_plan = nx.astar_path(self.game.map.road_map, source, target)
         return next_goal, next_plan
     def check_goals(self):
         if self.plant:
@@ -1804,13 +1834,39 @@ class GoalCycler(SupervisoryController):
         next_goal = next(self.goals)
         source = (self.plant.state.x, self.plant.state.y, self.plant.state.heading)
         target = next_goal
-        next_plan = nx.astar_path(game.map.road_map, source, target)
+        next_plan = nx.astar_path(self.game.map.road_map, source, target)
         return next_goal, next_plan
 
     def check_goals(self):
         if self.plant:
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.current_goal, self.current_plan = self.get_next_goal_and_plan()
+
+class BundleGoalExit(SupervisoryController):
+    def __init__(self, game, goals=None):
+        super(SupervisoryController, self).__init__()
+        self.game = game
+        self.goals = goals[0] # only consider first goal
+        self.subgoals = None
+
+    def get_next_goal_and_plan(self):
+        next_goal = self.goals
+        source = ((self.plant.state.x, self.plant.state.y), self.plant.state.heading)
+        target = ((next_goal[0], next_goal[1]), next_goal[2])
+        next_plan = self.game.map.get_bundle_plan(source, target)
+        return next_goal, next_plan
+
+    def check_subgoals(self):
+        return True
+#        if self.subgoals is None:
+#            st()
+#            print(self.current_plan)
+
+    def check_goals(self):
+        self.check_subgoals()
+        if self.plant:
+            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
+                self.game.agent_set.remove(self.plant)
 
 class SpecificationStructure():
     def __init__(self, oracle_list, oracle_tier):
@@ -1942,9 +1998,9 @@ def create_default_car(source, sink, game):
     spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
     start = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=2, a_min=-2,a_max=2)
+    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-2,a_max=2)
     car.set_controller(spec_struct_controller)
-    supervisor = GoalExit(game=game, goals=[end])
+    supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
     return car
 
@@ -1972,6 +2028,21 @@ class QuasiSimultaneousGame(Game):
                                               agent)
         return bundle_to_agent_precedence
 
+    # assuming ego and all agents in agent_set belong to the same bundle
+    def get_agents_with_higher_precedence(self, ego, agent_set):
+        higher_pred = []
+        ego_tile = ego.state.x, ego.state.y
+        ego_heading = ego.state.heading
+        bundle = self.map.directed_tile_to_bundle(ego_tile, ego_heading)
+        ego_score = bundle.tile_to_relative_length(ego_tile)
+        for agent in agent_set:
+            agent_tile = agent.state.x, agent.state.y
+            agent_score = bundle.tile_to_relative_length(agent_tile)
+            if agent_score > ego_score:
+                higher_pred.append(agent)
+        return higher_pred
+
+
     def resolve_precedence(self):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
@@ -1987,6 +2058,10 @@ class QuasiSimultaneousGame(Game):
     def play_step(self):
         self.sys_step()
         self.env_step()
+
+class IntentionProposer:
+    def __init__(self):
+        pass
 
 if __name__ == '__main__':
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.001)
