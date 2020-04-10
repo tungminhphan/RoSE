@@ -1791,9 +1791,9 @@ class SpecificationStructureController(Controller):
             scores.append(score)
 
         # action selection strategy action
-        ctrl = plant.action_selection_strategy()
-        collision_chk, safe_state_chk = plant.apply(ctrl)
-        #choice = random.choice(np.where(scores == np.max(scores))[0])
+        #ctrl = plant.action_selection_strategy()
+        choice = random.choice(np.where(scores == np.max(scores))[0])
+        collision_chk, safe_state_chk = plant.apply(all_ctrls[choice])
 
 class SupervisoryController():
     def _init__(self):
@@ -2143,7 +2143,7 @@ if __name__ == '__main__':
     output_filename = '/game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=20)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
