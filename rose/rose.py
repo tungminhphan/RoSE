@@ -308,7 +308,6 @@ class Car(Agent):
         # caching the agent bubbles  
         def create_pickle_file(filename):
             vel = np.arange(self.v_min, self.v_max+1)
-            #print(vel)
             bubble_dict = dict()
             for v in vel:
                 bubble_dict[v] = self.get_default_bubble(v)
@@ -503,8 +502,6 @@ class Car(Agent):
 
     # check farthest straight agent can go forward (assuming agent in front already took its turn)
     def get_max_forward_ctrl(self):
-       # print("getting max forward control")
-        #print(self.supervisor.game.occupancy_dict)
         lead_agent = self.find_lead_agent()
         if lead_agent is None: 
             print("No lead agent")
@@ -538,15 +535,8 @@ class Car(Agent):
         # higher precedence
         def check_conflict_with_higher_precedence_agents():
             my_occ = self.query_occupancy(self.intention)
-
-            # DEBUGGING print all agents in bubble
-            #print("agents in bubble")
-            #for ag in self.find_agents_in_bubble():
-            #    print(ag.state)
-            #print("agents with higher precedence")
             # presumably agents with higher precedence are only ones in agent bubble
             for agent in self.get_agents_with_higher_precedence_in_bubble():
-                #print(agent.state)
                 # check whether intention overlaps with agents of higher precedence
                 # and intended action has final config that preserves back-up plan
                 grid_pt = [(agent.state.x, agent.state.y)]
@@ -559,19 +549,6 @@ class Car(Agent):
         # TODO: need to change assuming other agent has already gone
         # check max amount another agent needs to yield for another agent to change lanes
         def check_min_dec_yield_req(winning_agent):
-            # if agent is receiver of winning agent's request, need to determine how much to yield 
-            # to that agent, so keep on reducing acceleration until it is safe
-            '''ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
-            for acc_val in ctrl_acc:
-                # check safety of ctrl action
-                ctrl = {'acceleration': acc_val, 'steer':'straight'}
-                #valid_actions_chk = self.check_valid_actions(self, ctrl, winning_agent, winning_agent.intention)
-                occ = self.query_occupancy(ctrl)
-                check_occupancy_intersection = self.check_occupancy_intersection(occ, [winning_agent.state])
-                valid_actions_check = self.check_safe_config(self, winning_agent, st_1=occ[-1], st_2=winning_agent.state)
-                if valid_actions_check and not check_occupancy_intersection: return ctrl
-
-            print("Warning: max deceleration of agent not enough!")'''
             return self.get_backup_plan_ctrl()
         
         # check whether received request from winning agent 
@@ -1155,7 +1132,6 @@ class Game:
         states = [(9,0, 'east',0), (10,0,'east',0)]
         intentions = [{'acceleration': 1, 'steer': 'right-lane'}, {'acceleration': 2, 'steer': 'left-lane' }]
         self.fix_agent_states_karena_debug(states, intentions)
-        #print(self.agent_set)
         # checking conflict swapping code
         self.send_and_receive_conflict_requests()
         for agent in self.agent_set: 
@@ -1200,21 +1176,6 @@ class Game:
             # for each agent receiving request, update their receive list 
             for agent_rec in agent.send_conflict_requests_to:
                 agent_rec.received_conflict_requests_from.append(agent)
-        
-        '''for agent in self.agent_set: 
-            print("NEW AGENT")
-            print(agent.state.__tuple__())
-            ag = agent.agent_max_braking_not_enough
-            if ag is not None: 
-                print(agent.state)
-                print("MAXIMUM YIELDING FLAG")
-                print(agent.agent_max_braking_not_enough.state.__tuple__())
-            print("send conflict requests to")
-            for ag in agent.send_conflict_requests_to:
-                print(ag.state.__tuple__())
-            print("received conflict requests from")
-            for ag in agent.received_conflict_requests_from: 
-                print(ag.state.__tuple__())'''
 
     def play(self, t_end=np.inf, outfile=None):
         # dump the map here and open json file
@@ -1379,8 +1340,6 @@ class Map:
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.bundle_graph = self.get_bundle_graph()
-#        self.directed_tile_to_turns(((23,9), 'east'))
-#        print(self.get_bundle_plan(((23,9), 'east'), ((49, 88), 'north')))
 
     def get_bundle_plan(self, source, sink):
         planning_graph = self.bundle_graph.copy()
