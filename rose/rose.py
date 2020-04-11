@@ -1039,6 +1039,13 @@ class Map:
 #        self.directed_tile_to_turns(((23,9), 'east'))
 #        print(self.get_bundle_plan(((23,9), 'east'), ((49, 88), 'north')))
 
+    def change_traffic_lights(self, traffic_tile, hstate, htimer):
+        traffic_light = self.tile_to_traffic_light_map[traffic_tile]
+        assert hstate in ['red', 'yellow', 'green']
+        assert htimer < traffic_light.durations[hstate]
+        traffic_light.hstate = hstate
+        traffic_light.htimer = htimer
+
     def get_bundle_plan(self, source, sink):
         planning_graph = self.bundle_graph.copy()
         original_edges = list(planning_graph.edges)
@@ -1142,7 +1149,10 @@ class Map:
                 return new_tile, tile_direction
 
     def check_if_right_turn_tile(self, tile, direction):
-        assert direction in self.legal_orientations[tile]
+        try:
+            assert direction in self.legal_orientations[tile]
+        except:
+            return False, None
         direction_degrees = Car.convert_orientation(direction)
         next_direction_degrees = (direction_degrees - 90)%360
         next_direction = Car.convert_orientation(next_direction_degrees)
@@ -2069,7 +2079,6 @@ class QuasiSimultaneousGame(Game):
                 higher_pred.append(agent)
         return higher_pred
 
-
     def resolve_precedence(self):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
@@ -2086,14 +2095,17 @@ class QuasiSimultaneousGame(Game):
         self.sys_step()
         self.env_step()
 
+
+
 if __name__ == '__main__':
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-#    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
-    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
+#    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
+#    the_map = Map('./maps/parking_lot', default_spawn_probability=0.1)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=100)
+    #game.play(outfile=output_filename, t_end=40)
     game.animate(frequency=0.1)
 
     #game = Game(game_map=the_map)
