@@ -16,16 +16,18 @@ for color in car_colors:
 
 
 # animate the files completely
-def traces_to_animation(the_map, filename):
+def traces_to_animation(filename):
     # extract out traces from pickle file
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
 
+    the_map = Map(traces['map_name'])
+    t_end = traces['t_end']
     global ax
     fig, ax = plt.subplots()
 
     # plot out agents and traffic lights
-    for t in range(max(traces.keys())+1): 
+    for t in range(t_end): 
         print(t)
         ax.cla()
         agents = traces[t]['agents']
@@ -69,13 +71,12 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure 
-def plot_map(map):
+def plot_map(map, grid_on=False):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
 
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
-    #ax.grid()
 
     # fill in the obstacle regions
     for obs in map.non_drivable_nodes:
@@ -83,14 +84,18 @@ def plot_map(map):
         ax.add_patch(rect)
     
     plt.gca().invert_yaxis()
-    plt.axis('off')
+    if grid_on: 
+        ax.grid()
+        plt.axis('on')
+    else: 
+        plt.axis('off')
 
 def draw_car(agent_state_tuple):
     # global params
-    x, y, theta, color, bubble = agent_state_tuple
+    x, y, theta, v, color, bubble, goals, param = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
-    car_fig = car_fig.rotate(theta_d, expand = False)
+    car_fig = car_fig.rotate(theta_d, expand=False)
     ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y, y+1, x, x+1])
 
     for grid in bubble:
@@ -145,15 +150,16 @@ def animate_images():
             duration=200, loop=3)
 
 if __name__ == '__main__':
-    output_dir = os.getcwd()+'/imgs/'
+    '''output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    the_map = Map('./maps/t_junction', default_spawn_probability=0.1)
-    #the_map = Map('map5', default_spawn_probability=0.05)
-    output_filename = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(the_map, output_filename)
+    traces_file = os.getcwd()+'/saved_traces/game.p'
+    traces_to_animation(traces_file)'''
+    #animate_images()
+    global ax
+    fig, ax = plt.subplots()
 
-    #filename = os.getcwd()+'/saved_bubbles/v_n0_2_a_n2_2.p'
-    #with open(filename, 'rb') as pckl_file:
-    #    data = pickle.load(pckl_file)
-    #plot_bubble(data[0])
+    # plot a map
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
+    plot_map(the_map, grid_on=True)
+    plt.show()
