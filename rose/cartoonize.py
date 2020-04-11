@@ -22,12 +22,12 @@ def traces_to_animation(filename):
         traces = pickle.load(pckl_file)
 
     the_map = Map(traces['map_name'])
+    t_end = traces['t_end']
     global ax
     fig, ax = plt.subplots()
 
-    t_end = len(traces.keys())-1
     # plot out agents and traffic lights
-    for t in range(t_end-1): 
+    for t in range(t_end): 
         print(t)
         ax.cla()
         agents = traces[t]['agents']
@@ -71,13 +71,12 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure 
-def plot_map(map):
+def plot_map(map, grid_on=False):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
 
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
-    #ax.grid()
 
     # fill in the obstacle regions
     for obs in map.non_drivable_nodes:
@@ -85,7 +84,11 @@ def plot_map(map):
         ax.add_patch(rect)
     
     plt.gca().invert_yaxis()
-    plt.axis('off')
+    if grid_on: 
+        ax.grid()
+        plt.axis('on')
+    else: 
+        plt.axis('off')
 
 def draw_car(agent_state_tuple):
     # global params
@@ -147,8 +150,16 @@ def animate_images():
             duration=200, loop=3)
 
 if __name__ == '__main__':
-    output_dir = os.getcwd()+'/imgs/'
+    '''output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(traces_file)
+    traces_to_animation(traces_file)'''
+    #animate_images()
+    global ax
+    fig, ax = plt.subplots()
+
+    # plot a map
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
+    plot_map(the_map, grid_on=True)
+    plt.show()
