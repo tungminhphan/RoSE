@@ -150,16 +150,17 @@ def animate_images():
             duration=200, loop=3)
 
 if __name__ == '__main__':
-    '''output_dir = os.getcwd()+'/imgs/'
+    output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(traces_file)'''
+    traces_to_animation(traces_file)
+    
     #animate_images()
-    global ax
-    fig, ax = plt.subplots()
+    #global ax
+    #fig, ax = plt.subplots()
 
     # plot a map
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
-    plot_map(the_map, grid_on=True)
-    plt.show()
+    #the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
+    #plot_map(the_map, grid_on=True)
+    #plt.show()
