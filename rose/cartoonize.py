@@ -27,7 +27,7 @@ def traces_to_animation(filename):
     fig, ax = plt.subplots()
 
     # plot out agents and traffic lights
-    for t in range(t_end): 
+    for t in range(t_end):
         print(t)
         ax.cla()
         agents = traces[t]['agents']
@@ -40,7 +40,7 @@ def traces_to_animation(filename):
         fig.savefig(img_name)
     animate_images()
 
-def plot_cars(agents): 
+def plot_cars(agents):
     for i, agent in enumerate(agents):
         # draw the car with its bubble
         draw_car(agent)
@@ -70,7 +70,7 @@ def get_map_corners(map):
     y_max = x_hi+1
     return x_min, x_max, y_min, y_max
 
-# defining a function that plots the map on a figure 
+# defining a function that plots the map on a figure
 def plot_map(map, grid_on=False):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
@@ -82,12 +82,12 @@ def plot_map(map, grid_on=False):
     for obs in map.non_drivable_nodes:
         rect = patches.Rectangle((obs[1],obs[0]), 1,1,linewidth=1,facecolor='k')
         ax.add_patch(rect)
-    
+
     plt.gca().invert_yaxis()
-    if grid_on: 
+    if grid_on:
         ax.grid()
         plt.axis('on')
-    else: 
+    else:
         plt.axis('off')
 
 def draw_car(agent_state_tuple):
@@ -128,7 +128,7 @@ def plot_bubble(bubble):
     #ax.xaxis.set_minor_locator(AutoMinorLocator(2))
     #ax.yaxis.set_minor_locator(AutoMinorLocator(2))
     #ax.grid(which='both')
-    
+
     plt.gca().invert_yaxis()
     plt.show()
     #return ax
@@ -142,7 +142,7 @@ def animate_images():
     for i in imgs:
         new_frame = Image.open(i)
         frames.append(new_frame)
- 
+
     # Save into a GIF file that loops forever
     frames[0].save(os.getcwd()+'/imgs/' + 'png_to_gif.gif', format='GIF',
             append_images=frames[1:],
@@ -161,6 +161,12 @@ if __name__ == '__main__':
     #fig, ax = plt.subplots()
 
     # plot a map
+<<<<<<< HEAD
     #the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
     #plot_map(the_map, grid_on=True)
     #plt.show()
+=======
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
+    plot_map(the_map, grid_on=True)
+    plt.show()
+>>>>>>> 3a7333d6fcc852714e324d94f7050fcd258a50b6
