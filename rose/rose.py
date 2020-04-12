@@ -646,7 +646,6 @@ class Car(Agent):
 
     #=== find agents in this agents' conflict cluster ===================#
     def find_agents_to_send_conflict_request(self):
-        #__import__('ipdb').set_trace(context=21)
         send_requests_list = []
         # collect all agents in bubble
         agents_in_bubble = self.find_agents_in_bubble()
@@ -654,21 +653,15 @@ class Car(Agent):
         if self.intention['steer'] == 'straight': return send_requests_list
 
         # check whether agent is in conflict with other agents in its bubble
-        #print("AGENT CHECKING CONFLICT")
-        #print(self.state)
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
-                #print("checking with agent")
-                #print(agent.state)
-                #print((self.get_length_along_bundle()[0], agent.get_length_along_bundle()[0]))
                 # first check if agent is longitudinally equal or ahead of other agent
                 try: 
                     chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
                 except:
                     return []
                 if chk_lon:
-                    #print("chk_lon passed")
-                    # send request to agent behind if intentions conflict 
+s                    # send request to agent behind if intentions conflict 
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
                     if chk_to_send_request: send_requests_list.append(agent)
                     # check whether max yield is not enough; if not, set flag
@@ -790,13 +783,6 @@ class Car(Agent):
     
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
-        #__import__('ipdb').set_trace(context=21)
-        # get acceleration needed to come to a stop (if not enough, maximal)
-        #print("CHECKING MAX BRAKING")
-        #print(self.state)
-        #print(agent.state)
-        #print(self.intention)
-        #print(self.get_backup_plan_ctrl())
         chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
         return not chk_valid_actions
 
@@ -809,12 +795,6 @@ class Car(Agent):
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
             return not chk_valid_actions
         
-        # check whether your action requires other agent to do something other than would it might want? 
-        #def intention_forward_action_conflict(agent):
-        #    forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
-        #    chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
-        #    return not chk_valid_actions
-
         return intentions_conflict(agent) #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
