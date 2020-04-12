@@ -157,7 +157,7 @@ class Agent:
         if collision_check:
             __import__('ipdb').set_trace(context=21)
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            print(ag.state)
+            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), (ag.intention))
             print(ag.intention)
         return len(gridpts_intersect) > 0
 
@@ -180,12 +180,18 @@ class Agent:
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
-        #print("applying action")
         # check for collision with any of the other agents
         collision_chk = self.check_collision(ctrl)
         #print(not collision_chk)
+        print(self.state)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # check whether the new state is 
+        out_of_bounds_chk = (self.state.x, self.state.y) not in self.supervisor.game.map.drivable_nodes
+        if out_of_bounds_chk:
+            print(self.state.x, self.state.y)
+            print("ERROR: Updated state makes agent out of bounds!!")
+
         # check whether the updated joint state is safe
         joint_state_safety_chk = self.check_joint_state_safety()
         #print(joint_state_safety_chk)
@@ -289,16 +295,24 @@ class Car(Agent):
         else:
             return agent_winner.get_id() == self.get_id()
 
-    def get_length_along_bundle(self):
-        assert self.supervisor, 'Supervisory controller required!'
-        x, y = self.state.x, self.state.y
-        current_bundles = self.supervisor.game.map.tile_to_bundle_map[x,y]
+    def get_length_along_bundle(self, state=None):
+        #__import__('ipdb').set_trace(context=21)
+        #assert self.supervisor, 'Supervisory controller required!'
+        if state is None: state=self.state
+        x, y = state.x, state.y
+        try: 
+            current_bundles = self.supervisor.game.map.tile_to_bundle_map[(x,y)]
+        except:
+            return None, None
+        
         for bundle in current_bundles:
             if bundle.direction == self.state.heading:
                 return bundle.tile_to_relative_length((x,y)), bundle
+        return None, None
 
-    def get_width_along_bundle(self):
-        x, y = self.state.x, self.state.y
+    def get_width_along_bundle(self, state=None):
+        if state is None: state=self.state
+        x, y = state.x, state.y
         current_bundles = self.supervisor.game.map.tile_to_bundle_map[x,y]
         for bundle in current_bundles:
             if bundle.direction == self.state.heading:
@@ -491,8 +505,7 @@ class Car(Agent):
                 try:
                     agent_score = bundle.tile_to_relative_length(agent_tile)
                 except:
-                    print("agent out of bounds, setting to have higher prec?")
-                    print(agent_tile)
+                    print("higher precedence, setting agent score to inf")
                     agent_score = np.inf
                 if agent_score > ego_score:
                     higher_pred.append(agent)
@@ -504,7 +517,7 @@ class Car(Agent):
     def get_max_forward_ctrl(self):
         lead_agent = self.find_lead_agent()
         if lead_agent is None:
-            print("No lead agent")
+            #print("No lead agent")
             ctrl = {'acceleration': self.a_max, 'steer': 'straight'}
             return ctrl
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
@@ -567,8 +580,9 @@ class Car(Agent):
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
         # print all flags for debugging
-        print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
+        #if self.supervisor.game.debug_flag: 
+        #    print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
+        #    print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
 
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
@@ -656,10 +670,11 @@ class Car(Agent):
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
                 # first check if agent is longitudinally equal or ahead of other agent
-                try:
+                try: 
                     chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
-                except:
-                    return []
+                except: 
+                    print("longitudinal check: agent in set out ouf bounds")
+                    chk_lon = False
                 if chk_lon:
                     # send request to agent behind if intentions conflict 
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
@@ -674,25 +689,22 @@ class Car(Agent):
 
     #============verifying agent back-up plan invariance===================#
     def find_lead_agent(self, state=None):
-        if state is None: state = self.state
-        try:
-            arc_l, bundle = self.get_length_along_bundle()
-        except:
-            # if agent out of
-            return None
+        #__import__('ipdb').set_trace(context=21)
+        if state is None: state = self.state 
+        arc_l, bundle = self.get_length_along_bundle(state=state)
 
-        d_vec = DIRECTION_TO_VECTOR[state.heading]
-        # get tiles in front
-        tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
-        tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
-
-        # check agents in these tiles
-        for i in range(0, len(tiles_x)):
-            # as soon as agent found in nearest tile, return lead vehicle
-            if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
-                agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                if (agent.get_id() != self.get_id()):
-                    return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+        if bundle: 
+            d_vec = DIRECTION_TO_VECTOR[state.heading]
+            # get tiles in front
+            tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
+            tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
+            # check agents in these tiles
+            for i in range(0, len(tiles_x)):
+                # as soon as agent found in nearest tile, return lead vehicle
+                if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
+                    agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                    if (agent.get_id() != self.get_id()):
+                        return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
@@ -727,10 +739,12 @@ class Car(Agent):
             try:
                 width_1, bundle_1 = ag_1.get_width_along_bundle()
             except:
+                print("check same lane in check safe config")
                 return False
             try:
                 width_2, bundle_2 = ag_2.get_width_along_bundle()
             except:
+                print("check same lane in check safe config")
                 return False
             return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
 
@@ -739,10 +753,12 @@ class Car(Agent):
             try:
                 l_1 = ag_1.get_length_along_bundle()[0]
             except:
+                print("sorting agents")
                 return None, None, None, None
             try:
                 l_2 = ag_2.get_length_along_bundle()[0]
             except:
+                print("sorting agents")
                 return None, None, None, None
             if l_1 > l_2:
                 return ag_1, ag_2, st_1, st_2
@@ -966,7 +982,7 @@ class Artist:
 
 class Game:
     # combines scenario + agents for game
-    def __init__(self, game_map, agent_set=[]):
+    def __init__(self, game_map, agent_set=[], debug_flag=False):
         self.time = 0
         self.map = game_map
         self.agent_set = agent_set
@@ -974,6 +990,7 @@ class Game:
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
         self.collisions = []
+        self.debug_flag = debug_flag
 
     def update_occupancy_dict(self):
         occupancy_dict = dict()
@@ -1108,8 +1125,8 @@ class Game:
         #states = [(8,1,'east',1), (8,3,'east',1), (8,4,'east',1), (9,2,'east',1), (9,3,'east',1)]
         #intentions = [{'acceleration': 0, 'steer': 'left-lane' }, {'acceleration': 0, 'steer':'right-lane'}, \
         #    {'acceleration': 0, 'steer': 'right-lane' }, {'acceleration': 0, 'steer': 'straight' }, {'acceleration': 0, 'steer': 'left-lane'}]
-        states = [(9,0, 'east',0), (10,0,'east',0)]
-        intentions = [{'acceleration': 1, 'steer': 'right-lane'}, {'acceleration': 2, 'steer': 'left-lane' }]
+        states = [(18,88, 'north',0), (18,89,'north',0)]
+        intentions = [{'acceleration': 1, 'steer': 'right-lane'}, {'acceleration': 2, 'steer': 'right-turn' }]
         self.fix_agent_states_karena_debug(states, intentions)
         # checking conflict swapping code
         self.send_and_receive_conflict_requests()
@@ -1161,7 +1178,8 @@ class Game:
         write_bool = outfile is not None and t_end is not np.inf
         traces = dict()
         while self.time < t_end:
-            print("TIME: " + str(self.time))
+            if self.debug_flag: 
+                print("TIME: " + str(self.time))
             # if save data to animate
             if write_bool:
                 snapshot = self.save_snapshot()
@@ -1252,7 +1270,7 @@ class Bundle:
         tube_list.sort(reverse=reverse)
         return tube_list
 
-    def tile_to_relative_length(self, tile):
+    def tile_to_relative_length(self, tile):        
         stp_idx = np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         return self.length_list.index(tile[stp_idx])
 
@@ -1305,8 +1323,8 @@ class Map:
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
-        self.drivable_nodes = list(self.grid.keys())
-        self.drivable_tiles, self.non_drivable_nodes = self.get_drivable_tiles()
+        self.nodes = list(self.grid.keys())
+        self.drivable_tiles, self.drivable_nodes, self.non_drivable_nodes = self.get_drivable_tiles()
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
@@ -1318,7 +1336,7 @@ class Map:
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
-        self.bundle_graph = self.get_bundle_graph()
+        self.bundle_graph = self.get_bundle_graph()        
 
     def change_traffic_lights(self, traffic_tile, hstate, htimer):
         traffic_light = self.tile_to_traffic_light_map[traffic_tile]
@@ -1598,16 +1616,18 @@ class Map:
 
     def get_drivable_tiles(self):
         drivable_tiles = []
+        drivable_nodes = []
         non_drivable_nodes = []
-        for xy in self.drivable_nodes:
+        for xy in self.nodes:
             if self.grid[xy] == '-':
                 symbol = '.'
                 non_drivable_nodes.append(xy)
             else:
                 symbol = self.grid[xy]
+                drivable_nodes.append(xy)
             tile = DrivableTile(xy,symbol)
             drivable_tiles.append(tile)
-        return drivable_tiles, non_drivable_nodes
+        return drivable_tiles, drivable_nodes, non_drivable_nodes
 
     def get_grid(self, csv_filename):
         grid = dict()
@@ -1932,11 +1952,17 @@ class BundleProgressOracle(Oracle):
                 return False
 
         current_subgoal = plant.supervisor.subgoals[0]
-        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
+        try: 
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
+        except: 
+            subgoal_bundle = None
 
         current_xy = plant.state.x, plant.state.y
         current_dir = plant.state.heading
-        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_xy, current_dir)
+        try: 
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_xy, current_dir)
+        except:
+            current_bunde = None
 
         queried_state = plant.query_occupancy(ctrl_action)[-1]
         queried_xy = queried_state.x, queried_state.y
@@ -1947,7 +1973,7 @@ class BundleProgressOracle(Oracle):
         except:
             return False
 
-        if subgoal_bundle is None:
+        if subgoal_bundle or current_bundle is None:
             return False
 
         if current_bundle != subgoal_bundle:
@@ -2066,7 +2092,7 @@ class StaticObstacleOracle(Oracle):
         # check if action is safe
         next_occupancy = plant.query_occupancy(ctrl_action)
         action_is_safe = all([(occ_state.x, occ_state.y) in
-            game.map.drivable_nodes for occ_state in
+            game.map.drivable_tiles for occ_state in
             next_occupancy])
         if not action_is_safe:
             return False
@@ -2118,8 +2144,6 @@ class SpecificationStructureController(Controller):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
     def run_on(self, plant):
-        #print("choosing action for agent " + str(plant.state.__tuple__()))
-        #print(plant.supervisor.game.occupancy_dict.keys())
         scores = []
         all_ctrls = plant.get_all_ctrl()
         for ctrl in all_ctrls:
@@ -2397,8 +2421,8 @@ def run(runnable_set):
         runnable.run()
 
 class QuasiSimultaneousGame(Game):
-    def __init__(self, game_map):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
+    def __init__(self, game_map, debug_flag=False):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, debug_flag=debug_flag)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
     def get_bundle_to_agent_precedence(self):
@@ -2410,6 +2434,8 @@ class QuasiSimultaneousGame(Game):
             try:
                 bundles = self.map.tile_to_bundle_map[(x,y)]
             except:
+                print("Agent in set is out of bounds")
+                print(x, y)
                 bundles = []
             for bundle in bundles:
                 if bundle.direction == heading:
@@ -2428,7 +2454,11 @@ class QuasiSimultaneousGame(Game):
         ego_score = bundle.tile_to_relative_length(ego_tile)
         for agent in agent_set:
             agent_tile = agent.state.x, agent.state.y
-            agent_score = bundle.tile_to_relative_length(agent_tile)
+            try: 
+                agent_score = bundle.tile_to_relative_length(agent_tile)
+            except:
+                print("agent in set is out of bounds, checking agents with higher precedence!")
+                agent_score = np.inf
             if agent_score >= ego_score:
                 higher_pred.append(agent)
         return higher_pred
@@ -2476,7 +2506,6 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     # add all agents to the game
     for i in range(num_agents):
         game.add_agent(make_car(game))
-    print("starting")
     game.play(outfile=output_filename, t_end=1)
 
 # restart scenario from saved traces at given t_index
@@ -2514,7 +2543,7 @@ def start_game_from_trace(filename, t_index):
     map_name = traces['map_name']
     spawn_prob = traces['spawn_probability']
     the_map = Map(map_name, default_spawn_probability=0)
-    game = QuasiSimultaneousGame(game_map=the_map)
+    game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
 
     # reset all the traffic lights according to traces
     traffic_light_reset_dict = {traffic_light.get_id(): False for traffic_light in the_map.traffic_lights}
@@ -2544,16 +2573,16 @@ class IntentionProposer:
 
 if __name__ == '__main__':
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
+    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
 #    the_map = Map('./maps/parking_lot', default_spawn_probability=0.1)
     output_filename = 'game.p'
 
-    game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=40)
-    game.animate(frequency=0.01)
+    game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
+    game.play(outfile=output_filename, t_end=100)
+    # game.animate(frequency=0.01)
 
-    #game = Game(game_map=the_map)
+    #game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
     #num_agents = 2
     #play_fixed_agent_game_karena_debug(num_agents, game)
 

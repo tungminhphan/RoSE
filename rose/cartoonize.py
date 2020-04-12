@@ -154,19 +154,14 @@ if __name__ == '__main__':
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(traces_file)
-    
+    #traces_to_animation(traces_file)
+    animate_images()
+
     #animate_images()
     #global ax
     #fig, ax = plt.subplots()
 
     # plot a map
-<<<<<<< HEAD
     #the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
     #plot_map(the_map, grid_on=True)
     #plt.show()
-=======
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
-    plot_map(the_map, grid_on=True)
-    plt.show()
->>>>>>> 3a7333d6fcc852714e324d94f7050fcd258a50b6
