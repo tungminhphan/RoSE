@@ -155,7 +155,7 @@ class Agent:
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         collision_check = len(gridpts_intersect) > 0
         if collision_check:
-            __import__('ipdb').set_trace(context=21)
+            #__import__('ipdb').set_trace(context=21)
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
             print(ag.state)
             print(ag.intention)
@@ -567,8 +567,8 @@ class Car(Agent):
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
         # print all flags for debugging
-        print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
+        #print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
+        #print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
 
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
@@ -1006,6 +1006,8 @@ class Game:
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
+                if source.node[0] == sink.node[0] or source.node[1] == sink.node[1]:
+                    return
                 new_car = create_default_car(source, sink, self)
                 # check if new car is on an intersection tile
                 orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
@@ -2475,6 +2477,9 @@ class QuasiSimultaneousGame(Game):
                     agent.run()
 
     def play_step(self):
+        for agent in self.agent_set:
+            print(agent.state)
+            print(agent.supervisor.goals)
         self.sys_step()
         self.env_step()
 
@@ -2564,14 +2569,14 @@ class IntentionProposer:
 
 if __name__ == '__main__':
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
 #    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
 #    the_map = Map('./maps/parking_lot', default_spawn_probability=0.1)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=40)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=40)
+    #game.animate(frequency=0.01)
 
     #game = Game(game_map=the_map)
     #num_agents = 2
