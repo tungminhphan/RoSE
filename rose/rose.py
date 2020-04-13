@@ -160,7 +160,7 @@ class Agent:
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
     
-    def check_out_of_bounds(self, agent, prior_state, state):
+    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
         if out_of_bounds_chk:
             if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
@@ -194,7 +194,7 @@ class Agent:
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
-        self.check_out_of_bounds(self, prior_state, self.state)
+        self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
         joint_state_safety_chk = self.check_joint_state_safety()
         #print(joint_state_safety_chk)
@@ -512,7 +512,6 @@ class Car(Agent):
     def get_max_forward_ctrl(self):
         lead_agent = self.find_lead_agent()
         if lead_agent is None:
-            print("No lead agent")
             ctrl = {'acceleration': self.a_max, 'steer': 'straight'}
             return ctrl
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
@@ -1001,8 +1000,8 @@ class Game:
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
-        self.collisions_dict = []
-        self.out_of_bounds_dict = []
+        self.collision_dict = dict()
+        self.out_of_bounds_dict = dict()
 
     def update_occupancy_dict(self):
         occupancy_dict = dict()
@@ -1081,7 +1080,7 @@ class Game:
                 artist.enable_window_moving()
 
                 stdscr.clear()
-                for node in self.map.drivable_nodes:
+                for node in self.map.nodes:
                     node_x, node_y = node
                     if self.map.grid[node] == '-':
                         draw_str = '.'
@@ -1207,8 +1206,8 @@ class Game:
             #traces["collisions"] = list(set(self.collisions))
             traces["map_name"] = self.map.map_name
             traces["spawn_probability"] = self.map.default_spawn_probability
-            traces["collisions_dict"] = self.map.default_spawn_probability
-            traces["out_of_bounds_dict"] = self.map.default_spawn_probability
+            traces["collision_dict"] = self.collision_dict
+            traces["out_of_bounds_dict"] = self.out_of_bounds_dict
             traces["t_end"] = t_end
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -1338,8 +1337,8 @@ class Map:
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
-        self.drivable_nodes = list(self.grid.keys())
-        self.drivable_tiles, self.non_drivable_nodes = self.get_drivable_tiles()
+        self.nodes = list(self.grid.keys())
+        self.drivable_tiles, self.drivable_nodes, self.non_drivable_nodes = self.get_drivable_tiles()
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
@@ -1523,7 +1522,7 @@ class Map:
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
-        assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
+        #assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
         if tile not in self.tile_to_bundle_map:
             return None
         bundles = self.tile_to_bundle_map[tile]
@@ -1632,15 +1631,17 @@ class Map:
     def get_drivable_tiles(self):
         drivable_tiles = []
         non_drivable_nodes = []
-        for xy in self.drivable_nodes:
+        drivable_nodes = []
+        for xy in self.nodes:
             if self.grid[xy] == '-':
                 symbol = '.'
                 non_drivable_nodes.append(xy)
             else:
+                drivable_nodes.append(xy)
                 symbol = self.grid[xy]
             tile = DrivableTile(xy,symbol)
             drivable_tiles.append(tile)
-        return drivable_tiles, non_drivable_nodes
+        return drivable_tiles, drivable_nodes, non_drivable_nodes
 
     def get_grid(self, csv_filename):
         grid = dict()
@@ -1766,7 +1767,7 @@ class Map:
                 cell_neighbors.append(Neighbor(xyt=neighbor_xyt, weight=weight, name=neighbor_name))
             return cell_neighbors
 
-        road_cells = [cell for cell in self.drivable_nodes if self.legal_orientations[cell]]
+        road_cells = [cell for cell in self.nodes if self.legal_orientations[cell]]
 
         for cell in road_cells:
             for direction in directions:
@@ -2303,7 +2304,7 @@ class SpecificationStructure():
 
 class TrafficLight:
     # 15, 4, 4
-    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=4, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
         self.durations['green'] = t_green
@@ -2485,9 +2486,9 @@ class QuasiSimultaneousGame(Game):
                     agent.run()
 
     def play_step(self):
-        for agent in self.agent_set:
-            print(agent.state)
-            print(agent.supervisor.goals)
+        #for agent in self.agent_set:
+            #print(agent.state)
+            #print(agent.supervisor.goals)
         self.sys_step()
         self.env_step()
 
@@ -2573,7 +2574,7 @@ def start_game_from_trace(filename, t_index):
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
-    print(traces['collisions_dict'])
+    print(traces['collision_dict'])
     print(traces['out_of_bounds_dict'])
     pass
 
@@ -2582,7 +2583,7 @@ class IntentionProposer:
         pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.5)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.45)
     output_filename = 'game.p'
 
     # play a normal game
