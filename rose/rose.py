@@ -299,8 +299,12 @@ class Car(Agent):
             return agent_winner.get_id() == self.get_id()
 
     def get_length_along_bundle(self, state=None):
+<<<<<<< Updated upstream
         #__import__('ipdb').set_trace(context=21)
         #assert self.supervisor, 'Supervisory controller required!'
+=======
+        assert self.supervisor, 'Supervisory controller required!'
+>>>>>>> Stashed changes
         if state is None: state=self.state
         x, y = state.x, state.y
         try: 
@@ -689,7 +693,7 @@ class Car(Agent):
                         return []
 
         return send_requests_list
-
+    
     #============verifying agent back-up plan invariance===================#
     def find_lead_agent(self, state=None, wall=False):
         #__import__('ipdb').set_trace(context=21)
@@ -704,14 +708,10 @@ class Car(Agent):
             # check agents in these tiles
             for i in range(0, len(tiles_x)):
                 # as soon as agent found in nearest tile, return lead vehicle
-                if wall:
-                    if (tiles_x[i], tiles_y[i]) in self.supervisor.game.map.non_drivable_nodes:
-                        return (tiles_x[i], tiles_y[i])
-                else:
-                    if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
-                        agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                        if (agent.get_id() != self.get_id()):
-                            return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
+                    agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                    if (agent.get_id() != self.get_id()):
+                        return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
@@ -2614,8 +2614,15 @@ def debug_game(in_filename, output_filename):
     print(traces['out_of_bounds_dict'])
 
 if __name__ == '__main__':
+<<<<<<< Updated upstream
     the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
     output_filename = 'game.p'
+=======
+#    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
+    #the_map = Map('./maps/straight_road', default_spawn_probability=0.65)
+    output_filename = 'game_city.p'
+>>>>>>> Stashed changes
 
     game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
     game.play(outfile=output_filename, t_end=100)
