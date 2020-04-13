@@ -146,20 +146,28 @@ class Agent:
         all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
         occ = self.query_occupancy(ctrl)
         if occ is None:
-            print(self.state.__tuple__())
-            print(ctrl)
-            print("Invalid action chosen!!!!!")
             return True
         else:
             action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         collision_check = len(gridpts_intersect) > 0
         if collision_check:
-            __import__('ipdb').set_trace(context=21)
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            print(ag.state)
-            print(ag.intention)
+            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+            else:
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention))
+            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
+    
+    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
+        out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
+        if out_of_bounds_chk:
+            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+            else:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(), ctrl, self.state.__tuple__()))
+            print("ERROR: Updated state makes agent out of bounds!!")
 
     def check_joint_state_safety(self):
         for gridpt, agent in self.supervisor.game.occupancy_dict.items():
@@ -182,14 +190,14 @@ class Agent:
     def apply(self, ctrl):
         #print("applying action")
         # check for collision with any of the other agents
-        collision_chk = self.check_collision(ctrl)
-        #print(not collision_chk)
+        prior_state = self.state
+        self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
         joint_state_safety_chk = self.check_joint_state_safety()
         #print(joint_state_safety_chk)
-        return not collision_chk, joint_state_safety_chk
 
 
 class Gridder(Agent):
@@ -504,7 +512,6 @@ class Car(Agent):
     def get_max_forward_ctrl(self):
         lead_agent = self.find_lead_agent()
         if lead_agent is None:
-            print("No lead agent")
             ctrl = {'acceleration': self.a_max, 'steer': 'straight'}
             return ctrl
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
@@ -567,8 +574,8 @@ class Car(Agent):
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
         # print all flags for debugging
-        print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
+        #print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
+        #print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
 
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
@@ -993,7 +1000,8 @@ class Game:
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
-        self.collisions = []
+        self.collision_dict = dict()
+        self.out_of_bounds_dict = dict()
 
     def update_occupancy_dict(self):
         occupancy_dict = dict()
@@ -1006,6 +1014,8 @@ class Game:
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
+                if source.node[0] == sink.node[0] or source.node[1] == sink.node[1]:
+                    return
                 new_car = create_default_car(source, sink, self)
                 # check if new car is on an intersection tile
                 orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
@@ -1070,7 +1080,7 @@ class Game:
                 artist.enable_window_moving()
 
                 stdscr.clear()
-                for node in self.map.drivable_nodes:
+                for node in self.map.nodes:
                     node_x, node_y = node
                     if self.map.grid[node] == '-':
                         draw_str = '.'
@@ -1186,8 +1196,6 @@ class Game:
             if write_bool:
                 snapshot = self.save_snapshot()
                 traces[self.time] = snapshot
-                traces["map_name"] = self.map.map_name
-                traces["spawn_probability"] = self.map.default_spawn_probability
             #self.check_conflict_requests_karena_debug()
 
             self.play_step()
@@ -1195,7 +1203,11 @@ class Game:
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
-            traces["collisions"] = list(set(self.collisions))
+            #traces["collisions"] = list(set(self.collisions))
+            traces["map_name"] = self.map.map_name
+            traces["spawn_probability"] = self.map.default_spawn_probability
+            traces["collision_dict"] = self.collision_dict
+            traces["out_of_bounds_dict"] = self.out_of_bounds_dict
             traces["t_end"] = t_end
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -1325,8 +1337,8 @@ class Map:
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
-        self.drivable_nodes = list(self.grid.keys())
-        self.drivable_tiles, self.non_drivable_nodes = self.get_drivable_tiles()
+        self.nodes = list(self.grid.keys())
+        self.drivable_tiles, self.drivable_nodes, self.non_drivable_nodes = self.get_drivable_tiles()
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
@@ -1510,7 +1522,7 @@ class Map:
         return left_turn_tiles
 
     def directed_tile_to_bundle(self, tile, heading=None):
-        assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
+        #assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
         if tile not in self.tile_to_bundle_map:
             return None
         bundles = self.tile_to_bundle_map[tile]
@@ -1619,15 +1631,17 @@ class Map:
     def get_drivable_tiles(self):
         drivable_tiles = []
         non_drivable_nodes = []
-        for xy in self.drivable_nodes:
+        drivable_nodes = []
+        for xy in self.nodes:
             if self.grid[xy] == '-':
                 symbol = '.'
                 non_drivable_nodes.append(xy)
             else:
+                drivable_nodes.append(xy)
                 symbol = self.grid[xy]
             tile = DrivableTile(xy,symbol)
             drivable_tiles.append(tile)
-        return drivable_tiles, non_drivable_nodes
+        return drivable_tiles, drivable_nodes, non_drivable_nodes
 
     def get_grid(self, csv_filename):
         grid = dict()
@@ -1753,7 +1767,7 @@ class Map:
                 cell_neighbors.append(Neighbor(xyt=neighbor_xyt, weight=weight, name=neighbor_name))
             return cell_neighbors
 
-        road_cells = [cell for cell in self.drivable_nodes if self.legal_orientations[cell]]
+        road_cells = [cell for cell in self.nodes if self.legal_orientations[cell]]
 
         for cell in road_cells:
             for direction in directions:
@@ -2160,10 +2174,7 @@ class SpecificationStructureController(Controller):
         #choice = plant.get_intention()
         #plant.apply(choice)
         ctrl = plant.action_selection_strategy()
-        no_collision_chk, safe_state_chk = plant.apply(ctrl)
-        # add in that collision occurred at which time step
-        if not no_collision_chk or not safe_state_chk:
-            self.game.collisions.append(self.game.time)
+        plant.apply(ctrl)
 
 class SupervisoryController():
     def _init__(self):
@@ -2293,7 +2304,7 @@ class SpecificationStructure():
 
 class TrafficLight:
     # 15, 4, 4
-    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=4, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
         self.durations['green'] = t_green
@@ -2316,7 +2327,7 @@ class TrafficLight:
     def set_traffic_lights(self, hstate, htimer):
         #traffic_light = self.tile_to_traffic_light_map[traffic_tile]
         assert hstate in ['red', 'yellow', 'green']
-        assert htimer < traffic_light.durations[hstate]
+        assert htimer < self.durations[hstate]
         self.hstate = hstate
         self.htimer = htimer
 
@@ -2475,6 +2486,9 @@ class QuasiSimultaneousGame(Game):
                     agent.run()
 
     def play_step(self):
+        #for agent in self.agent_set:
+            #print(agent.state)
+            #print(agent.supervisor.goals)
         self.sys_step()
         self.env_step()
 
@@ -2557,29 +2571,28 @@ def start_game_from_trace(filename, t_index):
     # start the game
     game.play(t_end=100)
 
+def print_debug_info(filename):
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    print(traces['collision_dict'])
+    print(traces['out_of_bounds_dict'])
+    pass
 
 class IntentionProposer:
     def __init__(self):
         pass
 
 if __name__ == '__main__':
-#    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.01)
-#    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
-#    the_map = Map('./maps/parking_lot', default_spawn_probability=0.1)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.45)
     output_filename = 'game.p'
 
+    # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=40)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=100)
+    #game.animate(frequency=0.01)
 
-    #game = Game(game_map=the_map)
-    #num_agents = 2
-    #play_fixed_agent_game_karena_debug(num_agents, game)
+    # print debug info 
+    debug_filename = os.getcwd()+'/saved_traces/game.p'
+    print_debug_info(debug_filename)
 
-    #def world_changer(func):
-    #    def world_changing_function(*args, **kwargs):
-    #        func(*args, **kwargs)
-    #        plant = args[1]
-    #        plant.supervisor.game.update_occupancy_dict()
-    #    return world_changing_function
+    # play debugged game 
