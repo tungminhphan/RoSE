@@ -16,7 +16,7 @@ for color in car_colors:
 
 
 # animate the files completely
-def traces_to_animation(filename):
+def traces_to_animation(filename, out_dir):
     # extract out traces from pickle file
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
@@ -36,7 +36,7 @@ def traces_to_animation(filename):
         plot_cars(agents)
         plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
-        img_name = os.getcwd()+'/imgs/plot_'+plot_name+'.png'
+        img_name = out_dir+'/plot_'+plot_name+'.png'
         fig.savefig(img_name)
     animate_images()
 
@@ -84,11 +84,12 @@ def plot_map(map, grid_on=False):
         ax.add_patch(rect)
 
     plt.gca().invert_yaxis()
+    plt.axis('on')
+
     if grid_on:
         ax.grid()
-        plt.axis('on')
-    else:
-        plt.axis('off')
+    #else:
+        #plt.axis('off')
 
 def draw_car(agent_state_tuple):
     # global params
@@ -150,18 +151,14 @@ def animate_images():
             duration=200, loop=3)
 
 if __name__ == '__main__':
-    output_dir = os.getcwd()+'/imgs/'
+    debug = False
+    if debug: 
+        output_dir = os.getcwd()+'/imgs/debug'
+        traces_file = os.getcwd()+'/saved_traces/debug/game.p'
+    else: 
+        output_dir = os.getcwd()+'/imgs/'
+        traces_file = os.getcwd()+'/saved_traces/game.p'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
-    #traces_to_animation(traces_file)
-    animate_images()
 
-    #animate_images()
-    #global ax
-    #fig, ax = plt.subplots()
-
-    # plot a map
-    #the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
-    #plot_map(the_map, grid_on=True)
-    #plt.show()
+    traces_to_animation(traces_file, output_dir)

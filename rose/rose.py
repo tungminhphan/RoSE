@@ -155,10 +155,12 @@ class Agent:
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         collision_check = len(gridpts_intersect) > 0
         if collision_check:
-            __import__('ipdb').set_trace(context=21)
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), (ag.intention))
-            print(ag.intention)
+            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+            else:
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention))
+            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
 
     def check_joint_state_safety(self):
@@ -182,21 +184,20 @@ class Agent:
     def apply(self, ctrl):
         # check for collision with any of the other agents
         collision_chk = self.check_collision(ctrl)
-        #print(not collision_chk)
-        print(self.state)
+        prior_state = self.state
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
-        # check whether the new state is 
+        # check whether the new state is out of bounds!!
         out_of_bounds_chk = (self.state.x, self.state.y) not in self.supervisor.game.map.drivable_nodes
         if out_of_bounds_chk:
-            print(self.state.x, self.state.y)
+            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+            else:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(), ctrl, self.state.__tuple__()))
             print("ERROR: Updated state makes agent out of bounds!!")
 
         # check whether the updated joint state is safe
         joint_state_safety_chk = self.check_joint_state_safety()
-        #print(joint_state_safety_chk)
-        return not collision_chk, joint_state_safety_chk
-
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -263,6 +264,8 @@ class Car(Agent):
                     pass
             scores.append(score)
 
+        #choice = np.where(scores == np.max(scores))[0][0]
+        #print(np.where(scores == np.max(scores))[0])
         choice = random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
 
@@ -688,7 +691,7 @@ class Car(Agent):
         return send_requests_list
 
     #============verifying agent back-up plan invariance===================#
-    def find_lead_agent(self, state=None):
+    def find_lead_agent(self, state=None, wall=False):
         #__import__('ipdb').set_trace(context=21)
         if state is None: state = self.state 
         arc_l, bundle = self.get_length_along_bundle(state=state)
@@ -701,10 +704,14 @@ class Car(Agent):
             # check agents in these tiles
             for i in range(0, len(tiles_x)):
                 # as soon as agent found in nearest tile, return lead vehicle
-                if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
-                    agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                    if (agent.get_id() != self.get_id()):
-                        return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                if wall:
+                    if (tiles_x[i], tiles_y[i]) in self.supervisor.game.map.non_drivable_nodes:
+                        return (tiles_x[i], tiles_y[i])
+                else:
+                    if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
+                        agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                        if (agent.get_id() != self.get_id()):
+                            return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
@@ -713,6 +720,11 @@ class Car(Agent):
         dx_behind = self.compute_dx(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
+    
+    def compute_gap_req_from_wall(self):
+        dx = self.compute_dx(self.a_min, self.state.v)
+        gap = dx+1
+
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
         #__import__('ipdb').set_trace(context=21)
@@ -989,7 +1001,8 @@ class Game:
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
-        self.collisions = []
+        self.collisions_dict = dict()
+        self.out_of_bounds_dict = dict()
         self.debug_flag = debug_flag
 
     def update_occupancy_dict(self):
@@ -1003,6 +1016,7 @@ class Game:
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
+                print(source.node, sink.node)
                 new_car = create_default_car(source, sink, self)
                 # check if new car is on an intersection tile
                 orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
@@ -1119,17 +1133,20 @@ class Game:
             if intentions is not None:
                 agent.set_debug_intention(intentions[i])
         self.update_occupancy_dict()
+    
 
     # code for debugging agent conflict requests
     def check_conflict_requests_karena_debug(self):
         #states = [(8,1,'east',1), (8,3,'east',1), (8,4,'east',1), (9,2,'east',1), (9,3,'east',1)]
         #intentions = [{'acceleration': 0, 'steer': 'left-lane' }, {'acceleration': 0, 'steer':'right-lane'}, \
         #    {'acceleration': 0, 'steer': 'right-lane' }, {'acceleration': 0, 'steer': 'straight' }, {'acceleration': 0, 'steer': 'left-lane'}]
-        states = [(18,88, 'north',0), (18,89,'north',0)]
-        intentions = [{'acceleration': 1, 'steer': 'right-lane'}, {'acceleration': 2, 'steer': 'right-turn' }]
+        states = [(27,47, 'east', 1)]
+        intentions = [{'acceleration': 3, 'steer': 'straight'}] # {'acceleration': 3, 'steer': 'right-turn' }]
         self.fix_agent_states_karena_debug(states, intentions)
+        # check the code for evaluating
+
         # checking conflict swapping code
-        self.send_and_receive_conflict_requests()
+        '''self.send_and_receive_conflict_requests()
         for agent in self.agent_set:
             print("NEW AGENT")
             print(agent.state.__tuple__())
@@ -1142,7 +1159,7 @@ class Game:
                 print(ag.state.__tuple__())
             print("received conflict requests from")
             for ag in agent.received_conflict_requests_from:
-                print(ag.state.__tuple__())
+                print(ag.state.__tuple__())'''
 
     # check that all agents in the current config have a backup plan
     def check_config_safety(self):
@@ -1173,7 +1190,7 @@ class Game:
             for agent_rec in agent.send_conflict_requests_to:
                 agent_rec.received_conflict_requests_from.append(agent)
 
-    def play(self, t_end=np.inf, outfile=None):
+    def play(self, t_end=np.inf, outfile=None, debug=False):
         # dump the map here and open json file
         write_bool = outfile is not None and t_end is not np.inf
         traces = dict()
@@ -1184,8 +1201,6 @@ class Game:
             if write_bool:
                 snapshot = self.save_snapshot()
                 traces[self.time] = snapshot
-                traces["map_name"] = self.map.map_name
-                traces["spawn_probability"] = self.map.default_spawn_probability
             #self.check_conflict_requests_karena_debug()
 
             self.play_step()
@@ -1193,7 +1208,12 @@ class Game:
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
-            traces["collisions"] = list(set(self.collisions))
+            if debug:
+                output_dir = output_dir+'/debug/'
+            traces["map_name"] = self.map.map_name
+            traces["spawn_probability"] = self.map.default_spawn_probability
+            traces["collisions_dict"] = self.collisions_dict
+            traces["out_of_bounds_dict"] = self.out_of_bounds_dict
             traces["t_end"] = t_end
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -1642,6 +1662,10 @@ class Map:
 
     def get_IO_map(self):
         sources, sinks = self.get_sources_sinks()
+        #print('sources')
+        #[print(source.node) for source in sources]
+        #print('sinks')
+        #[print(sink.node) for sink in sinks]
         IO_map = IOMap(sources=sources,sinks=sinks,map=dict())
         for source in IO_map.sources:
             IO_map.map[source] = []
@@ -1660,9 +1684,11 @@ class Map:
                     is_sink = self.road_map.out_degree(inp) == 0
                     is_source = self.road_map.in_degree(inp) == 0
                 if is_sink:
+                    #if self.legal_orientations[tile] is not None: 
                     sink = Sink(inp)
                     presinks.append(sink)
                 if is_source:
+                    #if self.legal_orientations[tile] is not None:
                     source = Source(inp, spawn_probability=self.default_spawn_probability)
                     presources.append(source)
         return presources, presinks
@@ -2098,15 +2124,21 @@ class StaticObstacleOracle(Oracle):
             return False
         else:
         # check if backup plan would be safe
-            next_state = next_occupancy[-1]
-            tile_sequence_chain = plant.query_backup_plan(state=next_state)
-            tiles = list(od.fromkeys([tile for tiles in [tile_turn[-1]
-                for tile_turn in tile_sequence_chain] for tile in
-                tiles]))
-            for tile in tiles:
-                if not (tile in game.map.drivable_nodes):
+            tiles = self.get_tiles_for_safety_plan()
+            for tile in tiles: 
+                if tile not in self.supervisor.game.map.drivable_nodes:
                     return False
             return True
+                
+            #next_state = next_occupancy[-1]
+            #tile_sequence_chain = plant.query_backup_plan(state=next_state)
+            #tiles = list(od.fromkeys([tile for tiles in [tile_turn[-1]
+            #    for tile_turn in tile_sequence_chain] for tile in
+            #    tiles]))
+            #for tile in tiles:
+            #    if not (tile in game.map.drivable_nodes):
+            #        return False
+            #return True
 
     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
         next_state = plant.query_occupancy(ctrl_action)[-1]
@@ -2161,13 +2193,8 @@ class SpecificationStructureController(Controller):
         #choice = random.choice(np.where(scores == np.max(scores))[0])
         #collision_chk, safe_state_chk = plant.apply(all_ctrls[choice])
 
-        #choice = plant.get_intention()
-        #plant.apply(choice)
         ctrl = plant.action_selection_strategy()
-        no_collision_chk, safe_state_chk = plant.apply(ctrl)
-        # add in that collision occurred at which time step
-        if not no_collision_chk or not safe_state_chk:
-            self.game.collisions.append(self.game.time)
+        plant.apply(ctrl)
 
 class SupervisoryController():
     def _init__(self):
@@ -2297,7 +2324,7 @@ class SpecificationStructure():
 
 class TrafficLight:
     # 15, 4, 4
-    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=4, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
         self.durations['green'] = t_green
@@ -2317,10 +2344,10 @@ class TrafficLight:
     def get_id(self):
         return id(self)
 
-    def set_traffic_lights(self, hstate, htimer):
+    def set_traffic_light(self, hstate, htimer):
         #traffic_light = self.tile_to_traffic_light_map[traffic_tile]
         assert hstate in ['red', 'yellow', 'green']
-        assert htimer < traffic_light.durations[hstate]
+        assert htimer < self.durations[hstate]
         self.hstate = hstate
         self.htimer = htimer
 
@@ -2485,6 +2512,10 @@ class QuasiSimultaneousGame(Game):
                     agent.run()
 
     def play_step(self):
+        # printing out all agents and states and their goals
+        for agent in self.agent_set:
+            print(agent.state)
+            print(agent.supervisor.goals)
         self.sys_step()
         self.env_step()
 
@@ -2509,7 +2540,7 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     game.play(outfile=output_filename, t_end=1)
 
 # restart scenario from saved traces at given t_index
-def start_game_from_trace(filename, t_index):
+def start_game_from_trace(filename, t_index, output_filename):
     # make a car from trace
     # car_trace = (x, y, heading, v, agent_color, bubble, goals, param)
     def make_car(game, car_trace):
@@ -2519,6 +2550,8 @@ def start_game_from_trace(filename, t_index):
         end = goal
         car = Car(x=x,y=y,heading=heading,v=v,v_min=param['v_min'],v_max=param['v_max'], a_min=param['a_min'],a_max=param['a_max'])
         car.set_controller(spec_struct_controller)
+        print("state", x, y, heading, v)
+        print("goal", goal)
         supervisor = BundleGoalExit(game=game, goals=[end])
         car.set_supervisor(supervisor)
         return car
@@ -2564,31 +2597,34 @@ def start_game_from_trace(filename, t_index):
         game.add_agent(ag)
 
     # start the game
-    game.play(t_end=100)
+    game.play(t_end=5, outfile=output_filename, debug=True)
 
 
 class IntentionProposer:
     def __init__(self):
         pass
 
+def debug_game(in_filename, output_filename):
+    with open(in_filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    print(traces['collisions_dict'])
+    print(traces['out_of_bounds_dict'])
+
 if __name__ == '__main__':
-#    the_map = Map('./maps/straight_road', default_spawn_probability=0.1)
-    the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
-#    the_map = Map('./maps/straight_road', default_spawn_probability=0.01)
-#    the_map = Map('./maps/parking_lot', default_spawn_probability=0.1)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
     game.play(outfile=output_filename, t_end=100)
-    # game.animate(frequency=0.01)
 
-    #game = QuasiSimultaneousGame(game_map=the_map, debug_flag=True)
-    #num_agents = 2
+
+
+    # DEBUGGING
+    #file_sv = os.getcwd()+'/saved_traces/game.p'
+    #debug_game = debug_game(file_sv, output_filename)
+    #start_game_from_trace(file_sv, 13, output_filename)
+
+
+    # MANUALLY DEBUG
+    #num_agents = 1
     #play_fixed_agent_game_karena_debug(num_agents, game)
-
-    #def world_changer(func):
-    #    def world_changing_function(*args, **kwargs):
-    #        func(*args, **kwargs)
-    #        plant = args[1]
-    #        plant.supervisor.game.update_occupancy_dict()
-    #    return world_changing_function
