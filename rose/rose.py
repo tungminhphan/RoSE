@@ -1017,6 +1017,9 @@ class Game:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
                 print(source.node, sink.node)
+                # for now check if source and sink are 
+                if source.node[0] == sink.node[0] or source.node[1] == sink.node[1]:
+                    return
                 new_car = create_default_car(source, sink, self)
                 # check if new car is on an intersection tile
                 orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
