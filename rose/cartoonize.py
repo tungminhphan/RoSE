@@ -95,6 +95,12 @@ def draw_car(agent_state_tuple):
     x, y, theta, v, color, bubble, goals, param = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
+    # need to flip since cars are inverted
+    if theta_d == 90: 
+        theta_d = 180
+    elif theta_d == 180:
+        theta_d = 90
+
     car_fig = car_fig.rotate(theta_d, expand=False)
     ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y, y+1, x, x+1])
 
@@ -110,7 +116,7 @@ def plot_bubble(bubble):
     ax.axis('equal')
 
     for grid in bubble:
-        rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.5)
+        rect = patches.Rectangle((grid[1],grid[0]),0.8,0.8,linewidth=0.5,facecolor='grey', alpha=0.5)
         ax.add_patch(rect)
 
     x_min = -5
