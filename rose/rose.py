@@ -140,64 +140,20 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
-    # check for collision with occupancy dict
-    def check_collision(self, ctrl):
-        # collect all grid points from occupancy dict except for own agent
-        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
-        occ = self.query_occupancy(ctrl)
-        if occ is None:
-            return True
-        else:
-            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
-        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
-        collision_check = len(gridpts_intersect) > 0
-        if collision_check:
-            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
-                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
-            else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
-        return len(gridpts_intersect) > 0
-    
-    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
-        out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
-        if out_of_bounds_chk:
-            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
-            else:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(), ctrl, self.state.__tuple__()))
-            print("ERROR: Updated state makes agent out of bounds!!")
-
-    def check_joint_state_safety(self):
-        for gridpt, agent in self.supervisor.game.occupancy_dict.items():
-            x, y, v = agent.state.x, agent.state.y, agent.state.v
-            #print("checking agent")
-            #print(agent.state)
-            lead_agent = agent.find_lead_agent()
-            if lead_agent:
-                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
-                # not safe if gap is not large enough for any one of the agents
-                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
-                    return False
-        return True
-
     def query_next_state(self, ctrl):
         assert ctrl in self.get_all_ctrl()
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
-        #print("applying action")
-        # check for collision with any of the other agents
         prior_state = self.state
+        # check for collision with any of the other agents
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
-        joint_state_safety_chk = self.check_joint_state_safety()
-        #print(joint_state_safety_chk)
+        self.check_joint_state_safety()
 
 
 class Gridder(Agent):
@@ -665,9 +621,6 @@ class Car(Agent):
         #print(self.state)
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
-                #print("checking with agent")
-                #print(agent.state)
-                #print((self.get_length_along_bundle()[0], agent.get_length_along_bundle()[0]))
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
                     chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
@@ -687,6 +640,52 @@ class Car(Agent):
         return send_requests_list
 
     #============verifying agent back-up plan invariance===================#
+    # check for collision with occupancy dict
+    def check_collision(self, ctrl):
+        # collect all grid points from occupancy dict except for own agent
+        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
+        occ = self.query_occupancy(ctrl)
+        if occ is None:
+            return True
+        else:
+            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+        collision_check = len(gridpts_intersect) > 0
+        if collision_check:
+            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
+            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                self.supervisor.game.collision_dict[self.supervisor.game.time] = \
+                    [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+            else:
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), \
+                    self.intention, ag.state.__tuple__(), ag.intention))
+            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
+        return len(gridpts_intersect) > 0
+    
+    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
+        out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
+        if out_of_bounds_chk:
+            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = \
+                    [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+            else:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(),\
+                    ctrl, self.state.__tuple__()))
+            print("ERROR: Updated state makes agent out of bounds!!")
+
+    def check_joint_state_safety(self, occupancy_dict=None):
+        if occupancy_dict is None: occupancy_dict = self.supervisor.game.occupancy_dict
+        for gridpt, agent in occupancy_dict.items():
+            x, y, v = agent.state.x, agent.state.y, agent.state.v
+            lead_agent = agent.find_lead_agent()
+            if lead_agent:
+                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
+                # not safe if gap is not large enough for any one of the agents
+                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                    return False
+        return True
+
     def find_lead_agent(self, state=None):
         if state is None: state = self.state
         try:
@@ -796,13 +795,6 @@ class Car(Agent):
 
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
-        #__import__('ipdb').set_trace(context=21)
-        # get acceleration needed to come to a stop (if not enough, maximal)
-        #print("CHECKING MAX BRAKING")
-        #print(self.state)
-        #print(agent.state)
-        #print(self.intention)
-        #print(self.get_backup_plan_ctrl())
         chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
         return not chk_valid_actions
 
@@ -991,6 +983,56 @@ class Artist:
         if in_range(x, self.x_min, self.x_max-1) and in_range(y, self.y_min, self.y_max):
             self.stdscr.addstr(x-self.x_min, y-self.y_min, draw_str)
 
+# verifies whether or not spawned agent passes certain safety checks
+class SpawningContract():
+    def __init__(self, game, new_agent):
+        self.game = game
+        self.new_agent = new_agent
+        self.okay_to_spawn_flag = self.passes_all_checks()
+        pass 
+
+    # passes all necessary checks 
+    def passes_all_checks(self):
+        all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
+            self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection()
+        return all_checks
+
+    # check to make sure not overlapping with other agents
+    def valid_init_state(self):
+        return (self.new_agent.state.x, self.new_agent.state.y) not in self.game.occupancy_dict 
+
+    # check that not in inevitable collision state with other agents or static obstacles
+    def valid_init_safe_state(self):
+        # make sure that max back-up plan can avoid collision with wall
+        valid_static_obs = True
+        tiles = self.new_agent.get_tiles_for_safety_plan(self.new_agent.state)
+        for tile in tiles: 
+            if tile not in self.game.map.drivable_nodes:
+                valid_static_obs = False
+
+        # make sure that joint state of all agents with this agent included is safe
+        # add to a copy of the occupancy dict
+        valid_joint_state = True
+        occupancy_dict_chk = self.game.occupancy_dict.copy()
+        occupancy_dict_chk[(self.new_agent.state.x, self.new_agent.state.y)] = self.new_agent
+        valid_joint_state = self.new_agent.check_joint_state_safety(occupancy_dict=occupancy_dict_chk)
+
+        return valid_joint_state and valid_static_obs
+
+    # check to make sure agent isn't in a state that makes it impossible to follow
+    # traffic rules
+    def valid_traffic_state_for_traffic_lights(self):
+        traffic_light_oracle = TrafficLightOracle()
+        for ctrl in self.new_agent.get_all_ctrl():
+            chk_ctrl = traffic_light_oracle.evaluate(ctrl, self.new_agent, self.game)
+            if chk_ctrl: return True
+        return False
+
+    # check to make sure agent is not in an intersection
+    def agent_not_in_intersection(self):
+        orientations = self.game.map.legal_orientations[(self.new_agent.state.x, self.new_agent.state.y)]
+        return not (len(orientations) > 1)
+
 class Game:
     # combines scenario + agents for game
     def __init__(self, game_map, agent_set=[]):
@@ -1011,29 +1053,37 @@ class Game:
         self.occupancy_dict = occupancy_dict
 
     def spawn_agents(self):
+        def valid_source_sink(source, sink):
+            return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
+
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
-                if source.node[0] == sink.node[0] or source.node[1] == sink.node[1]:
+                if not valid_source_sink(source, sink):
                     return
-                new_car = create_default_car(source, sink, self)
-                # check if new car is on an intersection tile
-                orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
-                in_intersection = len(orientations) > 1
 
-                # check if new car being spawned is safe!!
-                if (new_car.state.x, new_car.state.y) not in self.occupancy_dict and not in_intersection:
-                    # add car
+                # check if new car satisfies spawning safety contract
+                new_car = create_default_car(source, sink, self)
+                spawning_contract = SpawningContract(self, new_car)
+                if spawning_contract:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
 
-                    # only keep if safe
-                    check_safe_init =  new_car.check_joint_state_safety()
+                # check if new car is on an intersection tile
+                #orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
+                #in_intersection = len(orientations) > 1
 
-                    if not check_safe_init:
-                        self.agent_set.remove(new_car)
-                        del self.occupancy_dict[(new_car.state.x, new_car.state.y)]
+                # check if new car being spawned is safe!!
+                #if (new_car.state.x, new_car.state.y) not in self.occupancy_dict and not in_intersection:
+                    # add car
+                    #self.agent_set.append(new_car)
+                    #self.update_occupancy_dict()
+                    # only keep if safe
+                    #check_safe_init =  new_car.check_joint_state_safety()
+                    #if not check_safe_init:
+                        #self.agent_set.remove(new_car)
                         # if not safe, remove the agent from occupancy dict
+                        #del self.occupancy_dict[(new_car.state.x, new_car.state.y)]
 
     def add_agent(self, agent):
         self.agent_set.append(agent)
@@ -1058,6 +1108,7 @@ class Game:
 
         # return dict with all the info
         return {"lights": lights, "agents": agents}
+
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
             traces.update(new_entry)
@@ -2167,12 +2218,7 @@ class SpecificationStructureController(Controller):
                     pass
             scores.append(score)
 
-        # action selection strategy action
-        #choice = random.choice(np.where(scores == np.max(scores))[0])
-        #collision_chk, safe_state_chk = plant.apply(all_ctrls[choice])
-
-        #choice = plant.get_intention()
-        #plant.apply(choice)
+        # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         plant.apply(ctrl)
 
