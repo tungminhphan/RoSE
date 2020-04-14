@@ -529,10 +529,6 @@ class Car(Agent):
         cluster_chk, winning_agent = self.check_conflict_resolution_winner(specify_agent=True)
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
-        # print all flags for debugging
-        #print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        #print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
-
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
             # TODO: make less conservative?? also update token count or not?
@@ -691,7 +687,6 @@ class Car(Agent):
         try:
             arc_l, bundle = self.get_length_along_bundle()
         except:
-            # if agent out of
             return None
 
         d_vec = DIRECTION_TO_VECTOR[state.heading]
@@ -716,13 +711,11 @@ class Car(Agent):
         return gap
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
-        #__import__('ipdb').set_trace(context=21)
         # get occupancy for both actions
         occ_1 = ag_1.query_occupancy(ctrl_1)
         occ_2 = ag_2.query_occupancy(ctrl_2)
         # if invalid actions, print an error
         if occ_1 is None or occ_2 is None:
-            #print("error: agent intention not allowed")
             return False
         # check occupancy intersection
         chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
@@ -736,7 +729,6 @@ class Car(Agent):
 
         # check agents are in the same lane
         def check_same_lane(ag_1, ag_2):
-            #__import__('ipdb').set_trace(context=21)
             try:
                 width_1, bundle_1 = ag_1.get_width_along_bundle()
             except:
@@ -2206,8 +2198,6 @@ class SpecificationStructureController(Controller):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
     def run_on(self, plant):
-        #print("choosing action for agent " + str(plant.state.__tuple__()))
-        #print(plant.supervisor.game.occupancy_dict.keys())
         scores = []
         all_ctrls = plant.get_all_ctrl()
         for ctrl in all_ctrls:
