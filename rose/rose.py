@@ -803,16 +803,8 @@ class Car(Agent):
         # check if gap between two agents is large enough for stopping!
         # TODO: see whether end state after these actions still have a back-up plan
         def intentions_conflict(agent):
-            #__import__('ipdb').set_trace(context=21)
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
             return not chk_valid_actions
-
-        # check whether your action requires other agent to do something other than would it might want?
-        #def intention_forward_action_conflict(agent):
-        #    forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
-        #    chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
-        #    return not chk_valid_actions
-
         return intentions_conflict(agent) #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
@@ -2116,6 +2108,29 @@ class TrafficLightOracle(Oracle):
         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
         return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
+# oracle in charge of checking actions of agents if they are in an intersection
+# action is invalid if agent is in intersection and wants to change lanes
+class TrafficIntersectionOracle(Oracle):
+    def __init__(self):
+        super(TrafficIntersectionOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        # if agent isn't in intersection return true
+        if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
+            return True
+        # else check if action is a lane change move (which isn't allowed)
+        else: 
+            if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
+                return False
+            else:
+                return True
+
+class TrafficLightTurningLanesOracle(Oracle):
+    def __init__(self):
+        super(TrafficLightTurningLanesOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        pass 
+
+
 #TODO: improve some calc here...
 class BackupPlanSafetyOracle(Oracle):
     def __init__(self):
@@ -2442,8 +2457,10 @@ def get_default_car_ss():
     traffic_light_oracle = TrafficLightOracle()
     legal_orientation_oracle = LegalOrientationOracle()
     progress_oracle = BundleProgressOracle()
-    oracle_set = [static_obstacle_oracle, traffic_light_oracle, legal_orientation_oracle, progress_oracle, backup_plan_safety_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 1])
+    traffic_intersection_oracle = TrafficIntersectionOracle()
+    oracle_set = [static_obstacle_oracle, traffic_light_oracle, legal_orientation_oracle, \
+        progress_oracle, backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 1, 2])
     return specification_structure
 
 def create_default_car(source, sink, game):
