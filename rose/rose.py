@@ -154,64 +154,20 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
-    # check for collision with occupancy dict
-    def check_collision(self, ctrl):
-        # collect all grid points from occupancy dict except for own agent
-        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
-        occ = self.query_occupancy(ctrl)
-        if occ is None:
-            return True
-        else:
-            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
-        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
-        collision_check = len(gridpts_intersect) > 0
-        if collision_check:
-            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
-                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention,
-                    ag.state.__tuple__(), ag.intention)]
-            else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(),
-                    self.intention, ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
-        return len(gridpts_intersect) > 0
-
-    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
-        out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
-        if out_of_bounds_chk:
-            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
-            else:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(), ctrl, self.state.__tuple__()))
-            print("ERROR: Updated state makes agent out of bounds!!")
-
-    def check_joint_state_safety(self):
-        for gridpt, agent in self.supervisor.game.occupancy_dict.items():
-            x, y, v = agent.state.x, agent.state.y, agent.state.v
-            lead_agent = agent.find_lead_agent()
-            if lead_agent:
-                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
-                # not safe if gap is not large enough for any one of the agents
-                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
-                    return False
-        return True
-
     def query_next_state(self, ctrl):
         assert ctrl in self.get_all_ctrl()
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
-        #print("applying action")
-        # check for collision with any of the other agents
         prior_state = self.state
+        # check for collision with any of the other agents
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
-        joint_state_safety_chk = self.check_joint_state_safety()
-        #print(joint_state_safety_chk)
+        self.check_joint_state_safety()
 
 
 class Gridder(Agent):
@@ -589,10 +545,6 @@ class Car(Agent):
         cluster_chk, winning_agent = self.check_conflict_resolution_winner(specify_agent=True)
         chk_receive_request_from_winner = chk_receive_request_from_winning_agent(winning_agent)
 
-        # print all flags for debugging
-        #print("max_braking_flag, agent_type, bubble_chk, cluster_chk")
-        #print(self.agent_max_braking_not_enough, agent_type, bubble_chk, cluster_chk)
-
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
             # TODO: make less conservative?? also update token count or not?
@@ -681,9 +633,6 @@ class Car(Agent):
         #print(self.state)
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
-                #print("checking with agent")
-                #print(agent.state)
-                #print((self.get_length_along_bundle()[0], agent.get_length_along_bundle()[0]))
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
                     chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
@@ -703,12 +652,57 @@ class Car(Agent):
         return send_requests_list
 
     #============verifying agent back-up plan invariance===================#
+    # check for collision with occupancy dict
+    def check_collision(self, ctrl):
+        # collect all grid points from occupancy dict except for own agent
+        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
+        occ = self.query_occupancy(ctrl)
+        if occ is None:
+            return True
+        else:
+            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+        collision_check = len(gridpts_intersect) > 0
+        if collision_check:
+            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
+            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                self.supervisor.game.collision_dict[self.supervisor.game.time] = \
+                    [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+            else:
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), \
+                    self.intention, ag.state.__tuple__(), ag.intention))
+            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
+        return len(gridpts_intersect) > 0
+    
+    def check_out_of_bounds(self, agent, prior_state, ctrl, state):
+        out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
+        if out_of_bounds_chk:
+            if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = \
+                    [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+            else:
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(),\
+                    ctrl, self.state.__tuple__()))
+            print("ERROR: Updated state makes agent out of bounds!!")
+
+    def check_joint_state_safety(self, occupancy_dict=None):
+        if occupancy_dict is None: occupancy_dict = self.supervisor.game.occupancy_dict
+        for gridpt, agent in occupancy_dict.items():
+            x, y, v = agent.state.x, agent.state.y, agent.state.v
+            lead_agent = agent.find_lead_agent()
+            if lead_agent:
+                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
+                # not safe if gap is not large enough for any one of the agents
+                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                    return False
+        return True
+
     def find_lead_agent(self, state=None):
         if state is None: state = self.state
         try:
             arc_l, bundle = self.get_length_along_bundle()
         except:
-            # if agent out of
             return None
 
         d_vec = DIRECTION_TO_VECTOR[state.heading]
@@ -733,13 +727,11 @@ class Car(Agent):
         return gap
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
-        #__import__('ipdb').set_trace(context=21)
         # get occupancy for both actions
         occ_1 = ag_1.query_occupancy(ctrl_1)
         occ_2 = ag_2.query_occupancy(ctrl_2)
         # if invalid actions, print an error
         if occ_1 is None or occ_2 is None:
-            #print("error: agent intention not allowed")
             return False
         # check occupancy intersection
         chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
@@ -753,7 +745,6 @@ class Car(Agent):
 
         # check agents are in the same lane
         def check_same_lane(ag_1, ag_2):
-            #__import__('ipdb').set_trace(context=21)
             try:
                 width_1, bundle_1 = ag_1.get_width_along_bundle()
             except:
@@ -812,13 +803,6 @@ class Car(Agent):
 
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
-        #__import__('ipdb').set_trace(context=21)
-        # get acceleration needed to come to a stop (if not enough, maximal)
-        #print("CHECKING MAX BRAKING")
-        #print(self.state)
-        #print(agent.state)
-        #print(self.intention)
-        #print(self.get_backup_plan_ctrl())
         chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
         return not chk_valid_actions
 
@@ -827,16 +811,8 @@ class Car(Agent):
         # check if gap between two agents is large enough for stopping!
         # TODO: see whether end state after these actions still have a back-up plan
         def intentions_conflict(agent):
-            #__import__('ipdb').set_trace(context=21)
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
             return not chk_valid_actions
-
-        # check whether your action requires other agent to do something other than would it might want?
-        #def intention_forward_action_conflict(agent):
-        #    forward_action = {'acceleration': agent.a_max, 'steer': 'straight'}
-        #    chk_valid_actions = self.check_valid_actions(self, self.intention, agent, forward_action)
-        #    return not chk_valid_actions
-
         return intentions_conflict(agent) #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
@@ -1007,6 +983,62 @@ class Artist:
         if in_range(x, self.x_min, self.x_max-1) and in_range(y, self.y_min, self.y_max):
             self.stdscr.addstr(x-self.x_min, y-self.y_min, draw_str)
 
+# verifies whether or not spawned agent passes certain safety checks
+class SpawningContract():
+    def __init__(self, game, new_agent):
+        self.game = game
+        self.new_agent = new_agent
+        self.okay_to_spawn_flag = self.passes_all_checks()
+
+    # passes all necessary checks 
+    def passes_all_checks(self):
+        print(self.valid_init_state(), self.valid_init_safe_state(), \
+            self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
+        all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
+            self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
+                and self.agent_facing_right_direction()
+        return all_checks
+
+    # check to make sure not overlapping with other agents
+    def valid_init_state(self):
+        return (self.new_agent.state.x, self.new_agent.state.y) not in self.game.occupancy_dict 
+
+    # check that not in inevitable collision state with other agents or static obstacles
+    def valid_init_safe_state(self):
+        # make sure that max back-up plan can avoid collision with wall
+        valid_static_obs = True
+        tiles = self.new_agent.get_tiles_for_safety_plan(self.new_agent.state)
+        for tile in tiles: 
+            if tile not in self.game.map.drivable_nodes:
+                valid_static_obs = False
+
+        # make sure that joint state of all agents with this agent included is safe
+        # add to a copy of the occupancy dict
+        valid_joint_state = True
+        occupancy_dict_chk = self.game.occupancy_dict.copy()
+        occupancy_dict_chk[(self.new_agent.state.x, self.new_agent.state.y)] = self.new_agent
+        valid_joint_state = self.new_agent.check_joint_state_safety(occupancy_dict=occupancy_dict_chk)
+        return valid_joint_state and valid_static_obs
+
+    # check to make sure agent isn't in a state that makes it impossible to follow
+    # traffic rules
+    def valid_traffic_state_for_traffic_lights(self):
+        traffic_light_oracle = TrafficLightOracle()
+        for ctrl in self.new_agent.get_all_ctrl():
+            chk_ctrl = traffic_light_oracle.evaluate(ctrl, self.new_agent, self.game)
+            if chk_ctrl: return True
+        return False
+
+    # check to make sure agent is not in an intersection
+    def agent_not_in_intersection(self):
+        orientations = self.game.map.legal_orientations[(self.new_agent.state.x, self.new_agent.state.y)]
+        return not (len(orientations) > 1)
+    
+    # check agent is in the right legal orientation
+    def agent_facing_right_direction(self):
+        orientation = self.game.map.legal_orientations[(self.new_agent.state.x, self.new_agent.state.y)]
+        return orientation[0] == self.new_agent.state.heading
+
 class Game:
     # combines scenario + agents for game
     def __init__(self, game_map, agent_set=[]):
@@ -1027,29 +1059,21 @@ class Game:
         self.occupancy_dict = occupancy_dict
 
     def spawn_agents(self):
+        def valid_source_sink(source, sink):
+            return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
+
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
-                if source.node[0] == sink.node[0] or source.node[1] == sink.node[1]:
+                if not valid_source_sink(source, sink):
                     return
-                new_car = create_default_car(source, sink, self)
-                # check if new car is on an intersection tile
-                orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
-                in_intersection = len(orientations) > 1
 
-                # check if new car being spawned is safe!!
-                if (new_car.state.x, new_car.state.y) not in self.occupancy_dict and not in_intersection:
-                    # add car
+                # check if new car satisfies spawning safety contract
+                new_car = create_default_car(source, sink, self)
+                spawning_contract = SpawningContract(self, new_car)
+                if spawning_contract.okay_to_spawn_flag:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
-
-                    # only keep if safe
-                    check_safe_init =  new_car.check_joint_state_safety()
-
-                    if not check_safe_init:
-                        self.agent_set.remove(new_car)
-                        del self.occupancy_dict[(new_car.state.x, new_car.state.y)]
-                        # if not safe, remove the agent from occupancy dict
 
     def add_agent(self, agent):
         self.agent_set.append(agent)
@@ -1074,6 +1098,7 @@ class Game:
 
         # return dict with all the info
         return {"lights": lights, "agents": agents}
+
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
             traces.update(new_entry)
@@ -1395,8 +1420,8 @@ class Map:
         return plan
 
     def directed_tile_to_relative_bundle_tile(self, directed_tile):
-        tile, direction = directed_tile
-        bundle = self.directed_tile_to_bundle(tile, direction)
+        tile, _ = directed_tile
+        bundle = self.directed_tile_to_bundle(directed_tile)
         rel_tile = bundle.tile_to_relative_position(tile)
         return rel_tile
 
@@ -1414,9 +1439,9 @@ class Map:
             dtile_final = dtile_final[0]
 
         # determine which bundle dtile_start is in
-        bundle_start = self.directed_tile_to_bundle(dtile_start[0], dtile_start[1])
+        bundle_start = self.directed_tile_to_bundle(dtile_start)
         # determine which bundle dtile_final is in
-        bundle_final = self.directed_tile_to_bundle(dtile_final[0], dtile_final[1])
+        bundle_final = self.directed_tile_to_bundle(dtile_final)
 
         # if the two directed tiles do not belong to the same bundle
         if bundle_start != bundle_final:
@@ -1432,7 +1457,7 @@ class Map:
 
     def directed_tile_to_turns(self, directed_tile):
         turns = []
-        bundle = self.directed_tile_to_bundle(directed_tile[0], directed_tile[1])
+        bundle = self.directed_tile_to_bundle(directed_tile)
 
         for turn in self.right_turn_tiles[bundle]:
             if self.check_directed_tile_reachability(directed_tile, turn):
@@ -1502,7 +1527,7 @@ class Map:
         right = rotate_vector(forward, -np.pi/2)
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
         try:
-            next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
+            next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
             return next_bundle.is_rightmost_lane(next_tile), (next_tile, next_direction)
         except:
             return False, None
@@ -1519,7 +1544,7 @@ class Map:
         left = rotate_vector(forward, np.pi/2)
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
         try:
-            next_bundle = self.directed_tile_to_bundle(next_tile, next_direction)
+            next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
             return next_bundle.is_leftmost_lane(next_tile), (next_tile, next_direction)
         except:
             return False, None
@@ -1550,22 +1575,27 @@ class Map:
                     left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
-    def directed_tile_to_bundle(self, tile, heading=None):
-        #assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
+    def directed_tile_to_bundle(self, directed_tile):
+        """
+        given a tile and a direction, return the bundle containing that tile
+        """
+        # TODO: Fix to not have heading=None
+        # assert tile in self.tile_to_bundle_map, 'Tile does not belong to any bundle!'
+        tile, heading = directed_tile
         if tile not in self.tile_to_bundle_map:
             return None
         bundles = self.tile_to_bundle_map[tile]
-        if heading is None:
-            assert len(bundles) == 1
-            bundle = bundles[0]
-        else:
-            bundle_bool = np.nonzero([b.direction == heading for b in bundles])
-            if len(bundle_bool) == 0:
-                return None
-            else:
-                bundle_idx = bundle_bool[0][0]
-                bundle = bundles[bundle_idx]
-        return bundle
+        for bundle in bundles:
+            if heading == bundle.direction:
+                return bundle
+        return None
+        # try:
+        #bundle_bool = np.nonzero([b.direction == heading for b in bundles])
+        #if len(bundle_bool) == 0:
+        #    return None
+        #else:
+        #    bundle_idx = bundle_bool[0][0]
+        #    bundle = bundles[bundle_idx]
 
     def get_tile_to_traffic_light_map(self):
         tile_to_traffic_light_map = dict()
@@ -1986,36 +2016,47 @@ class BundleProgressOracle(Oracle):
     def evaluate(self, ctrl_action, plant, game):
         def backup_plan_is_ok_from_state(state, current_subgoal):
             tile_sequence_chain = plant.query_backup_plan(state=state)
+            # time-stamp, occupancy-tiles, which tile
             last_xy = tile_sequence_chain[-1][-1][-1]
             backup_xy = last_xy
+            # heading is unchanged because maximal braking backup plan does not change heading
             backup_dir = state.heading
             try:
                 return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
             except:
                 return False
 
+        # get current subgoal
         current_subgoal = plant.supervisor.subgoals[0]
-        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal[0], current_subgoal[1])
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+        # if subgoal_bundle is None: TODO: delete this?
+        #     return False
 
         current_xy = plant.state.x, plant.state.y
         current_dir = plant.state.heading
-        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_xy, current_dir)
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
 
+        # query next state
         queried_state = plant.query_occupancy(ctrl_action)[-1]
         queried_xy = queried_state.x, queried_state.y
         queried_dir = queried_state.heading
 
         try:
-            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle(queried_xy, queried_dir)
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
         except:
             return False
 
-        if subgoal_bundle is None:
-            return False
-
         if current_bundle != subgoal_bundle:
-            backup_plan_ok = backup_plan_is_ok_from_state(queried_state, current_subgoal)
-            return (queried_xy, queried_dir) == current_subgoal and backup_plan_ok
+            if len(plant.supervisor.subgoals) > 1:
+                next_subgoal = plant.supervisor.subgoals[1]
+                backup_plan_ok = backup_plan_is_ok_from_state(queried_state, next_subgoal)
+                if not backup_plan_ok:
+                    return False
+            bundle_change_success = (queried_xy, queried_dir) == current_subgoal
+            return bundle_change_success
         elif queried_bundle == subgoal_bundle:
             rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
             rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
@@ -2023,23 +2064,194 @@ class BundleProgressOracle(Oracle):
 
             dlong_curr = rel_goal[1]-rel_curr[1]
             dlong_next = rel_goal[1]-rel_next[1]
-            if dlong_next < 0:
-                return False
+            # if dlong_next < 0: TODO: delete?
+            #     return False
 
             dlatt_curr = abs(rel_curr[0]-rel_goal[0])
             dlatt_next = abs(rel_next[0]-rel_goal[0])
 
+            # check if strictly improving longitudinal/lateral distance
             latt_improves = dlatt_next < dlatt_curr
             long_improves = dlong_next < dlong_curr
             improves = latt_improves or long_improves
 
+            # check if at least maintaining longitudinal/lateral distance
             latt_maintains = dlatt_next <= dlatt_curr
             long_maintains = dlong_next <= dlong_curr
             maintains = latt_maintains and long_maintains
 
+            # TODO: separate into two different oracles to distinguish cases
+            # only need to check reachability for braking backup plan because this implies reachability for current action
             backup_plan_ok = backup_plan_is_ok_from_state(queried_state, current_subgoal)
             progress_up = improves and maintains and backup_plan_ok
             return progress_up
+        else:
+            return False
+
+class ImprovementBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(ImprovementBundleProgressOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+        # if subgoal_bundle is None: TODO: delete this?
+        #     return False
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                return True
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return False
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+            dlong_curr = rel_goal[1]-rel_curr[1]
+            dlong_next = rel_goal[1]-rel_next[1]
+
+            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+            dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+            # check if strictly improving longitudinal/lateral distance
+            latt_improves = dlatt_next < dlatt_curr
+            long_improves = dlong_next < dlong_curr
+            improves = latt_improves or long_improves
+
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return improves
+        else:
+            return False
+
+class MaintenanceBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(MaintenanceBundleProgressOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                return True
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return True
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+            dlong_curr = rel_goal[1]-rel_curr[1]
+            dlong_next = rel_goal[1]-rel_next[1]
+
+            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+            dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+            # check if at least maintaining longitudinal/lateral distance
+            latt_maintains = dlatt_next <= dlatt_curr
+            long_maintains = dlong_next <= dlong_curr
+            maintains = latt_maintains and long_maintains
+
+            # TODO: separate into two different oracles to distinguish cases
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return maintains
+        else:
+            return False
+
+
+class BackUpPlanBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(BackUpPlanBundleProgressOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        def backup_plan_is_ok_from_state(state, current_subgoal):
+            tile_sequence_chain = plant.query_backup_plan(state=state)
+            # time-stamp, occupancy-tiles, which tile
+            last_xy = tile_sequence_chain[-1][-1][-1]
+            backup_xy = last_xy
+            # heading is unchanged because maximal braking backup plan does not change heading
+            backup_dir = state.heading
+            try:
+                return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
+            except:
+                return False
+
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        # this is where a bundle change may happen
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                if len(plant.supervisor.subgoals) > 1:
+                    next_subgoal = plant.supervisor.subgoals[1]
+                    return backup_plan_is_ok_from_state(queried_state, next_subgoal)
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return backup_plan_is_ok_from_state(queried_state, current_subgoal)
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return backup_plan_is_ok_from_state(queried_state, current_subgoal)
         else:
             return False
 
@@ -2105,6 +2317,29 @@ class TrafficLightOracle(Oracle):
         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
         return action_not_running_a_red_light and backup_plant_will_still_be_ok
+
+# oracle in charge of checking actions of agents if they are in an intersection
+# action is invalid if agent is in intersection and wants to change lanes
+class TrafficIntersectionOracle(Oracle):
+    def __init__(self):
+        super(TrafficIntersectionOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        # if agent isn't in intersection return true
+        if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
+            return True
+        # else check if action is a lane change move (which isn't allowed)
+        else: 
+            if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
+                return False
+            else:
+                return True
+
+class TrafficLightTurningLanesOracle(Oracle):
+    def __init__(self):
+        super(TrafficLightTurningLanesOracle, self).__init__()
+    def evaluate(self, ctrl_action, plant, game):
+        pass 
+
 
 #TODO: improve some calc here...
 class BackupPlanSafetyOracle(Oracle):
@@ -2181,8 +2416,6 @@ class SpecificationStructureController(Controller):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
     def run_on(self, plant):
-        #print("choosing action for agent " + str(plant.state.__tuple__()))
-        #print(plant.supervisor.game.occupancy_dict.keys())
         scores = []
         all_ctrls = plant.get_all_ctrl()
         for ctrl in all_ctrls:
@@ -2196,12 +2429,7 @@ class SpecificationStructureController(Controller):
                     pass
             scores.append(score)
 
-        # action selection strategy action
-        #choice = random.choice(np.where(scores == np.max(scores))[0])
-        #collision_chk, safe_state_chk = plant.apply(all_ctrls[choice])
-
-        #choice = plant.get_intention()
-        #plant.apply(choice)
+        # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         plant.apply(ctrl)
 
@@ -2436,9 +2664,15 @@ def get_default_car_ss():
     static_obstacle_oracle = StaticObstacleOracle()
     traffic_light_oracle = TrafficLightOracle()
     legal_orientation_oracle = LegalOrientationOracle()
-    progress_oracle = BundleProgressOracle()
-    oracle_set = [static_obstacle_oracle, traffic_light_oracle, legal_orientation_oracle, progress_oracle, backup_plan_safety_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 1])
+    backup_plan_progress_oracle = BackUpPlanBundleProgressOracle()
+    maintenance_progress_oracle = MaintenanceBundleProgressOracle()
+    improvement_progress_oracle = ImprovementBundleProgressOracle()
+    traffic_intersection_oracle = TrafficIntersectionOracle()
+    oracle_set = [static_obstacle_oracle, traffic_light_oracle,
+            legal_orientation_oracle, backup_plan_progress_oracle,
+            maintenance_progress_oracle, improvement_progress_oracle,
+            backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1, 2])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -2484,7 +2718,7 @@ class QuasiSimultaneousGame(Game):
         higher_pred = []
         ego_tile = ego.state.x, ego.state.y
         ego_heading = ego.state.heading
-        bundle = self.map.directed_tile_to_bundle(ego_tile, ego_heading)
+        bundle = self.map.directed_tile_to_bundle((ego_tile, ego_heading))
         ego_score = bundle.tile_to_relative_length(ego_tile)
         for agent in agent_set:
             agent_tile = agent.state.x, agent.state.y
@@ -2608,12 +2842,12 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.45)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.45)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=50)
     #game.animate(frequency=0.01)
 
     # print debug info 

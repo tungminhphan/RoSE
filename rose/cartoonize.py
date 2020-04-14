@@ -71,16 +71,16 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure
-def plot_map(map, grid_on=False):
+def plot_map(map, grid_on=True):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
-
+    ax.minorticks_on()
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
 
     # fill in the obstacle regions
     for obs in map.non_drivable_nodes:
-        rect = patches.Rectangle((obs[1],obs[0]), 1,1,linewidth=1,facecolor='k')
+        rect = patches.Rectangle((obs[1],obs[0]), 1,1,linewidth=1,facecolor='k', alpha=0.3)
         ax.add_patch(rect)
 
     plt.gca().invert_yaxis()
@@ -95,8 +95,15 @@ def draw_car(agent_state_tuple):
     x, y, theta, v, color, bubble, goals, param = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
+    # need to flip since cars are inverted
+    if theta_d == np.pi/2: 
+        theta_d = np.pi
+    elif theta_d == np.pi:
+        theta_d = np.pi/2
+
     car_fig = car_fig.rotate(theta_d, expand=False)
-    ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y, y+1, x, x+1])
+    offset = 0.1
+    ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y+offset, y+1-offset, x+offset, x+1-offset])
 
     for grid in bubble:
         rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.1)
@@ -110,7 +117,7 @@ def plot_bubble(bubble):
     ax.axis('equal')
 
     for grid in bubble:
-        rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.5)
+        rect = patches.Rectangle((grid[1],grid[0]),0.8,0.8,linewidth=0.5,facecolor='grey', alpha=0.5)
         ax.add_patch(rect)
 
     x_min = -5
