@@ -994,8 +994,12 @@ class SpawningContract():
     # passes all necessary checks 
     def passes_all_checks(self):
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
+<<<<<<< HEAD
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
+=======
+            self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection()
+>>>>>>> 197aa1056de68b29625f7fb5786452febfdf67de
         return all_checks
 
     # check to make sure not overlapping with other agents
