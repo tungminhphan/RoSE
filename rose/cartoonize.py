@@ -92,7 +92,7 @@ def plot_map(map, grid_on=True):
 
 def draw_car(agent_state_tuple):
     # global params
-    x, y, theta, v, color, bubble, goals, param = agent_state_tuple
+    x, y, theta, v, color, bubble = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
     # need to flip since cars are inverted

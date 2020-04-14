@@ -23,12 +23,12 @@ def print_one_agent_trace(filename):
 
     # sort time_steps
 
-    print(agent_trace.keys())
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()): 
 
         # print out the time stamp
         trace_t = agent_trace[t]
+
         print("time step")
         print(t)
 
@@ -41,11 +41,15 @@ def print_one_agent_trace(filename):
         [print(ag) for ag in trace_t['agents_in_bubble']]
         
         # print out oracle dict
-        for ctrl, oracle_scores in trace_t['spec_struct_info'].items():
-            print("control action")
-            print(ctrl)
-            print("oracle scores")
-            print(oracle_scores)
+        if t != list(sorted(agent_trace.keys()))[-1]:
+            trace_nxt = agent_trace[t+1]
+
+            for ctrl, oracle_scores in trace_nxt['spec_struct_info'].items():
+                print("control action")
+                print(ctrl)
+            
+                for key, value in oracle_scores.items():
+                    print(key, value)
 
         print()
         print()

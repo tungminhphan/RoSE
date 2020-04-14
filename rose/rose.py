@@ -2002,7 +2002,8 @@ class GridPlanner(Planner):
         return plan
 
 class Oracle():
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         pass
     def evaluate(self, ctrl_action, plant, game):
         raise NotImplementedError
@@ -2010,7 +2011,7 @@ class Oracle():
 class ReplanProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(ReplanProgressOracle, self).__init__()
+        super(ReplanProgressOracle, self).__init__(name='replan_progress')
     def evaluate(self, ctrl_action, plant, game):
         source = (plant.state.x, plant.state.y)
         target = plant.supervisor.current_goal
@@ -2026,7 +2027,7 @@ class ReplanProgressOracle(Oracle):
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(PathProgressOracle, self).__init__()
+        super(PathProgressOracle, self).__init__(name='path_progress')
     def evaluate(self, ctrl_action, plant, game):
         def get_dist_to_plan(xy, plan):
             all_dist = [np.sum(np.abs(xy-np.array([p[0], p[1]]))) for p in plan]
@@ -2043,7 +2044,7 @@ class PathProgressOracle(Oracle):
 class BundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(BundleProgressOracle, self).__init__()
+        super(BundleProgressOracle, self).__init__(name='bundle_progress')
     def evaluate(self, ctrl_action, plant, game):
         def backup_plan_is_ok_from_state(state, current_subgoal):
             tile_sequence_chain = plant.query_backup_plan(state=state)
@@ -2119,11 +2120,176 @@ class BundleProgressOracle(Oracle):
         else:
             return False
 
+class ImprovementBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
+    def evaluate(self, ctrl_action, plant, game):
 
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+        # if subgoal_bundle is None: TODO: delete this?
+        #     return False
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                return True
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return False
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+            dlong_curr = rel_goal[1]-rel_curr[1]
+            dlong_next = rel_goal[1]-rel_next[1]
+
+            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+            dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+            # check if strictly improving longitudinal/lateral distance
+            latt_improves = dlatt_next < dlatt_curr
+            long_improves = dlong_next < dlong_curr
+            improves = latt_improves or long_improves
+
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return improves
+        else:
+            return False
+
+class MaintenanceBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
+    def evaluate(self, ctrl_action, plant, game):
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                return True
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return True
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+            dlong_curr = rel_goal[1]-rel_curr[1]
+            dlong_next = rel_goal[1]-rel_next[1]
+
+            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+            dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+            # check if at least maintaining longitudinal/lateral distance
+            latt_maintains = dlatt_next <= dlatt_curr
+            long_maintains = dlong_next <= dlong_curr
+            maintains = latt_maintains and long_maintains
+
+            # TODO: separate into two different oracles to distinguish cases
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return maintains
+        else:
+            return False
+
+
+class BackUpPlanBundleProgressOracle(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(BackUpPlanBundleProgressOracle, self).__init__(name='backup_plan_progress')
+    def evaluate(self, ctrl_action, plant, game):
+        def backup_plan_is_ok_from_state(state, current_subgoal):
+            tile_sequence_chain = plant.query_backup_plan(state=state)
+            # time-stamp, occupancy-tiles, which tile
+            last_xy = tile_sequence_chain[-1][-1][-1]
+            backup_xy = last_xy
+            # heading is unchanged because maximal braking backup plan does not change heading
+            backup_dir = state.heading
+            try:
+                return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
+            except:
+                return False
+
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # get bundle corresponding to the current subgoal
+        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        # get bundle corresponding to the current state
+        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+
+        try:
+            # get bundle for the queried state, if bundle doesn't exist, return False
+            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+        except:
+            return False
+
+        # this is where a bundle change may happen
+        if current_bundle != subgoal_bundle:
+            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                if len(plant.supervisor.subgoals) > 1:
+                    next_subgoal = plant.supervisor.subgoals[1]
+                    return backup_plan_is_ok_from_state(queried_state, next_subgoal)
+            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                return backup_plan_is_ok_from_state(queried_state, current_subgoal)
+            else:
+                return False
+        elif queried_bundle == subgoal_bundle:
+            # only need to check reachability for braking backup plan because this implies reachability for current action
+            return backup_plan_is_ok_from_state(queried_state, current_subgoal)
+        else:
+            return False
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
-        super(TrafficLightOracle, self).__init__()
+        super(TrafficLightOracle, self).__init__(name='traffic_light')
 
     def tile_sequence_not_running_a_red_light_on_N_turn(self, tile_sequence, game, N):
         light_checks = []
@@ -2188,7 +2354,7 @@ class TrafficLightOracle(Oracle):
 # action is invalid if agent is in intersection and wants to change lanes
 class TrafficIntersectionOracle(Oracle):
     def __init__(self):
-        super(TrafficIntersectionOracle, self).__init__()
+        super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
         # if agent isn't in intersection return true
         if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
@@ -2202,7 +2368,7 @@ class TrafficIntersectionOracle(Oracle):
 
 class TrafficLightTurningLanesOracle(Oracle):
     def __init__(self):
-        super(TrafficLightTurningLanesOracle, self).__init__()
+        super(TrafficLightTurningLanesOracle, self).__init__(name='traffic_light_turning_lanes')
     def evaluate(self, ctrl_action, plant, game):
         pass 
 
@@ -2210,7 +2376,7 @@ class TrafficLightTurningLanesOracle(Oracle):
 #TODO: improve some calc here...
 class BackupPlanSafetyOracle(Oracle):
     def __init__(self):
-        super(BackupPlanSafetyOracle, self).__init__()
+        super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
     def evaluate(self, ctrl_action, plant, game):
         next_state = plant.query_occupancy(ctrl_action)[-1]
         x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
@@ -2225,7 +2391,7 @@ class BackupPlanSafetyOracle(Oracle):
 
 class StaticObstacleOracle(Oracle):
     def __init__(self):
-        super(StaticObstacleOracle, self).__init__()
+        super(StaticObstacleOracle, self).__init__(name='static_obstacle')
     def evaluate(self, ctrl_action, plant, game):
         # check if action is safe
         next_occupancy = plant.query_occupancy(ctrl_action)
@@ -2254,7 +2420,7 @@ class StaticObstacleOracle(Oracle):
 
 class LegalOrientationOracle(Oracle):
     def __init__(self):
-        super(LegalOrientationOracle, self).__init__()
+        super(LegalOrientationOracle, self).__init__(name='legal_orientation')
     def evaluate(self, ctrl_action, plant, game):
         final_state = plant.query_occupancy(ctrl_action)[-1]
         final_node = final_state.x, final_state.y
@@ -2291,7 +2457,7 @@ class SpecificationStructureController(Controller):
 
         for ctrl in all_ctrls:
             score = 0
-            scores = []
+            scores = {}
             for oracle in self.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, plant, self.game)
                 o_tier = self.specification_structure.tier[oracle]
@@ -2299,9 +2465,9 @@ class SpecificationStructureController(Controller):
                     score += int(o_score) * self.specification_structure.tier_weights[o_tier]
                 except:
                     pass
-                scores.append(o_score)
+                scores[oracle.name] = o_score
             # save data
-            scores.append(score)
+            scores['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores
 
         # save data as agent attribute
@@ -2543,11 +2709,15 @@ def get_default_car_ss():
     static_obstacle_oracle = StaticObstacleOracle()
     traffic_light_oracle = TrafficLightOracle()
     legal_orientation_oracle = LegalOrientationOracle()
-    progress_oracle = BundleProgressOracle()
+    backup_plan_progress_oracle = BackUpPlanBundleProgressOracle()
+    maintenance_progress_oracle = MaintenanceBundleProgressOracle()
+    improvement_progress_oracle = ImprovementBundleProgressOracle()
     traffic_intersection_oracle = TrafficIntersectionOracle()
-    oracle_set = [static_obstacle_oracle, traffic_light_oracle, legal_orientation_oracle, \
-        progress_oracle, backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 1, 2])
+    oracle_set = [static_obstacle_oracle, traffic_light_oracle,
+            legal_orientation_oracle, backup_plan_progress_oracle,
+            maintenance_progress_oracle, improvement_progress_oracle,
+            backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1, 2])
     return specification_structure
 
 def create_default_car(source, sink, game):
