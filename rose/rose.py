@@ -994,8 +994,12 @@ class SpawningContract():
     # passes all necessary checks 
     def passes_all_checks(self):
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
+<<<<<<< HEAD
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
+=======
+            self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection()
+>>>>>>> 197aa1056de68b29625f7fb5786452febfdf67de
         return all_checks
 
     # check to make sure not overlapping with other agents
@@ -1066,6 +1070,7 @@ class Game:
                 sink = np.random.choice(self.map.IO_map.map[source])
                 if not valid_source_sink(source, sink):
                     return
+<<<<<<< HEAD
 
                 # check if new car satisfies spawning safety contract
                 new_car = create_default_car(source, sink, self)
@@ -1073,6 +1078,31 @@ class Game:
                 if spawning_contract.passes_all_checks:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
+=======
+
+                # check if new car satisfies spawning safety contract
+                new_car = create_default_car(source, sink, self)
+                spawning_contract = SpawningContract(self, new_car)
+                if spawning_contract:
+                    self.agent_set.append(new_car)
+                    self.update_occupancy_dict()
+
+                # check if new car is on an intersection tile
+                #orientations = new_car.supervisor.game.map.legal_orientations[(new_car.state.x, new_car.state.y)]
+                #in_intersection = len(orientations) > 1
+
+                # check if new car being spawned is safe!!
+                #if (new_car.state.x, new_car.state.y) not in self.occupancy_dict and not in_intersection:
+                    # add car
+                    #self.agent_set.append(new_car)
+                    #self.update_occupancy_dict()
+                    # only keep if safe
+                    #check_safe_init =  new_car.check_joint_state_safety()
+                    #if not check_safe_init:
+                        #self.agent_set.remove(new_car)
+                        # if not safe, remove the agent from occupancy dict
+                        #del self.occupancy_dict[(new_car.state.x, new_car.state.y)]
+>>>>>>> 197aa1056de68b29625f7fb5786452febfdf67de
 
     def add_agent(self, agent):
         self.agent_set.append(agent)
