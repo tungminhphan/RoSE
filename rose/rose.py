@@ -30,10 +30,24 @@ Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
 DIRECTION_TO_VECTOR = {'east': [0,1], 'west': [0,-1], 'north': [-1,0], 'south': [1,0]}
 
 def rotate_vector(vec, theta):
+    """
+    take in a 2D vector and an angle in radians and outputs the same vector
+    rotated by the amount specified by the input angle in a CCW fashion.
+    """
+    # create rotation matrix
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
 
 class Drawable:
+    """
+    A class for terminal drawable objects
+
+    Attributes:
+        xy : tuple[int]
+            the x, y coordinates of the object
+        drawstr: str
+            the string representation of the object
+    """
     def __init__(self, xy, drawstr):
         self.xy = xy
         self.drawstr = drawstr
@@ -154,12 +168,14 @@ class Agent:
         if collision_check:
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
             if self.supervisor.game.time not in self.supervisor.game.collision_dict:
-                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+                self.supervisor.game.collision_dict[self.supervisor.game.time] = [(self.state.__tuple__(), self.intention,
+                    ag.state.__tuple__(), ag.intention)]
             else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention))
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(),
+                    self.intention, ag.state.__tuple__(), ag.intention))
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
-    
+
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
         if out_of_bounds_chk:
@@ -172,8 +188,6 @@ class Agent:
     def check_joint_state_safety(self):
         for gridpt, agent in self.supervisor.game.occupancy_dict.items():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
-            #print("checking agent")
-            #print(agent.state)
             lead_agent = agent.find_lead_agent()
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
@@ -485,9 +499,11 @@ class Car(Agent):
         if state is None: state = self.state
         return Car.get_all_class_ctrl(state, self.acc_vals, inverse=inverse)
 
-  # gets the agents with higher precedence,
-  # assuming ego and all agents in agent_set belong to the same bundle
     def get_agents_with_higher_precedence_in_bubble(self):
+        """
+        gets the agents with higher precedence, assuming ego and all agents in
+        agent_set belong to the same bundle
+        """
         def get_agents_with_higher_precedence(agent_set):
             higher_pred = []
             ego_tile = self.state.x, self.state.y
@@ -1385,15 +1401,28 @@ class Map:
         return rel_tile
 
     def check_directed_tile_reachability(self, dtile_start, dtile_final):
+        """
+        check if there exists a forward-only sequence of control actions that will
+        take a car from a starting directed tile to a final directed tile, this is
+        assuming the default car dynamics.
+        """
+        # check if dtile_start is a list of directed tiles, if so take the last one
         if not isinstance(dtile_start[1], str):
-            dtile_start = dtile_start[1]
+            dtile_start = dtile_start[-1]
+        # check if dtile_final is a list of directed tiles, if so take the first one
         if not isinstance(dtile_final[1], str):
             dtile_final = dtile_final[0]
 
+        # determine which bundle dtile_start is in
         bundle_start = self.directed_tile_to_bundle(dtile_start[0], dtile_start[1])
+        # determine which bundle dtile_final is in
         bundle_final = self.directed_tile_to_bundle(dtile_final[0], dtile_final[1])
+
+        # if the two directed tiles do not belong to the same bundle
         if bundle_start != bundle_final:
             return False
+        # else, we do a tile count and check if the longitudinal difference is
+        # at least equal to the lateral difference
         else:
             rel_tile_start = self.directed_tile_to_relative_bundle_tile(dtile_start)
             rel_tile_final = self.directed_tile_to_relative_bundle_tile(dtile_final)
@@ -2577,10 +2606,6 @@ def print_debug_info(filename):
     print(traces['collision_dict'])
     print(traces['out_of_bounds_dict'])
     pass
-
-class IntentionProposer:
-    def __init__(self):
-        pass
 
 if __name__ == '__main__':
     the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.45)
