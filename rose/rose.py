@@ -213,6 +213,7 @@ class Car(Agent):
         self.agent_max_braking_not_enough = None
         self.token_count = 0
         self.intention = None
+        self.spec_struct_trace = {}
 
     def get_intention(self):
         return self.intention
@@ -1046,6 +1047,7 @@ class Game:
         self.map = game_map
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
+        self.traces = {"agent_ids":[]}
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
         self.collision_dict = dict()
@@ -1079,14 +1081,16 @@ class Game:
         self.agent_set.append(agent)
     def time_forward(self):
         self.time += 1
-    def save_snapshot(self):
+    def save_plotting_info(self):
         lights = []
         agents = []
         # save all the agent states
         for agent in self.agent_set:
-            agent_param = {"v_min":agent.v_min, "v_max":agent.v_max, "a_min":agent.a_min, "a_max":agent.a_max}
+            spec_struct_trace = {}
+            if self.time > 0:
+                spec_struct_trace = agent.spec_struct_trace
             agents.append((agent.state.x, agent.state.y, \
-                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble(), agent.supervisor.goals, agent_param))
+                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble()))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
@@ -1097,7 +1101,36 @@ class Game:
                 lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer, 'vertical', traffic_light.durations))
 
         # return dict with all the info
-        return {"lights": lights, "agents": agents}
+        self.traces[self.time] = {"lights": lights, "agents": agents}
+    
+    def write_agents_to_traces(self):
+        for agent in self.agent_set:
+            # unpack agents in bubble to tuples
+            agents_in_bubble = [agent.state.__tuple__() for agent in agent.find_agents_in_bubble()]
+            # unpack agents in send and receive requests to tuples
+            sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
+            received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
+            # save all data in trace
+            agent_trace_dict = {'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'color':agent.agent_color, \
+                'bubble':agent.get_bubble(), 'goals': agent.supervisor.goals, 'spec_struct_info':agent.spec_struct_trace,\
+                    'agents_in_bubble': agents_in_bubble, 'sent_request':sent, 'received_requests':received, 'token_count':agent.token_count}
+            # if not yet in traces, add it to traces
+            agent_id = agent.get_id()
+            if agent_id not in self.traces:
+                self.traces["agent_ids"].append(agent_id)
+                agent_param = {"v_min":agent.v_min, "v_max":agent.v_max, "a_min":agent.a_min, "a_max":agent.a_max}
+                self.traces[agent_id] = {'agent_param':agent_param, self.time:agent_trace_dict}
+            # else update its dict 
+            self.traces[agent_id][self.time] = agent_trace_dict
+    
+    
+    # write the game information to traces
+    def write_game_info_to_traces(self, t_end):
+        self.traces["map_name"] = self.map.map_name
+        self.traces["spawn_probability"] = self.map.default_spawn_probability
+        self.traces["collision_dict"] = self.collision_dict
+        self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
+        self.traces["t_end"] = t_end
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
@@ -1230,29 +1263,27 @@ class Game:
     def play(self, t_end=np.inf, outfile=None):
         # dump the map here and open json file
         write_bool = outfile is not None and t_end is not np.inf
-        traces = dict()
         while self.time < t_end:
             print("TIME: " + str(self.time))
             # if save data to animate
             if write_bool:
-                snapshot = self.save_snapshot()
-                traces[self.time] = snapshot
+                self.write_agents_to_traces()
+                self.save_plotting_info()
+                #self.write_lights_to_traces()
+                #snapshot = self.save_snapshot()
+                #traces[self.time] = snapshot
             #self.check_conflict_requests_karena_debug()
 
             self.play_step()
             self.time_forward()
+        
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
-            #traces["collisions"] = list(set(self.collisions))
-            traces["map_name"] = self.map.map_name
-            traces["spawn_probability"] = self.map.default_spawn_probability
-            traces["collision_dict"] = self.collision_dict
-            traces["out_of_bounds_dict"] = self.out_of_bounds_dict
-            traces["t_end"] = t_end
+            self.write_game_info_to_traces(t_end)
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            self.write_data_to_pckl(output_dir + outfile, traces)
+            self.write_data_to_pckl(output_dir + outfile, self.traces)
 
 def symbol_to_orientation(symb):
     if symb in ['←','⇠']:
@@ -2250,11 +2281,17 @@ class SpecificationStructureController(Controller):
     def __init__(self, game, specification_structure):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
+
     def run_on(self, plant):
-        scores = []
+        def ctrl_dict_to_tuple(ctrl):
+            return (ctrl['steer'], ctrl['acceleration'])
+
         all_ctrls = plant.get_all_ctrl()
+        spec_struct_trace = {} 
+
         for ctrl in all_ctrls:
             score = 0
+            scores = []
             for oracle in self.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, plant, self.game)
                 o_tier = self.specification_structure.tier[oracle]
@@ -2262,11 +2299,18 @@ class SpecificationStructureController(Controller):
                     score += int(o_score) * self.specification_structure.tier_weights[o_tier]
                 except:
                     pass
+                scores.append(o_score)
+            # save data
             scores.append(score)
+            spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores
+
+        # save data as agent attribute
+        plant.spec_struct_trace = spec_struct_trace
 
         # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         plant.apply(ctrl)
+
 
 class SupervisoryController():
     def _init__(self):
@@ -2678,7 +2722,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=10)
     #game.animate(frequency=0.01)
 
     # print debug info 
