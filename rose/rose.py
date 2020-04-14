@@ -989,17 +989,12 @@ class SpawningContract():
         self.game = game
         self.new_agent = new_agent
         self.okay_to_spawn_flag = self.passes_all_checks()
-        pass 
 
     # passes all necessary checks 
     def passes_all_checks(self):
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
-<<<<<<< HEAD
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
-=======
-            self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection()
->>>>>>> 197aa1056de68b29625f7fb5786452febfdf67de
         return all_checks
 
     # check to make sure not overlapping with other agents
@@ -1040,7 +1035,7 @@ class SpawningContract():
     # check agent is in the right legal orientation
     def agent_facing_right_direction(self):
         orientation = self.game.map.legal_orientations[(self.new_agent.state.x, self.new_agent.state.y)]
-        return orientation == self.new_agent.state.heading
+        return orientation[0] == self.new_agent.state.heading
 
 class Game:
     # combines scenario + agents for game
@@ -1074,7 +1069,7 @@ class Game:
                 # check if new car satisfies spawning safety contract
                 new_car = create_default_car(source, sink, self)
                 spawning_contract = SpawningContract(self, new_car)
-                if spawning_contract.passes_all_checks:
+                if spawning_contract.okay_to_spawn_flag:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
 
