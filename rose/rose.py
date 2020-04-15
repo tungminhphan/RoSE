@@ -474,6 +474,10 @@ class Car(Agent):
             higher_pred = []
             ego_tile = self.state.x, self.state.y
             ego_heading = self.state.heading
+            # TODO: fix this bandage code
+            if (ego_tile, ego_heading) in self.supervisor.game.map.special_goal_tiles:
+                ego_heading = Car.convert_orientation(Car.convert_orientation(ego_heading) + 90)
+
             bundle = self.supervisor.game.map.get_bundle_from_directed_tile(ego_tile, ego_heading)
             ego_score = bundle.tile_to_relative_length(ego_tile)
             for agent in agent_set:
@@ -679,7 +683,7 @@ class Car(Agent):
                 self.supervisor.game.collision_dict[self.supervisor.game.time] = \
                     [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
             else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.self.state.__tuple__(), \
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
                     self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
@@ -733,7 +737,8 @@ class Car(Agent):
             # as soon as agent found in nearest tile, return lead vehicle
             if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
                 agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                if (agent.get_id() != self.get_id()):
+                # only find agents that are facing in the same direction
+                if (agent.get_id() != self.get_id()) and (agent.state.heading == self.state.heading):
                     return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
 
@@ -1441,6 +1446,7 @@ class Map:
         self.IO_map = self.get_IO_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
+        self.special_goal_tiles = []
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.bundle_graph = self.get_bundle_graph()
@@ -1508,66 +1514,94 @@ class Map:
             return length_diff >= width_diff
 
     def directed_tile_to_turns(self, directed_tile):
+        """
+        compute (first) critical points for turning along bundles
+        """
+        # list of critical turning tiles
         turns = []
         bundle = self.directed_tile_to_bundle(directed_tile)
 
+        # process right turns
         for turn in self.right_turn_tiles[bundle]:
             if self.check_directed_tile_reachability(directed_tile, turn):
                 turns.append(turn)
 
+        # process left turns
         for turn in self.left_turn_tiles[bundle]:
             precrossing_tile = self.get_precrossing_left_turn_tile(turn)
+            stop_tiles = self.left_turn_tiles[bundle][turn]
             if precrossing_tile is None:
                 turn_node = turn
-                precrossing_tile = turn_node
+                precrossing_tile = (turn,) + stop_tiles
             else:
-                turn_node = (precrossing_tile, turn)
+                turn_node = (precrossing_tile, turn) + stop_tiles
             if self.check_directed_tile_reachability(directed_tile, precrossing_tile):
-                turns.append(turn_node)
+                turns.append(turn_node[0:-1])
         return turns
 
     def get_bundle_graph(self):
         '''
         constructs bundle graph
-
         '''
         bundle_graph = nx.DiGraph()
+        # process right turns
         for bundle in self.right_turn_tiles:
             for from_tile in self.right_turn_tiles[bundle]:
-                to_tile = self.right_turn_tiles[bundle][from_tile]
+                to_tiles = self.right_turn_tiles[bundle][from_tile]
+                # get last tile
+                to_tile = to_tiles[-1]
+                # add edge from critical tile to last configuration
                 bundle_graph.add_edge(from_tile, to_tile)
+                # get critical tiles reachable from to_tile
                 turns = self.directed_tile_to_turns(to_tile)
                 for turn in turns:
+                    # add the corresponding directed edges
                     bundle_graph.add_edge(to_tile, turn)
 
+        # process left turns
         for bundle in self.left_turn_tiles:
             for from_tile in self.left_turn_tiles[bundle]:
-                to_tile = self.left_turn_tiles[bundle][from_tile]
-
+                to_tiles = self.left_turn_tiles[bundle][from_tile]
+                # check if a procrossing_tile is required
                 precrossing_tile = self.get_precrossing_left_turn_tile(from_tile)
                 if precrossing_tile:
-                    bundle_graph.add_edge((precrossing_tile, from_tile), to_tile)
+                    frm = (precrossing_tile, from_tile) + to_tiles[0:-1]
+                    to = to_tiles[-1]
+                    bundle_graph.add_edge(frm, to)
                 else:
-                    bundle_graph.add_edge(from_tile, to_tile)
-                turns = self.directed_tile_to_turns(to_tile)
+                    frm = (from_tile,) + to_tiles[0:-1]
+                    to = to_tiles[-1]
+                    bundle_graph.add_edge(frm, to)
+                # get critical tiles reachable from last tile in to_tiles
+                turns = self.directed_tile_to_turns(to_tiles[-1])
                 for turn in turns:
-                    bundle_graph.add_edge(to_tile, turn)
+                    bundle_graph.add_edge(to_tiles[-1], turn)
 
         return bundle_graph
 
     def get_precrossing_left_turn_tile(self, left_turn_tile):
+        """
+        given a turn tile, find if it exists its closest legal predecessor
+        before entering an intersection
+        """
         tile_xy, tile_direction = left_turn_tile
-        backward = -np.array(DIRECTION_TO_VECTOR[tile_direction])
-        new_tile = tuple(np.array(tile_xy)+backward)
-        while True:
-            if new_tile not in self.legal_orientations or self.legal_orientations[new_tile] is None:
-                return None
-            elif len(self.legal_orientations[new_tile]) > 1:
-                new_tile = tuple(np.array(new_tile)+backward)
-            else:
-                return new_tile, tile_direction
+        # check if turn tile is not in an intersection
+        if len(self.legal_orientations[tile_xy]) <= 1:
+            return None
+        else:
+            # keep going backward until no longer in the intersection
+            backward = -np.array(DIRECTION_TO_VECTOR[tile_direction])
+            new_tile = tuple(np.array(tile_xy)+backward)
+            while True:
+                if new_tile not in self.legal_orientations or self.legal_orientations[new_tile] is None:
+                    return None
+                elif len(self.legal_orientations[new_tile]) > 1:
+                    new_tile = tuple(np.array(new_tile) + backward)
+                else:
+                    return new_tile, tile_direction
 
-    def check_if_right_turn_tile(self, tile, direction):
+    def check_if_right_turn_tile(self, directed_tile):
+        tile, direction = directed_tile
         try:
             assert direction in self.legal_orientations[tile]
         except:
@@ -1580,50 +1614,125 @@ class Map:
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
         try:
             next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
-            return next_bundle.is_rightmost_lane(next_tile), (next_tile, next_direction)
+            return next_bundle.is_rightmost_lane(next_tile), ((next_tile, next_direction),)
         except:
             return False, None
 
-    def check_if_left_turn_tile(self, tile, direction):
+    def check_if_left_turn_type_A(self, directed_tile):
+        """
+        check if left turn tile is of type A (from two-way street into two-way
+        street), assuming directed tile input is legal
+        """
+        tile, direction = directed_tile
+        direction_degrees = Car.convert_orientation(direction)
+        next_direction_degrees = (direction_degrees + 90) % 360
+        next_direction = Car.convert_orientation(next_direction_degrees)
+
+        forward = DIRECTION_TO_VECTOR[direction]
+        left = rotate_vector(forward, np.pi/2)
+        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
+        first_stop = (next_tile, next_direction)
+
+        next_next_tile = tuple(np.array(next_tile) + np.array(left) + np.array(forward))
+        second_stop = (next_next_tile, next_direction)
+        try:
+            next_bundle = self.directed_tile_to_bundle(second_stop)
+            if next_bundle.is_leftmost_lane(next_next_tile):
+                # update legal orientation dictionary
+                self.legal_orientations[next_tile].append(next_direction)
+                # add to special tiles the first stop
+                self.special_goal_tiles.append(first_stop)
+                return True, (first_stop, second_stop)
+            else:
+                return False, None
+        except:
+            return False, None
+
+    def check_if_left_turn_type_B(self, directed_tile):
+        """
+        check if left turn tile is of type B (direct turn into one-way street),
+        assuming directed tile input is legal;
+        this turn can only be made from a non-intersection tile
+        """
+        tile, direction = directed_tile
+        if len(self.legal_orientations[tile]) > 1:
+            return False, None
+        else:
+            direction_degrees = Car.convert_orientation(direction)
+            next_direction_degrees = (direction_degrees + 90) % 360
+            next_direction = Car.convert_orientation(next_direction_degrees)
+
+            forward = DIRECTION_TO_VECTOR[direction]
+            left = rotate_vector(forward, np.pi/2)
+            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
+            next_stop = [(next_tile, next_direction)]
+            try:
+                next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
+                return next_bundle.is_leftmost_lane(next_tile), (next_stop,)
+            except:
+                return False, None
+
+    def check_if_left_turn_tile(self, directed_tile):
+        """
+        given a tile, check if it is ok to perform a left-turn from there
+
+        """
+        tile, direction = directed_tile
+        # check if tile is even legal
         try:
             assert direction in self.legal_orientations[tile]
         except:
             return False, None
-        direction_degrees = Car.convert_orientation(direction)
-        next_direction_degrees = (direction_degrees + 90)%360
-        next_direction = Car.convert_orientation(next_direction_degrees)
-        forward = DIRECTION_TO_VECTOR[direction]
-        left = rotate_vector(forward, np.pi/2)
-        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
-        try:
-            next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
-            return next_bundle.is_leftmost_lane(next_tile), (next_tile, next_direction)
-        except:
-            return False, None
+        type_A_check = self.check_if_left_turn_type_A(directed_tile)
+        if type_A_check[0]:
+            return type_A_check
+        else:
+            type_B_check = self.check_if_left_turn_type_B(directed_tile)
+            if type_B_check[0]:
+                return type_B_check
+            else:
+                return False, None
 
     # assuming agents can only legally make a right turn from the rightmost lane into rightmost lane
     def find_right_turn_tiles(self):
+        """
+        collect all (final) right-turn tiles in the map using the check function
+        """
         right_turn_tiles = dict()
         for bundle in self.bundles:
             right_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
-                check, nxt = self.check_if_right_turn_tile(tile, direction)
+                directed_tile = (tile, direction)
+                check, nxt = self.check_if_right_turn_tile(directed_tile)
                 if check:
                     right_turn_tiles[bundle][(tile, direction)] = nxt
         return right_turn_tiles
 
     # assuming agents can only legally make a left turn from the leftmost lane into leftmost lane
     def find_left_turn_tiles(self):
+        """
+        collect all (final) left-turn tiles in the map using the check function
+        """
+
         left_turn_tiles = dict()
+        # goes through each bundle
         for bundle in self.bundles:
+            # create a dictionary entry for the bundle
             left_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
+                # pick tile in left-most lane
                 tile = bundle.relative_coordinates_to_tile((bundle.width-1, idx))
-                check, nxt = self.check_if_left_turn_tile(tile, direction)
+                directed_tile = (tile, direction)
+                # performs the check
+                check, nxt = self.check_if_left_turn_tile(directed_tile)
                 if check:
+                    # if check succeeds, add directed tile as a key to the
+                    # dictionary corresponding to the bundle with the
+                    # corresponding value nxt being the remaining tiles
+                    # required to complete the left-turn
                     left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
@@ -2147,111 +2256,130 @@ class ImprovementBundleProgressOracle(Oracle):
         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
     def evaluate(self, ctrl_action, plant, game):
 
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # get bundle corresponding to the current subgoal
-        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-        # if subgoal_bundle is None: TODO: delete this?
-        #     return False
-
+        # get current state
         current_xy = plant.state.x, plant.state.y
         current_dir = plant.state.heading
-        # get bundle corresponding to the current state
-        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+        current_directed_tile = (current_xy, current_dir)
 
         # query next state
         queried_state = plant.query_occupancy(ctrl_action)[-1]
         queried_xy = queried_state.x, queried_state.y
         queried_dir = queried_state.heading
+        queried_directed_tile = (queried_xy, queried_dir)
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # if current subgoal is special, namely, attempting to move toward special tile
+        # for now, we are assuming default car dynamics; TODO: generalize this
+        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if moving away from special tile
+        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if current subgoal isn't special
+        else:
+            # get bundle corresponding to the current subgoal
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+            # get bundle corresponding to the current state
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
 
-        try:
-            # get bundle for the queried state, if bundle doesn't exist, return False
-            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-        except:
-            return False
-
-        if current_bundle != subgoal_bundle:
-            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                return True
-            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+            try:
+                # get bundle for the queried state, if bundle doesn't exist, return False
+                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+            except:
                 return False
+
+            if current_bundle != subgoal_bundle:
+                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                    return True
+                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                    return False
+                else:
+                    return False
+            elif queried_bundle == subgoal_bundle:
+                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+                dlong_curr = rel_goal[1]-rel_curr[1]
+                dlong_next = rel_goal[1]-rel_next[1]
+
+                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+                dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+                # check if strictly improving longitudinal/lateral distance
+                latt_improves = dlatt_next < dlatt_curr
+                long_improves = dlong_next < dlong_curr
+                improves = latt_improves or long_improves
+
+                # only need to check reachability for braking backup plan because this implies reachability for current action
+                return improves
             else:
                 return False
-        elif queried_bundle == subgoal_bundle:
-            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
-            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
-            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
-
-            dlong_curr = rel_goal[1]-rel_curr[1]
-            dlong_next = rel_goal[1]-rel_next[1]
-
-            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
-            dlatt_next = abs(rel_next[0]-rel_goal[0])
-
-            # check if strictly improving longitudinal/lateral distance
-            latt_improves = dlatt_next < dlatt_curr
-            long_improves = dlong_next < dlong_curr
-            improves = latt_improves or long_improves
-
-            # only need to check reachability for braking backup plan because this implies reachability for current action
-            return improves
-        else:
-            return False
 
 class MaintenanceBundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
     def evaluate(self, ctrl_action, plant, game):
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # get bundle corresponding to the current subgoal
-        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-
+        # get current state
         current_xy = plant.state.x, plant.state.y
         current_dir = plant.state.heading
-        # get bundle corresponding to the current state
-        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+        current_directed_tile = (current_xy, current_dir)
 
         # query next state
         queried_state = plant.query_occupancy(ctrl_action)[-1]
         queried_xy = queried_state.x, queried_state.y
         queried_dir = queried_state.heading
+        queried_directed_tile = (queried_xy, queried_dir)
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # if current subgoal is special, namely, attempting to move toward special tile
+        # for now, we are assuming default car dynamics; TODO: generalize this
+        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
+            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
+        # if moving away from special tile
+        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
+            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
+        # if current subgoal isn't special
+        else:
+            # get bundle corresponding to the current subgoal
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+            # get bundle corresponding to the current state
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+            try:
+                # get bundle for the queried state, if bundle doesn't exist, return False
+                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+            except:
+                return False
 
-        try:
-            # get bundle for the queried state, if bundle doesn't exist, return False
-            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-        except:
-            return False
+            if current_bundle != subgoal_bundle:
+                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                    return True
+                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                    return True
+                else:
+                    return False
+            elif queried_bundle == subgoal_bundle:
+                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
 
-        if current_bundle != subgoal_bundle:
-            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                return True
-            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
-                return True
+                dlong_curr = rel_goal[1]-rel_curr[1]
+                dlong_next = rel_goal[1]-rel_next[1]
+
+                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+                dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+                # check if at least maintaining longitudinal/lateral distance
+                latt_maintains = dlatt_next <= dlatt_curr
+                long_maintains = dlong_next <= dlong_curr
+                maintains = latt_maintains and long_maintains
+
+                # TODO: separate into two different oracles to distinguish cases
+                # only need to check reachability for braking backup plan because this implies reachability for current action
+                return maintains
             else:
                 return False
-        elif queried_bundle == subgoal_bundle:
-            rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
-            rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
-            rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
-
-            dlong_curr = rel_goal[1]-rel_curr[1]
-            dlong_next = rel_goal[1]-rel_next[1]
-
-            dlatt_curr = abs(rel_curr[0]-rel_goal[0])
-            dlatt_next = abs(rel_next[0]-rel_goal[0])
-
-            # check if at least maintaining longitudinal/lateral distance
-            latt_maintains = dlatt_next <= dlatt_curr
-            long_maintains = dlong_next <= dlong_curr
-            maintains = latt_maintains and long_maintains
-
-            # TODO: separate into two different oracles to distinguish cases
-            # only need to check reachability for braking backup plan because this implies reachability for current action
-            return maintains
-        else:
-            return False
 
 
 class BackUpPlanBundleProgressOracle(Oracle):
@@ -2271,42 +2399,52 @@ class BackUpPlanBundleProgressOracle(Oracle):
             except:
                 return False
 
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # get bundle corresponding to the current subgoal
-        subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-
+        # get current state
         current_xy = plant.state.x, plant.state.y
         current_dir = plant.state.heading
-        # get bundle corresponding to the current state
-        current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+        current_directed_tile = (current_xy, current_dir)
 
         # query next state
         queried_state = plant.query_occupancy(ctrl_action)[-1]
         queried_xy = queried_state.x, queried_state.y
         queried_dir = queried_state.heading
+        queried_directed_tile = (queried_xy, queried_dir)
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # if current subgoal is special, namely, attempting to move toward special tile
+        # for now, we are assuming default car dynamics; TODO: generalize this
+        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
+            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
+        # if moving away from special tile
+        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
+            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
+        # if current subgoal isn't special
+        else:
+            # get bundle corresponding to the current subgoal
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+            # get bundle corresponding to the current state
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+            try:
+                # get bundle for the queried state, if bundle doesn't exist, return False
+                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+            except:
+                return False
 
-        try:
-            # get bundle for the queried state, if bundle doesn't exist, return False
-            queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-        except:
-            return False
-
-        # this is where a bundle change may happen
-        if current_bundle != subgoal_bundle:
-            if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                if len(plant.supervisor.subgoals) > 1:
-                    next_subgoal = plant.supervisor.subgoals[1]
-                    return backup_plan_is_ok_from_state(queried_state, next_subgoal)
-            elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+            # this is where a bundle change may happen
+            if current_bundle != subgoal_bundle:
+                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                    if len(plant.supervisor.subgoals) > 1:
+                        next_subgoal = plant.supervisor.subgoals[1]
+                        return backup_plan_is_ok_from_state(queried_state, next_subgoal)
+                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                    return backup_plan_is_ok_from_state(queried_state, current_subgoal)
+                else:
+                    return False
+            elif queried_bundle == subgoal_bundle:
+                # only need to check reachability for braking backup plan because this implies reachability for current action
                 return backup_plan_is_ok_from_state(queried_state, current_subgoal)
             else:
                 return False
-        elif queried_bundle == subgoal_bundle:
-            # only need to check reachability for braking backup plan because this implies reachability for current action
-            return backup_plan_is_ok_from_state(queried_state, current_subgoal)
-        else:
-            return False
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
@@ -2482,7 +2620,7 @@ class SpecificationStructureController(Controller):
             return (ctrl['steer'], ctrl['acceleration'])
 
         all_ctrls = plant.get_all_ctrl()
-        spec_struct_trace = {} 
+        spec_struct_trace = {}
 
         for ctrl in all_ctrls:
             score = 0
@@ -2745,8 +2883,8 @@ def get_default_car_ss():
     oracle_set = [static_obstacle_oracle, traffic_light_oracle,
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1, 2])
+            backup_plan_safety_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -2775,6 +2913,9 @@ class QuasiSimultaneousGame(Game):
             bundle_to_agent_precedence[bundle] = dict()
         for agent in self.agent_set:
             x, y, heading = agent.state.x, agent.state.y, agent.state.heading
+            # if in special tile, rotate by another 90 degrees; TODO: remove this bandage
+            if ((x, y), heading) in self.map.special_goal_tiles:
+                heading = Car.convert_orientation(Car.convert_orientation(heading) + 90)
             try:
                 bundles = self.map.tile_to_bundle_map[(x,y)]
             except:
@@ -2815,12 +2956,14 @@ class QuasiSimultaneousGame(Game):
         self.send_and_receive_conflict_requests()
         # resolve precedence
         self.resolve_precedence()
+        active_agents = []
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
             precedence_list.sort(reverse=True)
             for precedence in precedence_list:
                 for agent in self.bundle_to_agent_precedence[bundle][precedence]:
                     agent.run()
+                    active_agents.append(agent)
 
     def play_step(self):
         #for agent in self.agent_set:
@@ -2921,8 +3064,8 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=10)
-    #game.animate(frequency=0.01)
+#    game.play(outfile=output_filename, t_end=50)
+    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
