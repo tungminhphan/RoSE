@@ -171,7 +171,9 @@ class Agent:
         # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
+        chk_joint_safety = self.check_joint_state_safety(return_list=True)
         self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
+        
 
 
 class Gridder(Agent):
@@ -1125,7 +1127,7 @@ class Game:
     def write_agents_to_traces(self):
         for agent in self.agent_set:
             # unpack agents in bubble to tuples
-            agents_in_bubble = [agent.state.__tuple__() for agent in agent.agents_in_bubble]
+            agents_in_bubble = [[agent.state.__tuple__(), agent.get_id()]  for agent in agent.agents_in_bubble]
             # unpack agents in send and receive requests to tuples
             sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
@@ -1155,7 +1157,7 @@ class Game:
         self.traces["spawn_probability"] = self.map.default_spawn_probability
         self.traces["collision_dict"] = self.collision_dict
         self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
-        #self.traces["unsafe_joint_dict"] = self.unsafe_joint_state_dict
+        self.traces["unsafe_joint_state_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
@@ -2378,7 +2380,9 @@ class TrafficIntersectionOracle(Oracle):
         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
         # if agent isn't in intersection return true
-        if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
+        if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
+            return True
+        elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
             return True
         # else check if action is a lane change move (which isn't allowed)
         else: 
@@ -2913,6 +2917,7 @@ def print_debug_info(filename):
         traces = pickle.load(pckl_file)
     print(traces['collision_dict'])
     print(traces['out_of_bounds_dict'])
+    print(traces['unsafe_joint_state_dict'])
     pass
 
 if __name__ == '__main__':
@@ -2921,7 +2926,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=10)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
     # print debug info 
