@@ -1456,66 +1456,94 @@ class Map:
             return length_diff >= width_diff
 
     def directed_tile_to_turns(self, directed_tile):
+        """
+        compute (first) critical points for turning along bundles
+        """
+        # list of critical turning tiles
         turns = []
         bundle = self.directed_tile_to_bundle(directed_tile)
 
+        # process right turns
         for turn in self.right_turn_tiles[bundle]:
             if self.check_directed_tile_reachability(directed_tile, turn):
                 turns.append(turn)
 
+        # process left turns
         for turn in self.left_turn_tiles[bundle]:
             precrossing_tile = self.get_precrossing_left_turn_tile(turn)
+            stop_tiles = self.left_turn_tiles[bundle][turn]
             if precrossing_tile is None:
                 turn_node = turn
-                precrossing_tile = turn_node
+                precrossing_tile = (turn,) + stop_tiles
             else:
-                turn_node = (precrossing_tile, turn)
+                turn_node = (precrossing_tile, turn) + stop_tiles
             if self.check_directed_tile_reachability(directed_tile, precrossing_tile):
-                turns.append(turn_node)
+                turns.append(turn_node[0:-1])
         return turns
 
     def get_bundle_graph(self):
         '''
         constructs bundle graph
-
         '''
         bundle_graph = nx.DiGraph()
+        # process right turns
         for bundle in self.right_turn_tiles:
             for from_tile in self.right_turn_tiles[bundle]:
-                to_tile = self.right_turn_tiles[bundle][from_tile]
+                to_tiles = self.right_turn_tiles[bundle][from_tile]
+                # get last tile
+                to_tile = to_tiles[-1]
+                # add edge from critical tile to last configuration
                 bundle_graph.add_edge(from_tile, to_tile)
+                # get critical tiles reachable from to_tile
                 turns = self.directed_tile_to_turns(to_tile)
                 for turn in turns:
+                    # add the corresponding directed edges
                     bundle_graph.add_edge(to_tile, turn)
 
+        # process left turns
         for bundle in self.left_turn_tiles:
             for from_tile in self.left_turn_tiles[bundle]:
-                to_tile = self.left_turn_tiles[bundle][from_tile]
-
+                to_tiles = self.left_turn_tiles[bundle][from_tile]
+                # check if a procrossing_tile is required
                 precrossing_tile = self.get_precrossing_left_turn_tile(from_tile)
                 if precrossing_tile:
-                    bundle_graph.add_edge((precrossing_tile, from_tile), to_tile)
+                    frm = (precrossing_tile, from_tile) + to_tiles[0:-1]
+                    to = to_tiles[-1]
+                    bundle_graph.add_edge(frm, to)
                 else:
-                    bundle_graph.add_edge(from_tile, to_tile)
-                turns = self.directed_tile_to_turns(to_tile)
+                    frm = (from_tile,) + to_tiles[0:-1]
+                    to = to_tiles[-1]
+                    bundle_graph.add_edge(frm, to)
+                # get critical tiles reachable from last tile in to_tiles
+                turns = self.directed_tile_to_turns(to_tiles[-1])
                 for turn in turns:
-                    bundle_graph.add_edge(to_tile, turn)
+                    bundle_graph.add_edge(to_tiles[-1], turn)
 
         return bundle_graph
 
     def get_precrossing_left_turn_tile(self, left_turn_tile):
+        """
+        given a turn tile, find if it exists its closest legal predecessor
+        before entering an intersection
+        """
         tile_xy, tile_direction = left_turn_tile
-        backward = -np.array(DIRECTION_TO_VECTOR[tile_direction])
-        new_tile = tuple(np.array(tile_xy)+backward)
-        while True:
-            if new_tile not in self.legal_orientations or self.legal_orientations[new_tile] is None:
-                return None
-            elif len(self.legal_orientations[new_tile]) > 1:
-                new_tile = tuple(np.array(new_tile)+backward)
-            else:
-                return new_tile, tile_direction
+        # check if turn tile is not in an intersection
+        if len(self.legal_orientations[tile_xy]) <= 1:
+            return None
+        else:
+            # keep going backward until no longer in the intersection
+            backward = -np.array(DIRECTION_TO_VECTOR[tile_direction])
+            new_tile = tuple(np.array(tile_xy)+backward)
+            while True:
+                if new_tile not in self.legal_orientations or self.legal_orientations[new_tile] is None:
+                    return None
+                elif len(self.legal_orientations[new_tile]) > 1:
+                    new_tile = tuple(np.array(new_tile) + backward)
+                else:
+                    return new_tile, tile_direction
 
-    def check_if_right_turn_tile(self, tile, direction):
+    def check_if_right_turn_tile(self, directed_tile):
+        tile, direction = directed_tile
         try:
             assert direction in self.legal_orientations[tile]
         except:
@@ -1528,50 +1556,122 @@ class Map:
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
         try:
             next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
-            return next_bundle.is_rightmost_lane(next_tile), (next_tile, next_direction)
+            return next_bundle.is_rightmost_lane(next_tile), ((next_tile, next_direction),)
         except:
             return False, None
 
-    def check_if_left_turn_tile(self, tile, direction):
+    def check_if_left_turn_type_A(self, directed_tile):
+        """
+        check if left turn tile is of type A (from two-way street into two-way
+        street), assuming directed tile input is legal
+        """
+        tile, direction = directed_tile
+        direction_degrees = Car.convert_orientation(direction)
+        next_direction_degrees = (direction_degrees + 90) % 360
+        next_direction = Car.convert_orientation(next_direction_degrees)
+
+        forward = DIRECTION_TO_VECTOR[direction]
+        left = rotate_vector(forward, np.pi/2)
+        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
+        first_stop = (next_tile, next_direction)
+
+        next_next_tile = tuple(np.array(next_tile) + np.array(left) + np.array(forward))
+        second_stop = (next_next_tile, next_direction)
+        try:
+            next_bundle = self.directed_tile_to_bundle(second_stop)
+            if next_bundle.is_leftmost_lane(next_next_tile):
+                self.legal_orientations[next_tile].append(next_direction)
+                return True, (first_stop, second_stop)
+            else:
+                return False, None
+        except:
+            return False, None
+
+    def check_if_left_turn_type_B(self, directed_tile):
+        """
+        check if left turn tile is of type B (direct turn into one-way street),
+        assuming directed tile input is legal;
+        this turn can only be made from a non-intersection tile
+        """
+        tile, direction = directed_tile
+        if len(self.legal_orientations[tile]) > 1:
+            return False, None
+        else:
+            direction_degrees = Car.convert_orientation(direction)
+            next_direction_degrees = (direction_degrees + 90) % 360
+            next_direction = Car.convert_orientation(next_direction_degrees)
+
+            forward = DIRECTION_TO_VECTOR[direction]
+            left = rotate_vector(forward, np.pi/2)
+            next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
+            next_stop = [(next_tile, next_direction)]
+            try:
+                next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
+                return next_bundle.is_leftmost_lane(next_tile), (next_stop,)
+            except:
+                return False, None
+
+    def check_if_left_turn_tile(self, directed_tile):
+        """
+        given a tile, check if it is ok to perform a left-turn from there
+
+        """
+        tile, direction = directed_tile
+        # check if tile is even legal
         try:
             assert direction in self.legal_orientations[tile]
         except:
             return False, None
-        direction_degrees = Car.convert_orientation(direction)
-        next_direction_degrees = (direction_degrees + 90)%360
-        next_direction = Car.convert_orientation(next_direction_degrees)
-        forward = DIRECTION_TO_VECTOR[direction]
-        left = rotate_vector(forward, np.pi/2)
-        next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
-        try:
-            next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
-            return next_bundle.is_leftmost_lane(next_tile), (next_tile, next_direction)
-        except:
-            return False, None
+        type_A_check = self.check_if_left_turn_type_A(directed_tile)
+        if type_A_check[0]:
+            return type_A_check
+        else:
+            type_B_check = self.check_if_left_turn_type_B(directed_tile)
+            if type_B_check[0]:
+                return type_B_check
+            else:
+                return False, None
 
     # assuming agents can only legally make a right turn from the rightmost lane into rightmost lane
     def find_right_turn_tiles(self):
+        """
+        collect all (final) right-turn tiles in the map using the check function
+        """
         right_turn_tiles = dict()
         for bundle in self.bundles:
             right_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
-                check, nxt = self.check_if_right_turn_tile(tile, direction)
+                directed_tile = (tile, direction)
+                check, nxt = self.check_if_right_turn_tile(directed_tile)
                 if check:
                     right_turn_tiles[bundle][(tile, direction)] = nxt
         return right_turn_tiles
 
     # assuming agents can only legally make a left turn from the leftmost lane into leftmost lane
     def find_left_turn_tiles(self):
+        """
+        collect all (final) left-turn tiles in the map using the check function
+        """
+
         left_turn_tiles = dict()
+        # goes through each bundle
         for bundle in self.bundles:
+            # create a dictionary entry for the bundle
             left_turn_tiles[bundle] = dict()
             direction = bundle.direction
             for idx in range(bundle.length):
+                # pick tile in left-most lane
                 tile = bundle.relative_coordinates_to_tile((bundle.width-1, idx))
-                check, nxt = self.check_if_left_turn_tile(tile, direction)
+                directed_tile = (tile, direction)
+                # performs the check
+                check, nxt = self.check_if_left_turn_tile(directed_tile)
                 if check:
+                    # if check succeeds, add directed tile as a key to the
+                    # dictionary corresponding to the bundle with the
+                    # corresponding value nxt being the remaining tiles
+                    # required to complete the left-turn
                     left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
@@ -2855,8 +2955,8 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=200)
-    #game.animate(frequency=0.01)
+#    game.play(outfile=output_filename, t_end=50)
+    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
