@@ -164,10 +164,14 @@ class Agent:
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # save action that was chosen
+        self.ctrl_chosen = ctrl
+        # save the agents currently in agent bubble
+        self.agents_in_bubble = self.find_agents_in_bubble()
         # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
-        self.check_joint_state_safety()
+        self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
 
 
 class Gridder(Agent):
@@ -213,6 +217,12 @@ class Car(Agent):
         self.agent_max_braking_not_enough = None
         self.token_count = 0
         self.intention = None
+
+        # attributes for saving agent info
+        self.spec_struct_trace = {}
+        self.ctrl_chosen = None
+        self.unsafe_joint_state_dict = {}
+        self.agents_in_bubble = []
 
     def get_intention(self):
         return self.intention
@@ -667,10 +677,10 @@ class Car(Agent):
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
             if self.supervisor.game.time not in self.supervisor.game.collision_dict:
                 self.supervisor.game.collision_dict[self.supervisor.game.time] = \
-                    [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+                    [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
             else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), \
-                    self.intention, ag.state.__tuple__(), ag.intention))
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.self.state.__tuple__(), \
+                    self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
     
@@ -679,24 +689,32 @@ class Car(Agent):
         if out_of_bounds_chk:
             if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
                 self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = \
-                    [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+                    [(self.get_id(), prior_state.__tuple__(), ctrl, self.state.__tuple__())]
             else:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(),\
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((self.get_id(), prior_state.__tuple__(),\
                     ctrl, self.state.__tuple__()))
             print("ERROR: Updated state makes agent out of bounds!!")
 
-    def check_joint_state_safety(self, occupancy_dict=None):
+    def check_joint_state_safety(self, occupancy_dict=None, return_list=False):
         if occupancy_dict is None: occupancy_dict = self.supervisor.game.occupancy_dict
+        is_safe = True
         for gridpt, agent in occupancy_dict.items():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
             lead_agent = agent.find_lead_agent()
+            # record all agents without valid back-up plan
+            agents_no_bp = []
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
                 if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
-                    return False
-        return True
+                    is_safe = False
+                    agents_no_bp.append(agent.state.__tuple__())
+        
+        if return_list: 
+            return agents_no_bp
+        else: 
+            return is_safe
 
     def find_lead_agent(self, state=None):
         if state is None: state = self.state
@@ -725,6 +743,7 @@ class Car(Agent):
         dx_behind = self.compute_dx(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
+
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
         # get occupancy for both actions
@@ -992,8 +1011,8 @@ class SpawningContract():
 
     # passes all necessary checks 
     def passes_all_checks(self):
-        print(self.valid_init_state(), self.valid_init_safe_state(), \
-            self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
+        #print(self.valid_init_state(), self.valid_init_safe_state(), \
+        #    self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
@@ -1046,10 +1065,12 @@ class Game:
         self.map = game_map
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
+        self.traces = {"agent_ids":[]}
         self.occupancy_dict = dict()
         self.update_occupancy_dict()
         self.collision_dict = dict()
         self.out_of_bounds_dict = dict()
+        self.unsafe_joint_state_dict = dict()
 
     def update_occupancy_dict(self):
         occupancy_dict = dict()
@@ -1079,14 +1100,16 @@ class Game:
         self.agent_set.append(agent)
     def time_forward(self):
         self.time += 1
-    def save_snapshot(self):
+    def save_plotting_info(self):
         lights = []
         agents = []
         # save all the agent states
         for agent in self.agent_set:
-            agent_param = {"v_min":agent.v_min, "v_max":agent.v_max, "a_min":agent.a_min, "a_max":agent.a_max}
+            spec_struct_trace = {}
+            if self.time > 0:
+                spec_struct_trace = agent.spec_struct_trace
             agents.append((agent.state.x, agent.state.y, \
-                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble(), agent.supervisor.goals, agent_param))
+                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble()))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
@@ -1097,7 +1120,43 @@ class Game:
                 lights.append((x, y, traffic_light.get_vstate()[0], traffic_light.htimer, 'vertical', traffic_light.durations))
 
         # return dict with all the info
-        return {"lights": lights, "agents": agents}
+        self.traces[self.time] = {"lights": lights, "agents": agents}
+    
+    def write_agents_to_traces(self):
+        for agent in self.agent_set:
+            # unpack agents in bubble to tuples
+            agents_in_bubble = [agent.state.__tuple__() for agent in agent.agents_in_bubble]
+            # unpack agents in send and receive requests to tuples
+            sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
+            received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
+            max_not_braking_enough = agent.agent_max_braking_not_enough
+            if max_not_braking_enough is not None:
+                max_not_braking_enough = agent.agent_max_braking_not_enough.state.__tuple__()
+            # save all data in trace
+            agent_trace_dict = {'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
+                'color':agent.agent_color, 'bubble':agent.get_bubble(), 'goals': agent.supervisor.goals, \
+                    'spec_struct_info': agent.spec_struct_trace, 'agents_in_bubble': agents_in_bubble, \
+                        'sent_request': sent, 'received_requests': received, 'token_count':agent.token_count, \
+                            'max_braking_not_enough': max_not_braking_enough}
+
+            # if not yet in traces, add it to traces
+            agent_id = agent.get_id()
+            if agent_id not in self.traces:
+                self.traces["agent_ids"].append(agent_id)
+                agent_param = {"v_min":agent.v_min, "v_max":agent.v_max, "a_min":agent.a_min, "a_max":agent.a_max}
+                self.traces[agent_id] = {'agent_param':agent_param, self.time:agent_trace_dict}
+            # else update its dict 
+            self.traces[agent_id][self.time] = agent_trace_dict
+    
+    
+    # write the game information to traces
+    def write_game_info_to_traces(self, t_end):
+        self.traces["map_name"] = self.map.map_name
+        self.traces["spawn_probability"] = self.map.default_spawn_probability
+        self.traces["collision_dict"] = self.collision_dict
+        self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
+        #self.traces["unsafe_joint_dict"] = self.unsafe_joint_state_dict
+        self.traces["t_end"] = t_end
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
@@ -1220,7 +1279,6 @@ class Game:
 
         for agent in self.agent_set:
             # set list to send requests to
-            #print("FINDING CONFLICT REQUESTS FOR AGENT" + str(agent.state.__tuple__()))
             agent.send_conflict_requests_to = agent.find_agents_to_send_conflict_request()
 
             # for each agent receiving request, update their receive list
@@ -1230,29 +1288,23 @@ class Game:
     def play(self, t_end=np.inf, outfile=None):
         # dump the map here and open json file
         write_bool = outfile is not None and t_end is not np.inf
-        traces = dict()
         while self.time < t_end:
             print("TIME: " + str(self.time))
             # if save data to animate
             if write_bool:
-                snapshot = self.save_snapshot()
-                traces[self.time] = snapshot
-            #self.check_conflict_requests_karena_debug()
+                self.write_agents_to_traces()
+                self.save_plotting_info()
 
             self.play_step()
             self.time_forward()
+        
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
-            #traces["collisions"] = list(set(self.collisions))
-            traces["map_name"] = self.map.map_name
-            traces["spawn_probability"] = self.map.default_spawn_probability
-            traces["collision_dict"] = self.collision_dict
-            traces["out_of_bounds_dict"] = self.out_of_bounds_dict
-            traces["t_end"] = t_end
+            self.write_game_info_to_traces(t_end)
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            self.write_data_to_pckl(output_dir + outfile, traces)
+            self.write_data_to_pckl(output_dir + outfile, self.traces)
 
 def symbol_to_orientation(symb):
     if symb in ['←','⇠']:
@@ -1971,7 +2023,8 @@ class GridPlanner(Planner):
         return plan
 
 class Oracle():
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         pass
     def evaluate(self, ctrl_action, plant, game):
         raise NotImplementedError
@@ -1979,7 +2032,7 @@ class Oracle():
 class ReplanProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(ReplanProgressOracle, self).__init__()
+        super(ReplanProgressOracle, self).__init__(name='replan_progress')
     def evaluate(self, ctrl_action, plant, game):
         source = (plant.state.x, plant.state.y)
         target = plant.supervisor.current_goal
@@ -1995,7 +2048,7 @@ class ReplanProgressOracle(Oracle):
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(PathProgressOracle, self).__init__()
+        super(PathProgressOracle, self).__init__(name='path_progress')
     def evaluate(self, ctrl_action, plant, game):
         def get_dist_to_plan(xy, plan):
             all_dist = [np.sum(np.abs(xy-np.array([p[0], p[1]]))) for p in plan]
@@ -2012,7 +2065,7 @@ class PathProgressOracle(Oracle):
 class BundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(BundleProgressOracle, self).__init__()
+        super(BundleProgressOracle, self).__init__(name='bundle_progress')
     def evaluate(self, ctrl_action, plant, game):
         def backup_plan_is_ok_from_state(state, current_subgoal):
             tile_sequence_chain = plant.query_backup_plan(state=state)
@@ -2091,7 +2144,7 @@ class BundleProgressOracle(Oracle):
 class ImprovementBundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(ImprovementBundleProgressOracle, self).__init__()
+        super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
     def evaluate(self, ctrl_action, plant, game):
 
         # get current subgoal
@@ -2148,7 +2201,7 @@ class ImprovementBundleProgressOracle(Oracle):
 class MaintenanceBundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(MaintenanceBundleProgressOracle, self).__init__()
+        super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
     def evaluate(self, ctrl_action, plant, game):
         # get current subgoal
         current_subgoal = plant.supervisor.subgoals[0]
@@ -2204,7 +2257,7 @@ class MaintenanceBundleProgressOracle(Oracle):
 class BackUpPlanBundleProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(BackUpPlanBundleProgressOracle, self).__init__()
+        super(BackUpPlanBundleProgressOracle, self).__init__(name='backup_plan_progress')
     def evaluate(self, ctrl_action, plant, game):
         def backup_plan_is_ok_from_state(state, current_subgoal):
             tile_sequence_chain = plant.query_backup_plan(state=state)
@@ -2257,7 +2310,7 @@ class BackUpPlanBundleProgressOracle(Oracle):
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
-        super(TrafficLightOracle, self).__init__()
+        super(TrafficLightOracle, self).__init__(name='traffic_light')
 
     def tile_sequence_not_running_a_red_light_on_N_turn(self, tile_sequence, game, N):
         light_checks = []
@@ -2322,7 +2375,7 @@ class TrafficLightOracle(Oracle):
 # action is invalid if agent is in intersection and wants to change lanes
 class TrafficIntersectionOracle(Oracle):
     def __init__(self):
-        super(TrafficIntersectionOracle, self).__init__()
+        super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
         # if agent isn't in intersection return true
         if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
@@ -2336,7 +2389,7 @@ class TrafficIntersectionOracle(Oracle):
 
 class TrafficLightTurningLanesOracle(Oracle):
     def __init__(self):
-        super(TrafficLightTurningLanesOracle, self).__init__()
+        super(TrafficLightTurningLanesOracle, self).__init__(name='traffic_light_turning_lanes')
     def evaluate(self, ctrl_action, plant, game):
         pass 
 
@@ -2344,7 +2397,7 @@ class TrafficLightTurningLanesOracle(Oracle):
 #TODO: improve some calc here...
 class BackupPlanSafetyOracle(Oracle):
     def __init__(self):
-        super(BackupPlanSafetyOracle, self).__init__()
+        super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
     def evaluate(self, ctrl_action, plant, game):
         next_state = plant.query_occupancy(ctrl_action)[-1]
         x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
@@ -2359,7 +2412,7 @@ class BackupPlanSafetyOracle(Oracle):
 
 class StaticObstacleOracle(Oracle):
     def __init__(self):
-        super(StaticObstacleOracle, self).__init__()
+        super(StaticObstacleOracle, self).__init__(name='static_obstacle')
     def evaluate(self, ctrl_action, plant, game):
         # check if action is safe
         next_occupancy = plant.query_occupancy(ctrl_action)
@@ -2392,7 +2445,7 @@ class LegalOrientationOracle(Oracle):
 
     """
     def __init__(self):
-        super(LegalOrientationOracle, self).__init__()
+        super(LegalOrientationOracle, self).__init__(name='legal_orientation')
     def evaluate(self, ctrl_action, plant, game):
         final_state = plant.query_occupancy(ctrl_action)[-1]
         final_node = final_state.x, final_state.y
@@ -2423,11 +2476,17 @@ class SpecificationStructureController(Controller):
     def __init__(self, game, specification_structure):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
+
     def run_on(self, plant):
-        scores = []
+        def ctrl_dict_to_tuple(ctrl):
+            return (ctrl['steer'], ctrl['acceleration'])
+
         all_ctrls = plant.get_all_ctrl()
+        spec_struct_trace = {} 
+
         for ctrl in all_ctrls:
             score = 0
+            scores = {}
             for oracle in self.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, plant, self.game)
                 o_tier = self.specification_structure.tier[oracle]
@@ -2435,11 +2494,18 @@ class SpecificationStructureController(Controller):
                     score += int(o_score) * self.specification_structure.tier_weights[o_tier]
                 except:
                     pass
-            scores.append(score)
+                scores[oracle.name] = o_score
+            # save data
+            scores['total'] = score
+            spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores
+
+        # save data as agent attribute
+        plant.spec_struct_trace = spec_struct_trace
 
         # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         plant.apply(ctrl)
+
 
 class SupervisoryController():
     def _init__(self):
@@ -2770,7 +2836,7 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
         spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
         end = (x, y+25, heading)
         v_min = 0
-        v_max = 2
+        v_max = 3
         #v = random.choice(np.arange(2, v_max+1))
         car = Car(x=x,y=y,heading=heading,v=v,v_min=v_min,v_max=v_max, a_min=-2,a_max=2)
         car.set_controller(spec_struct_controller)
@@ -2850,12 +2916,12 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.45)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=200)
+    game.play(outfile=output_filename, t_end=10)
     #game.animate(frequency=0.01)
 
     # print debug info 
