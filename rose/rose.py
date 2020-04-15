@@ -2419,15 +2419,23 @@ class StaticObstacleOracle(Oracle):
         return True
 
 class LegalOrientationOracle(Oracle):
+    """
+    check if next heading is legal
+
+    """
     def __init__(self):
         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
     def evaluate(self, ctrl_action, plant, game):
         final_state = plant.query_occupancy(ctrl_action)[-1]
         final_node = final_state.x, final_state.y
-        legal_headings = None
         if final_node in game.map.drivable_nodes:
             legal_headings = game.map.legal_orientations[final_node]
-        return legal_headings and final_state.heading in game.map.legal_orientations[final_node]
+            if not legal_headings: # check if node is off road
+                return False
+            else: # check if next heading is legal
+                return final_state.heading in legal_headings
+        else:
+            return False # if node is an obstacle or out of bounds
 
 class OracleController(Controller):
     def __init__(self, game, oracle_set):
