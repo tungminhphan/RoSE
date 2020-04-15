@@ -474,6 +474,10 @@ class Car(Agent):
             higher_pred = []
             ego_tile = self.state.x, self.state.y
             ego_heading = self.state.heading
+            # TODO: fix this bandage code
+            if (ego_tile, ego_heading) in self.supervisor.game.map.special_goal_tiles:
+                ego_heading = Car.convert_orientation(Car.convert_orientation(ego_heading) + 90)
+
             bundle = self.supervisor.game.map.get_bundle_from_directed_tile(ego_tile, ego_heading)
             ego_score = bundle.tile_to_relative_length(ego_tile)
             for agent in agent_set:
@@ -679,7 +683,7 @@ class Car(Agent):
                 self.supervisor.game.collision_dict[self.supervisor.game.time] = \
                     [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
             else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.self.state.__tuple__(), \
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
                     self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
@@ -2879,8 +2883,8 @@ def get_default_car_ss():
     oracle_set = [static_obstacle_oracle, traffic_light_oracle,
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, traffic_intersection_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1, 2])
+            backup_plan_safety_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -2909,6 +2913,9 @@ class QuasiSimultaneousGame(Game):
             bundle_to_agent_precedence[bundle] = dict()
         for agent in self.agent_set:
             x, y, heading = agent.state.x, agent.state.y, agent.state.heading
+            # if in special tile, rotate by another 90 degrees; TODO: remove this bandage
+            if ((x, y), heading) in self.map.special_goal_tiles:
+                heading = Car.convert_orientation(Car.convert_orientation(heading) + 90)
             try:
                 bundles = self.map.tile_to_bundle_map[(x,y)]
             except:
@@ -2949,12 +2956,14 @@ class QuasiSimultaneousGame(Game):
         self.send_and_receive_conflict_requests()
         # resolve precedence
         self.resolve_precedence()
+        active_agents = []
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
             precedence_list.sort(reverse=True)
             for precedence in precedence_list:
                 for agent in self.bundle_to_agent_precedence[bundle][precedence]:
                     agent.run()
+                    active_agents.append(agent)
 
     def play_step(self):
         #for agent in self.agent_set:
