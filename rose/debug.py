@@ -39,17 +39,50 @@ def print_one_agent_trace(filename):
         # print the other agents in its bubble
         print("OTHER AGENTS IN BUBBLE ARE LOCATED AT: ")
         [print(ag) for ag in trace_t['agents_in_bubble']]
+
+        # print the agents goal
+        print("AGENT CGOAL IS:")
+        print(trace_t['goals'])
         
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
             trace_nxt = agent_trace[t+1]
 
+            # print out the oracle scores
             for ctrl, oracle_scores in trace_nxt['spec_struct_info'].items():
                 print("control action")
                 print(ctrl)
             
                 for key, value in oracle_scores.items():
                     print(key, value)
+        
+            # print out the conflict requests it sent out
+            print('sent requests to:')
+            for agent in trace_nxt['sent_request']:
+                print(agent)
+            
+            # print out the conflict requests received
+            print('received requests from')
+            for agent in trace_nxt['received_requests']:
+                print(agent)
+
+            # print token count
+            print('agent token count after action is taken')
+            print(trace_nxt['token_count'])
+
+            # print out max braking flag
+            print('max braking flag sent')
+            print(trace_nxt['max_braking_not_enough'])
+
+            # print control action taken
+            print('control action taken')
+            print(trace_nxt['action'])
+
+            
+        '''{'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
+                'color':agent.agent_color, 'bubble':agent.get_bubble(), \
+                  ,  \
+                            }'''
 
         print()
         print()

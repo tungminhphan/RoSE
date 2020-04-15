@@ -164,10 +164,14 @@ class Agent:
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict()
+        # save action that was chosen
+        self.ctrl_chosen = ctrl
+        # save the agents currently in agent bubble
+        self.agents_in_bubble = self.find_agents_in_bubble()
         # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
-        self.check_joint_state_safety()
+        self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
 
 
 class Gridder(Agent):
@@ -213,7 +217,12 @@ class Car(Agent):
         self.agent_max_braking_not_enough = None
         self.token_count = 0
         self.intention = None
+
+        # attributes for saving agent info
         self.spec_struct_trace = {}
+        self.ctrl_chosen = None
+        self.unsafe_joint_state_dict = {}
+        self.agents_in_bubble = []
 
     def get_intention(self):
         return self.intention
@@ -668,10 +677,10 @@ class Car(Agent):
             ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
             if self.supervisor.game.time not in self.supervisor.game.collision_dict:
                 self.supervisor.game.collision_dict[self.supervisor.game.time] = \
-                    [(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)]
+                    [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
             else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.state.__tuple__(), \
-                    self.intention, ag.state.__tuple__(), ag.intention))
+                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.self.state.__tuple__(), \
+                    self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
             print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
         return len(gridpts_intersect) > 0
     
@@ -680,24 +689,32 @@ class Car(Agent):
         if out_of_bounds_chk:
             if self.supervisor.game.time not in self.supervisor.game.out_of_bounds_dict:
                 self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time] = \
-                    [(prior_state.__tuple__(), ctrl, self.state.__tuple__())]
+                    [(self.get_id(), prior_state.__tuple__(), ctrl, self.state.__tuple__())]
             else:
-                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((prior_state.__tuple__(),\
+                self.supervisor.game.out_of_bounds_dict[self.supervisor.game.time].append((self.get_id(), prior_state.__tuple__(),\
                     ctrl, self.state.__tuple__()))
             print("ERROR: Updated state makes agent out of bounds!!")
 
-    def check_joint_state_safety(self, occupancy_dict=None):
+    def check_joint_state_safety(self, occupancy_dict=None, return_list=False):
         if occupancy_dict is None: occupancy_dict = self.supervisor.game.occupancy_dict
+        is_safe = True
         for gridpt, agent in occupancy_dict.items():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
             lead_agent = agent.find_lead_agent()
+            # record all agents without valid back-up plan
+            agents_no_bp = []
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
                 if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
-                    return False
-        return True
+                    is_safe = False
+                    agents_no_bp.append(agent.state.__tuple__())
+        
+        if return_list: 
+            return agents_no_bp
+        else: 
+            return is_safe
 
     def find_lead_agent(self, state=None):
         if state is None: state = self.state
@@ -726,6 +743,7 @@ class Car(Agent):
         dx_behind = self.compute_dx(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
+
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
         # get occupancy for both actions
@@ -993,8 +1011,8 @@ class SpawningContract():
 
     # passes all necessary checks 
     def passes_all_checks(self):
-        print(self.valid_init_state(), self.valid_init_safe_state(), \
-            self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
+        #print(self.valid_init_state(), self.valid_init_safe_state(), \
+        #    self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
@@ -1052,6 +1070,7 @@ class Game:
         self.update_occupancy_dict()
         self.collision_dict = dict()
         self.out_of_bounds_dict = dict()
+        self.unsafe_joint_state_dict = dict()
 
     def update_occupancy_dict(self):
         occupancy_dict = dict()
@@ -1106,14 +1125,20 @@ class Game:
     def write_agents_to_traces(self):
         for agent in self.agent_set:
             # unpack agents in bubble to tuples
-            agents_in_bubble = [agent.state.__tuple__() for agent in agent.find_agents_in_bubble()]
+            agents_in_bubble = [agent.state.__tuple__() for agent in agent.agents_in_bubble]
             # unpack agents in send and receive requests to tuples
             sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
+            max_not_braking_enough = agent.agent_max_braking_not_enough
+            if max_not_braking_enough is not None:
+                max_not_braking_enough = agent.agent_max_braking_not_enough.state.__tuple__()
             # save all data in trace
-            agent_trace_dict = {'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'color':agent.agent_color, \
-                'bubble':agent.get_bubble(), 'goals': agent.supervisor.goals, 'spec_struct_info':agent.spec_struct_trace,\
-                    'agents_in_bubble': agents_in_bubble, 'sent_request':sent, 'received_requests':received, 'token_count':agent.token_count}
+            agent_trace_dict = {'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
+                'color':agent.agent_color, 'bubble':agent.get_bubble(), 'goals': agent.supervisor.goals, \
+                    'spec_struct_info': agent.spec_struct_trace, 'agents_in_bubble': agents_in_bubble, \
+                        'sent_request': sent, 'received_requests': received, 'token_count':agent.token_count, \
+                            'max_braking_not_enough': max_not_braking_enough}
+
             # if not yet in traces, add it to traces
             agent_id = agent.get_id()
             if agent_id not in self.traces:
@@ -1130,6 +1155,7 @@ class Game:
         self.traces["spawn_probability"] = self.map.default_spawn_probability
         self.traces["collision_dict"] = self.collision_dict
         self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
+        #self.traces["unsafe_joint_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
@@ -1253,7 +1279,6 @@ class Game:
 
         for agent in self.agent_set:
             # set list to send requests to
-            #print("FINDING CONFLICT REQUESTS FOR AGENT" + str(agent.state.__tuple__()))
             agent.send_conflict_requests_to = agent.find_agents_to_send_conflict_request()
 
             # for each agent receiving request, update their receive list
@@ -1269,10 +1294,6 @@ class Game:
             if write_bool:
                 self.write_agents_to_traces()
                 self.save_plotting_info()
-                #self.write_lights_to_traces()
-                #snapshot = self.save_snapshot()
-                #traces[self.time] = snapshot
-            #self.check_conflict_requests_karena_debug()
 
             self.play_step()
             self.time_forward()
@@ -2815,7 +2836,7 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
         spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
         end = (x, y+25, heading)
         v_min = 0
-        v_max = 2
+        v_max = 3
         #v = random.choice(np.arange(2, v_max+1))
         car = Car(x=x,y=y,heading=heading,v=v,v_min=v_min,v_max=v_max, a_min=-2,a_max=2)
         car.set_controller(spec_struct_controller)
@@ -2895,7 +2916,7 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.45)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
     output_filename = 'game.p'
 
     # play a normal game
