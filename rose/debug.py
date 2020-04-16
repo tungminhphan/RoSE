@@ -4,9 +4,23 @@ import random
 import copy as cp
 
 # make sure an agent is doing the right things
+def get_agent_id(filename, x, y, heading, t):
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    agents = traces[t]['agents']
+    # search through all agents at time t 
+    for agent in agents:
+        ag_x, ag_y, ag_theta, ag_v, ag_color, ag_bubble, ag_id = agent
+        if ag_theta == heading: 
+            print(ag_x, ag_y, ag_theta)
+        if (x, y, heading) == (ag_x, ag_y, ag_theta):
+            return ag_id
+    
+    print('agent not found')
+    return None
 
 
-def print_one_agent_trace(filename, outfile):
+def print_one_agent_trace(filename, outfile, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
     
@@ -15,8 +29,9 @@ def print_one_agent_trace(filename, outfile):
     t_end = traces['t_end']
 
     # select an agent at random
-    agent_ids = traces['agent_ids']
-    agent_id = random.choice(agent_ids)
+    #agent_ids = traces['agent_ids']
+    #agent_id = random.choice(agent_ids)
+    agent_id = get_agent_id(filename, x, y, heading, t)
     agent_trace = traces[agent_id].copy()
 
     # get agent params then remove from trace
@@ -121,4 +136,4 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile)
+    print_one_agent_trace(traces_file, outfile, 17, 38, 'north', 54)

@@ -564,7 +564,7 @@ class Car(Agent):
         # check out whether the maximal yielding is not enough!
         if self.agent_max_braking_not_enough is not None:
             # TODO: make less conservative?? also update token count or not?
-            ctrl = self.get_max_forward_ctrl()
+            ctrl = self.get_backup_plan_ctrl()
         else:
             # list of all possible scenarios and what action to take
             if agent_type == 'none' and bubble_chk:
@@ -856,8 +856,11 @@ class Car(Agent):
 
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
-        chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
-        return not chk_valid_actions
+        if agent.state.heading == self.state.heading: 
+            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
+            return not chk_valid_actions
+        else:
+            return False
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
     def check_to_send_conflict_request(self, agent):
@@ -1051,8 +1054,8 @@ class SpawningContract():
 
     # passes all necessary checks 
     def passes_all_checks(self):
-        print(self.valid_init_state(), self.valid_init_safe_state(), \
-            self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
+        #print(self.valid_init_state(), self.valid_init_safe_state(), \
+        #    self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
@@ -1149,7 +1152,7 @@ class Game:
             if self.time > 0:
                 spec_struct_trace = agent.spec_struct_trace
             agents.append((agent.state.x, agent.state.y, \
-                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble()))
+                agent.state.heading, agent.state.v, agent.agent_color, agent.get_bubble(), agent.get_id()))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
             for tile in traffic_light.htiles:
@@ -3114,12 +3117,13 @@ def print_debug_info(filename):
 
 if __name__ == '__main__':
     np.random.seed(0)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.03)
+    random.seed(0)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=100)
 
     #game.animate(frequency=0.01)
 
