@@ -669,24 +669,28 @@ class Car(Agent):
 
     #======add in code for checking whether agent can go for right turn=========#
     def check_right_turn_is_clear(self, right_turn_ctrl):
-        #__import__('ipdb').set_trace(context=21)
         # get the bundle that agent is trying to turn into
         #right_turn_ctrl = {'acceleration': 1-self.state.v, 'right-turn'}
         next_st = self.query_occupancy(right_turn_ctrl)[-1]
         bundle = self.supervisor.game.map.get_bundle_from_directed_tile((next_st.x, next_st.y), next_st.heading)
+        if bundle is None: 
+            st()
         # collect all agents in agent bundle AND in agent bubble
         for agent in self.find_agents_in_bubble():
             # get the bundle the agent in the bubble is in 
             agent_bundle = agent.supervisor.game.map.get_bundle_from_directed_tile((agent.state.x, agent.state.y), agent.state.heading)
-            # if agent passes these checks, then see whether the agents are in conflict 
-            if bundle.get_id() == agent_bundle.get_id() and agent.get_id() != self.get_id(): 
-                # check whether an agent takes max acc and self takes right turn are valid actions
-                max_acc_ctrl = {'acceleration': agent.max_acc, 'steer': 'straight'}
-                chk_valid_1 = self.check_valid_actions(self, right_turn_ctrl, agent, max_acc_ctrl)
-                # check whether an agent takes back-up and self takes right turn are valid actions
-                chk_valid_2 = self.check_valid_actions(self, right_turn_ctrl, agent, agent.get_backup_plan_ctrl())
-                if not (chk_valid_1 and chk_valid_2): 
-                    return False
+            if agent_bundle is not None: 
+                # if agent passes these checks, then see whether the agents are in conflict 
+                if bundle.get_id() == agent_bundle.get_id() and agent.get_id() != self.get_id(): 
+                    # check whether an agent takes max acc and self takes right turn are valid actions
+                    max_acc_ctrl = {'acceleration': agent.a_max, 'steer': 'straight'}
+                    chk_valid_1 = self.check_valid_actions(self, right_turn_ctrl, agent, max_acc_ctrl)
+                    # check whether an agent takes back-up and self takes right turn are valid actions
+                    chk_valid_2 = self.check_valid_actions(self, right_turn_ctrl, agent, agent.get_backup_plan_ctrl())
+                    if not (chk_valid_1 and chk_valid_2): 
+                        return False
+            else:
+                pass
         return True
 
     #============verifying agent back-up plan invariance===================#
@@ -2537,14 +2541,19 @@ class TrafficLightOracle(Oracle):
         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
         # if you're at the critical right-turn tile and red light
         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
-        right_turn_tiles = list(game.map.right_turn_tiles[bundle].keys())
+        # special left turn lane bandage
+        if bundle is None: 
+            #print(plant.state.x, plant.state.y, plant.state.heading)
+            return False
         # check whether the right-turn action is okay
-        if ((plant.state.x, plant.state.y), plant.state.heading) in list(right_turn_tiles) and ctrl_action['steer'] == 'right-turn':
+        if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
             traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
             light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
             if light_is_red: 
                 # check if right turn is valid
                 return plant.check_right_turn_is_clear(ctrl_action)
+            else:
+                return action_not_running_a_red_light and backup_plant_will_still_be_ok
         else: 
             return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
