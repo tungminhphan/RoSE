@@ -3064,8 +3064,8 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=50)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=100)
+#    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
