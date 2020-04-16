@@ -864,11 +864,14 @@ class Car(Agent):
         # check if gap between two agents is large enough for stopping!
         # TODO: see whether end state after these actions still have a back-up plan
         def intentions_conflict(agent):
-            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-            return not chk_valid_actions
+            if agent.state.heading == self.state.heading:
+                chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
+                return not chk_valid_actions
+            else:
+                return False
         
         # should only send conflict requests to agents facing the same direction
-        return intentions_conflict(agent) and self.state.heading == agent.state.heading 
+        return intentions_conflict(agent) #and self.state.heading == agent.state.heading 
         #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
