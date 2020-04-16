@@ -171,7 +171,9 @@ class Agent:
         # check wehther the state is out of bounds
         self.check_out_of_bounds(self, prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
+        chk_joint_safety = self.check_joint_state_safety(return_list=True)
         self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
+        
 
 
 class Gridder(Agent):
@@ -665,6 +667,32 @@ class Car(Agent):
 
         return send_requests_list
 
+    #======add in code for checking whether agent can go for right turn=========#
+    def check_right_turn_is_clear(self, right_turn_ctrl):
+        # get the bundle that agent is trying to turn into
+        #right_turn_ctrl = {'acceleration': 1-self.state.v, 'right-turn'}
+        next_st = self.query_occupancy(right_turn_ctrl)[-1]
+        bundle = self.supervisor.game.map.get_bundle_from_directed_tile((next_st.x, next_st.y), next_st.heading)
+        if bundle is None: 
+            st()
+        # collect all agents in agent bundle AND in agent bubble
+        for agent in self.find_agents_in_bubble():
+            # get the bundle the agent in the bubble is in 
+            agent_bundle = agent.supervisor.game.map.get_bundle_from_directed_tile((agent.state.x, agent.state.y), agent.state.heading)
+            if agent_bundle is not None: 
+                # if agent passes these checks, then see whether the agents are in conflict 
+                if bundle.get_id() == agent_bundle.get_id() and agent.get_id() != self.get_id(): 
+                    # check whether an agent takes max acc and self takes right turn are valid actions
+                    max_acc_ctrl = {'acceleration': agent.a_max, 'steer': 'straight'}
+                    chk_valid_1 = self.check_valid_actions(self, right_turn_ctrl, agent, max_acc_ctrl)
+                    # check whether an agent takes back-up and self takes right turn are valid actions
+                    chk_valid_2 = self.check_valid_actions(self, right_turn_ctrl, agent, agent.get_backup_plan_ctrl())
+                    if not (chk_valid_1 and chk_valid_2): 
+                        return False
+            else:
+                pass
+        return True
+
     #============verifying agent back-up plan invariance===================#
     # check for collision with occupancy dict
     def check_collision(self, ctrl):
@@ -748,6 +776,7 @@ class Car(Agent):
         dx_behind = self.compute_dx(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
+    
 
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
@@ -837,7 +866,10 @@ class Car(Agent):
         def intentions_conflict(agent):
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
             return not chk_valid_actions
-        return intentions_conflict(agent) #or intention_forward_action_conflict(agent)
+        
+        # should only send conflict requests to agents facing the same direction
+        return intentions_conflict(agent) and self.state.heading == agent.state.heading 
+        #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
     def get_default_bubble(self, vel):
@@ -1016,8 +1048,8 @@ class SpawningContract():
 
     # passes all necessary checks 
     def passes_all_checks(self):
-        #print(self.valid_init_state(), self.valid_init_safe_state(), \
-        #    self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
+        print(self.valid_init_state(), self.valid_init_safe_state(), \
+            self.valid_traffic_state_for_traffic_lights(), self.agent_not_in_intersection(), self.agent_facing_right_direction())
         all_checks = self.valid_init_state() and self.valid_init_safe_state() and \
             self.valid_traffic_state_for_traffic_lights() and self.agent_not_in_intersection() \
                 and self.agent_facing_right_direction()
@@ -1130,7 +1162,7 @@ class Game:
     def write_agents_to_traces(self):
         for agent in self.agent_set:
             # unpack agents in bubble to tuples
-            agents_in_bubble = [agent.state.__tuple__() for agent in agent.agents_in_bubble]
+            agents_in_bubble = [[agent.state.__tuple__(), agent.get_id()]  for agent in agent.agents_in_bubble]
             # unpack agents in send and receive requests to tuples
             sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
@@ -1160,7 +1192,7 @@ class Game:
         self.traces["spawn_probability"] = self.map.default_spawn_probability
         self.traces["collision_dict"] = self.collision_dict
         self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
-        #self.traces["unsafe_joint_dict"] = self.unsafe_joint_state_dict
+        self.traces["unsafe_joint_state_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
@@ -2507,7 +2539,23 @@ class TrafficLightOracle(Oracle):
     def evaluate(self, ctrl_action, plant, game):
         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
-        return action_not_running_a_red_light and backup_plant_will_still_be_ok
+        # if you're at the critical right-turn tile and red light
+        bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
+        # special left turn lane bandage
+        if bundle is None: 
+            #print(plant.state.x, plant.state.y, plant.state.heading)
+            return False
+        # check whether the right-turn action is okay
+        if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
+            traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
+            light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
+            if light_is_red: 
+                # check if right turn is valid
+                return plant.check_right_turn_is_clear(ctrl_action)
+            else:
+                return action_not_running_a_red_light and backup_plant_will_still_be_ok
+        else: 
+            return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
 # oracle in charge of checking actions of agents if they are in an intersection
 # action is invalid if agent is in intersection and wants to change lanes
@@ -2516,7 +2564,9 @@ class TrafficIntersectionOracle(Oracle):
         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
         # if agent isn't in intersection return true
-        if len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
+        if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
+            return True
+        elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1: 
             return True
         # else check if action is a lane change move (which isn't allowed)
         else: 
@@ -3056,17 +3106,16 @@ def print_debug_info(filename):
         traces = pickle.load(pckl_file)
     print(traces['collision_dict'])
     print(traces['out_of_bounds_dict'])
+    print(traces['unsafe_joint_state_dict'])
     pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.03)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
-#    game.animate(frequency=0.01)
-
+    game.animate(frequency=0.01)
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
     print_debug_info(debug_filename)
