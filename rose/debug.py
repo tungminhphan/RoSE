@@ -19,7 +19,6 @@ def get_agent_id(filename, x, y, heading, t):
     print('agent not found')
     return None
 
-
 def print_one_agent_trace(filename, outfile, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
@@ -38,8 +37,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     agent_param = agent_trace['agent_param']
     del agent_trace['agent_param']    
 
-    # sort time_steps
-
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()): 
 
@@ -48,14 +45,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
 
         out_file.write("Time Step \n")
         out_file.write(str(t)+'\n')
-        #print("time step")
-        #print(t)
 
         # print the agent state
         out_file.write("AGENT IS LOCATED AT: \n")
         out_file.write(str(trace_t['state'])+'\n')
-        #print("AGENT IS LOCATED AT: ")
-        #print(trace_t['state'])
 
         # print the agent state
         out_file.write("AGENTS' BUBBLE INCLUDES: \n")
@@ -64,14 +57,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         # print the other agents in its bubble
         out_file.write("OTHER AGENTS IN BUBBLE ARE LOCATED AT: \n")
         [out_file.write(str(ag)+'\n') for ag in trace_t['agents_in_bubble']]
-        #print("OTHER AGENTS IN BUBBLE ARE LOCATED AT: ")
-        #[print(ag) for ag in trace_t['agents_in_bubble']]
 
         # print the agents goal
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((trace_t['goals']))+'\n')
-        #print("AGENT GOAL IS:")
-        #print(trace_t['goals'])
         
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
@@ -81,44 +70,47 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
             for ctrl, oracle_scores in trace_nxt['spec_struct_info'].items():
                 out_file.write("control action\n")
                 out_file.write(str(ctrl)+'\n')
-                #print("control action")
-                #print(ctrl)
             
                 for key, value in oracle_scores.items():
                     out_file.write(key + ' ' + str(value)+'\n')
-                    #print(key, value)
+
+            out_file.write('\n')
+            out_file.write("action selection strategy flags \n")
+            out_file.write(str(trace_nxt['action_selection_flags'])+'\n')
+
+            out_file.write('\n')
+            out_file.write("lead vehicle found \n")
+            out_file.write(str(trace_nxt['lead_vehicle'])+'\n')
+
+            # straight action eval
+            out_file.write("straight action evaluation \n")
+            for ctrl, oracle_scores in trace_nxt['straight_action_eval'].items():
+                out_file.write("control action\n")
+                out_file.write(str(ctrl)+'\n')
+                for key, value in oracle_scores.items():
+                    out_file.write(key + ' ' + str(value)+'\n')
+
+            out_file.write('\n')
         
             # print out the conflict requests it sent out
             out_file.write('sent requests to:\n')
-            #print('sent requests to:')
             for agent in trace_nxt['sent_request']:
                 out_file.write(str(agent)+'\n')
-                #print(agent)
             
-            # print out the conflict requests received
             out_file.write('received requests from\n')
-            #print('received requests from')
             for agent in trace_nxt['received_requests']:
                 out_file.write(str(agent)+'\n')
-                #print(agent)
 
-            # print token count
             out_file.write('agent token count after action is taken\n')
             out_file.write(str(trace_nxt['token_count'])+'\n')
-            #print('agent token count after action is taken')
-            #print(trace_nxt['token_count'])
 
             # print out max braking flag
             out_file.write('max braking flag sent\n')
             out_file.write(str(trace_nxt['max_braking_not_enough'])+'\n')
-            #print('max braking flag sent')
-            #print(trace_nxt['max_braking_not_enough'])
 
             # print control action taken
             out_file.write('control action taken\n')
             out_file.write(str(trace_nxt['action'])+'\n')
-            #print('control action taken')
-            #print(trace_nxt['action'])
 
             
         '''{'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
@@ -127,8 +119,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
                             }'''
         out_file.write('\n')
         out_file.write('\n')
-        #print()
-        #print()
         pass
     out_file.close()
 
@@ -140,4 +130,4 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 15, 37, 'north', 54)
+    print_one_agent_trace(traces_file, outfile, 12, 8, 'east', 39)
