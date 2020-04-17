@@ -229,8 +229,8 @@ class Car(Agent):
         self.agents_in_bubble = []
         self.straight_action_eval = {}
         self.action_selection_flags = ()
-        self.lead_vehicle = None
-        self.lead_agent = None
+        #self.lead_vehicle = None
+        #self.lead_agent = None
 
     def get_intention(self):
         return self.intention
@@ -612,8 +612,8 @@ class Car(Agent):
 
         self.action_selection_flags = (agent_type, bubble_chk, cluster_chk, max_braking_enough)
         #self.lead_vehicle = self.find_lead_agent()
-        if self.find_lead_agent():
-            self.lead_vehicle = self.find_lead_agent().state.__tuple__()
+        #if self.find_lead_agent():
+            #self.lead_vehicle = self.find_lead_agent().state.__tuple__()
 
         # list of all possible scenarios and what action to take
         if agent_type == 'none' and bubble_chk and max_braking_enough:
@@ -1268,6 +1268,9 @@ class Game:
             sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
             max_not_braking_enough = agent.agent_max_braking_not_enough
+            agent_intention = agent.intention
+            if agent.intention is not None: 
+                agent_intention = (agent.intention['acceleration'], agent.intention['steer'])
             if max_not_braking_enough is not None:
                 max_not_braking_enough = agent.agent_max_braking_not_enough.state.__tuple__()
             # save all data in trace
@@ -1278,7 +1281,7 @@ class Game:
                             'max_braking_not_enough': max_not_braking_enough, \
                                 'straight_action_eval': agent.straight_action_eval, \
                                     'action_selection_flags': agent.action_selection_flags, \
-                                        'lead_vehicle': agent.lead_vehicle, 'lead_agent': agent.lead_agent}
+                                        'intention': agent_intention}
 
             # if not yet in traces, add it to traces
             agent_id = agent.get_id()
@@ -2792,7 +2795,7 @@ class BackupPlanSafetyOracle(Oracle):
             lead_agent = plant.find_lead_agent(state=next_state)
 
             if lead_agent:
-                plant.lead_agent = lead_agent.state.__tuple__()
+                #plant.lead_agent = lead_agent.state.__tuple__()
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
@@ -3320,7 +3323,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=200)
+    game.play(outfile=output_filename, t_end=40)
     #game.animate(frequency=0.01)
 
     # print debug info 
