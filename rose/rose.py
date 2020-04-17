@@ -302,8 +302,6 @@ class Car(Agent):
             vel = np.arange(self.v_min, self.v_max+1)
             bubble_dict = dict()
             for v in vel:
-                print("velocity")
-                print(v)
                 bubble_dict[v] = self.get_default_bubble(v)
             with open(filename, 'wb+') as pckl_file:
                 pickle.dump(bubble_dict, pckl_file)
@@ -916,9 +914,7 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
-        
-        bubble = list(set(bubble))
-        
+                
         # plot the bubble
         '''fig, ax = plt.subplots()
         ax.set_xlim(-10, 10)
@@ -928,7 +924,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return bubble
+        return list(set(bubble))
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -3142,7 +3138,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=1)
+    game.play(outfile=output_filename, t_end=100)
 
     #game.animate(frequency=0.01)
 
