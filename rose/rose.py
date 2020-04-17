@@ -1499,6 +1499,8 @@ class Map:
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
         self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init)
+        self.intersection_to_traffic_light_map = self.get_intersection_to_traffic_light_map()
+        self.tile_to_intersection_map = self.get_tile_to_intersection_map()
         self.bundles = self.get_bundles()
         self.tile_to_bundle_map = self.get_tile_to_bundle_map()
         self.IO_map = self.get_IO_map()
@@ -2000,7 +2002,7 @@ class Map:
                     nodes.append(tl_node)
             return nodes
 
-        traffic_lights = []
+        traffic_lights = od()
         for intersection in self.intersections:
             mcorner = intersection.mcorner
             pcorner = intersection.pcorner
@@ -2014,9 +2016,23 @@ class Map:
             if htiles or vtiles:
                 light_id = len(traffic_lights)
                 traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init)
-                traffic_lights.append(traffic_light)
+                traffic_lights[traffic_light] = intersection
 
         return traffic_lights
+
+    def get_intersection_to_traffic_light_map(self):
+        intersection_to_traffic_light_map = dict()
+        for traffic_light in self.traffic_lights:
+            intersection = self.traffic_lights[traffic_light]
+            intersection_to_traffic_light_map[intersection] = traffic_light
+        return intersection_to_traffic_light_map
+
+    def get_tile_to_intersection_map(self):
+        tile_to_intersection_map = dict()
+        for intersection in self.intersections:
+            for tile in intersection.tiles:
+                tile_to_intersection_map[tile] = intersection
+        return tile_to_intersection_map
 
     def get_intersections(self):
         found_intersections = []
@@ -2047,6 +2063,7 @@ class Map:
                     for y in range(node[1] - ym, node[1] + yp + 1):
                         inspected.append((x,y))
                         tiles.append((x,y))
+                tiles = tuple(tiles)
                 new_intersection = Intersection(tiles, node_p, node_m, height, width)
                 found_intersections.append(new_intersection)
         return found_intersections
@@ -2564,10 +2581,15 @@ class UnprotectedLeftTurnOracle(Oracle):
                         pass
                     else:
                         gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
+                        current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
+                        # get traffic light
+                        traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
+                        # TODO: complete gap conditions
                         if gap > 4:
                             pass
                         else:
                             return False
+                return True
         else: # if the agent is not trying to perform a left turn
             return True
 
@@ -3204,9 +3226,10 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    np.random.seed(10)
-    random.seed(10)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
+    seed = 10
+    np.random.seed(seed)
+    random.seed(seed)
+    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     # play a normal game
