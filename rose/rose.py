@@ -1463,7 +1463,7 @@ class Map:
         original_edges = list(planning_graph.edges)
 
         for edge in original_edges:
-            end_node = edge[1]
+            end_node = edge[-1]
             if self.check_directed_tile_reachability(end_node, sink):
                 planning_graph.add_edge(end_node, sink)
 
@@ -1665,10 +1665,12 @@ class Map:
             forward = DIRECTION_TO_VECTOR[direction]
             left = rotate_vector(forward, np.pi/2)
             next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
-            next_stop = [(next_tile, next_direction)]
+            next_stop = (next_tile, next_direction)
             try:
                 next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
-                return next_bundle.is_leftmost_lane(next_tile), (next_stop,)
+                if next_bundle.is_leftmost_lane(next_tile):
+                    return True, (next_stop,)
+                else: return False, None
             except:
                 return False, None
 
@@ -3059,7 +3061,8 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
+#    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.01)
+    the_map = Map('./maps/parking_lot', default_spawn_probability=0.01)
     output_filename = 'game.p'
 
     # play a normal game
