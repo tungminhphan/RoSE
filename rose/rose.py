@@ -6,6 +6,8 @@
 '''
 from typing import List, Any
 from itertools import cycle
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import curses
 import time
 import sys
@@ -300,6 +302,8 @@ class Car(Agent):
             vel = np.arange(self.v_min, self.v_max+1)
             bubble_dict = dict()
             for v in vel:
+                print("velocity")
+                print(v)
                 bubble_dict[v] = self.get_default_bubble(v)
             with open(filename, 'wb+') as pckl_file:
                 pickle.dump(bubble_dict, pckl_file)
@@ -885,12 +889,15 @@ class Car(Agent):
             st = self.hack_state(self.state, x=self.default_state.x, y=self.default_state.y, heading=self.default_state.heading, v=vel)
             resources = []
             # make fake state here
-            for ctrl in self.get_all_ctrl():
+            for ctrl in self.get_all_ctrl(state=st):
+                #__import__('ipdb').set_trace(context=21)
                 #print(ctrl)
                 occ = self.query_occupancy(ctrl, state=st, inverse=False)
+                #[print(state.x, state.y) for state in occ]
                 if occ is not None:
                     resources_to_add = [(state.x, state.y) for state in occ]
                     resources.extend(resources_to_add)
+                    #print(resources)
                     # add in elements where car might need to execute emergency braking from the final state
                     final_st = occ[-1]
                     state_to_chk = self.hack_state(self.state, x=final_st.x, \
@@ -909,7 +916,19 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
-        return list(set(bubble))
+        
+        bubble = list(set(bubble))
+        
+        # plot the bubble
+        '''fig, ax = plt.subplots()
+        ax.set_xlim(-10, 10)
+        ax.set_ylim(-10, 10)
+        for grid in bubble:
+            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.3)
+            ax.add_patch(rect)
+        plt.show()'''
+
+        return bubble
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -3123,7 +3142,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=1)
 
     #game.animate(frequency=0.01)
 

@@ -57,6 +57,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         #print("AGENT IS LOCATED AT: ")
         #print(trace_t['state'])
 
+        # print the agent state
+        out_file.write("AGENTS' BUBBLE INCLUDES: \n")
+        out_file.write(str(trace_t['bubble'])+'\n')
+
         # print the other agents in its bubble
         out_file.write("OTHER AGENTS IN BUBBLE ARE LOCATED AT: \n")
         [out_file.write(str(ag)+'\n') for ag in trace_t['agents_in_bubble']]
@@ -136,4 +140,4 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 17, 38, 'north', 54)
+    print_one_agent_trace(traces_file, outfile, 15, 37, 'north', 54)
