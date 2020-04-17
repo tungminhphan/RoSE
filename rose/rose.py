@@ -3229,13 +3229,13 @@ if __name__ == '__main__':
     seed = 10
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_tiny', default_spawn_probability=0.01)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    #game.play(outfile=output_filename, t_end=1)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=200)
+    #game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
