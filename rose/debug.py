@@ -4,24 +4,38 @@ import random
 import copy as cp
 
 # make sure an agent is doing the right things
-
-
-def print_one_agent_trace(filename):
+def get_agent_id(filename, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
+    agents = traces[t]['agents']
+    # search through all agents at time t 
+    for agent in agents:
+        ag_x, ag_y, ag_theta, ag_v, ag_color, ag_bubble, ag_id = agent
+        if ag_theta == heading: 
+            print(ag_x, ag_y, ag_theta)
+        if (x, y, heading) == (ag_x, ag_y, ag_theta):
+            return ag_id
+    
+    print('agent not found')
+    return None
+
+def print_one_agent_trace(filename, outfile, x, y, heading, t):
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    
+    out_file = open(outfile,"w") 
     
     t_end = traces['t_end']
 
     # select an agent at random
-    agent_ids = traces['agent_ids']
-    agent_id = random.choice(agent_ids)
+    #agent_ids = traces['agent_ids']
+    #agent_id = random.choice(agent_ids)
+    agent_id = get_agent_id(filename, x, y, heading, t)
     agent_trace = traces[agent_id].copy()
 
     # get agent params then remove from trace
     agent_param = agent_trace['agent_param']
     del agent_trace['agent_param']    
-
-    # sort time_steps
 
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()): 
@@ -29,20 +43,24 @@ def print_one_agent_trace(filename):
         # print out the time stamp
         trace_t = agent_trace[t]
 
-        print("time step")
-        print(t)
+        out_file.write("Time Step \n")
+        out_file.write(str(t)+'\n')
 
         # print the agent state
-        print("AGENT IS LOCATED AT: ")
-        print(trace_t['state'])
+        out_file.write("AGENT IS LOCATED AT: \n")
+        out_file.write(str(trace_t['state'])+'\n')
+
+        # print the agent state
+        out_file.write("AGENTS' BUBBLE INCLUDES: \n")
+        out_file.write(str(trace_t['bubble'])+'\n')
 
         # print the other agents in its bubble
-        print("OTHER AGENTS IN BUBBLE ARE LOCATED AT: ")
-        [print(ag) for ag in trace_t['agents_in_bubble']]
+        out_file.write("OTHER AGENTS IN BUBBLE ARE LOCATED AT: \n")
+        [out_file.write(str(ag)+'\n') for ag in trace_t['agents_in_bubble']]
 
         # print the agents goal
-        print("AGENT CGOAL IS:")
-        print(trace_t['goals'])
+        out_file.write("AGENT GOAL IS:\n")
+        out_file.write(str((trace_t['goals']))+'\n')
         
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
@@ -50,43 +68,63 @@ def print_one_agent_trace(filename):
 
             # print out the oracle scores
             for ctrl, oracle_scores in trace_nxt['spec_struct_info'].items():
-                print("control action")
-                print(ctrl)
+                out_file.write("control action\n")
+                out_file.write(str(ctrl)+'\n')
             
                 for key, value in oracle_scores.items():
-                    print(key, value)
+                    out_file.write(key + ' ' + str(value)+'\n')
+
+            out_file.write('\n')
+            out_file.write("action selection strategy flags \n")
+            out_file.write(str(trace_nxt['action_selection_flags'])+'\n')
+
+            out_file.write('\n')
+            out_file.write("lead vehicle found \n")
+            out_file.write(str(trace_nxt['lead_vehicle'])+'\n')
+
+            out_file.write('\n')
+            out_file.write("lead agent found \n")
+            out_file.write(str(trace_nxt['lead_agent'])+'\n')
+
+            # straight action eval
+            out_file.write("straight action evaluation \n")
+            for ctrl, oracle_scores in trace_nxt['straight_action_eval'].items():
+                out_file.write("control action\n")
+                out_file.write(str(ctrl)+'\n')
+                for key, value in oracle_scores.items():
+                    out_file.write(key + ' ' + str(value)+'\n')
+
+            out_file.write('\n')
         
             # print out the conflict requests it sent out
-            print('sent requests to:')
+            out_file.write('sent requests to:\n')
             for agent in trace_nxt['sent_request']:
-                print(agent)
+                out_file.write(str(agent)+'\n')
             
-            # print out the conflict requests received
-            print('received requests from')
+            out_file.write('received requests from\n')
             for agent in trace_nxt['received_requests']:
-                print(agent)
+                out_file.write(str(agent)+'\n')
 
-            # print token count
-            print('agent token count after action is taken')
-            print(trace_nxt['token_count'])
+            out_file.write('agent token count after action is taken\n')
+            out_file.write(str(trace_nxt['token_count'])+'\n')
 
             # print out max braking flag
-            print('max braking flag sent')
-            print(trace_nxt['max_braking_not_enough'])
+            out_file.write('max braking flag sent\n')
+            out_file.write(str(trace_nxt['max_braking_not_enough'])+'\n')
 
             # print control action taken
-            print('control action taken')
-            print(trace_nxt['action'])
+            out_file.write('control action taken\n')
+            out_file.write(str(trace_nxt['action'])+'\n')
 
             
         '''{'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
                 'color':agent.agent_color, 'bubble':agent.get_bubble(), \
                   ,  \
                             }'''
-
-        print()
-        print()
+        out_file.write('\n')
+        out_file.write('\n')
         pass
+    out_file.close()
 
 # test out the debug file 
 if __name__ == '__main__':
@@ -94,4 +132,6 @@ if __name__ == '__main__':
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
-    print_one_agent_trace(traces_file)
+
+    outfile = os.getcwd()+'/saved_traces/debug.txt'
+    print_one_agent_trace(traces_file, outfile, 12, 8, 'east', 39)
