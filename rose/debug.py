@@ -82,6 +82,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
             out_file.write("lead vehicle found \n")
             out_file.write(str(trace_nxt['lead_vehicle'])+'\n')
 
+            out_file.write('\n')
+            out_file.write("lead agent found \n")
+            out_file.write(str(trace_nxt['lead_agent'])+'\n')
+
             # straight action eval
             out_file.write("straight action evaluation \n")
             for ctrl, oracle_scores in trace_nxt['straight_action_eval'].items():

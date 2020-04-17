@@ -230,6 +230,7 @@ class Car(Agent):
         self.straight_action_eval = {}
         self.action_selection_flags = ()
         self.lead_vehicle = None
+        self.lead_agent = None
 
     def get_intention(self):
         return self.intention
@@ -761,7 +762,19 @@ class Car(Agent):
                 pass
         return True
 
+    def check_collision_in_bubble(self, ctrl):
+        # get agents in bubble
+        agents_in_bubble = self.find_agents_in_bubble()
+        all_agent_gridpts = [(agent.state.x, agent.state.y) for agent in agents_in_bubble if agent.get_id()!=self.get_id()]
+
+        # 
+        occ = self.query_occupancy(ctrl)
+        action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+        return len(gridpts_intersect) > 0
+    
     #============verifying agent back-up plan invariance===================#
+
     # check for collision with occupancy dict
     def check_collision(self, ctrl):
         # collect all grid points from occupancy dict except for own agent
@@ -1265,7 +1278,7 @@ class Game:
                             'max_braking_not_enough': max_not_braking_enough, \
                                 'straight_action_eval': agent.straight_action_eval, \
                                     'action_selection_flags': agent.action_selection_flags, \
-                                        'lead_vehicle': agent.lead_vehicle}
+                                        'lead_vehicle': agent.lead_vehicle, 'lead_agent': agent.lead_agent}
 
             # if not yet in traces, add it to traces
             agent_id = agent.get_id()
@@ -2767,16 +2780,24 @@ class BackupPlanSafetyOracle(Oracle):
     def __init__(self):
         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
     def evaluate(self, ctrl_action, plant, game):
-        next_state = plant.query_occupancy(ctrl_action)[-1]
-        x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
-        lead_agent = plant.find_lead_agent(state=next_state)
+        # check if collision occurs by taking that action
+        collision_chk = plant.check_collision_in_bubble(ctrl_action)
+        if collision_chk: 
+            return False
+        else: 
+            # check if makes collision with agent during action
+            next_state = plant.query_occupancy(ctrl_action)[-1]
 
-        if lead_agent:
-            x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-            gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
-            return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
-        else:
-            return True
+            x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
+            lead_agent = plant.find_lead_agent(state=next_state)
+
+            if lead_agent:
+                plant.lead_agent = lead_agent.state.__tuple__()
+                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
+                return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
+            else:
+                return True
 
 class StaticObstacleOracle(Oracle):
     def __init__(self):
@@ -3294,13 +3315,12 @@ if __name__ == '__main__':
     seed = 10
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.1)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=35)
-
+    game.play(outfile=output_filename, t_end=200)
     #game.animate(frequency=0.01)
 
     # print debug info 
