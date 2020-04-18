@@ -3315,7 +3315,7 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    seed = 10
+    seed = 15
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
