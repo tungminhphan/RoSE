@@ -28,8 +28,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     t_end = traces['t_end']
 
     # select an agent at random
-    #agent_ids = traces['agent_ids']
-    #agent_id = random.choice(agent_ids)
     agent_id = get_agent_id(filename, x, y, heading, t)
     agent_trace = traces[agent_id].copy()
 
@@ -78,14 +76,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
             out_file.write("action selection strategy flags \n")
             out_file.write(str(trace_nxt['action_selection_flags'])+'\n')
 
-            #out_file.write('\n')
-            #out_file.write("lead vehicle found \n")
-            #out_file.write(str(trace_nxt['lead_vehicle'])+'\n')
-
-            #out_file.write('\n')
-            #out_file.write("lead agent found \n")
-            #out_file.write(str(trace_nxt['lead_agent'])+'\n')
-
             # straight action eval
             out_file.write("straight action evaluation \n")
             for ctrl, oracle_scores in trace_nxt['straight_action_eval'].items():
@@ -120,11 +110,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
             out_file.write('control action taken\n')
             out_file.write(str(trace_nxt['action'])+'\n')
 
-            
-        '''{'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
-                'color':agent.agent_color, 'bubble':agent.get_bubble(), \
-                  ,  \
-                            }'''
         out_file.write('\n')
         out_file.write('\n')
         pass
