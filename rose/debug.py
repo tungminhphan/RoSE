@@ -138,4 +138,4 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 13, 6, 'east', 5)
+    print_one_agent_trace(traces_file, outfile, 26, 15, 'west', 93)

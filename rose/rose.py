@@ -223,7 +223,7 @@ class Car(Agent):
         self.intention = None
 
         # attributes for saving agent info
-        self.spec_struct_trace = {}
+        self.spec_struct_trace = od()
         self.ctrl_chosen = None
         self.unsafe_joint_state_dict = {}
         self.agents_in_bubble = []
@@ -244,11 +244,11 @@ class Car(Agent):
             return (ctrl['steer'], ctrl['acceleration'])
         scores = []
         all_ctrls = self.get_all_ctrl()
-        spec_struct_trace = {}
+        spec_struct_trace = od()
 
         for ctrl in all_ctrls:
             score = 0
-            scores_sv = {}
+            scores_sv = od()
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
@@ -3139,7 +3139,7 @@ def get_default_car_ss():
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
             backup_plan_safety_oracle, unprotected_left_turn_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 3, 3, 1, 1])
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -3318,12 +3318,12 @@ if __name__ == '__main__':
     seed = 10
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.1)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=40)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
     # print debug info 
