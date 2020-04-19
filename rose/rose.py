@@ -252,13 +252,15 @@ class Car(Agent):
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
-                try:
-                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
-                except:
-                    pass
-                scores_sv[oracle.name] = o_score
+                if oracle.name != 'backup_plan_safety':
+                    try:
+                       score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                    except:
+                        pass
+                    scores_sv[oracle.name] = o_score
 
             scores.append(score)
+
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
 
@@ -731,6 +733,7 @@ class Car(Agent):
                     # check whether max yield is not enough; if not, set flag
                     chk_max_braking_not_enough = self.intention_bp_conflict(agent)
                     if chk_max_braking_not_enough:
+                        #print("max braking not enough")
                         self.agent_max_braking_not_enough = agent
                         return []
 
@@ -794,7 +797,7 @@ class Car(Agent):
             else:
                 self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
                     self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
+            print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
         return len(gridpts_intersect) > 0
     
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
@@ -951,6 +954,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
+                #if not chk_valid_actions:
+                    #print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -2666,7 +2671,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                         # get traffic light
                         traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
                         # TODO: complete gap conditions
-                        if gap > 4:
+                        if gap > 6:
                             pass
                         else:
                             return False
@@ -2759,6 +2764,12 @@ class TrafficIntersectionOracle(Oracle):
     def __init__(self):
         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
+        def check_heading_matches_bundle_heading(bundles, heading):
+            for bundle in bundles:
+                if bundle.direction == heading: 
+                    return True
+            return False
+
         # if agent isn't in intersection return true
         if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
             return True
@@ -2766,10 +2777,22 @@ class TrafficIntersectionOracle(Oracle):
             return True
         # else check if action is a lane change move (which isn't allowed)
         else: 
-            if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
-                return False
-            else:
+            ego_tile = plant.state.x, plant.state.y
+            ego_heading = plant.state.heading
+            bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
+            # check if ego_heading aligns with any of bundles at the tile
+            chk_heading_match = check_heading_matches_bundle_heading(bundles, ego_heading)
+
+            # TODO: change 
+            if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:
+                #st()
                 return True
+            # else don't make a lane change in an intersection
+            else: 
+                if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
+                    return False
+                else:
+                    return True
 
 class TrafficLightTurningLanesOracle(Oracle):
     def __init__(self):
@@ -3138,8 +3161,9 @@ def get_default_car_ss():
     oracle_set = [static_obstacle_oracle, traffic_light_oracle,
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, unprotected_left_turn_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1])
+            backup_plan_safety_oracle, unprotected_left_turn_oracle, 
+            traffic_intersection_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -3309,10 +3333,18 @@ def start_game_from_trace(filename, t_index):
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
-    print(traces['collision_dict'])
-    print(traces['out_of_bounds_dict'])
-    print(traces['unsafe_joint_state_dict'])
-    pass
+    # print collision dictionary entries
+    print("Collisions")
+    for key, value in traces['collision_dict'].items():
+        print(key, value)
+
+    # print out of bounds dictionary entries
+    print("Out of bounds")
+    for key, value in traces['out_of_bounds_dict'].items():
+        print(key, value)
+
+    #print(traces['unsafe_joint_state_dict'])
+    
 
 if __name__ == '__main__':
     seed = 15

@@ -12,7 +12,7 @@ def get_agent_id(filename, x, y, heading, t):
     for agent in agents:
         ag_x, ag_y, ag_theta, ag_v, ag_color, ag_bubble, ag_id = agent
         if ag_theta == heading: 
-            print(ag_x, ag_y, ag_theta)
+            print(ag_x, ag_y, ag_theta, ag_color)
         if (x, y, heading) == (ag_x, ag_y, ag_theta):
             return ag_id
     
@@ -26,6 +26,7 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     out_file = open(outfile,"w") 
     
     t_end = traces['t_end']
+    #print(t_end)
 
     # select an agent at random
     agent_id = get_agent_id(filename, x, y, heading, t)
@@ -35,9 +36,9 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     agent_param = agent_trace['agent_param']
     del agent_trace['agent_param']    
 
+    #print(agent_trace.keys())
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()): 
-
         # print out the time stamp
         trace_t = agent_trace[t]
 
@@ -60,9 +61,14 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((trace_t['goals']))+'\n')
         
+
+
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
-            trace_nxt = agent_trace[t+1]
+            try: 
+                trace_nxt = agent_trace[t+1]
+            except:
+                break
 
             # print out the oracle scores
             for ctrl, oracle_scores in trace_nxt['spec_struct_info'].items():
@@ -123,4 +129,4 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 26, 15, 'west', 93)
+    print_one_agent_trace(traces_file, outfile, 12, 35, 'east', 46)
