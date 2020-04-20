@@ -19,15 +19,59 @@ def get_agent_id(filename, x, y, heading, t):
     print('agent not found')
     return None
 
-def print_one_agent_trace(filename, outfile, x, y, heading, t):
+def check_conistent_conflict_cluster_resolution(filename, outfile):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
     
     out_file = open(outfile,"w") 
-    
-    t_end = traces['t_end']
-    #print(t_end)
 
+    t_end = traces['t_end']
+    # for each time step, loop through all agents and 
+    for t in range(t_end):
+        agents = traces[t]['agents']
+        out_file.write("TIME\n")
+        out_file.write(str(t+1)+'\n')
+        # print out send and received conflict requests
+        for agent in agents: 
+            x, y, theta, v, color, bubble, ag_id = agent
+
+            try: 
+                agent_info = traces[ag_id][t+1]
+            except:
+                break
+
+            out_file.write(str(agent_info['state'])+'\n')
+            out_file.write(str(agent_info['agent_id'])+'\n')
+            # print out agent conflict sent
+            out_file.write('sent requests to:\n')
+            for agent in agent_info['sent']:
+                out_file.write(str(agent)+'\n')
+            
+            out_file.write('received requests from\n')
+            for agent in agent_info['received']:
+                out_file.write(str(agent)+'\n')
+
+            # print out agent conflict received
+            out_file.write('max braking flag sent\n')
+            out_file.write(str(agent_info['max_braking_not_enough'])+'\n')
+
+            # print out agent conflict winner
+            out_file.write('conflict winner\n')
+            out_file.write(str(agent_info['conflict_winner'])+'\n') 
+
+            # print out token count during bid
+            out_file.write('token count during bid \n')
+            out_file.write(str(agent_info['token_count_before'])+'\n')
+
+            # add in some spaces
+            out_file.write('\n')
+
+
+def print_one_agent_trace(filename, outfile, x, y, heading, t):
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    out_file = open(outfile,"w") 
+    
     # select an agent at random
     agent_id = get_agent_id(filename, x, y, heading, t)
     agent_trace = traces[agent_id].copy()
@@ -35,6 +79,8 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     # get agent params then remove from trace
     agent_param = agent_trace['agent_param']
     del agent_trace['agent_param']    
+    t_end = traces['t_end']
+
 
     #print(agent_trace.keys())
     # inspect the agent trace over time (how the agent is making it's decisions)
@@ -62,11 +108,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         out_file.write(str((trace_t['goals']))+'\n')
         
 
-
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
             try: 
-                trace_nxt = agent_trace[t+1]
+                trace_nxt = agent_trace[t]
             except:
                 break
 
@@ -94,11 +139,11 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         
             # print out the conflict requests it sent out
             out_file.write('sent requests to:\n')
-            for agent in trace_nxt['sent_request']:
+            for agent in trace_nxt['sent']:
                 out_file.write(str(agent)+'\n')
             
             out_file.write('received requests from\n')
-            for agent in trace_nxt['received_requests']:
+            for agent in trace_nxt['received']:
                 out_file.write(str(agent)+'\n')
 
             out_file.write('agent token count after action is taken\n')
@@ -129,4 +174,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 12, 35, 'east', 46)
+    print_one_agent_trace(traces_file, outfile, 17, 5, 'east', 4)
+
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    check_conistent_conflict_cluster_resolution(traces_file, outfile_cc)
