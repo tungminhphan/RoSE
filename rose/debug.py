@@ -106,7 +106,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         # print the agents goal
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((trace_t['goals']))+'\n')
-        
 
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:

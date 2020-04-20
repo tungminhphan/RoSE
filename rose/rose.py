@@ -256,12 +256,12 @@ class Car(Agent):
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
-                if oracle.name != 'backup_plan_safety':
-                    try:
-                       score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
-                    except:
-                        pass
-                    scores_sv[oracle.name] = o_score
+                #if oracle.name != 'backup_plan_safety':
+                try:
+                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                except:
+                    pass
+                scores_sv[oracle.name] = o_score
 
             scores.append(score)
 
@@ -286,9 +286,6 @@ class Car(Agent):
     def check_conflict_resolution_winner(self, specify_agent=False):
         # collect all agents in send and receive requests and find the winner
         conflict_cluster = list(set(self.send_conflict_requests_to + self.received_conflict_requests_from + [self]))
-        #if len(conflict_cluster) > 1:
-            #st()
-            #print("conflict cluster not empty")
         max_val = 0
         max_agent_list = []
         for agent in conflict_cluster:
@@ -648,13 +645,13 @@ class Car(Agent):
             # list of all possible scenarios and what action to take
             if agent_type == 'none' and bubble_chk and max_braking_enough:
                 # take intended action if safe (all checks pass)
-                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action: 
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
+                #valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                #if valid_action: 
+                ctrl = self.intention
+                self.token_count = 0
+                #else:
+                #    ctrl = self.get_best_straight_action()
+                #    self.token_count = self.token_count+1
 
             elif agent_type == 'none' and not bubble_chk:
                 # TODO: take straight action, best safe one that aligns with intention
@@ -672,12 +669,12 @@ class Car(Agent):
             elif agent_type == 'sender' and cluster_chk and bubble_chk:
                 # take intended action if safe!!
                 valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action: 
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
+                #if valid_action: 
+                ctrl = self.intention
+                self.token_count = 0
+                #else:
+                    #ctrl = self.get_best_straight_action()
+                    #self.token_count = self.token_count+1
         
             elif agent_type == 'receiver' or agent_type == 'both' and not cluster_chk:
                 # yield as much as needed for conflict winner to move
@@ -686,13 +683,13 @@ class Car(Agent):
                 self.token_count = self.token_count+1
             elif agent_type == 'receiver' or agent_type =='both' and bubble_chk and cluster_chk:
                 # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
-                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action: 
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
+                # valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                #if valid_action: 
+                ctrl = self.intention
+                self.token_count = 0
+                #else:
+                #    ctrl = self.get_best_straight_action()
+                #    self.token_count = self.token_count+1
             elif agent_type == 'receiver' or agent_type =='both' and not bubble_chk and cluster_chk:
                 # TODO: take straight action, best safe one that aligns with intention
                 ctrl = self.get_best_straight_action()
@@ -961,8 +958,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading: 
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
-            #if not chk_valid_actions:
-                #print("max yield set")
+            if not chk_valid_actions:
+                print("max yield flag is set")
             return not chk_valid_actions
         else:
             return False
@@ -974,8 +971,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                #if not chk_valid_actions:
-                    #print("sending conflict request")
+                if not chk_valid_actions:
+                    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -2932,30 +2929,6 @@ class SpecificationStructureController(Controller):
         self.specification_structure = specification_structure
 
     def run_on(self, plant):
-        '''def ctrl_dict_to_tuple(ctrl):
-            return (ctrl['steer'], ctrl['acceleration'])
-
-        all_ctrls = plant.get_all_ctrl()
-        spec_struct_trace = {}
-
-        for ctrl in all_ctrls:
-            score = 0
-            scores = {}
-            for oracle in self.specification_structure.oracle_set:
-                o_score = oracle.evaluate(ctrl, plant, self.game)
-                o_tier = self.specification_structure.tier[oracle]
-                try:
-                    score += int(o_score) * self.specification_structure.tier_weights[o_tier]
-                except:
-                    pass
-                scores[oracle.name] = o_score
-            # save data
-            scores['total'] = score
-            spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores
-
-        # save data as agent attribute
-        plant.spec_struct_trace = spec_struct_trace'''
-
         # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         plant.apply(ctrl)
