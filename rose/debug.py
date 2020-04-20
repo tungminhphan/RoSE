@@ -171,10 +171,10 @@ if __name__ == '__main__':
     #output_dir = os.getcwd()+'/imgs/'
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
+    traces_file = os.getcwd()+'/saved_traces/seed_15.p'
 
-    outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 17, 5, 'east', 4)
+    #outfile = os.getcwd()+'/saved_traces/debug.txt'
+    #print_one_agent_trace(traces_file, outfile, 17, 5, 'east', 4)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     check_conistent_conflict_cluster_resolution(traces_file, outfile_cc)

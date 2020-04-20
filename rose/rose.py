@@ -1297,7 +1297,10 @@ class Game:
             #sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = []
             for ag in agent.received_conflict_requests_from:
-                received.append((ag.state.__tuple__(), ag.get_id())) 
+                received.append((ag.state.__tuple__(), ag.get_id()))
+            #print("conflict winner")
+            #print(agent.conflict_winner.get_id())
+            #received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
             max_not_braking_enough = agent.agent_max_braking_not_enough
             agent_intention = agent.intention
             if agent.intention is not None: 
@@ -3387,7 +3390,7 @@ if __name__ == '__main__':
     seed = 15
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.75)
     output_filename = 'game.p'
 
     # play a normal game
