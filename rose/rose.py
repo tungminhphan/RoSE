@@ -3315,15 +3315,15 @@ def print_debug_info(filename):
     pass
 
 if __name__ == '__main__':
-    seed = 15
+    seed = 0
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.3)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=250)
     #game.animate(frequency=0.01)
 
     # print debug info 
