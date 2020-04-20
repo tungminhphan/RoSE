@@ -1648,10 +1648,10 @@ class Map:
                 first_rel_x = opposing_bundle.tile_to_relative_length(first_xy)
                 first_rel_y = opposing_bundle.tile_to_relative_width(first_xy)
                 second_rel_x = opposing_bundle.tile_to_relative_length(second_xy)
+                # relative occupancy contains the relative positions of the (left-turn) jumps on the opposing lane
                 relative_occupancy = [second_rel_x] * (first_rel_y + 1)
                 relative_occupancy[-1] = first_rel_x
                 relative_occupancy[-2] = second_rel_x
-
                 left_turn_to_opposing_traffic_map[left_turn_tile] = opposing_bundle, relative_occupancy
         return left_turn_to_opposing_traffic_map
 
@@ -2690,30 +2690,50 @@ class UnprotectedLeftTurnOracle(Oracle):
             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
                 return True
             else: # if commit to turning
-                opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
-                relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
-                relative_tiles.reverse() # sort so temporal order is achieved
-                gaps = []
-                fake_heading = Car.convert_orientation(Car.convert_orientation(plant.state.heading) + 180)
-                for occupancy_tile in relative_tiles:
-                    abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
-                    fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
-                    lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
-                    if lead_agent is None:
-                        pass
-                    else:
-                        gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
-                        current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
-                        # get traffic light
-                        traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
-                        # TODO: complete gap conditions
-                        if gap > 5:
+                current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
+                            # get traffic light
+                traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
+                light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
+                if light_color == 'red':
+                    return True
+                else:
+                    opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
+                    # idx indicates the lane number on the opposing traffic bundle
+                    # (bigger means closer to left-most lane)
+                    relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
+                    relative_tiles.reverse() # sort so temporal order is achieved
+                    gaps = []
+                    fake_heading = opposing_bundle.direction
+                    for N, occupancy_tile in enumerate(relative_tiles):
+                        abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
+                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
+                        if lead_agent is None:
                             pass
                         else:
-                            return False
-                return True
+                            gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
+                            # TODO: complete gap conditions
+                            gap_requirement = self.get_conservative_gap(lead_agent, N)
+                            if gap >= gap_requirement:
+                                pass
+                            else:
+                                return False
+                    return True
         else: # if the agent is not trying to perform a left turn
             return True
+
+    def get_conservative_gap(self, lead_agent, N):
+        """
+        compute how much gap is needed for a continuous left turn for N
+        time steps assuming maximum acceleration at each time step
+        """
+        gap = 0
+        v_init = lead_agent.state.v
+        for idx in range(N):
+            v_init = max(lead_agent.v_max, v_init + lead_agent.a_max)
+            gap += v_init
+        return gap
+
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
@@ -2737,18 +2757,14 @@ class TrafficLightOracle(Oracle):
                 return False
         return True
 
+    def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
+        color = traffic_light.check_directed_light_in_N_turns(direction, N)
+        return color == 'red'
+
     def action_not_running_a_red_light(self, ctrl_action, plant, game):
         occ_states = plant.query_occupancy(ctrl_action)
         occ_tiles = [(state.x, state.y) for state in occ_states]
         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
-
-    def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
-        future_lights = traffic_light.check_light_N_turns_from_now(N)
-        if direction in ['east', 'west']:
-            color, _ = future_lights['vertical']
-        elif direction in ['north', 'south']:
-            color, _ = future_lights['horizontal']
-        return color == 'red'
 
     def check_if_crossing(self, light_tile, tiles, direction):
         if direction in ['west', 'east']:
@@ -3079,6 +3095,14 @@ class TrafficLight:
         self.htiles = htiles
         self.vtiles = vtiles
 
+    def check_directed_light_in_N_turns(self, direction, N):
+        future_lights = self.check_light_N_turns_from_now(N)
+        if direction in ['east', 'west']:
+            color, _ = future_lights['vertical']
+        elif direction in ['north', 'south']:
+            color, _ = future_lights['horizontal']
+        return color
+
     def get_id(self):
         return id(self)
 
@@ -3173,7 +3197,7 @@ def get_default_car_ss():
     oracle_set = [static_obstacle_oracle, traffic_light_oracle,
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, unprotected_left_turn_oracle, 
+            backup_plan_safety_oracle, unprotected_left_turn_oracle,
             traffic_intersection_oracle] # type: List[Oracle]
     specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
@@ -3357,10 +3381,9 @@ def print_debug_info(filename):
         print(key, value)
 
     #print(traces['unsafe_joint_state_dict'])
-    
 
 if __name__ == '__main__':
-    seed = 15
+    seed = 0
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.75)
@@ -3368,8 +3391,8 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
-    #game.animate(frequency=0.01)
+    #game.play(outfile=output_filename, t_end=250)
+    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
