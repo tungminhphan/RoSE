@@ -112,12 +112,12 @@ def draw_car(agent_state_tuple):
 
 # to plot a single bubble for the paper figure
 def plot_bubble(bubble):
-    global ax, fig
-    fig, ax = plt.subplots()
-    ax.axis('equal')
+    #global ax, fig
+    #fig, ax = plt.subplots()
+    #ax.axis('equal')
 
     for grid in bubble:
-        rect = patches.Rectangle((grid[1],grid[0]),0.8,0.8,linewidth=0.5,facecolor='grey', alpha=0.5)
+        rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.5)
         ax.add_patch(rect)
 
     x_min = -5
@@ -140,6 +140,41 @@ def plot_bubble(bubble):
     plt.show()
     #return ax
 
+def make_bubble_figure(bubble_file):
+    def plt_car(ax, car_tuple):
+        x, y, theta, v, color, bubble, ag_id = car_tuple
+        theta_d = Car.convert_orientation(theta)
+        car_fig = Image.open(car_figs[color])
+        # need to flip since cars are inverted
+        if theta_d == np.pi/2: 
+            theta_d = np.pi
+        elif theta_d == np.pi:
+            theta_d = np.pi/2
+
+        car_fig = car_fig.rotate(theta_d, expand=False)
+        offset = 0.1
+        ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y+offset, y+1-offset, x+offset, x+1-offset])
+
+    with open(bubble_file, 'rb') as pckl_file:
+        all_bubbles = pickle.load(pckl_file)
+
+    fig = plt.figure()
+    car_tuple = (0, 0, 'east', 0, 'orange', [(0,0)], 0)
+        
+    for key, bubble in all_bubbles.items():
+        ax = fig.add_subplot(1,4,key+1)
+        ax.set_title('bubble for v = {}'.format(key), fontdict={'fontsize': 18, 'fontweight': 'medium', 'family':'serif'})
+        ax.set_xlim(-5, 11)
+        ax.set_ylim(-5, 6)
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        for grid in bubble:
+            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.25,facecolor='orange', alpha=0.2)
+            ax.add_patch(rect)
+        plt_car(ax, car_tuple)
+
+    
+    plt.show()
 
 def animate_images():
     # Create the frames
@@ -162,11 +197,8 @@ if __name__ == '__main__':
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
     traces_to_animation(traces_file)
-    #animate_images()
-    #global ax
-    #fig, ax = plt.subplots()
 
-    # plot a map
-    #the_map = Map('./maps/city_blocks', default_spawn_probability=0.5)
-    #plot_map(the_map, grid_on=True)
-    #plt.show()
+    # bubbles figure for the paper
+    # for dynamics a:-1,1, v=3
+    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1.p'
+    #make_bubble_figure(bubble_file)

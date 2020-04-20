@@ -229,6 +229,10 @@ class Car(Agent):
         self.agents_in_bubble = []
         self.straight_action_eval = {}
         self.action_selection_flags = ()
+        self.conflict_winner = None
+        self.token_count_before = None
+        self.received = []
+        self.sent = []
         #self.lead_vehicle = None
         #self.lead_agent = None
 
@@ -252,13 +256,15 @@ class Car(Agent):
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
-                try:
-                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
-                except:
-                    pass
-                scores_sv[oracle.name] = o_score
+                if oracle.name != 'backup_plan_safety':
+                    try:
+                       score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                    except:
+                        pass
+                    scores_sv[oracle.name] = o_score
 
             scores.append(score)
+
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
 
@@ -274,12 +280,15 @@ class Car(Agent):
         self.agent_max_braking_not_enough = None
         self.send_conflict_requests_to = []
         self.received_conflict_requests_from = []
+        #self.conflict_winner = None
 
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self, specify_agent=False):
         # collect all agents in send and receive requests and find the winner
         conflict_cluster = list(set(self.send_conflict_requests_to + self.received_conflict_requests_from + [self]))
-
+        #if len(conflict_cluster) > 1:
+            #st()
+            #print("conflict cluster not empty")
         max_val = 0
         max_agent_list = []
         for agent in conflict_cluster:
@@ -290,6 +299,7 @@ class Car(Agent):
         # resolve ties with max values with agent ID comparison
         ind_max = np.argmax(np.array([agent.get_id() for agent in max_agent_list]))
         agent_winner = max_agent_list[ind_max]
+        
         if specify_agent:
             return agent_winner.get_id() == self.get_id(), agent_winner
         else:
@@ -454,12 +464,12 @@ class Car(Agent):
                 dy = k
                 abs_displacements.append(np.array([dx, dy]))
         elif steer == 'left-lane' and final_v == 1:
-            abs_displacements = [[0, 0], [-1, 0], [-1, 1]]
+            abs_displacements = [[0, 0], [0, 1], [-1, 1]]
         elif steer == 'left-turn' and final_v == 1:
             abs_displacements = [[0, 0], [0, 1], [-1, 1]]
             final_heading = get_new_heading('left-turn')
         elif steer == 'right-lane' and final_v == 1:
-            abs_displacements = [[0, 0], [1, 0], [1, 1]]
+            abs_displacements = [[0, 0], [0, 1], [1, 1]]
         elif steer == 'right-turn' and final_v == 1:
             abs_displacements = [[0, 0], [0, 1], [1, 1]]
             final_heading = get_new_heading('right-turn')
@@ -601,6 +611,8 @@ class Car(Agent):
                     return True
             return False
 
+        self.token_count_before = self.token_count
+
         # switch statements that define the outcome of the decision tree
         agent_type = get_agent_type()
         # True means no conflict with agents in bubble with higher precedence
@@ -611,79 +623,87 @@ class Car(Agent):
         max_braking_enough = self.agent_max_braking_not_enough is None
 
         self.action_selection_flags = (agent_type, bubble_chk, cluster_chk, max_braking_enough)
-        #self.lead_vehicle = self.find_lead_agent()
-        #if self.find_lead_agent():
-            #self.lead_vehicle = self.find_lead_agent().state.__tuple__()
 
-        # list of all possible scenarios and what action to take
-        if agent_type == 'none' and bubble_chk and max_braking_enough:
-            # take intended action (all checks pass)
-            ctrl = self.intention
-            self.token_count = 0
-        elif agent_type == 'none' and not bubble_chk and max_braking_enough:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_best_straight_action()
-        elif agent_type == 'none' and not max_braking_enough:
-            self.token_count = self.token_count+1
-            ctrl = self.get_best_straight_action()
+        # only set conflict winner when there are agents in cluster
+        if len(self.send_conflict_requests_to+self.received_conflict_requests_from) > 0:
+            self.conflict_winner = winning_agent
+    
+        safety_oracle = self.controller.specification_structure.oracle_set[6]
+        assert safety_oracle.name == 'backup_plan_safety'
 
-        elif agent_type == 'sender' and not cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_best_straight_action()
-        elif agent_type == 'sender' and cluster_chk and not max_braking_enough:
-            # max braking not enough
-            ctrl = self.get_best_straight_action()
-            self.token_count = self.token_count+1
-        elif agent_type == 'sender' and cluster_chk and max_braking_enough and not bubble_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_best_straight_action()
-        elif agent_type == 'sender' and cluster_chk and max_braking_enough and bubble_chk:
-            # take intended action!!
-            self.token_count = 0
-            ctrl = self.intention
+        # save info about sending and receiving requests
+        self.sent = self.send_conflict_requests_to
+        self.received = self.received_conflict_requests_from
+
+
+        if not max_braking_enough:
+            if (agent_type == 'both' or agent_type == 'receiver') and not cluster_chk:
+                ctrl = check_min_dec_yield_req(winning_agent)
+                self.token_count = self.token_count+1
+            else: 
+                ctrl = self.get_best_straight_action()
+                self.token_count = self.token_count+1
+
+        else: 
+            # list of all possible scenarios and what action to take
+            if agent_type == 'none' and bubble_chk and max_braking_enough:
+                # take intended action if safe (all checks pass)
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action: 
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
+
+            elif agent_type == 'none' and not bubble_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_best_straight_action()
+
+            elif agent_type == 'sender' and not cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_best_straight_action()
+            elif agent_type == 'sender' and cluster_chk and not bubble_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                self.token_count = self.token_count+1
+                ctrl = self.get_best_straight_action()
+            elif agent_type == 'sender' and cluster_chk and bubble_chk:
+                # take intended action if safe!!
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action: 
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
         
-        elif agent_type == 'both' and not cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = check_min_dec_yield_req(winning_agent)
-        elif agent_type == 'both' and cluster_chk and not max_braking_enough:
-            # max braking not enough
-            ctrl = self.get_best_straight_action()
-            self.token_count = self.token_count+1
-        elif agent_type == 'both' and cluster_chk and max_braking_enough and not bubble_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            self.token_count = self.token_count+1
-            ctrl = self.get_best_straight_action()
-        elif agent_type == 'both' and cluster_chk and max_braking_enough and bubble_chk:
-            # take intended action!!
-            self.token_count = 0
-            ctrl = self.intention
+            elif agent_type == 'receiver' or agent_type == 'both' and not cluster_chk:
+                # yield as much as needed for conflict winner to move
+                # assumes winner has already taken its action!!!
+                ctrl = check_min_dec_yield_req(winning_agent)
+                self.token_count = self.token_count+1
+            elif agent_type == 'receiver' or agent_type =='both' and bubble_chk and cluster_chk:
+                # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action: 
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
+            elif agent_type == 'receiver' or agent_type =='both' and not bubble_chk and cluster_chk:
+                # TODO: take straight action, best safe one that aligns with intention
+                ctrl = self.get_best_straight_action()
+                self.token_count = self.token_count+1
         
-        elif agent_type == 'receiver' or agent_type and bubble_chk and not cluster_chk:
-            # yield as much as needed for conflict winner to move
-            # assumes winner has already taken its action!!!
-            ctrl = check_min_dec_yield_req(winning_agent)
-            self.token_count = self.token_count+1
-        elif agent_type == 'receiver' and bubble_chk and cluster_chk:
-            # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
-            ctrl = self.intention
-            self.token_count = 0
-        elif agent_type == 'receiver' and not bubble_chk and cluster_chk:
-            # TODO: take straight action, best safe one that aligns with intention
-            ctrl = self.get_best_straight_action()
-            self.token_count = self.token_count+1
-        
-
-        else:
-            print(agent_type)
-            print(bubble_chk)
-            print(cluster_chk)
-            print("Error: invalid combination of inputs to action selection strategy!")
-            ctrl = None
-
+            else:
+                print(agent_type)
+                print(bubble_chk)
+                print(cluster_chk)
+                print("Error: invalid combination of inputs to action selection strategy!")
+                ctrl = None
         return ctrl
 
     #=== methods for car bubble =======================================#
@@ -731,6 +751,7 @@ class Car(Agent):
                     # check whether max yield is not enough; if not, set flag
                     chk_max_braking_not_enough = self.intention_bp_conflict(agent)
                     if chk_max_braking_not_enough:
+                        #print("max braking not enough")
                         self.agent_max_braking_not_enough = agent
                         return []
 
@@ -794,7 +815,7 @@ class Car(Agent):
             else:
                 self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
                     self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, ag.state.__tuple__(), ag.intention)
+            print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
         return len(gridpts_intersect) > 0
     
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
@@ -940,6 +961,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading: 
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
+            #if not chk_valid_actions:
+                #print("max yield set")
             return not chk_valid_actions
         else:
             return False
@@ -951,6 +974,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
+                #if not chk_valid_actions:
+                    #print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1265,23 +1290,38 @@ class Game:
             # unpack agents in bubble to tuples
             agents_in_bubble = [[agent.state.__tuple__(), agent.get_id()]  for agent in agent.agents_in_bubble]
             # unpack agents in send and receive requests to tuples
-            sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
-            received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
+            sent = []
+            #print(agent.state.__tuple__())
+            for ag in agent.send_conflict_requests_to:
+                sent.append((ag.state.__tuple__(), ag.get_id()))
+            #sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
+            received = []
+            for ag in agent.received_conflict_requests_from:
+                received.append((ag.state.__tuple__(), ag.get_id()))
+            #print("conflict winner")
+            #print(agent.conflict_winner.get_id())
+            #received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from] 
             max_not_braking_enough = agent.agent_max_braking_not_enough
             agent_intention = agent.intention
             if agent.intention is not None: 
                 agent_intention = (agent.intention['acceleration'], agent.intention['steer'])
             if max_not_braking_enough is not None:
                 max_not_braking_enough = agent.agent_max_braking_not_enough.state.__tuple__()
+            conflict_winner = agent.conflict_winner
+            if conflict_winner is not None: 
+                conflict_winner = conflict_winner.get_id()
             # save all data in trace
             agent_trace_dict = {'state':(agent.state.x, agent.state.y, agent.state.heading, agent.state.v), 'action': agent.ctrl_chosen, \
                 'color':agent.agent_color, 'bubble':agent.get_bubble(), 'goals': agent.supervisor.goals, \
                     'spec_struct_info': agent.spec_struct_trace, 'agents_in_bubble': agents_in_bubble, \
-                        'sent_request': sent, 'received_requests': received, 'token_count':agent.token_count, \
+                        'sent': sent, 'received': received, 'token_count':agent.token_count, \
                             'max_braking_not_enough': max_not_braking_enough, \
                                 'straight_action_eval': agent.straight_action_eval, \
                                     'action_selection_flags': agent.action_selection_flags, \
-                                        'intention': agent_intention}
+                                        'intention': agent_intention, 'conflict_winner': conflict_winner, \
+                                            'token_count_before': agent.token_count_before, \
+                                                'agent_id':agent.get_id()}
+            agent.conflict_winner = None
 
             # if not yet in traces, add it to traces
             agent_id = agent.get_id()
@@ -1424,6 +1464,11 @@ class Game:
         for agent in self.agent_set:
             # set list to send requests to
             agent.send_conflict_requests_to = agent.find_agents_to_send_conflict_request()
+            '''if len(agent.send_conflict_requests_to) > 0:
+                print("PRINTING")
+                print(agent.state)
+                for ag in agent.send_conflict_requests_to:
+                    print(ag.state)'''
 
             # for each agent receiving request, update their receive list
             for agent_rec in agent.send_conflict_requests_to:
@@ -1442,7 +1487,6 @@ class Game:
             self.play_step()
             self.time_forward()
         
-
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
             self.write_game_info_to_traces(t_end)
@@ -1607,10 +1651,10 @@ class Map:
                 first_rel_x = opposing_bundle.tile_to_relative_length(first_xy)
                 first_rel_y = opposing_bundle.tile_to_relative_width(first_xy)
                 second_rel_x = opposing_bundle.tile_to_relative_length(second_xy)
+                # relative occupancy contains the relative positions of the (left-turn) jumps on the opposing lane
                 relative_occupancy = [second_rel_x] * (first_rel_y + 1)
                 relative_occupancy[-1] = first_rel_x
                 relative_occupancy[-2] = second_rel_x
-
                 left_turn_to_opposing_traffic_map[left_turn_tile] = opposing_bundle, relative_occupancy
         return left_turn_to_opposing_traffic_map
 
@@ -2649,30 +2693,50 @@ class UnprotectedLeftTurnOracle(Oracle):
             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
                 return True
             else: # if commit to turning
-                opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
-                relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
-                relative_tiles.reverse() # sort so temporal order is achieved
-                gaps = []
-                fake_heading = Car.convert_orientation(Car.convert_orientation(plant.state.heading) + 180)
-                for occupancy_tile in relative_tiles:
-                    abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
-                    fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
-                    lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
-                    if lead_agent is None:
-                        pass
-                    else:
-                        gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
-                        current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
-                        # get traffic light
-                        traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
-                        # TODO: complete gap conditions
-                        if gap > 4:
+                current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
+                            # get traffic light
+                traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
+                light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
+                if light_color == 'red':
+                    return True
+                else:
+                    opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
+                    # idx indicates the lane number on the opposing traffic bundle
+                    # (bigger means closer to left-most lane)
+                    relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
+                    relative_tiles.reverse() # sort so temporal order is achieved
+                    gaps = []
+                    fake_heading = opposing_bundle.direction
+                    for N, occupancy_tile in enumerate(relative_tiles):
+                        abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
+                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
+                        if lead_agent is None:
                             pass
                         else:
-                            return False
-                return True
+                            gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
+                            # TODO: complete gap conditions
+                            gap_requirement = self.get_conservative_gap(lead_agent, N)
+                            if gap >= gap_requirement:
+                                pass
+                            else:
+                                return False
+                    return True
         else: # if the agent is not trying to perform a left turn
             return True
+
+    def get_conservative_gap(self, lead_agent, N):
+        """
+        compute how much gap is needed for a continuous left turn for N
+        time steps assuming maximum acceleration at each time step
+        """
+        gap = 0
+        v_init = lead_agent.state.v
+        for idx in range(N):
+            v_init = max(lead_agent.v_max, v_init + lead_agent.a_max)
+            gap += v_init
+        return gap
+
 
 class TrafficLightOracle(Oracle):
     def __init__(self):
@@ -2696,18 +2760,14 @@ class TrafficLightOracle(Oracle):
                 return False
         return True
 
+    def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
+        color = traffic_light.check_directed_light_in_N_turns(direction, N)
+        return color == 'red'
+
     def action_not_running_a_red_light(self, ctrl_action, plant, game):
         occ_states = plant.query_occupancy(ctrl_action)
         occ_tiles = [(state.x, state.y) for state in occ_states]
         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
-
-    def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
-        future_lights = traffic_light.check_light_N_turns_from_now(N)
-        if direction in ['east', 'west']:
-            color, _ = future_lights['vertical']
-        elif direction in ['north', 'south']:
-            color, _ = future_lights['horizontal']
-        return color == 'red'
 
     def check_if_crossing(self, light_tile, tiles, direction):
         if direction in ['west', 'east']:
@@ -2759,6 +2819,12 @@ class TrafficIntersectionOracle(Oracle):
     def __init__(self):
         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
     def evaluate(self, ctrl_action, plant, game):
+        def check_heading_matches_bundle_heading(bundles, heading):
+            for bundle in bundles:
+                if bundle.direction == heading: 
+                    return True
+            return False
+
         # if agent isn't in intersection return true
         if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
             return True
@@ -2766,10 +2832,22 @@ class TrafficIntersectionOracle(Oracle):
             return True
         # else check if action is a lane change move (which isn't allowed)
         else: 
-            if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
-                return False
-            else:
+            ego_tile = plant.state.x, plant.state.y
+            ego_heading = plant.state.heading
+            bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
+            # check if ego_heading aligns with any of bundles at the tile
+            chk_heading_match = check_heading_matches_bundle_heading(bundles, ego_heading)
+
+            # TODO: change 
+            if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:
+                #st()
                 return True
+            # else don't make a lane change in an intersection
+            else: 
+                if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
+                    return False
+                else:
+                    return True
 
 class TrafficLightTurningLanesOracle(Oracle):
     def __init__(self):
@@ -3044,6 +3122,14 @@ class TrafficLight:
         self.htiles = htiles
         self.vtiles = vtiles
 
+    def check_directed_light_in_N_turns(self, direction, N):
+        future_lights = self.check_light_N_turns_from_now(N)
+        if direction in ['east', 'west']:
+            color, _ = future_lights['vertical']
+        elif direction in ['north', 'south']:
+            color, _ = future_lights['horizontal']
+        return color
+
     def get_id(self):
         return id(self)
 
@@ -3138,8 +3224,9 @@ def get_default_car_ss():
     oracle_set = [static_obstacle_oracle, traffic_light_oracle,
             legal_orientation_oracle, backup_plan_progress_oracle,
             maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, unprotected_left_turn_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1])
+            backup_plan_safety_oracle, unprotected_left_turn_oracle,
+            traffic_intersection_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
 def create_default_car(source, sink, game):
@@ -3209,6 +3296,7 @@ class QuasiSimultaneousGame(Game):
         self.set_agent_intentions()
         # call resolve_conflicts
         self.send_and_receive_conflict_requests()
+        # write send and receive conflict requests to file
         # resolve precedence
         self.resolve_precedence()
         active_agents = []
@@ -3309,22 +3397,29 @@ def start_game_from_trace(filename, t_index):
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
-    print(traces['collision_dict'])
-    print(traces['out_of_bounds_dict'])
-    print(traces['unsafe_joint_state_dict'])
-    pass
+    # print collision dictionary entries
+    print("Collisions")
+    for key, value in traces['collision_dict'].items():
+        print(key, value)
+
+    # print out of bounds dictionary entries
+    print("Out of bounds")
+    for key, value in traces['out_of_bounds_dict'].items():
+        print(key, value)
+
+    #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
     seed = 0
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.75)
     output_filename = 'game.p'
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=250)
-    #game.animate(frequency=0.01)
+    #game.play(outfile=output_filename, t_end=250)
+    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
