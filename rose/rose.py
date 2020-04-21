@@ -2713,7 +2713,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                         else:
                             gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
                             # TODO: complete gap conditions
-                            gap_requirement = self.get_conservative_gap(lead_agent, N)
+                            gap_requirement = self.get_conservative_gap(lead_agent, N+1)
                             if gap >= gap_requirement:
                                 pass
                             else:
@@ -3383,7 +3383,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 0
+    seed = 999
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.75)
@@ -3391,8 +3391,8 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    #game.play(outfile=output_filename, t_end=250)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=100)
+#    game.animate(frequency=0.01)
 
     # print debug info 
     debug_filename = os.getcwd()+'/saved_traces/game.p'
