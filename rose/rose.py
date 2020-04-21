@@ -234,8 +234,18 @@ class Car(Agent):
         self.received = []
         self.sent = []
         self.left_turn_gap_arr = []
+        self.turn_signal = None
+
         #self.lead_vehicle = None
         #self.lead_agent = None
+    
+    # signal should be 'left' or 'right' or None
+    def set_turn_signal(self, signal):
+        assert signal is not None
+        self.turn_signal = signal
+    
+    def reset_turn_signal(self):
+        self.turn_signal = None
 
     def get_intention(self):
         return self.intention
@@ -626,8 +636,8 @@ class Car(Agent):
         if len(self.send_conflict_requests_to+self.received_conflict_requests_from) > 0:
             self.conflict_winner = winning_agent
 
-        safety_oracle = self.controller.specification_structure.oracle_set[6]
-        assert safety_oracle.name == 'backup_plan_safety'
+        #safety_oracle = self.controller.specification_structure.oracle_set[6]
+        #assert safety_oracle.name == 'backup_plan_safety'
 
         # save info about sending and receiving requests
         self.sent = self.send_conflict_requests_to
@@ -2700,6 +2710,30 @@ class UnprotectedLeftTurnOracle(Oracle):
                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
                 if light_color == 'red':
+                    # find agents in intersection to check if collision might occur during red light
+                    for N, occupancy_tile in enumerate(relative_tiles):
+                        abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
+                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False) 
+                        if lead_agent is not None: 
+                            # if agent is in intersection
+                            if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:
+                                # get other agent intention
+                                if lead_agent.turn_signal == 'left':
+                                    pass
+                                else:
+                                    # check collision, make conservative and assume other agent bundle hasn't gone
+                                    gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
+                                    gap_requirement = self.get_conservative_gap(lead_agent, N+1)
+                                    if gap > gap_requirement: 
+                                        pass
+                                    else:
+                                        return False
+                            # other agent is not in intersection, don't need to check
+                            else:
+                                pass
+                        else:
+                            pass
                     return True
                 else:
                     #print("checking for gap")
@@ -2714,7 +2748,8 @@ class UnprotectedLeftTurnOracle(Oracle):
                     for N, occupancy_tile in enumerate(relative_tiles):
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)                                
+
                         if lead_agent is None:
                             #print('no lead agent')
                             pass
@@ -2964,10 +2999,25 @@ class SpecificationStructureController(Controller):
     def __init__(self, game, specification_structure):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
+    
+    def manage_turn_signals(self, plant, ctrl):
+        next_st = plant.query_occupancy(ctrl)[-1]
+        x_nxt, y_nxt, heading_nxt = next_st.x, next_st.y, next_st.heading
+        next_directed_tile = ((x_nxt,y_nxt), heading_nxt)
+        # turn left signal on if ctrl ends up in first left turn tile and 
+        # agent subgoal is in left turn tiles
+        if plant.supervisor.subgoals[0] in self.game.map.all_left_turns and \
+            plant.supervisor.subgoals[0] == next_directed_tile:
+            plant.set_turn_signal('left')
+        # turn off signal when ctrl makes agent leave the intersection
+        x, y = plant.state.x, plant.state.y
+        if len(self.game.map.legal_orientations[x,y]) > 1 and len(self.game.map.legal_orientations[x_nxt,y_nxt]) == 1:
+            plant.reset_turn_signal()
 
     def run_on(self, plant):
         # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
+        self.manage_turn_signals(plant, ctrl)
         plant.apply(ctrl)
 
 
@@ -3404,7 +3454,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 87
+    seed = 120
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3412,11 +3462,11 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-#    game.play(outfile=output_filename, t_end=1000)
+    game.play(outfile=output_filename, t_end=100)
 #    game.animate(frequency=0.01)
 
     # print debug info
-    debug_filename = os.getcwd()+'/saved_traces/game.p'
-    print_debug_info(debug_filename)
+    #debug_filename = os.getcwd()+'/saved_traces/game.p'
+    #print_debug_info(debug_filename)
 
     # play debugged game
