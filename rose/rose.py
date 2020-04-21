@@ -806,7 +806,7 @@ class Car(Agent):
             occ = self.query_occupancy(ctrl)
             if len(occ) > 1:
                 occ = occ[1:]
-            action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+            action_gridpts = [(state.x, state.y) for state in occ]
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         collision_check = len(gridpts_intersect) > 0
         if collision_check:
@@ -2696,7 +2696,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                 return True
             else: # if commit to turning
                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
-                            # get traffic light
+                # get traffic light
                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
                 if light_color == 'red':
@@ -3404,7 +3404,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 120
+    seed = 150
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
@@ -3412,7 +3412,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=250)
 #    game.animate(frequency=0.01)
 
     # print debug info 
