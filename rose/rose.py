@@ -651,24 +651,15 @@ class Car(Agent):
             else:
                 ctrl = self.get_best_straight_action()
                 self.token_count = self.token_count+1
-
         else:
             # list of all possible scenarios and what action to take
             if agent_type == 'none' and bubble_chk and max_braking_enough:
-                # take intended action if safe (all checks pass)
-                #valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                #if valid_action:
                 ctrl = self.intention
                 self.token_count = 0
-                #else:
-                #    ctrl = self.get_best_straight_action()
-                #    self.token_count = self.token_count+1
-
             elif agent_type == 'none' and not bubble_chk:
                 # TODO: take straight action, best safe one that aligns with intention
                 self.token_count = self.token_count+1
                 ctrl = self.get_best_straight_action()
-
             elif agent_type == 'sender' and not cluster_chk:
                 # TODO: take straight action, best safe one that aligns with intention
                 self.token_count = self.token_count+1
@@ -678,34 +669,20 @@ class Car(Agent):
                 self.token_count = self.token_count+1
                 ctrl = self.get_best_straight_action()
             elif agent_type == 'sender' and cluster_chk and bubble_chk:
-                # take intended action if safe!!
-                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                #if valid_action:
                 ctrl = self.intention
                 self.token_count = 0
-                #else:
-                    #ctrl = self.get_best_straight_action()
-                    #self.token_count = self.token_count+1
-
             elif agent_type == 'receiver' or agent_type == 'both' and not cluster_chk:
                 # yield as much as needed for conflict winner to move
                 # assumes winner has already taken its action!!!
                 ctrl = check_min_dec_yield_req(winning_agent)
                 self.token_count = self.token_count+1
             elif agent_type == 'receiver' or agent_type =='both' and bubble_chk and cluster_chk:
-                # if agent_type is receiver, then take intended action as long as safe w.r.t agents behind in precedence too
-                # valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                #if valid_action:
                 ctrl = self.intention
                 self.token_count = 0
-                #else:
-                #    ctrl = self.get_best_straight_action()
-                #    self.token_count = self.token_count+1
             elif agent_type == 'receiver' or agent_type =='both' and not bubble_chk and cluster_chk:
                 # TODO: take straight action, best safe one that aligns with intention
                 ctrl = self.get_best_straight_action()
                 self.token_count = self.token_count+1
-
             else:
                 print(agent_type)
                 print(bubble_chk)
@@ -2705,6 +2682,11 @@ class UnprotectedLeftTurnOracle(Oracle):
             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
                 return True
             else: # if commit to turning
+                opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
+                # idx indicates the lane number on the opposing traffic bundle
+                # (bigger means closer to left-most lane)
+                relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
+                relative_tiles.reverse()
                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
                 # get traffic light
                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
