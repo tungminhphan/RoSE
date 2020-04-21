@@ -233,6 +233,7 @@ class Car(Agent):
         self.token_count_before = None
         self.received = []
         self.sent = []
+        self.left_turn_gap_arr = []
         #self.lead_vehicle = None
         #self.lead_agent = None
 
@@ -801,6 +802,10 @@ class Car(Agent):
         if occ is None:
             return True
         else:
+            # remove first gridpoint if more than one state in occ grid
+            occ = self.query_occupancy(ctrl)
+            if len(occ) > 1:
+                occ = occ[1:]
             action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         collision_check = len(gridpts_intersect) > 0
@@ -958,8 +963,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading: 
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
-            if not chk_valid_actions:
-                print("max yield flag is set")
+            #if not chk_valid_actions:
+                #print("max yield flag is set")
             return not chk_valid_actions
         else:
             return False
@@ -971,8 +976,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                if not chk_valid_actions:
-                    print("sending conflict request")
+                #if not chk_valid_actions:
+                    #print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1317,7 +1322,7 @@ class Game:
                                     'action_selection_flags': agent.action_selection_flags, \
                                         'intention': agent_intention, 'conflict_winner': conflict_winner, \
                                             'token_count_before': agent.token_count_before, \
-                                                'agent_id':agent.get_id()}
+                                                'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr}
             agent.conflict_winner = None
 
             # if not yet in traces, add it to traces
@@ -2705,6 +2710,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                     gaps = []
                     fake_heading = opposing_bundle.direction
                     for N, occupancy_tile in enumerate(relative_tiles):
+                        left_turn_gap_arr = []
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
@@ -2714,10 +2720,12 @@ class UnprotectedLeftTurnOracle(Oracle):
                             gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
                             # TODO: complete gap conditions
                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)
+                            left_turn_gap_arr.append((gap_requirement, N+1))
                             if gap >= gap_requirement:
                                 pass
                             else:
                                 return False
+                    plant.left_turn_gap_arr = left_turn_gap_arr
                     return True
         else: # if the agent is not trying to perform a left turn
             return True
@@ -2730,7 +2738,7 @@ class UnprotectedLeftTurnOracle(Oracle):
         gap = 0
         v_init = lead_agent.state.v
         for idx in range(N):
-            v_init = max(lead_agent.v_max, v_init + lead_agent.a_max)
+            v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
             gap += v_init
         return gap
 
@@ -2867,7 +2875,7 @@ class BackupPlanSafetyOracle(Oracle):
             next_state = plant.query_occupancy(ctrl_action)[-1]
 
             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
-            lead_agent = plant.find_lead_agent(state=next_state)
+            lead_agent = plant.find_lead_agent(state=next_state, same_heading_required=False)
 
             if lead_agent:
                 #plant.lead_agent = lead_agent.state.__tuple__()
@@ -3383,10 +3391,10 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 999
+    seed = 12
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.75)
+    the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
     output_filename = 'game.p'
 
     # play a normal game

@@ -110,7 +110,7 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
             try: 
-                trace_nxt = agent_trace[t]
+                trace_nxt = agent_trace[t+1]
             except:
                 break
 
@@ -170,10 +170,10 @@ if __name__ == '__main__':
     #output_dir = os.getcwd()+'/imgs/'
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/seed_15.p'
+    traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 17, 5, 'east', 4)
+    print_one_agent_trace(traces_file, outfile, 17, 41, 'east', 99)
 
-    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-#    check_consistent_conflict_cluster_resolution(traces_file, outfile_cc)
+    #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    #check_consistent_conflict_cluster_resolution(traces_file, outfile_cc)
