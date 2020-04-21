@@ -135,6 +135,11 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
                     out_file.write(key + ' ' + str(value)+'\n')
 
             out_file.write('\n')
+            out_file.write('left turn gap info:\n')
+            for tup in trace_nxt['left_turn_gap_arr']:
+                out_file.write(str(tup)+'\n')
+
+            out_file.write('\n')
         
             # print out the conflict requests it sent out
             out_file.write('sent requests to:\n')
@@ -173,7 +178,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 17, 41, 'east', 99)
+    print_one_agent_trace(traces_file, outfile, 16, 44, 'west', 33)
 
     #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     #check_consistent_conflict_cluster_resolution(traces_file, outfile_cc)

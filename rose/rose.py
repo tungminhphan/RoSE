@@ -2702,30 +2702,43 @@ class UnprotectedLeftTurnOracle(Oracle):
                 if light_color == 'red':
                     return True
                 else:
+                    #print("checking for gap")
                     opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
                     # idx indicates the lane number on the opposing traffic bundle
                     # (bigger means closer to left-most lane)
                     relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
                     relative_tiles.reverse() # sort so temporal order is achieved
                     gaps = []
-                    fake_heading = opposing_bundle.direction
+                    #fake_heading = opposing_bundle.direction
+                    left_turn_gap_arr = []
                     for N, occupancy_tile in enumerate(relative_tiles):
-                        left_turn_gap_arr = []
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
-                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=fake_heading)
+                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
                         if lead_agent is None:
+                            #print('no lead agent')
                             pass
                         else:
                             gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
                             # TODO: complete gap conditions
                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)
+                            #print("gap required")
+                            #print(gap_requirement)
+                            #print("current gap")
+                            #print(gap)
                             left_turn_gap_arr.append((gap_requirement, N+1))
                             if gap >= gap_requirement:
                                 pass
                             else:
+                                #print("gap not enough!")
+                                #print(gap, gap_requirement)
                                 return False
+                    
+                    #print("checking for left turn gap")
+                    #print(plant.state)
                     plant.left_turn_gap_arr = left_turn_gap_arr
+                    #print(left_turn_gap_arr)
+                    #st()
                     return True
         else: # if the agent is not trying to perform a left turn
             return True
@@ -3391,7 +3404,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 12
+    seed = 120
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small', default_spawn_probability=0.5)
