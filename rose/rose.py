@@ -233,11 +233,12 @@ class Car(Agent):
         self.token_count_before = None
         self.received = []
         self.sent = []
+        self.agents_checked_for_conflict = []
         self.left_turn_gap_arr = []
         self.turn_signal = None
 
         #self.lead_vehicle = None
-        #self.lead_agent = None
+        self.lead_agent = None
     
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
@@ -714,17 +715,22 @@ class Car(Agent):
         agents_in_bubble = self.find_agents_in_bubble()
         # if agent intention is to go straight, it shouldn't send a request
         if self.intention['steer'] == 'straight': return send_requests_list
+        # which agents checking to send
+        agents_checked_for_conflict = []
 
         # check whether agent is in conflict with other agents in its bubble
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
-                    chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
+                    chk = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])
+                    chk_lon = chk>=0
+                    #if chk == 0: 
+                    #    st()
                 except:
-                    #print("agent not in same bundle")
                     break
-                if chk_lon:
+                if chk_lon and self.state.heading == agent.state.heading:
+                    agents_checked_for_conflict.append(agent)
                     # send request to agent behind if intentions conflict
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
                     if chk_to_send_request: 
@@ -732,10 +738,9 @@ class Car(Agent):
                     # check whether max yield is not enough; if not, set flag
                     chk_max_braking_not_enough = self.intention_bp_conflict(agent)
                     if chk_max_braking_not_enough:
-                        #print("max braking not enough")
                         self.agent_max_braking_not_enough = agent
                         return []
-
+        self.agents_checked_for_conflict = agents_checked_for_conflict
         return send_requests_list
 
     #======add in code for checking whether agent can go for right turn=========#
@@ -1289,6 +1294,10 @@ class Game:
             received = []
             for ag in agent.received_conflict_requests_from:
                 received.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
+            checked_for_conflict = []
+            for ag in agent.agents_checked_for_conflict:
+                checked_for_conflict.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
+
             #print("conflict winner")
             #print(agent.conflict_winner.get_id())
             #received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from]
@@ -1311,7 +1320,8 @@ class Game:
                                     'action_selection_flags': agent.action_selection_flags, \
                                         'intention': agent_intention, 'conflict_winner': conflict_winner, \
                                             'token_count_before': agent.token_count_before, \
-                                                'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr}
+                                                'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr, \
+                                                    'lead_agent':agent.lead_agent, 'checked_for_conflict':checked_for_conflict}
             agent.conflict_winner = None
 
             # if not yet in traces, add it to traces
@@ -1455,12 +1465,6 @@ class Game:
         for agent in self.agent_set:
             # set list to send requests to
             agent.send_conflict_requests_to = agent.find_agents_to_send_conflict_request()
-            '''if len(agent.send_conflict_requests_to) > 0:
-                print("PRINTING")
-                print(agent.state)
-                for ag in agent.send_conflict_requests_to:
-                    print(ag.state)'''
-
             # for each agent receiving request, update their receive list
             for agent_rec in agent.send_conflict_requests_to:
                 agent_rec.received_conflict_requests_from.append(agent)
@@ -2910,9 +2914,12 @@ class BackupPlanSafetyOracle(Oracle):
             lead_agent = plant.find_lead_agent(state=next_state, same_heading_required=False)
 
             if lead_agent:
-                #plant.lead_agent = lead_agent.state.__tuple__()
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
+                # record lead agent
+                plant.lead_agent = lead_agent.state.__tuple__()
+                # record computed gap 
+                #plant.gap_curr = gap_curr
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
                 return True
@@ -3468,7 +3475,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 300
+    seed = 444
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3476,7 +3483,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=300)
+    game.play(outfile=output_filename, t_end=150)
 #    game.animate(frequency=0.01)
 
     # print debug info
