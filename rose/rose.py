@@ -931,9 +931,9 @@ class Car(Agent):
 
     def check_occupancy_intersection(self, occ_a, occ_b):
         # convert list of agent states to grid points if not already list of tuples
-        if len(occ_a)>1: 
+        if len(occ_a)>1:
             occ_a = occ_a[1:]
-        if len(occ_b)>1: 
+        if len(occ_b)>1:
             occ_b = occ_b[1:]
         if not isinstance(occ_a[0], tuple):
             occ_a = [(state.x, state.y) for state in occ_a]
@@ -3311,14 +3311,14 @@ class QuasiSimultaneousGame(Game):
             if agent_score >= ego_score:
                 higher_pred.append(agent)
         return higher_pred
-    
+
     # do a global collision check and add to traces the overlapping gridpoints at
     # the right time step
     def global_collision_check(self, all_occupancy_gridpts):
-        # find out all elements that are duplicates and return list of duplicates 
+        # find out all elements that are duplicates and return list of duplicates
         dup = [pt for pt in all_occupancy_gridpts if all_occupancy_gridpts.count(pt) > 1]
         # saves traces
-        try: 
+        try:
             self.traces["global_traces"][self.time] = dup
         except:
             self.traces["global_traces"] = {}
@@ -3358,7 +3358,7 @@ class QuasiSimultaneousGame(Game):
                     # add in occupancy of agent when it took its action
                     #print(agent.ctrl_chosen)
                     occ = agent.query_occupancy(agent.ctrl_chosen, state=state)
-                    if len(occ) > 1: 
+                    if len(occ) > 1:
                         occ = occ[1:]
                     gridpts = [(state.x, state.y) for state in occ]
                     all_occupancy_gridpts.extend(gridpts)
@@ -3477,7 +3477,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=1000)
 #    game.animate(frequency=0.01)
 
     # print debug info
