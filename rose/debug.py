@@ -9,6 +9,7 @@ def get_agent_id(filename, x, y, heading, t):
         traces = pickle.load(pckl_file)
     agents = traces[t]['agents']
     # search through all agents at time t
+
     for agent in agents:
         ag_x, ag_y, ag_theta, ag_v, ag_color, ag_bubble, ag_id = agent
         if ag_theta == heading:
@@ -19,29 +20,21 @@ def get_agent_id(filename, x, y, heading, t):
     print('agent not found')
     return None
 
-def check_consistent_conflict_cluster_resolution(filename, outfile):
-    with open(filename, 'rb') as pckl_file:
-        traces = pickle.load(pckl_file)
-
-    out_file = open(outfile,"w")
-
-    t_end = traces['t_end']
-    # for each time step, loop through all agents and
-    for t in range(t_end):
-        agents = traces[t]['agents']
-        out_file.write("TIME\n")
-        out_file.write(str(t+1)+'\n')
-        # print out send and received conflict requests
+def check_consistent_conflict_cluster_resolution(filename, outfile, time_step=None):
+    def write_conflicts_at_timestep(agents, t):
         for agent in agents:
             x, y, theta, v, color, bubble, ag_id = agent
+            tup = (x, y, theta, v, color, ag_id)
+            # get the agent id from the current agents
+            out_file.write(str(tup)+'\n')
+            #out_file.write(str(agents['state'])+'\n')
+            #out_file.write(str(agent_info['agent_id'])+'\n')
 
             try:
-                agent_info = traces[ag_id][t+1]
+                agent_info = traces[ag_id][t]
             except:
-                break
-
-            out_file.write(str(agent_info['state'])+'\n')
-            out_file.write(str(agent_info['agent_id'])+'\n')
+                return
+        
             # print out agent conflict sent
             out_file.write('sent requests to:\n')
             for agent in agent_info['sent']:
@@ -65,6 +58,26 @@ def check_consistent_conflict_cluster_resolution(filename, outfile):
 
             # add in some spaces
             out_file.write('\n')
+
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+
+    out_file = open(outfile,"w")
+    t_end = traces['t_end']
+
+    # for each time step, loop through all agents and
+    if time_step is None: 
+        for t in range(t_end):
+            agents = traces[t]['agents']
+            #agents = traces[t]['agents']
+            out_file.write("TIME\n")
+            out_file.write(str(t)+'\n')
+            # print out send and received conflict requests
+            for agent in agents:
+                write_conflicts_at_timestep(agents, t+1)
+    else: 
+        agents = traces[time_step]['agents']
+        write_conflicts_at_timestep(agents, time_step+1)
 
 
 def print_one_agent_trace(filename, outfile, x, y, heading, t):
@@ -177,8 +190,8 @@ if __name__ == '__main__':
     #    os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
-    outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 18, 42, 'south', 47)
+    #outfile = os.getcwd()+'/saved_traces/debug.txt'
+    #print_one_agent_trace(traces_file, outfile, 23, 17, 'north', 196)
 
-    #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    #check_consistent_conflict_cluster_resolution(traces_file, outfile_cc)
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    check_consistent_conflict_cluster_resolution(traces_file, outfile_cc, 196)
