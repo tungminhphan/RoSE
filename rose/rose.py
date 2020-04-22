@@ -716,20 +716,19 @@ class Car(Agent):
         if self.intention['steer'] == 'straight': return send_requests_list
 
         # check whether agent is in conflict with other agents in its bubble
-        #print("AGENT CHECKING CONFLICT")
-        #print(self.state)
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
                     chk_lon = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])>=0
                 except:
-                    return []
+                    #print("agent not in same bundle")
+                    break
                 if chk_lon:
-                    #print("chk_lon passed")
                     # send request to agent behind if intentions conflict
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
-                    if chk_to_send_request: send_requests_list.append(agent)
+                    if chk_to_send_request: 
+                        send_requests_list.append(agent)
                     # check whether max yield is not enough; if not, set flag
                     chk_max_braking_not_enough = self.intention_bp_conflict(agent)
                     if chk_max_braking_not_enough:
@@ -774,7 +773,7 @@ class Car(Agent):
         occ = self.query_occupancy(ctrl)
         if len(occ) > 1:
             occ = occ[1:]
-        action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
+        action_gridpts = [(state.x, state.y) for state in occ]
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         return len(gridpts_intersect) > 0
 
@@ -954,7 +953,7 @@ class Car(Agent):
         if agent.state.heading == self.state.heading:
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
             #if not chk_valid_actions:
-                #print("max yield flag is set")
+            #    print("max yield flag is set")
             return not chk_valid_actions
         else:
             return False
@@ -967,7 +966,7 @@ class Car(Agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
                 #if not chk_valid_actions:
-                    #print("sending conflict request")
+                #    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1285,11 +1284,11 @@ class Game:
             sent = []
             #print(agent.state.__tuple__())
             for ag in agent.send_conflict_requests_to:
-                sent.append((ag.state.__tuple__(), ag.get_id()))
+                sent.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
             #sent = [agent.state.__tuple__() for agent in agent.send_conflict_requests_to]
             received = []
             for ag in agent.received_conflict_requests_from:
-                received.append((ag.state.__tuple__(), ag.get_id()))
+                received.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
             #print("conflict winner")
             #print(agent.conflict_winner.get_id())
             #received = [agent.state.__tuple__() for agent in agent.received_conflict_requests_from]
@@ -3469,7 +3468,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 120
+    seed = 300
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3477,7 +3476,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=300)
 #    game.animate(frequency=0.01)
 
     # print debug info

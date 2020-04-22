@@ -197,6 +197,7 @@ if __name__ == '__main__':
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
     traces_to_animation(traces_file)
+    animate_images()
 
     # bubbles figure for the paper
     # for dynamics a:-1,1, v=3
