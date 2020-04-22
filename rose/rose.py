@@ -636,9 +636,6 @@ class Car(Agent):
         if len(self.send_conflict_requests_to+self.received_conflict_requests_from) > 0:
             self.conflict_winner = winning_agent
 
-        #safety_oracle = self.controller.specification_structure.oracle_set[6]
-        #assert safety_oracle.name == 'backup_plan_safety'
-
         # save info about sending and receiving requests
         self.sent = self.send_conflict_requests_to
         self.received = self.received_conflict_requests_from
@@ -773,8 +770,10 @@ class Car(Agent):
         agents_in_bubble = self.find_agents_in_bubble()
         all_agent_gridpts = [(agent.state.x, agent.state.y) for agent in agents_in_bubble if agent.get_id()!=self.get_id()]
 
-        #
+        # don't check the first gridpoint in occupancy if list is greater than one
         occ = self.query_occupancy(ctrl)
+        if len(occ) > 1:
+            occ = occ[1:]
         action_gridpts = [(state.x, state.y) for state in self.query_occupancy(ctrl)]
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         return len(gridpts_intersect) > 0
@@ -932,10 +931,14 @@ class Car(Agent):
 
     def check_occupancy_intersection(self, occ_a, occ_b):
         # convert list of agent states to grid points if not already list of tuples
-        if len(occ_a)>1: occ_a = occ_a[1:]
-        if len(occ_b)>1: occ_b = occ_b[1:]
-        if not isinstance(occ_a[0], tuple): occ_a = [(state.x, state.y) for state in occ_a]
-        if not isinstance(occ_b[0], tuple): occ_b = [(state.x, state.y) for state in occ_b]
+        if len(occ_a)>1: 
+            occ_a = occ_a[1:]
+        if len(occ_b)>1: 
+            occ_b = occ_b[1:]
+        if not isinstance(occ_a[0], tuple):
+            occ_a = [(state.x, state.y) for state in occ_a]
+        if not isinstance(occ_b[0], tuple):
+            occ_b = [(state.x, state.y) for state in occ_b]
         occ_all = occ_a + occ_b
         if len(occ_all) != len(set(occ_all)):
             return True
@@ -3130,7 +3133,6 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    # 15, 4, 4
     def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
@@ -3309,6 +3311,25 @@ class QuasiSimultaneousGame(Game):
             if agent_score >= ego_score:
                 higher_pred.append(agent)
         return higher_pred
+    
+    # do a global collision check and add to traces the overlapping gridpoints at
+    # the right time step
+    def global_collision_check(self, all_occupancy_gridpts):
+        # find out all elements that are duplicates and return list of duplicates 
+        dup = [pt for pt in all_occupancy_gridpts if all_occupancy_gridpts.count(pt) > 1]
+        # saves traces
+        try: 
+            self.traces["global_traces"][self.time] = dup
+        except:
+            self.traces["global_traces"] = {}
+            self.traces["global_traces"][self.time] = dup
+
+        # returns true if collision occurs
+        if len(dup) > 0:
+            "collision has occurred"
+            print(self.time)
+            print(set(dup))
+        return len(dup) > 0
 
     def set_agent_intentions(self):
         for agent in self.agent_set:
@@ -3326,13 +3347,25 @@ class QuasiSimultaneousGame(Game):
         # resolve precedence
         self.resolve_precedence()
         active_agents = []
+        all_occupancy_gridpts = []
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
             precedence_list.sort(reverse=True)
             for precedence in precedence_list:
                 for agent in self.bundle_to_agent_precedence[bundle][precedence]:
+                    state = agent.state
                     agent.run()
+                    # add in occupancy of agent when it took its action
+                    #print(agent.ctrl_chosen)
+                    occ = agent.query_occupancy(agent.ctrl_chosen, state=state)
+                    if len(occ) > 1: 
+                        occ = occ[1:]
+                    gridpts = [(state.x, state.y) for state in occ]
+                    all_occupancy_gridpts.extend(gridpts)
                     active_agents.append(agent)
+        # check for collision
+        self.global_collision_check(all_occupancy_gridpts)
+
 
     def play_step(self):
         #for agent in self.agent_set:
