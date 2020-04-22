@@ -238,12 +238,12 @@ class Car(Agent):
 
         #self.lead_vehicle = None
         #self.lead_agent = None
-    
+
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
         assert signal is not None
         self.turn_signal = signal
-    
+
     def reset_turn_signal(self):
         self.turn_signal = None
 
@@ -794,18 +794,18 @@ class Car(Agent):
             if len(occ) > 1:
                 occ = occ[1:]
             action_gridpts = [(state.x, state.y) for state in occ]
-        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
-        collision_check = len(gridpts_intersect) > 0
-        if collision_check:
-            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
-                self.supervisor.game.collision_dict[self.supervisor.game.time] = \
-                    [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
-            else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
-                    self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
-        return len(gridpts_intersect) > 0
+            gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+            collision_check = len(gridpts_intersect) > 0
+            if collision_check:
+                ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
+                if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                    self.supervisor.game.collision_dict[self.supervisor.game.time] = \
+                        [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
+                else:
+                    self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
+                        self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
+                print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
+            return len(gridpts_intersect) > 0
 
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
@@ -2696,8 +2696,8 @@ class UnprotectedLeftTurnOracle(Oracle):
                     for N, occupancy_tile in enumerate(relative_tiles):
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False) 
-                        if lead_agent is not None: 
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
+                        if lead_agent is not None:
                             # if agent is in intersection
                             if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:
                                 # get other agent intention
@@ -2707,7 +2707,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                                     # check collision, make conservative and assume other agent bundle hasn't gone
                                     gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
                                     gap_requirement = self.get_conservative_gap(lead_agent, N+1)
-                                    if gap > gap_requirement: 
+                                    if gap > gap_requirement:
                                         pass
                                     else:
                                         return False
@@ -2730,7 +2730,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                     for N, occupancy_tile in enumerate(relative_tiles):
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)                                
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
 
                         if lead_agent is None:
                             #print('no lead agent')
@@ -2981,12 +2981,12 @@ class SpecificationStructureController(Controller):
     def __init__(self, game, specification_structure):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
-    
+
     def manage_turn_signals(self, plant, ctrl):
         next_st = plant.query_occupancy(ctrl)[-1]
         x_nxt, y_nxt, heading_nxt = next_st.x, next_st.y, next_st.heading
         next_directed_tile = ((x_nxt,y_nxt), heading_nxt)
-        # turn left signal on if ctrl ends up in first left turn tile and 
+        # turn left signal on if ctrl ends up in first left turn tile and
         # agent subgoal is in left turn tiles
         if plant.supervisor.subgoals[0] in self.game.map.all_left_turns and \
             plant.supervisor.subgoals[0] == next_directed_tile:
@@ -3436,7 +3436,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 120
+    seed = 777
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3444,7 +3444,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=50)
 #    game.animate(frequency=0.01)
 
     # print debug info
