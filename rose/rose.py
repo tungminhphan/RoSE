@@ -721,6 +721,16 @@ class Car(Agent):
         # check whether agent is in conflict with other agents in its bubble
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
+                # debugging information!!
+                try: 
+                    lon1 = self.get_length_along_bundle()[0]
+                except:
+                    lon1 = None
+                try:
+                    lon2 = agent.get_length_along_bundle()[0]
+                except:
+                    lon2 = None
+                agents_checked_for_conflict.append((agent, lon1, lon2, self.state.heading==agent.state.heading))
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
                     chk = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])
@@ -730,7 +740,7 @@ class Car(Agent):
                 except:
                     break
                 if chk_lon and self.state.heading == agent.state.heading:
-                    agents_checked_for_conflict.append(agent)
+                    #agents_checked_for_conflict.append(agent)
                     # send request to agent behind if intentions conflict
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
                     if chk_to_send_request: 
@@ -1296,7 +1306,7 @@ class Game:
                 received.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
             checked_for_conflict = []
             for ag in agent.agents_checked_for_conflict:
-                checked_for_conflict.append((ag.state.__tuple__(), ag.intention, ag.token_count_before, ag.get_id()))
+                checked_for_conflict.append((ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]))
 
             #print("conflict winner")
             #print(agent.conflict_winner.get_id())
@@ -1423,8 +1433,8 @@ class Game:
         #states = [(8,1,'east',1), (8,3,'east',1), (8,4,'east',1), (9,2,'east',1), (9,3,'east',1)]
         #intentions = [{'acceleration': 0, 'steer': 'left-lane' }, {'acceleration': 0, 'steer':'right-lane'}, \
         #    {'acceleration': 0, 'steer': 'right-lane' }, {'acceleration': 0, 'steer': 'straight' }, {'acceleration': 0, 'steer': 'left-lane'}]
-        states = [(9,0, 'east',0), (10,0,'east',0)]
-        intentions = [{'acceleration': 1, 'steer': 'right-lane'}, {'acceleration': 2, 'steer': 'left-lane' }]
+        states = [(17,11, 'east',2), (18,11,'east',3)]
+        intentions = [{'acceleration': -1, 'steer': 'right-lane'}, {'acceleration': -1, 'steer': 'straight' }]
         self.fix_agent_states_karena_debug(states, intentions)
         # checking conflict swapping code
         self.send_and_receive_conflict_requests()
@@ -1478,6 +1488,8 @@ class Game:
             if write_bool:
                 self.write_agents_to_traces()
                 self.save_plotting_info()
+
+            #self.play_fixed_agent_game_karena_debug()
 
             self.play_step()
             self.time_forward()
@@ -2917,7 +2929,7 @@ class BackupPlanSafetyOracle(Oracle):
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # record lead agent
-                plant.lead_agent = lead_agent.state.__tuple__()
+                plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap 
                 #plant.gap_curr = gap_curr
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
@@ -3385,7 +3397,7 @@ def play_fixed_agent_game_karena_debug(num_agents, game):
     def make_car(game, x=8, y=2, heading='east', v=0):
         ss = get_default_car_ss()
         spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
-        end = (x, y+25, heading)
+        end = (1, 17, heading)
         v_min = 0
         v_max = 3
         #v = random.choice(np.arange(2, v_max+1))
@@ -3475,7 +3487,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 120
+    seed = 1930
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3483,11 +3495,13 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    #game.play(outfile=output_filename, t_end=250)
-#    game.animate(frequency=0.01)
+
+    #play_fixed_agent_game_karena_debug(2, game)
+    game.play(outfile=output_filename, t_end=100)
+#   game.animate(frequency=0.01)
 
     # print debug info
-    debug_filename = os.getcwd()+'/saved_traces/game.p'
-    print_debug_info(debug_filename)
+    #debug_filename = os.getcwd()+'/saved_traces/game.p'
+    #print_debug_info(debug_filename)
 
     # play debugged game
