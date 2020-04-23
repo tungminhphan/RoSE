@@ -249,6 +249,20 @@ class Car(Agent):
         self.lead_agent = None
         self.prior_state = None
 
+    # optimized hack_state method for Car agents
+    @classmethod
+    def hack_state(cls, state, **kwargs):
+        new_state = cp.copy(state)
+        if 'x' in kwargs:
+            new_state.x = kwargs.get('x')
+        if 'y' in kwargs:
+            new_state.y = kwargs.get('y')
+        if 'heading' in kwargs:
+            new_state.heading = kwargs.get('heading')
+        if 'v' in kwargs:
+            new_state.v = kwargs.get('v')
+        return new_state
+
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
         assert signal is not None
@@ -3468,19 +3482,19 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 666
+    seed = 4321
     np.random.seed(seed)
     random.seed(seed)
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1)
-    output_filename = 'game.p'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.7)
+    output_filename = 'game'
 
     # create a game from map/initial config files
 #    game = QuasiSimultaneousGame(game_map=the_map)
     game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=200)
 #    game.animate(frequency=0.01)
 
     # print debug info
