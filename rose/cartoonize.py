@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import glob
-from rose import Car, Map, car_colors
+from rose import Car, Map, CAR_COLORS
 from PIL import Image
 import _pickle as pickle
 from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
@@ -16,7 +16,7 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
 
 main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
 car_figs = dict()
-for color in car_colors:
+for color in CAR_COLORS:
     car_figs[color] = main_dir + '/rose/cars/' + color + '_car.png'
 
 
@@ -201,8 +201,6 @@ def make_bubble_figure(bubble_file):
             rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.25,facecolor='orange', alpha=0.2)
             ax.add_patch(rect)
         plt_car(ax, car_tuple)
-
-
     plt.show()
 
 def animate_images():
