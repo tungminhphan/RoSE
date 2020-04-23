@@ -21,15 +21,17 @@ from collections import OrderedDict as od
 from collections import namedtuple
 import os
 import _pickle as pickle
+import json
 import copy as cp
 #from plotting import traces_to_animation
 
-car_colors = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
+CAR_COLORS = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
 IOMap = namedtuple('IOMap', ['sources','sinks','map'])
 TLNode = namedtuple('TLNode', ['xy', 'green', 'yellow', 'red'])
 Intersection = namedtuple('Intersection', ['tiles', 'pcorner', 'mcorner', 'height', 'width'])
 Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
 DIRECTION_TO_VECTOR = {'east': [0,1], 'west': [0,-1], 'north': [-1,0], 'south': [1,0]}
+AGENT_CHAR = [str(i) for i in range(10)]
 
 def rotate_vector(vec, theta):
     """
@@ -126,8 +128,8 @@ class Agent:
 
     # return a random color from an array
     def get_random_color(self):
-        ind = random.randrange(len(car_colors))
-        return car_colors[ind]
+        ind = random.randrange(len(CAR_COLORS))
+        return CAR_COLORS[ind]
 
     def get_symbol(self):
         if not self.symbol:
@@ -722,7 +724,7 @@ class Car(Agent):
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
                 # debugging information!!
-                try: 
+                try:
                     lon1 = self.get_length_along_bundle()[0]
                 except:
                     lon1 = None
@@ -1355,6 +1357,7 @@ class Game:
         self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
         self.traces["unsafe_joint_state_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
+        self.traces["special_heading_tiles"] = self.map.special_goal_tiles
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
@@ -1483,7 +1486,6 @@ class Game:
                 agent_rec.received_conflict_requests_from.append(agent)
 
     def play(self, t_end=np.inf, outfile=None):
-        # dump the map here and open json file
         write_bool = outfile is not None and t_end is not np.inf
         while self.time < t_end:
             print("TIME: " + str(self.time))
@@ -1642,6 +1644,7 @@ class Map:
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.special_goal_tiles = []
+        self.special_heading_tiles = []
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.all_left_turns = self.get_all_left_turns()
@@ -1857,6 +1860,7 @@ class Map:
             if next_bundle.is_leftmost_lane(next_next_tile):
                 # update legal orientation dictionary
                 self.legal_orientations[next_tile].append(next_direction)
+                self.special_heading_tiles.append(first_stop)
                 # add to special tiles the first stop
                 self.special_goal_tiles.append(first_stop)
                 return True, (first_stop, second_stop)
@@ -2933,7 +2937,7 @@ class BackupPlanSafetyOracle(Oracle):
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # record lead agent
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
-                # record computed gap 
+                # record computed gap
                 #plant.gap_curr = gap_curr
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
@@ -3288,6 +3292,42 @@ def create_default_car(source, sink, game):
     car.set_supervisor(supervisor)
     return car
 
+def create_specified_car(attributes, game):
+    if 'goal' not in 'attributes' or attributes['goal'] == 'auto':
+        attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
+    if 'controller' not in attributes:
+        ss = get_default_car_ss()
+        # default to SpecificationStructureController
+        controller = SpecificationStructureController(game=game,specification_structure=ss)
+        attributes['controller'] = controller
+    if 'agent_color' not in attributes:
+        # if not specified choose a random color
+        agent_color = np.random.choice(CAR_COLORS)
+        attributes['color'] = color
+    if 'v_min' not in attributes:
+        attributes['v_min'] = 0
+    if 'v_max' not in attributes:
+        attributes['v_max'] = 3
+    if 'a_min' not in attributes:
+        attributes['a_min'] = -1
+    if 'a_max' not in attributes:
+        attributes['a_max'] = 1
+    if 'heading' not in attributes or attributes['heading'] == 'auto':
+        attributes['heading'] = game.map.legal_orientations[(attributes['x'],
+                                attributes['y'])][0]
+    if 'v' not in attributes:
+        attributes['v'] = 0
+    car =  Car(x=attributes['x'], y=attributes['y'],
+            heading=attributes['heading'], v=attributes['v'],
+            v_min=attributes['v_min'], v_max=attributes['v_max'],
+            a_min=attributes['a_min'],a_max=attributes['a_max'])
+    # set car color
+    car.agent_color = attributes['agent_color']
+    car.set_controller(attributes['controller'])
+    supervisor = BundleGoalExit(game=game, goals=[attributes['goal']])
+    car.set_supervisor(supervisor)
+    return car
+
 def run(runnable_set):
     for runnable in runnable_set:
         runnable.run()
@@ -3296,6 +3336,7 @@ class QuasiSimultaneousGame(Game):
     def __init__(self, game_map):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
+        self.bundle_to_agent_precedence = None
         self.simulated_agents = []
 
     def done_simulating_agent(self, agent):
@@ -3308,9 +3349,9 @@ class QuasiSimultaneousGame(Game):
         self.simulated_agents = []
 
     def get_bundle_to_agent_precedence(self):
-        bundle_to_agent_precedence = dict()
+        bundle_to_agent_precedence = od()
         for bundle in self.map.bundles:
-            bundle_to_agent_precedence[bundle] = dict()
+            bundle_to_agent_precedence[bundle] = od()
         for agent in self.agent_set:
             x, y, heading = agent.state.x, agent.state.y, agent.state.heading
             # if in special tile, rotate by another 90 degrees; TODO: remove this bandage
@@ -3495,19 +3536,72 @@ def print_debug_info(filename):
     print("Out of bounds")
     for key, value in traces['out_of_bounds_dict'].items():
         print(key, value)
-
 #    print(traces['global_traces'])
 
+def parse_config(csv_file_path, config_file_path):
+    """
+    parse configuration file
+    """
+    # get agents from csv mask
+    def get_agents():
+        agents = od()
+        with open(csv_file_path, 'rt') as f:
+            graph = csv.reader(f)
+            for i, row in enumerate(graph):
+                for j, item in enumerate(row):
+                    if item in AGENT_CHAR:
+                        agents[item] = (i, j)
+        return agents
+    # get agents' attributes from config file
+    def get_attributes():
+        agents = od()
+        data = import_json(config_file_path)
+        return data
+    xy_agents = get_agents()
+    attrs_agents = get_attributes()
+    data_all_agents = od()
+    for agent in xy_agents:
+        x, y = xy_agents[agent]
+        data_all_agents[agent] = od()
+        data_all_agents[agent]['x'] = x
+        data_all_agents[agent]['y'] = y
+        for attr in attrs_agents[agent]:
+            data_all_agents[agent][attr] = attrs_agents[agent][attr]
+    return data_all_agents
+
+def import_json(infile):
+    with open(infile) as f:
+        data = json.load(f, object_pairs_hook=od)
+    return data
+
+def create_qs_game_from_config(game_map, config_path):
+    # create game object
+    game = QuasiSimultaneousGame(game_map=the_map)
+    # create csv config file path
+    csv_file_path = config_path + '.csv'
+    # create json config file path
+    config_file_path = config_path + '.json'
+    configs = parse_config(csv_file_path, config_file_path)
+    for agent in configs:
+        new_car = create_specified_car(configs[agent], game)
+        game.agent_set.append(new_car)
+    game.update_occupancy_dict()
+    return game
+
 if __name__ == '__main__':
-    seed = 11111
+    seed = 666
     np.random.seed(seed)
     random.seed(seed)
-    the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
+    map_name = 'city_blocks_small'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1)
     output_filename = 'game.p'
 
-    # play a normal game
-    game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=100)
+    # create a game from map/initial config files
+#    game = QuasiSimultaneousGame(game_map=the_map)
+    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+
+    # play or animate a normal game
+    game.play(outfile=output_filename, t_end=60)
 #    game.animate(frequency=0.01)
 
     # print debug info

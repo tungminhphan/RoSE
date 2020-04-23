@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import glob
-from rose import Car, Map, car_colors
+from rose import Car, Map, CAR_COLORS
 from PIL import Image
 import _pickle as pickle
 from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
@@ -16,7 +16,7 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
 
 main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
 car_figs = dict()
-for color in car_colors:
+for color in CAR_COLORS:
     car_figs[color] = main_dir + '/rose/cars/' + color + '_car.png'
 
 
@@ -27,6 +27,7 @@ def traces_to_animation(filename, start=0, end=-1):
         traces = pickle.load(pckl_file)
 
     the_map = Map(traces['map_name'])
+    special_heading_tiles = traces['special_heading_tiles']
     t_end = traces['t_end']
     global ax
     fig, ax = plt.subplots()
@@ -45,17 +46,19 @@ def traces_to_animation(filename, start=0, end=-1):
         plt.gca().patches = cp.copy(map_patches)
         agents = traces[t]['agents']
         lights = traces[t]['lights']
-        plot_cars(agents, draw_bubble=False)
+        plot_cars(agents, draw_bubble=False,
+                special_heading_tiles=special_heading_tiles)
         plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
         img_name = os.getcwd()+'/imgs/plot_'+plot_name+'.png'
         fig.savefig(img_name)
     animate_images()
 
-def plot_cars(agents, draw_bubble=True):
+def plot_cars(agents, draw_bubble=False, special_heading_tiles=None):
     for i, agent in enumerate(agents):
         # draw the car with its bubble
-        draw_car(agent, draw_bubble=draw_bubble)
+        draw_car(agent, draw_bubble=draw_bubble,
+                special_heading_tiles=special_heading_tiles)
 
 def plot_traffic_lights(traffic_lights):
     for i, light_node in enumerate(traffic_lights):
@@ -118,16 +121,20 @@ def plot_map(map, grid_on=True):
     else:
         plt.axis('off')
 
-def draw_car(agent_state_tuple, draw_bubble):
+def draw_car(agent_state_tuple, draw_bubble, special_heading_tiles):
     # global params
     x, y, theta, v, color, bubble, ag_id = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
     # need to flip since cars are inverted
-    if theta_d == np.pi/2:
-        theta_d = np.pi
-    elif theta_d == np.pi:
-        theta_d = np.pi/2
+    if theta_d == 90:
+        theta_d = 270
+    elif theta_d == 270:
+        theta_d = 90
+
+    if special_heading_tiles:
+        if ((x,y),theta) in special_heading_tiles:
+            theta_d += 45
 
     car_fig = car_fig.rotate(theta_d, expand=False)
     offset = 0.1
@@ -201,8 +208,6 @@ def make_bubble_figure(bubble_file):
             rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.25,facecolor='orange', alpha=0.2)
             ax.add_patch(rect)
         plt_car(ax, car_tuple)
-
-
     plt.show()
 
 def animate_images():

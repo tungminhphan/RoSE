@@ -1,0 +1,14 @@
+{
+  "0": {
+    "heading": "auto",
+    "v": 1,
+    "goals": "auto",
+    "agent_color": "red"
+  },
+  "1": {
+    "heading": "auto",
+    "v": 2,
+    "goals": "auto",
+    "agent_color": "green"
+  }
+}
