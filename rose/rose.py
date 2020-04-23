@@ -3462,16 +3462,15 @@ def create_qs_game_from_config(game_map, config_path):
     config_file_path = config_path + '.json'
     configs = parse_config(csv_file_path, config_file_path)
     for agent in configs:
-        print(configs[agent])
         new_car = create_specified_car(configs[agent], game)
         game.agent_set.append(new_car)
     game.update_occupancy_dict()
     return game
 
 if __name__ == '__main__':
-    #seed = 123
-    #np.random.seed(seed)
-    #random.seed(seed)
+    seed = 666
+    np.random.seed(seed)
+    random.seed(seed)
     map_name = 'city_blocks_small'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.75)
     output_filename = 'game'
@@ -3481,8 +3480,8 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=200)
-#    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=50)
+#   game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/game.p'

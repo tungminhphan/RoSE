@@ -1,5 +1,6 @@
 {
   "0": {
+<<<<<<< HEAD
     "heading": "east",
     "v": 3,
     "goals": "((48,15), 'south')",
@@ -22,5 +23,17 @@
     "v": 0,
     "goals": "auto",
     "agent_color": "light_green"
+=======
+    "heading": "auto",
+    "v": 1,
+    "goals": "auto",
+    "agent_color": "red"
+  },
+  "1": {
+    "heading": "auto",
+    "v": 2,
+    "goals": "auto",
+    "agent_color": "green"
+>>>>>>> 740439711102435d578199f73e7373ab695f112b
   }
 }
