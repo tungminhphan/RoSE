@@ -1357,6 +1357,7 @@ class Game:
         self.traces["out_of_bounds_dict"] = self.out_of_bounds_dict
         self.traces["unsafe_joint_state_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
+        self.traces["special_heading_tiles"] = self.map.special_goal_tiles
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         if new_entry is not None:
@@ -1643,6 +1644,7 @@ class Map:
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.special_goal_tiles = []
+        self.special_heading_tiles = []
         self.right_turn_tiles = self.find_right_turn_tiles()
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.all_left_turns = self.get_all_left_turns()
@@ -1858,6 +1860,7 @@ class Map:
             if next_bundle.is_leftmost_lane(next_next_tile):
                 # update legal orientation dictionary
                 self.legal_orientations[next_tile].append(next_direction)
+                self.special_heading_tiles.append(first_stop)
                 # add to special tiles the first stop
                 self.special_goal_tiles.append(first_stop)
                 return True, (first_stop, second_stop)
@@ -3590,7 +3593,7 @@ if __name__ == '__main__':
     np.random.seed(seed)
     random.seed(seed)
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.75)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1)
     output_filename = 'game.p'
 
     # create a game from map/initial config files
