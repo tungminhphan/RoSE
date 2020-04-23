@@ -41,6 +41,8 @@ def traces_to_animation(filename, start=0, end=-1):
     for patch in plt.gca().patches:
         map_patches.append(patch)
     for t in t_array:
+        #if t == 35:
+        #    __import__('ipdb').set_trace(context=21)
         print(t)
         plt.gca().images = []
         plt.gca().patches = cp.copy(map_patches)
@@ -51,6 +53,7 @@ def traces_to_animation(filename, start=0, end=-1):
         plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
         img_name = os.getcwd()+'/imgs/plot_'+plot_name+'.png'
+        #plt.show(1)
         fig.savefig(img_name)
     animate_images()
 
