@@ -155,10 +155,6 @@ def draw_car(agent_state_tuple, draw_bubble, special_heading_tiles):
 
 # to plot a single bubble for the paper figure
 def plot_bubble(bubble):
-    #global ax, fig
-    #fig, ax = plt.subplots()
-    #ax.axis('equal')
-
     for grid in bubble:
         rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.5)
         ax.add_patch(rect)
@@ -169,15 +165,6 @@ def plot_bubble(bubble):
     y_max = 10
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
-
-    # draw the car
-    #fig = Image.open(car_figs['green'])
-    #agent_state_tuple = (0, 0, 'east', 'green')
-    #draw_car(agent_state_tuple)
-
-    #ax.xaxis.set_minor_locator(AutoMinorLocator(2))
-    #ax.yaxis.set_minor_locator(AutoMinorLocator(2))
-    #ax.grid(which='both')
 
     plt.gca().invert_yaxis()
     plt.show()

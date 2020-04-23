@@ -89,19 +89,18 @@ def write_info(out_file, t, trace):
 
 
 def print_one_agent_trace(filename, x, y, heading, time, outfile):
-
     def get_agent_id(traces, x, y, heading, t):
         agent_dict = traces[t]
+        #print(agent_dict)
         for agent_id, agent_trace in agent_dict.items():
-            try:
-                x_ag, y_ag, heading_ag, v_ag = agent_trace['state']
-                color_ag = agent_trace['color']
+            agent_state = agent_trace['state']
+            if agent_state is not None: 
+                x_ag, y_ag, heading_ag, v_ag = agent_state
                 if heading_ag == heading:
+                    color_ag = agent_trace['color']
                     print(x_ag, y_ag, heading_ag, color_ag)
                 if (x_ag, y_ag, heading_ag) == (x, y, heading):
                     return agent_id
-            except:
-                break
 
         print("Agent is not found!")
         return None
@@ -115,7 +114,7 @@ def print_one_agent_trace(filename, x, y, heading, time, outfile):
     agent_id = get_agent_id(traces, x, y, heading, time)
 
     t_end = int(max(traces.keys()))
-    print(t_end)
+    #print(t_end)
     for t in range(1,t_end):
         agents_dict = traces[t]
         # search through all agents at time t
@@ -176,7 +175,7 @@ if __name__ == '__main__':
     #    os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 18, 16, 'east', 23, outfile)
+    print_one_agent_trace(traces_file, 1, 16, 'south', 4, outfile)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 23)
+    print_all_agents_at_time_t(traces_file, outfile_cc, 4)
