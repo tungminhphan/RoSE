@@ -42,6 +42,10 @@ def traces_to_animation(filename, start=0, end=-1):
         map_patches.append(patch)
     for t in t_array:
         print(t)
+        for car_image in plt.gca().images:
+            del car_image
+        for patch in plt.gca().patches:
+            del patch
         plt.gca().images = []
         plt.gca().patches = cp.copy(map_patches)
         agents = traces[t]['agents']
