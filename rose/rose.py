@@ -1624,7 +1624,7 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key] = [item]
 
 class Map:
-    def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=False):
+    def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=True):
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
