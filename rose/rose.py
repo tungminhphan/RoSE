@@ -239,12 +239,12 @@ class Car(Agent):
 
         #self.lead_vehicle = None
         self.lead_agent = None
-    
+
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
         assert signal is not None
         self.turn_signal = signal
-    
+
     def reset_turn_signal(self):
         self.turn_signal = None
 
@@ -735,7 +735,7 @@ class Car(Agent):
                 try:
                     chk = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])
                     chk_lon = chk>=0
-                    #if chk == 0: 
+                    #if chk == 0:
                     #    st()
                 except:
                     break
@@ -743,7 +743,7 @@ class Car(Agent):
                     #agents_checked_for_conflict.append(agent)
                     # send request to agent behind if intentions conflict
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
-                    if chk_to_send_request: 
+                    if chk_to_send_request:
                         send_requests_list.append(agent)
                     # check whether max yield is not enough; if not, set flag
                     chk_max_braking_not_enough = self.intention_bp_conflict(agent)
@@ -807,18 +807,18 @@ class Car(Agent):
             if len(occ) > 1:
                 occ = occ[1:]
             action_gridpts = [(state.x, state.y) for state in occ]
-        gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
-        collision_check = len(gridpts_intersect) > 0
-        if collision_check:
-            ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
-            if self.supervisor.game.time not in self.supervisor.game.collision_dict:
-                self.supervisor.game.collision_dict[self.supervisor.game.time] = \
-                    [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
-            else:
-                self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
-                    self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
-            print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
-        return len(gridpts_intersect) > 0
+            gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
+            collision_check = len(gridpts_intersect) > 0
+            if collision_check:
+                ag = self.supervisor.game.occupancy_dict[gridpts_intersect[0]]
+                if self.supervisor.game.time not in self.supervisor.game.collision_dict:
+                    self.supervisor.game.collision_dict[self.supervisor.game.time] = \
+                        [(self.get_id(), self.state.__tuple__(), self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention)]
+                else:
+                    self.supervisor.game.collision_dict[self.supervisor.game.time].append((self.get_id(),self.state.__tuple__(), \
+                        self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
+                print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
+            return len(gridpts_intersect) > 0
 
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
@@ -945,9 +945,9 @@ class Car(Agent):
 
     def check_occupancy_intersection(self, occ_a, occ_b):
         # convert list of agent states to grid points if not already list of tuples
-        if len(occ_a)>1: 
+        if len(occ_a)>1:
             occ_a = occ_a[1:]
-        if len(occ_b)>1: 
+        if len(occ_b)>1:
             occ_b = occ_b[1:]
         if not isinstance(occ_a[0], tuple):
             occ_a = [(state.x, state.y) for state in occ_a]
@@ -2714,8 +2714,8 @@ class UnprotectedLeftTurnOracle(Oracle):
                     for N, occupancy_tile in enumerate(relative_tiles):
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False) 
-                        if lead_agent is not None: 
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
+                        if lead_agent is not None:
                             # if agent is in intersection
                             if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:
                                 # get other agent intention
@@ -2725,7 +2725,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                                     # check collision, make conservative and assume other agent bundle hasn't gone
                                     gap = max(abs_x-lead_agent.state.x, abs_y-lead_agent.state.y)
                                     gap_requirement = self.get_conservative_gap(lead_agent, N+1)
-                                    if gap > gap_requirement: 
+                                    if gap > gap_requirement:
                                         pass
                                     else:
                                         return False
@@ -2748,7 +2748,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                     for N, occupancy_tile in enumerate(relative_tiles):
                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
                         fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)                                
+                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
 
                         if lead_agent is None:
                             #print('no lead agent')
@@ -2929,8 +2929,13 @@ class BackupPlanSafetyOracle(Oracle):
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # record lead agent
+<<<<<<< HEAD
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap 
+=======
+                plant.lead_agent = lead_agent.state.__tuple__()
+                # record computed gap
+>>>>>>> 1ad3df723e37a3471aa6c55ed248a6ea0c896cad
                 #plant.gap_curr = gap_curr
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
@@ -3002,12 +3007,12 @@ class SpecificationStructureController(Controller):
     def __init__(self, game, specification_structure):
         super(SpecificationStructureController, self).__init__(game=game)
         self.specification_structure = specification_structure
-    
+
     def manage_turn_signals(self, plant, ctrl):
         next_st = plant.query_occupancy(ctrl)[-1]
         x_nxt, y_nxt, heading_nxt = next_st.x, next_st.y, next_st.heading
         next_directed_tile = ((x_nxt,y_nxt), heading_nxt)
-        # turn left signal on if ctrl ends up in first left turn tile and 
+        # turn left signal on if ctrl ends up in first left turn tile and
         # agent subgoal is in left turn tiles
         if plant.supervisor.subgoals[0] in self.game.map.all_left_turns and \
             plant.supervisor.subgoals[0] == next_directed_tile:
@@ -3329,14 +3334,14 @@ class QuasiSimultaneousGame(Game):
             if agent_score >= ego_score:
                 higher_pred.append(agent)
         return higher_pred
-    
+
     # do a global collision check and add to traces the overlapping gridpoints at
     # the right time step
     def global_collision_check(self, all_occupancy_gridpts):
-        # find out all elements that are duplicates and return list of duplicates 
+        # find out all elements that are duplicates and return list of duplicates
         dup = [pt for pt in all_occupancy_gridpts if all_occupancy_gridpts.count(pt) > 1]
         # saves traces
-        try: 
+        try:
             self.traces["global_traces"][self.time] = dup
         except:
             self.traces["global_traces"] = {}
@@ -3376,7 +3381,7 @@ class QuasiSimultaneousGame(Game):
                     # add in occupancy of agent when it took its action
                     #print(agent.ctrl_chosen)
                     occ = agent.query_occupancy(agent.ctrl_chosen, state=state)
-                    if len(occ) > 1: 
+                    if len(occ) > 1:
                         occ = occ[1:]
                     gridpts = [(state.x, state.y) for state in occ]
                     all_occupancy_gridpts.extend(gridpts)
