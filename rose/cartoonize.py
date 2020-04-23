@@ -1,3 +1,4 @@
+import copy as cp
 import sys
 from ipdb import set_trace as st
 import numpy as np
@@ -9,6 +10,8 @@ from rose import Car, Map, car_colors
 from PIL import Image
 import _pickle as pickle
 from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
 
 
 main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
@@ -31,23 +34,28 @@ def traces_to_animation(filename, start=0, end=-1):
     t_array = np.arange(t_end+1)
     t_array = t_array[start:end]
     # plot out agents and traffic lights
+    # plot map once
+    plot_map(the_map)
+    map_patches = []
+    for patch in plt.gca().patches:
+        map_patches.append(patch)
     for t in t_array:
         print(t)
-        ax.cla()
+        plt.gca().images = []
+        plt.gca().patches = cp.copy(map_patches)
         agents = traces[t]['agents']
         lights = traces[t]['lights']
-        plot_map(the_map)
-        plot_cars(agents)
+        plot_cars(agents, draw_bubble=False)
         plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
         img_name = os.getcwd()+'/imgs/plot_'+plot_name+'.png'
         fig.savefig(img_name)
     animate_images()
 
-def plot_cars(agents):
+def plot_cars(agents, draw_bubble=True):
     for i, agent in enumerate(agents):
         # draw the car with its bubble
-        draw_car(agent)
+        draw_car(agent, draw_bubble=draw_bubble)
 
 def plot_traffic_lights(traffic_lights):
     for i, light_node in enumerate(traffic_lights):
@@ -78,23 +86,39 @@ def get_map_corners(map):
 def plot_map(map, grid_on=True):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
-    ax.minorticks_on()
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
 
     # fill in the obstacle regions
-    for obs in map.non_drivable_nodes:
+    for obs in map.drivable_nodes:
         rect = patches.Rectangle((obs[1],obs[0]), 1,1,linewidth=1,facecolor='k', alpha=0.3)
         ax.add_patch(rect)
 
     plt.gca().invert_yaxis()
     if grid_on:
-        ax.grid()
+        ax.minorticks_on()
+        # customize the major grid
+        ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
+        # customize the minor grid
+        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+
+        # Make a plot with major ticks that are multiples of 20 and minor ticks that
+        # are multiples of 5.  Label major ticks with '%d' formatting but don't label
+        # minor ticks.
+        ax.xaxis.set_major_locator(MultipleLocator(5))
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%d'))
+
+        ax.yaxis.set_major_locator(MultipleLocator(5))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%d'))
+
+        # For the minor ticks, use no labels; default NullFormatter.
+        ax.xaxis.set_minor_locator(MultipleLocator(1))
+        ax.yaxis.set_minor_locator(MultipleLocator(1))
         plt.axis('on')
     else:
         plt.axis('off')
 
-def draw_car(agent_state_tuple):
+def draw_car(agent_state_tuple, draw_bubble):
     # global params
     x, y, theta, v, color, bubble, ag_id = agent_state_tuple
     theta_d = Car.convert_orientation(theta)
@@ -109,9 +133,10 @@ def draw_car(agent_state_tuple):
     offset = 0.1
     ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y+offset, y+1-offset, x+offset, x+1-offset])
 
-    for grid in bubble:
-        rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.1)
-        ax.add_patch(rect)
+    if draw_bubble:
+        for grid in bubble:
+            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='grey', alpha=0.1)
+            ax.add_patch(rect)
 
 
 # to plot a single bubble for the paper figure
