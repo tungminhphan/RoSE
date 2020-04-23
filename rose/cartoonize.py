@@ -1,3 +1,5 @@
+import sys
+from ipdb import set_trace as st
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -16,7 +18,7 @@ for color in car_colors:
 
 
 # animate the files completely
-def traces_to_animation(filename):
+def traces_to_animation(filename, start=0, end=-1):
     # extract out traces from pickle file
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
@@ -26,8 +28,10 @@ def traces_to_animation(filename):
     global ax
     fig, ax = plt.subplots()
 
+    t_array = np.arange(t_end+1)
+    t_array = t_array[start:end]
     # plot out agents and traffic lights
-    for t in range(t_end):
+    for t in t_array:
         print(t)
         ax.cla()
         agents = traces[t]['agents']
@@ -96,7 +100,7 @@ def draw_car(agent_state_tuple):
     theta_d = Car.convert_orientation(theta)
     car_fig = Image.open(car_figs[color])
     # need to flip since cars are inverted
-    if theta_d == np.pi/2: 
+    if theta_d == np.pi/2:
         theta_d = np.pi
     elif theta_d == np.pi:
         theta_d = np.pi/2
@@ -146,7 +150,7 @@ def make_bubble_figure(bubble_file):
         theta_d = Car.convert_orientation(theta)
         car_fig = Image.open(car_figs[color])
         # need to flip since cars are inverted
-        if theta_d == np.pi/2: 
+        if theta_d == np.pi/2:
             theta_d = np.pi
         elif theta_d == np.pi:
             theta_d = np.pi/2
@@ -160,7 +164,7 @@ def make_bubble_figure(bubble_file):
 
     fig = plt.figure()
     car_tuple = (0, 0, 'east', 0, 'orange', [(0,0)], 0)
-        
+
     for key, bubble in all_bubbles.items():
         ax = fig.add_subplot(1,4,key+1)
         ax.set_title('bubble for v = {}'.format(key), fontdict={'fontsize': 18, 'fontweight': 'medium', 'family':'serif'})
@@ -173,7 +177,7 @@ def make_bubble_figure(bubble_file):
             ax.add_patch(rect)
         plt_car(ax, car_tuple)
 
-    
+
     plt.show()
 
 def animate_images():
@@ -191,12 +195,26 @@ def animate_images():
             save_all=True,
             duration=200, loop=3)
 
+def argv_to_start_end():
+    assert len(sys.argv) <= 3
+    if len(sys.argv) == 1:
+        start = 0
+        end = -1
+    elif len(sys.argv) == 2:
+        start = int(sys.argv[1])
+        end = start+1
+    else:
+        start = int(sys.argv[1])
+        end = int(sys.argv[2])
+    return start, end
+
 if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
-    traces_to_animation(traces_file)
+    traces_file = os.getcwd()+'/saved_traces/conflict_req_lane_change_bug_55.p'
+    start, end = argv_to_start_end()
+    traces_to_animation(traces_file, start=start, end=end)
     animate_images()
 
     # bubbles figure for the paper
