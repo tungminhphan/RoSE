@@ -3483,11 +3483,11 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=250)
+    #game.play(outfile=output_filename, t_end=250)
 #    game.animate(frequency=0.01)
 
     # print debug info
-    #debug_filename = os.getcwd()+'/saved_traces/game.p'
-    #print_debug_info(debug_filename)
+    debug_filename = os.getcwd()+'/saved_traces/game.p'
+    print_debug_info(debug_filename)
 
     # play debugged game

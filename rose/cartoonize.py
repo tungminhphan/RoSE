@@ -195,7 +195,7 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/seed_444_0_75.p'
+    traces_file = os.getcwd()+'/saved_traces/debugging_conflict.p'
     traces_to_animation(traces_file)
     animate_images()
 
