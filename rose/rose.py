@@ -981,8 +981,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
             chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
-            if not chk_valid_actions:
-                print("max yield flag is set")
+            #if not chk_valid_actions:
+            #    print("max yield flag is set")
             return not chk_valid_actions
         else:
             return False
@@ -3468,7 +3468,7 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 666
+    seed = 2349
     np.random.seed(seed)
     random.seed(seed)
     map_name = 'city_blocks_small'
@@ -3480,7 +3480,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=100)
 #   game.animate(frequency=0.01)
 
     # print debug info

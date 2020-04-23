@@ -236,7 +236,7 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
+    traces_file = os.getcwd()+'/saved_traces/game_0.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, start=start, end=end)
     animate_images()
