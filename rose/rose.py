@@ -3475,7 +3475,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 444
+    seed = 120
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
@@ -3483,7 +3483,7 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=150)
+    game.play(outfile=output_filename, t_end=250)
 #    game.animate(frequency=0.01)
 
     # print debug info

@@ -56,6 +56,11 @@ def check_consistent_conflict_cluster_resolution(filename, outfile, time_step=No
             out_file.write('token count during bid \n')
             out_file.write(str(agent_info['token_count_before'])+'\n')
 
+            # print out which agents it checked 
+            out_file.write('checked for agent conflict with:\n')
+            for agent in agent_info['checked_for_conflict']:
+                out_file.write(str(agent)+'\n')
+
             # add in some spaces
             out_file.write('\n')
 
@@ -94,7 +99,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     del agent_trace['agent_param']
     t_end = traces['t_end']
 
-
     #print(agent_trace.keys())
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()):
@@ -119,6 +123,7 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         # print the agents goal
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((trace_t['goals']))+'\n')
+
 
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
@@ -153,6 +158,11 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
                 out_file.write(str(tup)+'\n')
 
             out_file.write('\n')
+
+            # print out which agents it checked conflict with
+            out_file.write('checked for agent conflict with:\n')
+            for agent in agent_info['checked_for_conflict']:
+                out_file.write(str(agent)+'\n')
 
             # print out the conflict requests it sent out
             out_file.write('sent requests to:\n')
