@@ -2929,13 +2929,8 @@ class BackupPlanSafetyOracle(Oracle):
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # record lead agent
-<<<<<<< HEAD
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap 
-=======
-                plant.lead_agent = lead_agent.state.__tuple__()
-                # record computed gap
->>>>>>> 1ad3df723e37a3471aa6c55ed248a6ea0c896cad
                 #plant.gap_curr = gap_curr
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
@@ -3027,7 +3022,6 @@ class SpecificationStructureController(Controller):
         ctrl = plant.action_selection_strategy()
         self.manage_turn_signals(plant, ctrl)
         plant.apply(ctrl)
-
 
 class SupervisoryController():
     def _init__(self):
@@ -3492,7 +3486,7 @@ def print_debug_info(filename):
     #print(traces['unsafe_joint_state_dict'])
 
 if __name__ == '__main__':
-    seed = 1930
+    seed = 11111
     np.random.seed(seed)
     random.seed(seed)
     the_map = Map('./maps/city_blocks_small',default_spawn_probability=0.75)
