@@ -797,7 +797,10 @@ class Car(Agent):
     # check for collision with occupancy dict
     def check_collision(self, ctrl):
         # collect all grid points from occupancy dict except for own agent
-        all_agent_gridpts = [gridpt for gridpt, agent in self.supervisor.game.occupancy_dict.items() if agent.get_id()!=self.get_id()]
+        all_agent_gridpts = [gridpt for gridpt, agent in
+                self.supervisor.game.occupancy_dict.items() if
+                agent.get_id()!=self.get_id() and agent in
+                self.supervisor.game.simulated_agents]
         occ = self.query_occupancy(ctrl)
         if occ is None:
             return True
@@ -3293,6 +3296,16 @@ class QuasiSimultaneousGame(Game):
     def __init__(self, game_map):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
+        self.simulated_agents = []
+
+    def done_simulating_agent(self, agent):
+        """
+        add agent to list of simulated agent list
+        """
+        self.simulated_agents.append(agent)
+
+    def done_simulating_everyone(self):
+        self.simulated_agents = []
 
     def get_bundle_to_agent_precedence(self):
         bundle_to_agent_precedence = dict()
@@ -3363,7 +3376,6 @@ class QuasiSimultaneousGame(Game):
         # write send and receive conflict requests to file
         # resolve precedence
         self.resolve_precedence()
-        active_agents = []
         all_occupancy_gridpts = []
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
@@ -3379,9 +3391,10 @@ class QuasiSimultaneousGame(Game):
                         occ = occ[1:]
                     gridpts = [(state.x, state.y) for state in occ]
                     all_occupancy_gridpts.extend(gridpts)
-                    active_agents.append(agent)
+                    self.done_simulating_agent(agent)
+        self.done_simulating_everyone()
         # check for collision
-        self.global_collision_check(all_occupancy_gridpts)
+#        self.global_collision_check(all_occupancy_gridpts)
 
 
     def play_step(self):
@@ -3483,7 +3496,7 @@ def print_debug_info(filename):
     for key, value in traces['out_of_bounds_dict'].items():
         print(key, value)
 
-    #print(traces['unsafe_joint_state_dict'])
+#    print(traces['global_traces'])
 
 if __name__ == '__main__':
     seed = 11111
@@ -3494,13 +3507,11 @@ if __name__ == '__main__':
 
     # play a normal game
     game = QuasiSimultaneousGame(game_map=the_map)
-
-    #play_fixed_agent_game_karena_debug(2, game)
     game.play(outfile=output_filename, t_end=100)
-#   game.animate(frequency=0.01)
+#    game.animate(frequency=0.01)
 
     # print debug info
-    #debug_filename = os.getcwd()+'/saved_traces/game.p'
-    #print_debug_info(debug_filename)
+    debug_filename = os.getcwd()+'/saved_traces/game.p'
+    print_debug_info(debug_filename)
 
     # play debugged game
