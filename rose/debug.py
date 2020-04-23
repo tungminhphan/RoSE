@@ -31,36 +31,55 @@ def print_all_agents_and_conflict_requests_at_time_t(filename, outfile, time_ste
     for agent in agents:
         x, y, theta, v, color, bubble, ag_id = agent
         tup = (x, y, theta, v, color, ag_id)
-        #print("======================AGENT IS LOCATED ATTTT==================")
-        #print(str(tup))
+        print("======================AGENT IS LOCATED ATTTT==================")
+        print(str(tup))
     
         try: 
-            agent_info = traces[int(ag_id)][time_step+1]
-            print("======================AGENT IS LOCATED ATTTT==================")
-            print(str(tup))
-        except: 
-            print("agent not found")
-        
-        print("agent intention is:")
-        print(agent_info['intention'])
+            #print(str(tup))
+            agent_info = traces[int(ag_id)][time_step]
+            agents = agent_info['agents_in_bubble']
+            print("agents in bubble")
+            for agent in agents: 
+                print(agent)
+            #for key, value in agent_info.items():
+            #    print(key)
+            #print("agents in bubble")
+            #agents = agent_info['agents_in_bubble']
+            #for agent in agents: 
+            #    print(agent)
 
-        print("sent requests to")
+            #out_file.write("======================AGENT IS LOCATED ATTTT================== \n")
+            #out_file.write(str(tup)+'\n')
+        except:
+            break
+        
+        out_file.write("agent intention is:\n")
+        out_file.write(str(agent_info['intention'])+'\n')
+
+        # print the other agents in its bubble
+        out_file.write("other agents in bubble located at: \n")
+        [out_file.write(str(ag)+'\n') for ag in agent_info['agents_in_bubble']]
+
+        # print the other agents in its bubble
+        out_file.write("other agents in bubble before request located at: \n")
+        [out_file.write(str(ag)+'\n') for ag in agent_info['agents_in_bubble_before']]
+
+        out_file.write("sent requests to \n")
         for agent in agent_info['sent']:
-            print(agent)
+            out_file.write(str(agent)+'\n')
             #out_file.write(str(agent)+'\n')
         
-        #out_file.write('received requests from\n')
-        print("received requests from")
+        out_file.write('received requests from\n')
+        #print("received requests from")
         for agent in agent_info['received']:
-            print(agent)
-            #out_file.write(str(agent)+'\n')
+            #print(agent)
+            out_file.write(str(agent)+'\n')
         
-        #out_file.write('checked for agent conflict with:\n')
-        print("checked agent conflict with")
+        out_file.write('checked for agent conflict with:\n')
+        #print("checked agent conflict with")
         for agent in agent_info['checked_for_conflict']:
-            print(agent)
-            #out_file.write(str(agent)+'\n')
-
+            #print(agent)
+            out_file.write(str(agent)+'\n')
 
 def print_one_agent_trace(filename, outfile, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
@@ -179,10 +198,10 @@ if __name__ == '__main__':
     #output_dir = os.getcwd()+'/imgs/'
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/debugging_conflict.p'
+    traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    #print_one_agent_trace(traces_file, outfile, 17, 11, 'east', 55)
+    #print_one_agent_trace(traces_file, outfile, 17,2, 'east', 2)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_and_conflict_requests_at_time_t(traces_file, outfile_cc, 55)
+    print_all_agents_and_conflict_requests_at_time_t(traces_file, outfile_cc, 5)
