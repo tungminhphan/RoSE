@@ -30,8 +30,14 @@ IOMap = namedtuple('IOMap', ['sources','sinks','map'])
 TLNode = namedtuple('TLNode', ['xy', 'green', 'yellow', 'red'])
 Intersection = namedtuple('Intersection', ['tiles', 'pcorner', 'mcorner', 'height', 'width'])
 Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
-DIRECTION_TO_VECTOR = {'east': [0,1], 'west': [0,-1], 'north': [-1,0], 'south': [1,0]}
+DIRECTION_TO_VECTOR  = od()
+DIRECTION_TO_VECTOR['east'] = [0, 1]
+DIRECTION_TO_VECTOR['west'] = [0, -1]
+DIRECTION_TO_VECTOR['north'] = [-1, 0]
+DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
+CHOSEN_IDs = []
+CAR_OCCUPANCY_DICT = od()
 
 def rotate_vector(vec, theta):
     """
@@ -41,6 +47,12 @@ def rotate_vector(vec, theta):
     # create rotation matrix
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
+
+def set_seed(seed, other_param=0):
+    if seed is not None: 
+        np.random.seed(seed+other_param)
+        random.seed(seed+other_param)
+        np.random.RandomState(seed+other_param)
 
 class Drawable:
     """
@@ -90,7 +102,7 @@ class Agent:
         supervisor.set_plant(self)
 
     def get_id(self):
-        return id(self)
+        return self.id
 
     @classmethod
     def hack_state(cls, state, **kwargs):
@@ -105,6 +117,7 @@ class Agent:
         return new_state
 
     def __init__(self, **kwargs):
+
         if 'agent_name' in kwargs:
             self.agent_name = kwargs.get('agent_name')
         else:
@@ -125,11 +138,20 @@ class Agent:
             self.supervisor = kwargs.get('supervisor')
         else:
             self.supervisor = None
+        self.id = self.set_id()
+
+    # for reproducibility
+    def set_id(self):
+        set_seed(self.seed, self.car_count)
+        while True:
+            random_id = np.random.uniform()
+            if random_id not in CHOSEN_IDs:
+                CHOSEN_IDs.append(random_id)
+                return random_id
 
     # return a random color from an array
     def get_random_color(self):
-        ind = random.randrange(len(CAR_COLORS))
-        return CAR_COLORS[ind]
+        return np.random.choice(CAR_COLORS)
 
     def get_symbol(self):
         if not self.symbol:
@@ -164,7 +186,7 @@ class Agent:
 
     def apply(self, ctrl):
         self.prior_state = self.state
-        print(self.prior_state)
+        #print(self.prior_state)
         # check for collision with any of the other agents
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
@@ -213,8 +235,9 @@ class Gridder(Agent):
 class Car(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Car'
-        attributes = ['v_min', 'v_max', 'a_min', 'a_max']
+        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed']
         state_variable_names = ['x', 'y', 'heading', 'v']
+        #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
         self.acc_vals = np.arange(self.a_min, self.a_max+1)
         self.default_state = Car.hack_state(self.state, x=0, y=0, heading='east', v=0)
@@ -232,8 +255,8 @@ class Car(Agent):
         # attributes for saving agent info
         self.spec_struct_trace = od()
         self.ctrl_chosen = None
-        self.unsafe_joint_state_dict = {}
-        self.straight_action_eval = {}
+        self.unsafe_joint_state_dict = od()
+        self.straight_action_eval = od()
         self.action_selection_flags = ()
         self.token_count_before = None
         self.left_turn_gap_arr = []
@@ -249,6 +272,13 @@ class Car(Agent):
         #self.lead_vehicle = None
         self.lead_agent = None
         self.prior_state = None
+
+    @classmethod
+    def get_ctrl_od(cls, acc, steer):
+        ctrl = od()
+        ctrl['acceleration'] = acc
+        ctrl['steer'] = steer
+        return ctrl
 
     # optimized hack_state method for Car agents
     @classmethod
@@ -304,11 +334,8 @@ class Car(Agent):
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
         
-        seed = 1111
-        np.random.seed(seed)
-        random.seed(seed)
-
-        choice = random.choice(np.where(scores == np.max(scores))[0])
+        set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
+        choice = np.random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
         #print(self.intention)
         self.spec_struct_trace = spec_struct_trace
@@ -326,7 +353,7 @@ class Car(Agent):
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self):
         # collect all agents in send and receive requests and find the winner
-        conflict_cluster = list(set(self.send_conflict_requests_to + self.received_conflict_requests_from + [self]))
+        conflict_cluster = self.send_conflict_requests_to + self.received_conflict_requests_from + [self]
         max_val = 0
         max_agent_list = []
         for agent in conflict_cluster:
@@ -363,7 +390,7 @@ class Car(Agent):
         # caching the agent bubbles
         def create_pickle_file(filename):
             vel = np.arange(self.v_min, self.v_max+1)
-            bubble_dict = dict()
+            bubble_dict = od()
             for v in vel:
                 bubble_dict[v] = self.get_default_bubble(v)
             with open(filename, 'wb+') as pckl_file:
@@ -390,8 +417,8 @@ class Car(Agent):
     def get_maximum_braking_controls(self):
         def at_complete_stop(state):
             return state.v == 0
-        plan = dict()
-        plan['controls'] = {'acceleration': self.a_min, 'steer': 'straight'}
+        plan = od()
+        plan['controls'] = Car.get_ctrl_od(self.a_min, 'straight')
         plan['v_min'] = 0
         plan['v_max'] = self.v_max
         plan['stopping_condition'] = at_complete_stop
@@ -452,78 +479,81 @@ class Car(Agent):
     @classmethod
     def get_all_class_ctrl(cls, state, acc_vals, inverse=False, straight_only=False):
         all_ctrl = []
-        def make_ctrl(acc, steer):
-            return {'steer': steer, 'acceleration': acc}
-
         for acc in acc_vals:
             if state.v + acc == 1 and not straight_only:
                 steer_vals = ['straight', 'left-lane', 'right-lane', 'left-turn', 'right-turn']
             else:
                 steer_vals  = ['straight']
             for steer in steer_vals:
-                all_ctrl.append(make_ctrl(acc, steer))
+                all_ctrl.append(Car.get_ctrl_od(acc, steer))
         return all_ctrl
 
     @classmethod
     def query_class_occupancy(cls, ctrl, state, v_min, v_max, inverse=False):
-        acc = ctrl['acceleration']
-        steer = ctrl['steer']
-
-        def get_new_heading(act):
-            heading = Car.convert_orientation(state.heading)
-            if act == 'left-turn':
-                heading += 90
-            elif act == 'right-turn':
-                heading -= 90
-            return Car.convert_orientation(heading)
-
-        def relativize_absolute_displacement(abs_dis, inverse=False):
-            rel_dis = []
-            offset = np.array([state.x, state.y])
-            for displacement in abs_dis:
-                heading = Car.convert_orientation(state.heading) * np.pi/180
-                rel_dis.append(offset + rotate_vector(displacement, heading))
-                offset_reverse = rotate_vector(displacement, heading)
-            if inverse:
-                rel_dis = [x-offset_reverse for x in rel_dis]
-            return rel_dis
-
-        abs_displacements = []
-        final_heading = state.heading
-        init_heading = final_heading
-        final_v = min(max(acc + state.v, v_min), v_max)
-        if steer == 'straight':
-            num_moves = final_v
-            num_moves_sign = np.sign(num_moves)
-            num_moves_abs = np.abs(num_moves)
-            if num_moves_sign == 0:
-                num_moves_sign = 1
-            for k in np.arange(0, num_moves_sign * (num_moves_abs + 1), num_moves_sign):
-                dx = 0
-                dy = k
-                abs_displacements.append(np.array([dx, dy]))
-        elif steer == 'left-lane' and final_v == 1:
-            abs_displacements = [[0, 0], [0, 1], [-1, 1]]
-        elif steer == 'left-turn' and final_v == 1:
-            abs_displacements = [[0, 0], [0, 1], [-1, 1]]
-            final_heading = get_new_heading('left-turn')
-        elif steer == 'right-lane' and final_v == 1:
-            abs_displacements = [[0, 0], [0, 1], [1, 1]]
-        elif steer == 'right-turn' and final_v == 1:
-            abs_displacements = [[0, 0], [0, 1], [1, 1]]
-            final_heading = get_new_heading('right-turn')
+        signature = str(cls) + str(ctrl) + str(state) + str(v_min) + \
+                    str(v_max) + str(inverse)
+        if signature in CAR_OCCUPANCY_DICT:
+            return CAR_OCCUPANCY_DICT[signature]
         else:
-            return None
+            acc = ctrl['acceleration']
+            steer = ctrl['steer']
 
-        # assign occupancy list
-        occupancy_list = [None]*len(abs_displacements)
-        for i, xy in enumerate(relativize_absolute_displacement(abs_displacements, inverse=inverse)):
-            heading = init_heading if i == 0 else final_heading
-            vel = final_v if not inverse else state.v-acc
-            if vel < v_min or vel > v_max: return None
-            occupancy_list[i] = Car.hack_state(state, x=xy[0], y=xy[1], heading=heading, v=vel)
+            def get_new_heading(act):
+                heading = Car.convert_orientation(state.heading)
+                if act == 'left-turn':
+                    heading += 90
+                elif act == 'right-turn':
+                    heading -= 90
+                return Car.convert_orientation(heading)
 
-        return occupancy_list
+            def relativize_absolute_displacement(abs_dis, inverse=False):
+                rel_dis = []
+                offset = np.array([state.x, state.y])
+                for displacement in abs_dis:
+                    heading = Car.convert_orientation(state.heading) * np.pi/180
+                    rel_dis.append(offset + rotate_vector(displacement, heading))
+                    offset_reverse = rotate_vector(displacement, heading)
+                if inverse:
+                    rel_dis = [x-offset_reverse for x in rel_dis]
+                return rel_dis
+
+            abs_displacements = []
+            final_heading = state.heading
+            init_heading = final_heading
+            final_v = min(max(acc + state.v, v_min), v_max)
+            if steer == 'straight':
+                num_moves = final_v
+                num_moves_sign = np.sign(num_moves)
+                num_moves_abs = np.abs(num_moves)
+                if num_moves_sign == 0:
+                    num_moves_sign = 1
+                for k in np.arange(0, num_moves_sign * (num_moves_abs + 1), num_moves_sign):
+                    dx = 0
+                    dy = k
+                    abs_displacements.append(np.array([dx, dy]))
+            elif steer == 'left-lane' and final_v == 1:
+                abs_displacements = [[0, 0], [0, 1], [-1, 1]]
+            elif steer == 'left-turn' and final_v == 1:
+                abs_displacements = [[0, 0], [0, 1], [-1, 1]]
+                final_heading = get_new_heading('left-turn')
+            elif steer == 'right-lane' and final_v == 1:
+                abs_displacements = [[0, 0], [0, 1], [1, 1]]
+            elif steer == 'right-turn' and final_v == 1:
+                abs_displacements = [[0, 0], [0, 1], [1, 1]]
+                final_heading = get_new_heading('right-turn')
+            else:
+                return None
+
+            # assign occupancy list
+            occupancy_list = [None]*len(abs_displacements)
+            for i, xy in enumerate(relativize_absolute_displacement(abs_displacements, inverse=inverse)):
+                heading = init_heading if i == 0 else final_heading
+                vel = final_v if not inverse else state.v-acc
+                if vel < v_min or vel > v_max: return None
+                occupancy_list[i] = Car.hack_state(state, x=xy[0], y=xy[1], heading=heading, v=vel)
+
+            CAR_OCCUPANCY_DICT[signature] = occupancy_list
+            return occupancy_list
 
     def query_occupancy(self, ctrl, state=None, inverse=False):
         if state is None: state = self.state
@@ -566,13 +596,13 @@ class Car(Agent):
     def get_max_forward_ctrl(self):
         lead_agent = self.find_lead_agent()
         if lead_agent is None:
-            ctrl = {'acceleration': self.a_max, 'steer': 'straight'}
+            ctrl = Car.get_ctrl_od(self.a_max, 'straight')
             return ctrl
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
         # try all acceleration values
         ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
         for acc_val in ctrl_acc:
-            ctrl = {'acceleration': acc_val, 'steer':'straight'}
+            ctrl = Car.get_ctrl_od(acc_val,'straight')
             occ = self.query_occupancy(ctrl)
             intersection = self.check_occupancy_intersection(occ, [lead_agent.state])
             safe_chk = self.check_safe_config(self, lead_agent, st_1=occ[-1], st_2=lead_agent.state)
@@ -584,11 +614,11 @@ class Car(Agent):
         def ctrl_dict_to_tuple(ctrl):
             return (ctrl['steer'], ctrl['acceleration'])
         # evaluate all the straight actions with the oracle
-        straight_action_eval = {}
+        straight_action_eval = od()
         scores = []
         all_straight_ctrl = self.get_all_ctrl(straight_only=True)
         for ctrl in all_straight_ctrl:
-            score_save = {}
+            score_save = od()
             score = 0
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
@@ -602,10 +632,8 @@ class Car(Agent):
             score_save['total'] = score
             straight_action_eval[ctrl_dict_to_tuple(ctrl)] = score_save
 
-        seed = 1111
-        np.random.seed(seed)
-        random.seed(seed)
-
+        #seed = 1111
+        set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = random.choice(np.where(scores == np.max(scores))[0])
         self.straight_action_eval = straight_action_eval
         return all_straight_ctrl[choice]
@@ -728,7 +756,7 @@ class Car(Agent):
         bubble_tf = [self.transform_state(node, dx, dy, dtheta, assign_heading=False) for node in default_bubble]
         # only keep nodes that are in the drivable set
         if the_map: bubble_tf = [node for node in bubble_tf if node in the_map.drivable_nodes]
-        return list(set(bubble_tf))
+        return bubble_tf
 
     # find all agents in the agents' bubble
     def find_agents_in_bubble(self, bubble=None):
@@ -803,7 +831,7 @@ class Car(Agent):
                 # if agent passes these checks, then see whether the agents are in conflict
                 if bundle.get_id() == agent_bundle.get_id() and agent.get_id() != self.get_id():
                     # check whether an agent takes max acc and self takes right turn are valid actions
-                    max_acc_ctrl = {'acceleration': agent.a_max, 'steer': 'straight'}
+                    max_acc_ctrl = Car.get_ctrl_od(agent.a_max, 'straight')
                     chk_valid_1 = self.check_valid_actions(self, right_turn_ctrl, agent, max_acc_ctrl)
                     # check whether an agent takes back-up and self takes right turn are valid actions
                     chk_valid_2 = self.check_valid_actions(self, right_turn_ctrl, agent, agent.get_backup_plan_ctrl())
@@ -998,7 +1026,7 @@ class Car(Agent):
     def get_backup_plan_ctrl(self, state=None):
         if state is None: state = self.state
         acc = self.a_min if state.v+self.a_min > 0 else -state.v
-        return {'acceleration':acc, 'steer':'straight'}
+        return Car.get_ctrl_od(acc,'straight')
 
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
@@ -1072,7 +1100,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return list(set(bubble))
+        return bubble
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -1271,16 +1299,18 @@ class Game:
         self.map = game_map
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
-        self.traces = {"agent_ids":[]}
-        self.traces_debug = dict()
-        self.occupancy_dict = dict()
+        self.traces = od()
+        self.traces['agent_ids'] = []
+        self.traces_debug = od()
+        self.occupancy_dict = od()
+        self.car_count = 0
         self.update_occupancy_dict()
-        self.collision_dict = dict()
-        self.out_of_bounds_dict = dict()
-        self.unsafe_joint_state_dict = dict()
+        self.collision_dict = od()
+        self.out_of_bounds_dict = od()
+        self.unsafe_joint_state_dict = od()
 
     def update_occupancy_dict(self):
-        occupancy_dict = dict()
+        occupancy_dict = od()
         for agent in self.agent_set:
             x, y = agent.state.x, agent.state.y
             occupancy_dict[x,y] = agent
@@ -1290,22 +1320,20 @@ class Game:
         def valid_source_sink(source, sink):
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
 
-        seed = 1111
-        np.random.seed(seed)
-        random.seed(seed)
-
         for source in self.map.IO_map.sources:
+            set_seed(self.map.seed, self.time)
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
-                if not valid_source_sink(source, sink):
-                    return
+                #if not valid_source_sink(source, sink):
+                #    return
 
                 # check if new car satisfies spawning safety contract
-                new_car = create_default_car(source, sink, self)
+                new_car = create_default_car(source, sink, self, self.car_count)
                 spawning_contract = SpawningContract(self, new_car)
                 if spawning_contract.okay_to_spawn_flag:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
+                    self.car_count = self.car_count+1
 
     def add_agent(self, agent):
         self.agent_set.append(agent)
@@ -1316,7 +1344,7 @@ class Game:
         agents = []
         # save all the agent states
         for agent in self.agent_set:
-            spec_struct_trace = {}
+            spec_struct_trace = od()
             if self.time > 0:
                 spec_struct_trace = agent.spec_struct_trace
             agents.append((agent.state.x, agent.state.y, \
@@ -1334,7 +1362,7 @@ class Game:
         self.traces[self.time] = {"lights": lights, "agents": agents}
 
     def write_agents_to_traces(self):
-        all_agent_info_at_time_t_dict = {}
+        all_agent_info_at_time_t_dict = od()
         for agent in self.agent_set:
             # if prior state is not none
             prior_state = agent.prior_state
@@ -1604,7 +1632,8 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key] = [item]
 
 class Map:
-    def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=True):
+    def __init__(self, csv_filename, default_spawn_probability=0.9, seed=None, random_traffic_lights_init=True):
+        self.seed = seed
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
@@ -1613,7 +1642,7 @@ class Map:
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
-        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init)
+        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init, self.seed)
         self.intersection_to_traffic_light_map = self.get_intersection_to_traffic_light_map()
         self.tile_to_intersection_map = self.get_tile_to_intersection_map()
         self.bundles = self.get_bundles()
@@ -1631,7 +1660,7 @@ class Map:
 
     # for now, we are assuming default car dynamics; TODO: generalize this
     def get_left_turn_to_opposing_traffic_map(self):
-        left_turn_to_opposing_traffic_map = dict()
+        left_turn_to_opposing_traffic_map = od()
         for bundle in self.left_turn_tiles:
             for left_turn_tile in self.left_turn_tiles[bundle]:
                 next_tiles = self.left_turn_tiles[bundle][left_turn_tile]
@@ -1899,9 +1928,9 @@ class Map:
         """
         collect all (final) right-turn tiles in the map using the check function
         """
-        right_turn_tiles = dict()
+        right_turn_tiles = od()
         for bundle in self.bundles:
-            right_turn_tiles[bundle] = dict()
+            right_turn_tiles[bundle] = od()
             direction = bundle.direction
             for idx in range(bundle.length):
                 tile = bundle.relative_coordinates_to_tile((0, idx))
@@ -1917,11 +1946,11 @@ class Map:
         collect all (final) left-turn tiles in the map using the check function
         """
 
-        left_turn_tiles = dict()
+        left_turn_tiles = od()
         # goes through each bundle
         for bundle in self.bundles:
             # create a dictionary entry for the bundle
-            left_turn_tiles[bundle] = dict()
+            left_turn_tiles[bundle] = od()
             direction = bundle.direction
             for idx in range(bundle.length):
                 # pick tile in left-most lane
@@ -1967,7 +1996,7 @@ class Map:
         #    bundle = bundles[bundle_idx]
 
     def get_tile_to_traffic_light_map(self):
-        tile_to_traffic_light_map = dict()
+        tile_to_traffic_light_map = od()
         for traffic_light in self.traffic_lights:
             for tile in traffic_light.vtiles:
                 tile_to_traffic_light_map[tile.xy] = traffic_light
@@ -1976,7 +2005,7 @@ class Map:
         return tile_to_traffic_light_map
 
     def get_traffic_light_tile_to_bundle_map(self):
-        tile_to_bundle_map = dict()
+        tile_to_bundle_map = od()
         for traffic_light in self.traffic_lights:
             for tile in traffic_light.vtiles:
                 bundle = self.tile_to_bundle_map[tile.xy]
@@ -1987,7 +2016,7 @@ class Map:
         return tile_to_bundle_map
 
     def get_tile_to_bundle_map(self):
-        tile_to_bundle_map = dict()
+        tile_to_bundle_map = od()
         for bundle in self.bundles:
             for tile in bundle.tiles:
                 append_or_create_new_list(tile_to_bundle_map, tile, bundle)
@@ -2016,11 +2045,11 @@ class Map:
         return partitions
 
     def get_bundles(self):
-        bins = dict()
+        bins = od()
         all_bundles = []
         # initalizes bins to be empty lists
         for direction in DIRECTION_TO_VECTOR:
-            bins[direction] = dict()
+            bins[direction] = od()
         # collects lines
         for node in self.legal_orientations:
             if self.legal_orientations[node]:
@@ -2035,14 +2064,14 @@ class Map:
             if len(bins[direction]) > 0:
                 direction_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[direction])[0][0]
                 for line_cluster in separate_list(list(bins[direction].keys()), 'increasing', sort=True):
-                    cluster_projections = dict()
+                    cluster_projections = od()
                     for line in line_cluster:
                         for point in bins[direction][line]:
                             projection = point[1-direction_idx]
                             if projection not in cluster_projections:
-                                cluster_projections[projection] = set([line])
+                                cluster_projections[projection] = [line]
                             else:
-                                cluster_projections[projection].add(line)
+                                cluster_projections[projection].append(line)
                     partitions = self.cluster_projections_to_bundles(cluster_projections)
                     bundles = self.create_subpartitions(cluster_projections, partitions, direction)
                     all_bundles = all_bundles + bundles
@@ -2072,8 +2101,8 @@ class Map:
         return drivable_tiles, drivable_nodes, non_drivable_nodes
 
     def get_grid(self, csv_filename):
-        grid = dict()
-        obstacles = dict()
+        grid = od()
+        obstacles = od()
         with open(csv_filename + '.csv', 'rt') as f:
             graph = csv.reader(f)
             for i, row in enumerate(graph):
@@ -2109,7 +2138,7 @@ class Map:
                     presources.append(source)
         return presources, presinks
 
-    def get_traffic_lights(self, random_traffic_lights_init):
+    def get_traffic_lights(self, random_traffic_lights_init, seed):
         def search_along(start, direction, search_length, green_symbol, yellow_symbol, red_symbol):
             nodes = []
             for k in range(search_length):
@@ -2132,20 +2161,20 @@ class Map:
             vtiles = vleft + vright
             if htiles or vtiles:
                 light_id = len(traffic_lights)
-                traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init)
+                traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init, seed=seed)
                 traffic_lights[traffic_light] = intersection
 
         return traffic_lights
 
     def get_intersection_to_traffic_light_map(self):
-        intersection_to_traffic_light_map = dict()
+        intersection_to_traffic_light_map = od()
         for traffic_light in self.traffic_lights:
             intersection = self.traffic_lights[traffic_light]
             intersection_to_traffic_light_map[intersection] = traffic_light
         return intersection_to_traffic_light_map
 
     def get_tile_to_intersection_map(self):
-        tile_to_intersection_map = dict()
+        tile_to_intersection_map = od()
         for intersection in self.intersections:
             for tile in intersection.tiles:
                 tile_to_intersection_map[tile] = intersection
@@ -2256,7 +2285,7 @@ class Map:
                     found_orientations.append(found)
             return found_orientations
 
-        legal_orientations = dict()
+        legal_orientations = od()
         for node in self.grid:
             symb = self.grid[node]
             if symb not in orientation_set:
@@ -3106,7 +3135,7 @@ class SpecificationStructure():
         self.tier_weights = self.set_tier_weights(oracle_tier)
 
     def set_tier(self, oracle_tier):
-        tier = dict()
+        tier = od()
         for idx, oracle in enumerate(self.oracle_set):
             tier[oracle] = oracle_tier[idx]
         return tier
@@ -3114,8 +3143,8 @@ class SpecificationStructure():
     def set_tier_weights(self, oracle_tier):
         def num(tier):
             return np.sum(np.array(oracle_tier) == tier)
-        all_tiers = np.sort(list(set(oracle_tier)))[::-1]
-        tier_weights = dict()
+        all_tiers = np.sort(oracle_tier)[::-1]
+        tier_weights = od()
         tier_weights[all_tiers[0]] = 1
         for idx in range(1, len(all_tiers)):
             tier = all_tiers[idx]
@@ -3124,7 +3153,7 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, seed, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
         self.durations['green'] = t_green
@@ -3132,12 +3161,12 @@ class TrafficLight:
         self.t_buffer = t_buffer
         self.durations['red'] = self.durations['green'] + self.durations['yellow'] + self.t_buffer * 2
         self.states = cycle([color for color in self.durations])
-        seed = 1111
-        np.random.seed(seed)
-        random.seed(seed)
+
 
         if random_init:
+            set_seed(seed)
             self.hstate = np.random.choice([color for color in self.durations])
+            set_seed(seed)
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
             self.htimer = 0
@@ -3167,7 +3196,11 @@ class TrafficLight:
         dummy_traffic_light = cp.deepcopy(self)
         for t in range(N):
             dummy_traffic_light.run()
-        return {'horizontal': dummy_traffic_light.get_hstate(), 'vertical': dummy_traffic_light.get_vstate()}
+
+        state = od()
+        state['horizontal'] = dummy_traffic_light.get_hstate()
+        state['vertical'] = dummy_traffic_light.get_vstate()
+        return state
 
     def run(self):
         self.htimer += 1
@@ -3252,12 +3285,12 @@ def get_default_car_ss():
     specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
-def create_default_car(source, sink, game):
+def create_default_car(source, sink, game, car_count):
     ss = get_default_car_ss()
     spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
     start = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1)
+    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3265,6 +3298,7 @@ def create_default_car(source, sink, game):
 
 def create_specified_car(attributes, game):
     if 'goal' not in 'attributes' or attributes['goal'] == 'auto':
+        set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     if 'controller' not in attributes:
         ss = get_default_car_ss()
@@ -3291,7 +3325,7 @@ def create_specified_car(attributes, game):
     car =  Car(x=attributes['x'], y=attributes['y'],
             heading=attributes['heading'], v=attributes['v'],
             v_min=attributes['v_min'], v_max=attributes['v_max'],
-            a_min=attributes['a_min'],a_max=attributes['a_max'])
+            a_min=attributes['a_min'],a_max=attributes['a_max'], car_count=0)
     # set car color
     car.agent_color = attributes['agent_color']
     car.set_controller(attributes['controller'])
@@ -3363,7 +3397,7 @@ class QuasiSimultaneousGame(Game):
         try:
             self.traces["global_traces"][self.time] = dup
         except:
-            self.traces["global_traces"] = {}
+            self.traces["global_traces"] = od()
             self.traces["global_traces"][self.time] = dup
 
         # returns true if collision occurs
@@ -3494,23 +3528,22 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 1111
-    np.random.seed(seed)
-    random.seed(seed)
+    seed = 1500
+
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.7)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-#    game = QuasiSimultaneousGame(game_map=the_map)
-    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    game = QuasiSimultaneousGame(game_map=the_map)
+    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=10)
+    game.play(outfile=output_filename, t_end=50)
 #    game.animate(frequency=0.01)
 
     # print debug info
-    debug_filename = os.getcwd()+'/saved_traces/game.p'
+    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
     print_debug_info(debug_filename)
 
     # play debugged game

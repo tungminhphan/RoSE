@@ -234,10 +234,10 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game_3b.p'
+    traces_file = os.getcwd()+'/saved_traces/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, start=start, end=end)
-    animate_images()
+    #animate_images()
 
     # bubbles figure for the paper
     # for dynamics a:-1,1, v=3
