@@ -249,6 +249,20 @@ class Car(Agent):
         self.lead_agent = None
         self.prior_state = None
 
+    # optimized hack_state method for Car agents
+    @classmethod
+    def hack_state(cls, state, **kwargs):
+        new_state = cp.copy(state)
+        if 'x' in kwargs:
+            new_state.x = kwargs.get('x')
+        if 'y' in kwargs:
+            new_state.y = kwargs.get('y')
+        if 'heading' in kwargs:
+            new_state.heading = kwargs.get('heading')
+        if 'v' in kwargs:
+            new_state.v = kwargs.get('v')
+        return new_state
+
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
         assert signal is not None
@@ -318,11 +332,11 @@ class Car(Agent):
         # resolve ties with max values with agent ID comparison
         ind_max = np.argmax(np.array([agent.get_id() for agent in max_agent_list]))
         agent_winner = max_agent_list[ind_max]
-    
+
         if len(conflict_cluster) > 1:
             return agent_winner.get_id() == self.get_id(), agent_winner
         # no other agents in conflict cluster
-        else: 
+        else:
             return False, None
 
     def get_length_along_bundle(self):
@@ -1311,7 +1325,7 @@ class Game:
         for agent in self.agent_set:
             # if prior state is not none
             prior_state = agent.prior_state
-            if agent.prior_state is not None: 
+            if agent.prior_state is not None:
                prior_state = (agent.prior_state.x, agent.prior_state.y, agent.prior_state.heading, agent.prior_state.v)
             # save all data in trace
             agent_trace_dict = {'state':prior_state, 'action': agent.ctrl_chosen, \
@@ -1443,10 +1457,10 @@ class Game:
             if write_bool:
                 self.save_plotting_info()
             self.play_step()
-            # need to save data after time step has occured 
-            if write_bool and self.time > 0: 
+            # need to save data after time step has occured
+            if write_bool and self.time > 0:
                 self.write_agents_to_traces()
-                
+
             self.time_forward()
 
         if write_bool:
@@ -3341,7 +3355,7 @@ class QuasiSimultaneousGame(Game):
             print(self.time)
             print(set(dup))
         return len(dup) > 0
-    
+
     def set_agent_bubbles(self):
         for agent in self.agent_set:
             self.bubble = agent.get_bubble()
@@ -3358,7 +3372,7 @@ class QuasiSimultaneousGame(Game):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
 
     def determine_conflict_cluster_resolutions(self):
-        for agent in self.agent_set: 
+        for agent in self.agent_set:
             agent.is_winner, agent.conflict_winner = agent.check_conflict_resolution_winner()
             if agent.conflict_winner is not None:
                 agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
@@ -3393,13 +3407,8 @@ class QuasiSimultaneousGame(Game):
                     all_occupancy_gridpts.extend(gridpts)
                     self.done_simulating_agent(agent)
         self.done_simulating_everyone()
-        # check for collision
-#        self.global_collision_check(all_occupancy_gridpts)
 
     def play_step(self):
-        #for agent in self.agent_set:
-            #print(agent.state)
-            #print(agent.supervisor.goals)
         self.sys_step()
         self.env_step()
 
@@ -3468,20 +3477,20 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 2349
+    seed = 1111
     np.random.seed(seed)
     random.seed(seed)
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.75)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.7)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map)
-    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+#    game = QuasiSimultaneousGame(game_map=the_map)
+    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
     game.play(outfile=output_filename, t_end=100)
-#   game.animate(frequency=0.01)
+#    game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/game.p'
