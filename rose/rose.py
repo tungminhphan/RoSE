@@ -2053,9 +2053,9 @@ class Map:
                         for point in bins[direction][line]:
                             projection = point[1-direction_idx]
                             if projection not in cluster_projections:
-                                cluster_projections[projection] = set([line])
+                                cluster_projections[projection] = [line]
                             else:
-                                cluster_projections[projection].add(line)
+                                cluster_projections[projection].append(line)
                     partitions = self.cluster_projections_to_bundles(cluster_projections)
                     bundles = self.create_subpartitions(cluster_projections, partitions, direction)
                     all_bundles = all_bundles + bundles
