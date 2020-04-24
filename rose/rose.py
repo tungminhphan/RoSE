@@ -744,7 +744,7 @@ class Car(Agent):
         bubble_tf = [self.transform_state(node, dx, dy, dtheta, assign_heading=False) for node in default_bubble]
         # only keep nodes that are in the drivable set
         if the_map: bubble_tf = [node for node in bubble_tf if node in the_map.drivable_nodes]
-        return list(set(bubble_tf))
+        return bubble_tf
 
     # find all agents in the agents' bubble
     def find_agents_in_bubble(self, bubble=None):
@@ -1088,7 +1088,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return list(set(bubble))
+        return bubble
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
