@@ -325,7 +325,7 @@ class Car(Agent):
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
 
-        choice = random.choice(np.where(scores == np.max(scores))[0])
+        choice = np.random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
         #print(self.intention)
         self.spec_struct_trace = spec_struct_trace
@@ -3127,7 +3127,7 @@ class SpecificationStructure():
     def set_tier_weights(self, oracle_tier):
         def num(tier):
             return np.sum(np.array(oracle_tier) == tier)
-        all_tiers = np.sort(list(set(oracle_tier)))[::-1]
+        all_tiers = np.sort(oracle_tier)[::-1]
         tier_weights = od()
         tier_weights[all_tiers[0]] = 1
         for idx in range(1, len(all_tiers)):
