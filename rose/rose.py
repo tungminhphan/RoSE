@@ -36,6 +36,7 @@ DIRECTION_TO_VECTOR['west'] = [0, -1]
 DIRECTION_TO_VECTOR['north'] = [-1, 0]
 DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
+CHOSEN_IDs = []
 CAR_OCCUPANCY_DICT = od()
 
 def rotate_vector(vec, theta):
@@ -95,7 +96,7 @@ class Agent:
         supervisor.set_plant(self)
 
     def get_id(self):
-        return id(self)
+        return self.id
 
     @classmethod
     def hack_state(cls, state, **kwargs):
@@ -122,6 +123,7 @@ class Agent:
         self.state_variable_names = kwargs.get('state_variable_names')
         self.set_state(kwargs)
         self.set_attributes(kwargs)
+        self.id = self.set_id()
         if 'controller' in kwargs:
             self.controller = kwargs.get('controller')
         else:
@@ -130,6 +132,14 @@ class Agent:
             self.supervisor = kwargs.get('supervisor')
         else:
             self.supervisor = None
+
+    # for reproducibility
+    def set_id(self):
+        while True:
+            random_id = np.random.uniform()
+            if random_id not in CHOSEN_IDs:
+                CHOSEN_IDs.append(random_id)
+                return random_id
 
     # return a random color from an array
     def get_random_color(self):
