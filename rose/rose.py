@@ -122,10 +122,6 @@ class Agent:
             self.agent_name = kwargs.get('agent_name')
         else:
             self.agent_name = 'Agent'
-        if 'agent_color' in kwargs:
-            self.agent_color = kwargs.get('agent_color')
-        else:
-            self.agent_color = self.get_random_color()
         self.attributes = kwargs.get('attributes')
         self.state_variable_names = kwargs.get('state_variable_names')
         self.set_state(kwargs)
@@ -139,6 +135,10 @@ class Agent:
         else:
             self.supervisor = None
         self.id = self.set_id()
+        if 'agent_color' in kwargs:
+            self.agent_color = kwargs.get('agent_color')
+        else:
+            self.agent_color = self.get_random_color()
 
     # for reproducibility
     def set_id(self):
@@ -151,6 +151,7 @@ class Agent:
 
     # return a random color from an array
     def get_random_color(self):
+        #set_seed(self.seed, self.car_count)
         return np.random.choice(CAR_COLORS)
 
     def get_symbol(self):
@@ -348,7 +349,13 @@ class Car(Agent):
         self.agent_max_braking_not_enough = None
         self.send_conflict_requests_to = []
         self.received_conflict_requests_from = []
-        #self.conflict_winner = None
+        self.conflict_winner = None
+
+        self.received_sv = []
+        self.sent_sv = []
+        self.agents_checked_for_conflict_sv = []
+        self.agent_max_braking_not_enough_sv = None
+        self.conflict_winner_sv = None
 
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self):
@@ -695,7 +702,6 @@ class Car(Agent):
         max_braking_enough = self.agent_max_braking_not_enough is None
 
         self.action_selection_flags = (agent_type, bubble_chk, cluster_chk, max_braking_enough)
-
         # save info about sending and receiving requests
         self.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in self.send_conflict_requests_to]
         self.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in self.received_conflict_requests_from]
@@ -1046,7 +1052,7 @@ class Car(Agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
                 #if not chk_valid_actions:
-                    #p#rint("sending conflict request")
+                #    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1077,7 +1083,11 @@ class Car(Agent):
                     state_to_chk = self.hack_state(self.state, x=final_st.x, \
                         y=final_st.y, heading=final_st.heading, v=final_st.v)
                     safety_plan_resources = self.get_tiles_for_safety_plan(state=state_to_chk)
-                    resources.extend(safety_plan_resources)
+                    resources.extend(safety_plan_resources)  
+            
+            # remove any elements already inside
+            resources_unique = []
+            [resources_unique.append(x) for x in resources if x not in resources_unique] 
             return resources
 
         # gridpoints
@@ -1090,6 +1100,10 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
+        
+        # remove repeat elements
+        bubble_unique = []
+        [bubble_unique.append(x) for x in bubble if x not in bubble_unique] 
 
         # plot the bubble
         '''fig, ax = plt.subplots()
@@ -1100,7 +1114,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return bubble
+        return bubble_unique
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -1320,12 +1334,11 @@ class Game:
         def valid_source_sink(source, sink):
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
 
-        for source in self.map.IO_map.sources:
+        for i, source in enumerate(self.map.IO_map.sources):
             set_seed(self.map.seed, self.time)
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
                 #if not valid_source_sink(source, sink):
-                #    return
 
                 # check if new car satisfies spawning safety contract
                 new_car = create_default_car(source, sink, self, self.car_count)
@@ -1381,7 +1394,7 @@ class Game:
                                                 'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr, \
                                                     'lead_agent':agent.lead_agent, 'checked_for_conflict':agent.agents_checked_for_conflict_sv, \
                                                         'agents_in_bubble_before': agent.agents_in_bubble_before_sv}
-            agent.conflict_winner = None
+            #agent.conflict_winner = None
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
         self.traces_debug[self.time] = all_agent_info_at_time_t_dict
@@ -3528,10 +3541,10 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 1500
+    seed = 1
 
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3539,7 +3552,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=100)
 #    game.animate(frequency=0.01)
 
     # print debug info

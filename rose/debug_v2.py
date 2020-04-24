@@ -156,8 +156,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
             out_file.write(str(agent)+'\n')
         
         out_file.write('checked for agent conflict with:\n')
-        for agent in agent_trace['checked_for_conflict']:
-            out_file.write(str(agent)+'\n')
+        if agent_trace['checked_for_conflict'] is not None: 
+            for agent in agent_trace['checked_for_conflict']:
+                out_file.write(str(agent)+'\n')
 
         out_file.write('agent max braking flag :\n')
         out_file.write(str(agent_trace['max_braking_not_enough'])+'\n')
@@ -174,8 +175,8 @@ if __name__ == '__main__':
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
-    outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 1, 16, 'south', 4, outfile)
+    #outfile = os.getcwd()+'/saved_traces/debug.txt'
+    #print_one_agent_trace(traces_file, 2, 15, 'south', 10, outfile)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     print_all_agents_at_time_t(traces_file, outfile_cc, 4)
