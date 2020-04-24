@@ -21,7 +21,7 @@ for color in CAR_COLORS:
 
 
 # animate the files completely
-def traces_to_animation(filename, start=0, end=-1):
+def traces_to_animation(filename, output_dir, start=0, end=-1):
     # extract out traces from pickle file
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
@@ -48,10 +48,10 @@ def traces_to_animation(filename, start=0, end=-1):
                 special_heading_tiles=special_heading_tiles)
         plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
-        img_name = os.getcwd()+'/imgs/plot_'+plot_name+'.png'
+        img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)
         fig.savefig(img_name)
-    animate_images()
+    #animate_images(output_dir)
 
 def plot_cars(agents, draw_bubble=False, special_heading_tiles=None):
     for i, agent in enumerate(agents):
@@ -202,17 +202,17 @@ def make_bubble_figure(bubble_file):
         plt_car(ax, car_tuple)
     plt.show()
 
-def animate_images():
+def animate_images(output_dir):
     # Create the frames
     frames = []
-    imgs = glob.glob(os.getcwd()+'/imgs/plot_'"*.png")
+    imgs = output_dir +'/plot_'+"*.png"
     imgs.sort()
     for i in imgs:
         new_frame = Image.open(i)
         frames.append(new_frame)
 
     # Save into a GIF file that loops forever
-    frames[0].save(os.getcwd()+'/imgs/' + 'png_to_gif.gif', format='GIF',
+    frames[0].save(output_dir + 'png_to_gif.gif', format='GIF',
             append_images=frames[1:],
             save_all=True,
             duration=200, loop=3)
@@ -236,7 +236,7 @@ if __name__ == '__main__':
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
     start, end = argv_to_start_end()
-    traces_to_animation(traces_file, start=start, end=end)
+    traces_to_animation(traces_file, output_dir, start=start, end=end)
     #animate_images()
 
     # bubbles figure for the paper
