@@ -3515,6 +3515,7 @@ if __name__ == '__main__':
     seed = 823
     np.random.seed(seed)
     random.seed(seed)
+    np.random.RandomState(seed)
     map_name = 'city_blocks_small'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.7)
     output_filename = 'game'
