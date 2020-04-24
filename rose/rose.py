@@ -333,7 +333,7 @@ class Car(Agent):
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self):
         # collect all agents in send and receive requests and find the winner
-        conflict_cluster = list(set(self.send_conflict_requests_to + self.received_conflict_requests_from + [self]))
+        conflict_cluster = self.send_conflict_requests_to + self.received_conflict_requests_from + [self]
         max_val = 0
         max_agent_list = []
         for agent in conflict_cluster:
