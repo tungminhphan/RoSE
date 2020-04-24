@@ -164,6 +164,7 @@ class Agent:
 
     def apply(self, ctrl):
         self.prior_state = self.state
+        print(self.prior_state)
         # check for collision with any of the other agents
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
@@ -302,6 +303,10 @@ class Car(Agent):
 
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
+        
+        seed = 1111
+        np.random.seed(seed)
+        random.seed(seed)
 
         choice = random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
@@ -596,6 +601,10 @@ class Car(Agent):
             scores.append(score)
             score_save['total'] = score
             straight_action_eval[ctrl_dict_to_tuple(ctrl)] = score_save
+
+        seed = 1111
+        np.random.seed(seed)
+        random.seed(seed)
 
         choice = random.choice(np.where(scores == np.max(scores))[0])
         self.straight_action_eval = straight_action_eval
@@ -1280,6 +1289,10 @@ class Game:
     def spawn_agents(self):
         def valid_source_sink(source, sink):
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
+
+        seed = 1111
+        np.random.seed(seed)
+        random.seed(seed)
 
         for source in self.map.IO_map.sources:
             if np.random.uniform() <= source.p:
@@ -3119,6 +3132,10 @@ class TrafficLight:
         self.t_buffer = t_buffer
         self.durations['red'] = self.durations['green'] + self.durations['yellow'] + self.t_buffer * 2
         self.states = cycle([color for color in self.durations])
+        seed = 1111
+        np.random.seed(seed)
+        random.seed(seed)
+
         if random_init:
             self.hstate = np.random.choice([color for color in self.durations])
             self.htimer = np.random.choice(self.durations[self.hstate])
@@ -3489,7 +3506,7 @@ if __name__ == '__main__':
     game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=10)
 #    game.animate(frequency=0.01)
 
     # print debug info

@@ -9,9 +9,9 @@ import glob
 from rose import Car, Map, CAR_COLORS
 from PIL import Image
 import _pickle as pickle
-from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
-                               AutoMinorLocator)
+from matplotlib.ticker import (AutoMinorLocator, MultipleLocator,
+        FormatStrFormatter, AutoMinorLocator)
+from matplotlib.collections import PatchCollection
 
 
 main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
@@ -36,20 +36,12 @@ def traces_to_animation(filename, start=0, end=-1):
     t_array = t_array[start:end]
     # plot out agents and traffic lights
     # plot map once
-    plot_map(the_map)
-    map_patches = []
-    for patch in plt.gca().patches:
-        map_patches.append(patch)
     for t in t_array:
         #if t == 35:
         #    __import__('ipdb').set_trace(context=21)
         print(t)
-        for car_image in plt.gca().images:
-            del car_image
-        for patch in plt.gca().patches:
-            del patch
-        plt.gca().images = []
-        plt.gca().patches = cp.copy(map_patches)
+        plt.gca().cla()
+        plot_map(the_map)
         agents = traces[t]['agents']
         lights = traces[t]['lights']
         plot_cars(agents, draw_bubble=False,
@@ -68,6 +60,7 @@ def plot_cars(agents, draw_bubble=False, special_heading_tiles=None):
                 special_heading_tiles=special_heading_tiles)
 
 def plot_traffic_lights(traffic_lights):
+    tl_patches = []
     for i, light_node in enumerate(traffic_lights):
         #print(light_node)
         color = light_node[2]
@@ -78,7 +71,9 @@ def plot_traffic_lights(traffic_lights):
         if color == 'yellow':
             c = 'y'
         rect = patches.Rectangle((light_node[1],light_node[0]), 1,1,linewidth=0,facecolor=c, alpha=0.2)
-        ax.add_patch(rect)
+        tl_patches.append(rect)
+    tl_patches.append(rect)
+    ax.add_collection(PatchCollection(tl_patches, match_original=True))
 
 def get_map_corners(map):
     grid = map.grid
@@ -99,10 +94,13 @@ def plot_map(map, grid_on=True):
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(y_min, y_max)
 
-    # fill in the obstacle regions
+    # fill in the road regions
+    road_patches = []
     for obs in map.drivable_nodes:
-        rect = patches.Rectangle((obs[1],obs[0]), 1,1,linewidth=1,facecolor='k', alpha=0.3)
-        ax.add_patch(rect)
+        rect = patches.Rectangle((obs[1],obs[0]),
+                1,1,linewidth=1,facecolor='k', alpha=0.4)
+        road_patches.append(rect)
+    ax.add_collection(PatchCollection(road_patches, match_original=True))
 
     plt.gca().invert_yaxis()
     if grid_on:
@@ -236,7 +234,7 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game_0.p'
+    traces_file = os.getcwd()+'/saved_traces/game_3b.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, start=start, end=end)
     animate_images()
