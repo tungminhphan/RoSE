@@ -142,6 +142,7 @@ class Agent:
 
     # for reproducibility
     def set_id(self):
+        set_seed(self.seed, self.car_count)
         while True:
             random_id = np.random.uniform()
             if random_id not in CHOSEN_IDs:
@@ -150,6 +151,7 @@ class Agent:
 
     # return a random color from an array
     def get_random_color(self):
+        #set_seed(self.seed, self.car_count)
         return np.random.choice(CAR_COLORS)
 
     def get_symbol(self):
@@ -234,8 +236,9 @@ class Gridder(Agent):
 class Car(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Car'
-        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count']
+        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed']
         state_variable_names = ['x', 'y', 'heading', 'v']
+        #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
         self.acc_vals = np.arange(self.a_min, self.a_max+1)
         self.default_state = Car.hack_state(self.state, x=0, y=0, heading='east', v=0)
@@ -332,6 +335,7 @@ class Car(Agent):
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
 
+        set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = np.random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
         #print(self.intention)
@@ -635,6 +639,8 @@ class Car(Agent):
             score_save['total'] = score
             straight_action_eval[ctrl_dict_to_tuple(ctrl)] = score_save
 
+        #seed = 1111
+        set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = random.choice(np.where(scores == np.max(scores))[0])
         self.straight_action_eval = straight_action_eval
         return all_straight_ctrl[choice]
@@ -1329,6 +1335,7 @@ class Game:
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
 
         for i, source in enumerate(self.map.IO_map.sources):
+            set_seed(self.map.seed, self.time)
             if np.random.uniform() <= source.p:
                 sink = np.random.choice(self.map.IO_map.map[source])
                 #if not valid_source_sink(source, sink):
@@ -1639,7 +1646,8 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key] = [item]
 
 class Map:
-    def __init__(self, csv_filename, default_spawn_probability=0.9, random_traffic_lights_init=True):
+    def __init__(self, csv_filename, default_spawn_probability=0.9, seed=None, random_traffic_lights_init=True):
+        self.seed = seed
         self.map_name = csv_filename
         self.grid = self.get_grid(csv_filename)
         self.default_spawn_probability = default_spawn_probability
@@ -1648,7 +1656,7 @@ class Map:
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
-        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init)
+        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init, self.seed)
         self.intersection_to_traffic_light_map = self.get_intersection_to_traffic_light_map()
         self.tile_to_intersection_map = self.get_tile_to_intersection_map()
         self.bundles = self.get_bundles()
@@ -2169,7 +2177,7 @@ class Map:
                     presources.append(source)
         return presources, presinks
 
-    def get_traffic_lights(self, random_traffic_lights_init):
+    def get_traffic_lights(self, random_traffic_lights_init, seed):
         def search_along(start, direction, search_length, green_symbol, yellow_symbol, red_symbol):
             nodes = []
             for k in range(search_length):
@@ -2192,7 +2200,7 @@ class Map:
             vtiles = vleft + vright
             if htiles or vtiles:
                 light_id = len(traffic_lights)
-                traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init)
+                traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init, seed=seed)
                 traffic_lights[traffic_light] = intersection
 
         return traffic_lights
@@ -3184,7 +3192,7 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    def __init__(self, light_id, htiles, vtiles, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, seed, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
         self.durations = od()
         self.durations['green'] = t_green
@@ -3195,7 +3203,9 @@ class TrafficLight:
 
 
         if random_init:
+            set_seed(seed)
             self.hstate = np.random.choice([color for color in self.durations])
+            set_seed(seed)
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
             self.htimer = 0
@@ -3319,7 +3329,7 @@ def create_default_car(source, sink, game, car_count):
     spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
     start = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count)
+    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3327,6 +3337,7 @@ def create_default_car(source, sink, game, car_count):
 
 def create_specified_car(attributes, game):
     if 'goal' not in 'attributes' or attributes['goal'] == 'auto':
+        set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     if 'controller' not in attributes:
         ss = get_default_car_ss()
@@ -3557,8 +3568,9 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 1
+
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
