@@ -19,6 +19,7 @@ import csv
 import networkx as nx
 from collections import OrderedDict as od
 from collections import namedtuple
+import collections
 import os
 import _pickle as pickle
 import json
@@ -39,6 +40,37 @@ AGENT_CHAR = [str(i) for i in range(10)]
 CHOSEN_IDs = []
 CAR_OCCUPANCY_DICT = od()
 
+class Memoize:
+    """
+    caching class intended to be used as a decorator
+    """
+    def __init__(self, fn):
+        self.fn = fn
+        self.memo = {}
+
+    def __call__(self, *args):
+        # check if args is memoizable
+        if any([isinstance(arg, collections.Hashable) for arg in args]):
+            args = list(args)
+            for idx, arg in enumerate(args):
+                if not isinstance(arg, collections.Hashable):
+                    args[idx] = tuple(arg)
+            args = tuple(args)
+        # check cache
+        if args not in self.memo:
+            self.memo[args] = self.fn(*args)
+        return self.memo[args]
+
+@Memoize
+def compute_dx_fast(a_min, vel):
+    """
+    memoized version of compute_dx
+    """
+    dt = math.ceil(-vel/a_min)-1
+    dx = int(np.sum([vel+(k+1)*a_min for k in range(dt)]))
+    return dx
+
+@Memoize
 def rotate_vector(vec, theta):
     """
     take in a 2D vector and an angle in radians and outputs the same vector
@@ -76,18 +108,18 @@ class AgentState:
 
     def set_state_variables(self, kwargs):
         for state_var in self.state_variable_names:
-            exec('self.%s = kwargs.get(\'%s\')' % (state_var, state_var))
+            setattr(self, state_var, kwargs.get(state_var))
 
     def __str__(self):
         printed = []
         for state_var in self.state_variable_names:
-            printed.append(state_var + ' = ' + str(eval('self.%s' % state_var)))
+            printed.append(state_var + ' = ' + str(getattr(self, state_var)))
         return self.agent_name + 'State(' + ', '.join(printed) + ')'
 
     def __tuple__(self):
         tup = ()
         for i, state_var in enumerate(self.state_variable_names):
-            a = eval('self.%s' % (state_var))
+            a = getattr(self, state_var)
             tup = (*tup, a)
         return tup
 
@@ -109,11 +141,11 @@ class Agent:
         new_state = AgentState(agent_name=state.agent_name, state_variable_names=state.state_variable_names)
         for name in new_state.state_variable_names:
             # just copy from state
-            is_not_none = eval('kwargs.get(\'%s\') != None' % name)
-            exec('new_state.%s = state.%s' % (name, name))
+            is_not_none = kwargs.get(name) != None
+            setattr(new_state, name, getattr(state, name))
             if is_not_none:
                 # update from is_not_none input
-                exec('new_state.%s = kwargs.get(\'%s\')' % (name, name))
+                setattr(new_state, name, kwargs.get(name))
         return new_state
 
     def __init__(self, **kwargs):
@@ -169,7 +201,7 @@ class Agent:
 
     def set_attributes(self, kwargs_dict):
         for attr in self.attributes:
-            exec('self.%s = kwargs_dict.get(\'%s\')' % (attr, attr))
+            setattr(self, attr, kwargs_dict.get(attr))
 
     def set_state(self, kwargs_dict):
         if 'state' in kwargs_dict:
@@ -948,8 +980,8 @@ class Car(Agent):
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
         #__import__('ipdb').set_trace(context=21)
-        dx_lead = self.compute_dx(lead_max_dec, lead_vel)
-        dx_behind = self.compute_dx(follow_max_dec, follow_vel)
+        dx_lead = compute_dx_fast(lead_max_dec, lead_vel)
+        dx_behind = compute_dx_fast(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
 
@@ -1125,7 +1157,7 @@ class Car(Agent):
     # returns the tiles used in executing safety plan
     # note need agent to get max dec
     def get_tiles_for_safety_plan(self, state):
-        dx = self.compute_dx(self.a_min, state.v)
+        dx = compute_dx_fast(self.a_min, state.v)
         # populate tiles in front according to that depth for east facing agent
         gridpts = [(0, j+1) for j in range(dx)]
         if len(gridpts) == 0: gridpts.append((0,0))
