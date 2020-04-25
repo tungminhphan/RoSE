@@ -49,7 +49,7 @@ def rotate_vector(vec, theta):
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
 
 def set_seed(seed, other_param=0):
-    if seed is not None: 
+    if seed is not None:
         np.random.seed(seed+other_param)
         random.seed(seed+other_param)
         np.random.RandomState(seed+other_param)
@@ -334,7 +334,7 @@ class Car(Agent):
 
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
-        
+
         set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = np.random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
@@ -762,7 +762,7 @@ class Car(Agent):
         bubble_tf = [self.transform_state(node, dx, dy, dtheta, assign_heading=False) for node in default_bubble]
         # only keep nodes that are in the drivable set
         if the_map: bubble_tf = [node for node in bubble_tf if node in the_map.drivable_nodes]
-        return bubble_tf
+        return list(set(bubble_tf))
 
     # find all agents in the agents' bubble
     def find_agents_in_bubble(self, bubble=None):
@@ -1083,11 +1083,11 @@ class Car(Agent):
                     state_to_chk = self.hack_state(self.state, x=final_st.x, \
                         y=final_st.y, heading=final_st.heading, v=final_st.v)
                     safety_plan_resources = self.get_tiles_for_safety_plan(state=state_to_chk)
-                    resources.extend(safety_plan_resources)  
-            
+                    resources.extend(safety_plan_resources)
+
             # remove any elements already inside
             resources_unique = []
-            [resources_unique.append(x) for x in resources if x not in resources_unique] 
+            [resources_unique.append(x) for x in resources if x not in resources_unique]
             return resources
 
         # gridpoints
@@ -1100,10 +1100,10 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
-        
+
         # remove repeat elements
         bubble_unique = []
-        [bubble_unique.append(x) for x in bubble if x not in bubble_unique] 
+        [bubble_unique.append(x) for x in bubble if x not in bubble_unique]
 
         # plot the bubble
         '''fig, ax = plt.subplots()
@@ -1524,6 +1524,7 @@ class Game:
             self.write_game_info_to_traces(t_end)
             self.write_data_to_pckl(output_dir + outfile, self.traces)
             self.write_data_to_pckl(output_dir + outfile+'_debug', self.traces_debug)
+        self.map.dump_cache()
 
 def symbol_to_orientation(symb):
     if symb in ['←','⇠']:
@@ -1670,6 +1671,25 @@ class Map:
         self.all_left_turns = self.get_all_left_turns()
         self.bundle_graph = self.get_bundle_graph()
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
+        self.bundle_plan_cache = self.get_bundle_plan_cache()
+
+    def get_bundle_plan_cache(self):
+        path = os.getcwd() + '/saved_bundle_plans/' + self.map_name[7:]  + '.p'
+        if os.path.exists(path):
+            print('loading bundle plan cache from ' + path)
+            with open(path, 'rb') as cache:
+                cache = pickle.load(cache)
+            bundle_plan_cache = cache
+        else:
+            bundle_plan_cache = od()
+        return bundle_plan_cache
+
+    def dump_cache(self):
+        path = os.getcwd() + '/saved_bundle_plans/' + self.map_name[7:]  + '.p'
+        print('dumping bundle plan cache to ' + path)
+        with open(path, 'wb') as f:
+            pickle.dump(self.bundle_plan_cache, f)
+        print('done!')
 
     # for now, we are assuming default car dynamics; TODO: generalize this
     def get_left_turn_to_opposing_traffic_map(self):
@@ -1714,7 +1734,13 @@ class Map:
         for turn in turns:
             planning_graph.add_edge(source, turn)
 
-        plan = nx.astar_path(planning_graph, source, sink)
+        # bundle plan calculation
+        signature = str(source) + str(sink)
+        if signature in self.bundle_plan_cache:
+            plan = self.bundle_plan_cache[signature]
+        else:
+            plan = nx.astar_path(planning_graph, source, sink)
+            self.bundle_plan_cache[signature] = plan
         return plan
 
     def directed_tile_to_relative_bundle_tile(self, directed_tile):
@@ -3156,7 +3182,7 @@ class SpecificationStructure():
     def set_tier_weights(self, oracle_tier):
         def num(tier):
             return np.sum(np.array(oracle_tier) == tier)
-        all_tiers = np.sort(oracle_tier)[::-1]
+        all_tiers = np.sort(list(set(oracle_tier)))[::-1]
         tier_weights = od()
         tier_weights[all_tiers[0]] = 1
         for idx in range(1, len(all_tiers)):
