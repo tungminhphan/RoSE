@@ -49,6 +49,7 @@ def rotate_vector(vec, theta):
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
 
 def set_seed(seed, other_param=0):
+    #other_param = 0
     if seed is not None: 
         np.random.seed(seed+other_param)
         random.seed(seed+other_param)
@@ -147,12 +148,17 @@ class Agent:
             random_id = np.random.uniform()
             if random_id not in CHOSEN_IDs:
                 CHOSEN_IDs.append(random_id)
+                #print("car id")
+                #print(random_id)
                 return random_id
 
     # return a random color from an array
     def get_random_color(self):
-        #set_seed(self.seed, self.car_count)
-        return np.random.choice(CAR_COLORS)
+        set_seed(self.seed, self.car_count)
+        color = np.random.choice(CAR_COLORS)
+        #print('car color')
+        #print(color)
+        return color
 
     def get_symbol(self):
         if not self.symbol:
@@ -337,6 +343,8 @@ class Car(Agent):
         
         set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = np.random.choice(np.where(scores == np.max(scores))[0])
+        #print("choice")
+        #print(choice)
         self.intention = all_ctrls[choice]
         #print(self.intention)
         self.spec_struct_trace = spec_struct_trace
@@ -590,8 +598,8 @@ class Car(Agent):
                 try:
                     agent_score = bundle.tile_to_relative_length(agent_tile)
                 except:
-                    print("agent out of bounds, setting to have higher prec?")
-                    print(agent_tile)
+                    #print("agent out of bounds, setting to have higher prec?")
+                    #print(agent_tile)
                     agent_score = np.inf
                 if agent_score > ego_score:
                     higher_pred.append(agent)
@@ -642,6 +650,8 @@ class Car(Agent):
         #seed = 1111
         set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = random.choice(np.where(scores == np.max(scores))[0])
+        #print("straight choice")
+        #print(choice)
         self.straight_action_eval = straight_action_eval
         return all_straight_ctrl[choice]
 
@@ -704,6 +714,7 @@ class Car(Agent):
         self.action_selection_flags = (agent_type, bubble_chk, cluster_chk, max_braking_enough)
         # save info about sending and receiving requests
         self.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in self.send_conflict_requests_to]
+        #self.sent_sv = ["hello"]
         self.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in self.received_conflict_requests_from]
 
         if not max_braking_enough:
@@ -780,7 +791,8 @@ class Car(Agent):
         # collect all agents in bubble
         agents_in_bubble = self.agents_in_bubble
         # if agent intention is to go straight, it shouldn't send a request
-        if self.intention['steer'] == 'straight': return send_requests_list
+        if self.intention['steer'] == 'straight' or self.intention['steer']=='right-turn' or self.intention['steer'] == 'left-turn':
+            return send_requests_list
         # which agents checking to send
         agents_checked_for_conflict = []
 
@@ -867,8 +879,8 @@ class Car(Agent):
         # collect all grid points from occupancy dict except for own agent
         all_agent_gridpts = [gridpt for gridpt, agent in
                 self.supervisor.game.occupancy_dict.items() if
-                agent.get_id()!=self.get_id() and agent in
-                self.supervisor.game.simulated_agents]
+                agent.get_id()!=self.get_id()]# and agent in
+                #self.supervisor.game.simulated_agents]
         occ = self.query_occupancy(ctrl)
         if occ is None:
             return True
@@ -1051,8 +1063,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                #if not chk_valid_actions:
-                #    print("sending conflict request")
+                if not chk_valid_actions:
+                    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1086,8 +1098,8 @@ class Car(Agent):
                     resources.extend(safety_plan_resources)  
             
             # remove any elements already inside
-            resources_unique = []
-            [resources_unique.append(x) for x in resources if x not in resources_unique] 
+            #resources_unique = []
+            #[resources_unique.append(x) for x in resources if x not in resources_unique] 
             return resources
 
         # gridpoints
@@ -1102,8 +1114,8 @@ class Car(Agent):
             bubble.extend(gridpts)
         
         # remove repeat elements
-        bubble_unique = []
-        [bubble_unique.append(x) for x in bubble if x not in bubble_unique] 
+        #bubble_unique = []
+        #[bubble_unique.append(x) for x in bubble if x not in bubble_unique] 
 
         # plot the bubble
         '''fig, ax = plt.subplots()
@@ -1114,7 +1126,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return bubble_unique
+        return list(set(bubble))
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -1334,16 +1346,32 @@ class Game:
         def valid_source_sink(source, sink):
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
 
-        for i, source in enumerate(self.map.IO_map.sources):
-            set_seed(self.map.seed, self.time)
-            if np.random.uniform() <= source.p:
-                sink = np.random.choice(self.map.IO_map.map[source])
-                #if not valid_source_sink(source, sink):
+        # generate random array
+        set_seed(self.map.seed, self.time)
+        # create two random arrays from this seed
+        rand_arr1 = np.random.random(len(self.map.IO_map.sources))
+        source = self.map.IO_map.sources[0]
+        rand_arr2 = np.random.randint(len(self.map.IO_map.map[source]), size=len(rand_arr1))
+        #print(rand_arr1)
+        #print(rand_arr2)
 
+        for i, source in enumerate(self.map.IO_map.sources):  
+            #print('source to check')
+            #print(source.node)
+            if rand_arr1[i] <= source.p:
+                #print(len(self.map.IO_map.map[source]))
+                sink = self.map.IO_map.map[source][rand_arr2[i]]
                 # check if new car satisfies spawning safety contract
+                #print('sources and sinks')
+                #print(source.node, sink.node)
                 new_car = create_default_car(source, sink, self, self.car_count)
                 spawning_contract = SpawningContract(self, new_car)
+                #print('state')
+                #print(new_car.state)
+                #print(spawning_contract.okay_to_spawn_flag)
+
                 if spawning_contract.okay_to_spawn_flag:
+                    #print(new_car.supervisor.goals)
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict()
                     self.car_count = self.car_count+1
@@ -1380,7 +1408,9 @@ class Game:
             # if prior state is not none
             prior_state = agent.prior_state
             if agent.prior_state is not None:
-               prior_state = (agent.prior_state.x, agent.prior_state.y, agent.prior_state.heading, agent.prior_state.v)
+                prior_state = (agent.prior_state.x, agent.prior_state.y, agent.prior_state.heading, agent.prior_state.v)
+                #print("final state of agent")
+                #print(prior_state)
             # save all data in trace
             agent_trace_dict = {'state':prior_state, 'action': agent.ctrl_chosen, \
                 'color':agent.agent_color, 'bubble':agent.bubble, 'goals': agent.supervisor.goals, \
@@ -3179,7 +3209,6 @@ class TrafficLight:
         if random_init:
             set_seed(seed)
             self.hstate = np.random.choice([color for color in self.durations])
-            set_seed(seed)
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
             self.htimer = 0
@@ -3541,10 +3570,10 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 1
+    #seed = 123
 
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.15)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3552,7 +3581,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=500)
 #    game.animate(frequency=0.01)
 
     # print debug info

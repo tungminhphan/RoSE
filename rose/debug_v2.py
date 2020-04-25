@@ -120,7 +120,7 @@ def print_one_agent_trace(filename, x, y, heading, time, outfile):
         # search through all agents at time t
         for ag_id, agent_trace in agents_dict.items():
             # if agent is at time t, print out information
-            if int(ag_id) == int(agent_id): 
+            if ag_id == agent_id: 
                 # print information
                 write_info(out_file, t, agent_trace)
 
@@ -171,12 +171,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 
 # test out the debug file
 if __name__ == '__main__':
-    #output_dir = os.getcwd()+'/imgs/'
-    #if not os.path.exists(output_dir):
-    #    os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     #outfile = os.getcwd()+'/saved_traces/debug.txt'
-    #print_one_agent_trace(traces_file, 2, 15, 'south', 10, outfile)
+    #print_one_agent_trace(traces_file, 15, 16, 'south', 229, outfile)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 4)
+    print_all_agents_at_time_t(traces_file, outfile_cc, 143)
