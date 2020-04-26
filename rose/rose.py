@@ -39,6 +39,7 @@ DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
 CHOSEN_IDs = []
 CAR_OCCUPANCY_DICT = od()
+np.random.seed(1)
 
 class Memoize:
     """
@@ -83,8 +84,6 @@ def rotate_vector(vec, theta):
 def set_seed(seed, other_param=0):
     if seed is not None:
         np.random.seed(seed+other_param)
-        random.seed(seed+other_param)
-        np.random.RandomState(seed+other_param)
 
 class Drawable:
     """
@@ -183,7 +182,6 @@ class Agent:
 
     # return a random color from an array
     def get_random_color(self):
-        #set_seed(self.seed, self.car_count)
         return np.random.choice(CAR_COLORS)
 
     def get_symbol(self):
@@ -3235,9 +3233,7 @@ class TrafficLight:
 
 
         if random_init:
-            set_seed(seed)
             self.hstate = np.random.choice([color for color in self.durations])
-            set_seed(seed)
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
             self.htimer = 0
@@ -3369,7 +3365,6 @@ def create_default_car(source, sink, game, car_count):
 
 def create_specified_car(attributes, game):
     if 'goal' not in 'attributes' or attributes['goal'] == 'auto':
-        set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     if 'controller' not in attributes:
         ss = get_default_car_ss()
