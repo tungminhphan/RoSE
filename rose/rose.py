@@ -358,6 +358,7 @@ class Car(Agent):
         self.send_conflict_requests_to = []
         self.received_conflict_requests_from = []
         self.conflict_winner = None
+        self.is_winner = False
 
         self.received_sv = []
         self.sent_sv = []
@@ -373,10 +374,11 @@ class Car(Agent):
         max_agent_list = []
         for agent in conflict_cluster:
             if agent.token_count > max_val:
+                max_val = agent.token_count
                 max_agent_list = [agent]
             elif agent.token_count == max_val:
                 max_agent_list.append(agent)
-        # resolve ties with max values with agent ID comparison
+        # resolve ties with max values wifth agent ID comparison
         ind_max = np.argmax(np.array([agent.get_id() for agent in max_agent_list]))
         agent_winner = max_agent_list[ind_max]
 
