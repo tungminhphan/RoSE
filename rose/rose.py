@@ -398,6 +398,8 @@ class Car(Agent):
         for agent in conflict_cluster:
             if agent.token_count > max_val:
                 max_agent_list = [agent]
+                # set max_val
+                max_val = agent.token_count
             elif agent.token_count == max_val:
                 max_agent_list.append(agent)
         # resolve ties with max values with agent ID comparison
@@ -2184,7 +2186,7 @@ class Map:
 
     def get_IO_map(self):
         sources, sinks = self.get_sources_sinks()
-        IO_map = IOMap(sources=sources,sinks=sinks,map=dict())
+        IO_map = IOMap(sources=sources,sinks=sinks,map=od())
         for source in IO_map.sources:
             IO_map.map[source] = []
             for sink in IO_map.sinks:
