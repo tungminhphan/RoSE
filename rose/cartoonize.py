@@ -51,7 +51,7 @@ def traces_to_animation(filename, output_dir, start=0, end=-1):
         img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)
         fig.savefig(img_name)
-    #animate_images(output_dir)
+    animate_images(output_dir)
 
 def plot_cars(agents, draw_bubble=False, special_heading_tiles=None):
     for i, agent in enumerate(agents):
@@ -205,7 +205,9 @@ def make_bubble_figure(bubble_file):
 def animate_images(output_dir):
     # Create the frames
     frames = []
-    imgs = output_dir +'/plot_'+"*.png"
+
+    #imgs = output_dir +'/plot_'+"*.png"
+    imgs = glob.glob(output_dir+'plot_'"*.png")
     imgs.sort()
     for i in imgs:
         new_frame = Image.open(i)
@@ -237,7 +239,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, output_dir, start=start, end=end)
-    #animate_images()
+    #animate_images(output_dir)
 
     # bubbles figure for the paper
     # for dynamics a:-1,1, v=3

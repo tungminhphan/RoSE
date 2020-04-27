@@ -20,6 +20,14 @@ def write_info(out_file, t, trace):
     out_file.write("AGENT COLOR: \n")
     out_file.write(str(trace['color'])+'\n')
 
+    # agent token count before resolution
+    out_file.write("AGENT TOKEN COUNT BEFORE: \n")
+    out_file.write(str(trace['token_count_before'])+'\n')
+
+    # agent token count after resolutoin
+    out_file.write("AGENT TOKEN COUNT AFTER: \n")
+    out_file.write(str(trace['token_count'])+'\n')
+
     # print the other agents in its bubble
     out_file.write("OTHER AGENTS IN BUBBLE ARE LOCATED AT: \n")
     [out_file.write(str(ag)+'\n') for ag in trace['agents_in_bubble']]
@@ -56,9 +64,9 @@ def write_info(out_file, t, trace):
     out_file.write('\n')
 
     # print out which agents it checked conflict with
-    out_file.write('checked for agent conflict with:\n')
-    for agent in trace['checked_for_conflict']:
-        out_file.write(str(agent)+'\n')
+    #out_file.write('checked for agent conflict with:\n')
+    #for agent in trace['checked_for_conflict']:
+    #    out_file.write(str(agent)+'\n')
 
     # print out the conflict requests it sent out
     out_file.write('sent requests to:\n')
@@ -143,6 +151,14 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("agent intention is:\n")
         out_file.write(str(agent_trace['intention'])+'\n')
 
+        # agent token count before resolution
+        out_file.write("AGENT TOKEN COUNT BEFORE: \n")
+        out_file.write(str(agent_trace['token_count_before'])+'\n')
+
+        # agent token count after resolutoin
+        out_file.write("AGENT TOKEN COUNT AFTER: \n")
+        out_file.write(str(agent_trace['token_count'])+'\n')
+
         # print the other agents in its bubble
         out_file.write("other agents in bubble before request located at: \n")
         [out_file.write(str(ag)+'\n') for ag in agent_trace['agents_in_bubble_before']]
@@ -155,10 +171,16 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         for agent in agent_trace['received']:
             out_file.write(str(agent)+'\n')
         
-        out_file.write('checked for agent conflict with:\n')
-        if agent_trace['checked_for_conflict'] is not None: 
-            for agent in agent_trace['checked_for_conflict']:
-                out_file.write(str(agent)+'\n')
+        out_file.write("ACTION SELECTION STRATEGY FLAGS: \n")
+        out_file.write(str(agent_trace['action_selection_flags'])+'\n')
+
+        out_file.write("ACTION TAKEN: \n")
+        out_file.write(str(agent_trace['action'])+'\n')
+        
+        #out_file.write('checked for agent conflict with:\n')
+        #if agent_trace['checked_for_conflict'] is not None: 
+        #    for agent in agent_trace['checked_for_conflict']:
+        #        out_file.write(str(agent)+'\n')
 
         out_file.write('agent max braking flag :\n')
         out_file.write(str(agent_trace['max_braking_not_enough'])+'\n')
@@ -172,8 +194,8 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 # test out the debug file
 if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
-    #outfile = os.getcwd()+'/saved_traces/debug.txt'
-    #print_one_agent_trace(traces_file, 15, 16, 'south', 229, outfile)
+    outfile = os.getcwd()+'/saved_traces/debug.txt'
+    print_one_agent_trace(traces_file, 13, 15, 'south', 28, outfile)
 
-    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 143)
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc_28.txt'
+    print_all_agents_at_time_t(traces_file, outfile_cc, 28)

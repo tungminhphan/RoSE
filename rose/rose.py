@@ -362,11 +362,11 @@ class Car(Agent):
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
-                #if oracle.name != 'backup_plan_safety':
-                try:
-                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
-                except:
-                    pass
+                if oracle.name != 'backup_plan_safety':
+                    try:
+                        score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                    except:
+                        pass
                 scores_sv[oracle.name] = o_score
 
             scores.append(score)
@@ -756,10 +756,13 @@ class Car(Agent):
         flag_dict['resolution_winner'] = cluster_chk
         flag_dict['max_braking_enough'] = max_braking_enough
         self.action_selection_flags = flag_dict
+
+        safety_oracle = self.controller.specification_structure.oracle_set[6]
+        assert safety_oracle.name == 'backup_plan_safety'
+
         # save info about sending and receiving requests
         #print(self.state)
         #print(self.action_selection_flags)
-        #print(cluster_chk)
         #__import__('ipdb').set_trace(context=21)
 
         if not max_braking_enough:
@@ -775,8 +778,14 @@ class Car(Agent):
             # list of all possible scenarios and what action to take
             if agent_type == 'none' and bubble_chk and max_braking_enough:
                 #print(3)
-                ctrl = self.intention
-                self.token_count = 0
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action:
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
+
             elif agent_type == 'none' and not bubble_chk:
                 # TODO: take straight action, best safe one that aligns with intention
                 #print(4)
@@ -794,8 +803,13 @@ class Car(Agent):
                 ctrl = self.get_best_straight_action()
             elif agent_type == 'sender' and cluster_chk and bubble_chk:
                 #print(7)
-                ctrl = self.intention
-                self.token_count = 0
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action:
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
             elif (agent_type == 'receiver' or agent_type == 'both') and not cluster_chk:
                 #st()
                 #print(8)
@@ -805,8 +819,13 @@ class Car(Agent):
                 self.token_count = self.token_count+1
             elif (agent_type == 'receiver' or agent_type =='both') and bubble_chk and cluster_chk:
                 #print(9)
-                ctrl = self.intention
-                self.token_count = 0
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                if valid_action:
+                    ctrl = self.intention
+                    self.token_count = 0
+                else:
+                    ctrl = self.get_best_straight_action()
+                    self.token_count = self.token_count+1
             elif (agent_type == 'receiver' or agent_type =='both') and not bubble_chk and cluster_chk:
                 #print(10)
                 # TODO: take straight action, best safe one that aligns with intention
@@ -818,7 +837,7 @@ class Car(Agent):
                 print(cluster_chk)
                 print("Error: invalid combination of inputs to action selection strategy!")
                 ctrl = None
-            self.token_count_sv = self.token_count
+        self.token_count_sv = self.token_count
         return ctrl
 
     #=== methods for car bubble =======================================#
@@ -3666,10 +3685,10 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 123
-
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
+    #seed = 111
+    
+    map_name = 'city_blocks_med'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.10)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3677,7 +3696,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=500)
 #    game.animate(frequency=0.01)
 
     # print debug info
