@@ -230,7 +230,6 @@ class Agent:
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
-        #st()
         # save action that was chosen
         self.ctrl_chosen = ctrl
         self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
@@ -811,7 +810,6 @@ class Car(Agent):
                     ctrl = self.get_best_straight_action()
                     self.token_count = self.token_count+1
             elif (agent_type == 'receiver' or agent_type == 'both') and not cluster_chk:
-                #st()
                 #print(8)
                 # yield as much as needed for conflict winner to move
                 # assumes winner has already taken its action!!!
@@ -890,9 +888,7 @@ class Car(Agent):
                 try:
                     chk = (self.get_length_along_bundle()[0]-agent.get_length_along_bundle()[0])
                     chk_lon = chk>=0
-                    #st()
                     #if chk == 0:
-                    #    st()
                 except:
                     break
                 if chk_lon and self.state.heading == agent.state.heading:
@@ -917,8 +913,8 @@ class Car(Agent):
         #right_turn_ctrl = {'acceleration': 1-self.state.v, 'right-turn'}
         next_st = self.query_occupancy(right_turn_ctrl)[-1]
         bundle = self.supervisor.game.map.get_bundle_from_directed_tile((next_st.x, next_st.y), next_st.heading)
-        if bundle is None:
-            st()
+#        if bundle is None:
+#            TODO: figure why this is necessary...
         # collect all agents in agent bundle AND in agent bubble
         for agent in self.agents_in_bubble:
             # get the bundle the agent in the bubble is in
@@ -1022,7 +1018,7 @@ class Car(Agent):
         else:
             return is_safe
 
-    def find_lead_agent(self, state=None, same_heading_required=True):
+    def find_lead_agent(self, state=None, must_not_be_in_intersection=False, same_heading_required=True):
         if state is None:
             state = self.state
         try:
@@ -1042,7 +1038,11 @@ class Car(Agent):
                 agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
                 # only find agents that are facing in the same direction
                 if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == self.state.heading)):
-                    return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                    if not must_not_be_in_intersection:
+                        return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                    else:
+                        if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
+                            return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
         return None
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
@@ -1079,7 +1079,6 @@ class Car(Agent):
 
         # check agents are in the same lane
         def check_same_lane(st_1, st_2):
-            #st()
             try: 
                 width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
             except:
@@ -1822,6 +1821,16 @@ class Map:
         self.bundle_graph = self.get_bundle_graph()
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
+
+    def tile_is_in_intersection(self, xy):
+        """
+        check if tile is in an intersection
+        """
+        try:
+            num_orientations = len(self.legal_orientations[xy])
+            return num_orientations > 1
+        except:
+            return False
 
     def get_bundle_plan_cache(self):
         path = os.getcwd() + '/saved_bundle_plans/' + self.map_name[7:]  + '.p'
@@ -2606,6 +2615,63 @@ class ReplanProgressOracle(Oracle):
             next_distance = np.inf
         return next_distance < current_distance
 
+class IntersectionClearanceOracle(Oracle):
+    def __init__(self):
+        super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
+    def evaluate(self, ctrl_action, plant, game):
+        current_state = plant.state.x, plant.state.y
+        x_curr, y_curr = current_state
+        next_state = plant.query_next_state(ctrl_action)
+        x_next, y_next = next_state.x, next_state.y
+        # check if not crossing into an intersection
+        try:
+            if plant.supervisor.game.map.tile_is_in_intersection((x__curr,y_curr)) or (not plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))):
+                return True
+            else: # if indeed crossing into an intersection
+                # check if attempting to perform a left turn
+                current_subgoal = plant.supervisor.subgoals[0]
+                # figure out what intersection is being entered
+                next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
+                current_heading = plant.state.heading
+                # confirm intention to perform left turn; TODO: generalize this check
+                if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoals[0][1])):
+                    # left turn is confirmed
+                    heading_degrees = Car.convert_orientation(current_heading)
+                    left_heading_degrees  = (heading_degrees + 90) % 360
+                    left_heading = Car.convert_orientation(left_heading_degrees)
+                    forward = DIRECTION_TO_VECTOR[current_heading]
+                    next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
+                    while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
+                        next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
+                    reference_state = plant.hack_state(x=next_tile[0], y=next_tile[1], heading=left_heading)
+
+                    if current_heading in ['east', 'west']:
+                        intersection_gap = next_intersection.height
+                    else:
+                        intersection_gap = next_intersection.width
+                    lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
+                    if lead_agent:
+                        reference_state_bundle_width = plant.get_width_along_bundle() + 1
+                        num_residual_tiles = intersection_gap - reference_state_bundle_width
+                        clearance = max(abs(lead_agent.x-reference_state.x), abs(lead_agent.y-reference_state.y))
+                    else:
+                        clearance = np.inf
+                    return clearance > intersection_gap #TODO: find a better bound
+
+                else: # going straight
+                    if current_heading in ['east', 'west']:
+                        intersection_gap = next_intersection.width
+                    else:
+                        intersection_gap = next_intersection.height
+                    lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
+                    if lead_agent:
+                        clearance = max(abs(lead_agent.x-x_curr), abs(lead_agent.y-y_curr)) - intersection_gap
+                    else:
+                        clearance = np.inf
+                    return clearance > intersection_gap #TODO: find a better bound
+        except:
+            return False
+
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
@@ -3097,7 +3163,6 @@ class TrafficIntersectionOracle(Oracle):
 
             # TODO: change
             if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:
-                #st()
                 return True
             # else don't make a lane change in an intersection
             else:
@@ -3489,12 +3554,18 @@ def get_default_car_ss():
     improvement_progress_oracle = ImprovementBundleProgressOracle()
     traffic_intersection_oracle = TrafficIntersectionOracle()
     unprotected_left_turn_oracle = UnprotectedLeftTurnOracle()
-    oracle_set = [static_obstacle_oracle, traffic_light_oracle,
-            legal_orientation_oracle, backup_plan_progress_oracle,
-            maintenance_progress_oracle, improvement_progress_oracle,
-            backup_plan_safety_oracle, unprotected_left_turn_oracle,
-            traffic_intersection_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
+    intersection_clearance_oracle = IntersectionClearanceOracle()
+    oracle_set = [static_obstacle_oracle,
+                  traffic_light_oracle,
+                  legal_orientation_oracle,
+                  backup_plan_progress_oracle,
+                  maintenance_progress_oracle,
+                  improvement_progress_oracle,
+                  backup_plan_safety_oracle,
+                  unprotected_left_turn_oracle,
+                  traffic_intersection_oracle,
+                  intersection_clearance_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2, 2])
     return specification_structure
 
 def create_default_car(source, sink, game, car_count):
@@ -3510,22 +3581,17 @@ def create_default_car(source, sink, game, car_count):
 
 def create_specified_car(attributes, game):
     def parse_goal_string_to_goal_tuple(string):
-        #st()
         string=string.replace(" ", "")
         string=string.replace("(", "")
         string=string.replace(")", "")
         x, y, direction = string.split(',')
-        #st()
         return (int(x), int(y), direction)
 
-    #print(attributes)
-    #st()
     if ('goal' not in attributes) or (attributes['goal'] == 'auto'):
         set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     else:
         attributes['goal'] = parse_goal_string_to_goal_tuple(attributes['goal'])
-        #st()
     if 'controller' not in attributes:
         ss = get_default_car_ss()
         # default to SpecificationStructureController
@@ -3556,7 +3622,6 @@ def create_specified_car(attributes, game):
     car.agent_color = attributes['agent_color']
     car.set_controller(attributes['controller'])
     supervisor = BundleGoalExit(game=game, goals=[attributes['goal']])
-    #st()
     car.set_supervisor(supervisor)
     return car
 
@@ -3666,7 +3731,6 @@ class QuasiSimultaneousGame(Game):
                 agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
             #print("AGENT CONFLICT RESOLUTION")
             #print(agent.conflict_winner_sv, agent.is_winner)
-        
 
     def sys_step(self):
         # set all agent intentions
@@ -3769,9 +3833,9 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 111
-    
-    map_name = 'city_blocks_med'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
+
+    map_name = 'city_blocks_small'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.2, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3779,7 +3843,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=30)
+    game.play(outfile=output_filename, t_end=50)
 #    game.animate(frequency=0.01)
 
     # print debug info
