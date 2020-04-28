@@ -297,6 +297,7 @@ class Car(Agent):
         self.action_selection_flags = ()
         self.token_count_before = 0
         self.left_turn_gap_arr = []
+        self.clearance_straight_info = None
 
         self.conflict_winner_sv = None
         self.received_sv = []
@@ -393,6 +394,7 @@ class Car(Agent):
         self.agents_checked_for_conflict_sv = []
         self.agent_max_braking_not_enough_sv = None
         self.conflict_winner_sv = None
+        #self.clearance_straight_info = None
         #self.token_count_sv = 0
 
     # conflict resolution, returns True if winner and false if not winner
@@ -1634,7 +1636,8 @@ class Game:
                                             'token_count_before': agent.token_count_before, \
                                                 'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr, \
                                                     'lead_agent':agent.lead_agent, 'checked_for_conflict':agent.agents_checked_for_conflict_sv, \
-                                                        'agents_in_bubble_before': agent.agents_in_bubble_before_sv}
+                                                        'agents_in_bubble_before': agent.agents_in_bubble_before_sv, \
+                                                            'clearance_straight_info': agent.clearance_straight_info}
             #agent.conflict_winner = None
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
@@ -2712,26 +2715,43 @@ class IntersectionClearanceOracle(Oracle):
     def __init__(self):
         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
     def evaluate(self, ctrl_action, plant, game):
+        # return count of number of agents ahead of it in interesection
+        def count_agents_in_intersection_ahead(intersection_gap):
+            cnt = 0
+            # check for number of agents ahead in intersection
+            forward = DIRECTION_TO_VECTOR[plant.state.heading]
+            curr_st = np.array([plant.state.x, plant.state.y])
+            for i in range(1, intersection_gap):
+                next_tile_tuple = tuple(curr_st + i*np.array(forward))
+                # if there is an agent there, then count it
+                if next_tile_tuple in game.occupancy_dict: 
+                    cnt = cnt + 1
+            return cnt
+
+        self.clearance_straight_info = None
         current_state = plant.state.x, plant.state.y
         x_curr, y_curr = current_state
         next_state = plant.query_next_state(ctrl_action)
         x_next, y_next = next_state.x, next_state.y
         # check if not crossing into an intersection
         try:
-            currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x__curr,y_curr))
+            currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
         except:
             return True
         if currently_in_intersection or not will_be_in_intersection:
             return True
-        else: # if indeed crossing into an intersection
+        else:
+            #print("action crossing into intersection") 
+            # if indeed crossing into an intersection
             # check if attempting to perform a left turn
             current_subgoal = plant.supervisor.subgoals[0]
             # figure out what intersection is being entered
             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
             current_heading = plant.state.heading
             # confirm intention to perform left turn; TODO: generalize this check
-            if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoals[0][1])):
+            if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
+                #print("trying to turn left!!")
                 # left turn is confirmed
                 heading_degrees = Car.convert_orientation(current_heading)
                 left_heading_degrees  = (heading_degrees + 90) % 360
@@ -2740,7 +2760,7 @@ class IntersectionClearanceOracle(Oracle):
                 next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
                 while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
                     next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
-                reference_state = plant.hack_state(x=next_tile[0], y=next_tile[1], heading=left_heading)
+                reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
 
                 if current_heading in ['east', 'west']:
                     intersection_gap = next_intersection.height
@@ -2748,24 +2768,38 @@ class IntersectionClearanceOracle(Oracle):
                     intersection_gap = next_intersection.width
                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
                 if lead_agent:
-                    reference_state_bundle_width = plant.get_width_along_bundle() + 1
+                    width, _= plant.get_width_along_bundle()
+                    reference_state_bundle_width = width + 1
                     num_residual_tiles = intersection_gap - reference_state_bundle_width
-                    clearance = max(abs(lead_agent.x-reference_state.x), abs(lead_agent.y-reference_state.y))
+                    clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))
                 else:
                     clearance = np.inf
-                return clearance > intersection_gap*5 #TODO: find a better bound
+                return clearance > intersection_gap #TODO: find a better bound
 
             else: # going straight
+                #print("entering intersection straight with intention to move straight")
+                # save intersection gap, 
                 if current_heading in ['east', 'west']:
                     intersection_gap = next_intersection.width
                 else:
                     intersection_gap = next_intersection.height
+                # count the number of agents in intersection ahead of it
+                agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
                 if lead_agent:
-                    clearance = max(abs(lead_agent.x-x_curr), abs(lead_agent.y-y_curr)) - intersection_gap
+                    clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
                 else:
                     clearance = np.inf
-                return clearance > intersection_gap*5 #TODO: find a better bound
+
+                if lead_agent is None: 
+                    x_sv = None
+                    y_sv = None
+                else: 
+                    x_sv = lead_agent.state.x
+                    y_sv = lead_agent.state.y
+    
+                self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
+                return clearance > intersection_gap #TODO: find a better bound
 
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
@@ -3942,7 +3976,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=30)
+    game.play(outfile=output_filename, t_end=100)
 #    game.animate(frequency=0.01)
 
     # print debug info

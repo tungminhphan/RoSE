@@ -238,10 +238,10 @@ if __name__ == '__main__':
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
     start, end = argv_to_start_end()
-    #traces_to_animation(traces_file, output_dir, start=start, end=end)
+    traces_to_animation(traces_file, output_dir, start=start, end=end)
     #animate_images(output_dir)
 
     # bubbles figure for the paper
     #for dynamics a:-1,1, v=3
-    bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_filtered.p'
-    make_bubble_figure(bubble_file)
+    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_filtered.p'
+    #make_bubble_figure(bubble_file)
