@@ -278,6 +278,7 @@ class Car(Agent):
         self.acc_vals = np.arange(self.a_min, self.a_max+1)
         self.default_state = Car.hack_state(self.state, x=0, y=0, heading='east', v=0)
         self.default_bubbles = self.get_default_bubbles()
+        self.default_filtered_bubbles = self.get_default_bubbles(front_back_only=True)
         self.bubble = None # this should update at every time step
         self.agents_in_bubble = [] # this should update at every time step
         self.send_conflict_requests_to = [] # list of agents
@@ -434,13 +435,13 @@ class Car(Agent):
                 return bundle.tile_to_relative_width((x,y)), bundle
 
 
-    def get_default_bubbles(self):
+    def get_default_bubbles(self, front_back_only=False):
         # caching the agent bubbles
         def create_pickle_file(filename):
             vel = np.arange(self.v_min, self.v_max+1)
             bubble_dict = od()
             for v in vel:
-                bubble_dict[v] = self.get_default_bubble(v)
+                bubble_dict[v] = self.get_default_bubble(v, front_back_only=front_back_only)
             with open(filename, 'wb+') as pckl_file:
                 pickle.dump(bubble_dict, pckl_file)
             pass
@@ -454,6 +455,8 @@ class Car(Agent):
             os.makedirs(output_dir)
 
         filedir = output_dir + car_param #v_n1_2_a_n2_2.p'
+        if front_back_only:
+            filedir = filedir[:-2]+'_filtered.p'
         if not os.path.exists(filedir):
             create_pickle_file(filedir)
 
@@ -642,7 +645,7 @@ class Car(Agent):
 
     # check farthest straight agent can go forward (assuming agent in front already took its turn)
     def get_max_forward_ctrl(self):
-        lead_agent = self.find_lead_agent()
+        lead_agent = self.find_lead_agent(inside_bubble=True)
         if lead_agent is None:
             ctrl = Car.get_ctrl_od(self.a_max, 'straight')
             return ctrl
@@ -1002,7 +1005,7 @@ class Car(Agent):
         is_safe = True
         for gridpt, agent in occupancy_dict.items():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
-            lead_agent = agent.find_lead_agent()
+            lead_agent = agent.find_lead_agent(inside_bubble=True)
             # record all agents without valid back-up plan
             agents_no_bp = []
             if lead_agent:
@@ -1018,7 +1021,23 @@ class Car(Agent):
         else:
             return is_safe
 
-    def find_lead_agent(self, state=None, must_not_be_in_intersection=False, same_heading_required=True):
+    def find_lead_agent(self, state=None, inside_bubble=False, must_not_be_in_intersection=False, same_heading_required=True):
+        def check_agent_is_ahead(agent_state, other_agent):
+            d_vec = np.array(DIRECTION_TO_VECTOR[agent_state.heading])
+            diff_vec = np.array([other_agent.state.x, other_agent.state.y]) - np.array([agent_state.x, agent_state.y])
+            diff_vec_norm = diff_vec
+            norm = np.linalg.norm(diff_vec)
+            if norm != 0:
+                diff_vec_norm = diff_vec/norm
+            
+            #print(agent_state)
+            #print(other_agent.state)
+            #print(d_vec, diff_vec_norm)
+            #boolean = (np.dot(d_vec,diff_vec_norm)==1) or (norm ==0)
+            #print(boolean)
+
+            return (np.dot(d_vec,diff_vec_norm)==1) or (norm ==0), norm
+
         if state is None:
             state = self.state
         try:
@@ -1026,24 +1045,48 @@ class Car(Agent):
         except:
             return None
 
-        d_vec = DIRECTION_TO_VECTOR[state.heading]
-        # get tiles in front
-        tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
-        tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
-
-        # check agents in these tiles
-        for i in range(0, len(tiles_x)):
-            # as soon as agent found in nearest tile, return lead vehicle
-            if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
-                agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-                # only find agents that are facing in the same direction
-                if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == self.state.heading)):
+        # if only looking for lead agent inside of bubble
+        if inside_bubble:
+            # keep track of the closest lead agent
+            closest_agent = None
+            min_dist = np.inf
+            for agent in self.agents_in_bubble:
+                # check if agent is in front
+                chk_ahead, norm = check_agent_is_ahead(state, agent)
+                if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == state.heading)):
                     if not must_not_be_in_intersection:
-                        return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                        if norm < min_dist: 
+                            closest_agent = agent
+                            min_dist = norm
                     else:
                         if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
+                            if norm < min_dist: 
+                                closest_agent = agent
+                                min_dist = norm
+
+            return closest_agent
+
+        else:
+            d_vec = DIRECTION_TO_VECTOR[state.heading]
+            # get tiles in front
+            tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
+            tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
+
+            # check agents in these tiles
+            for i in range(0, len(tiles_x)):
+                # as soon as agent found in nearest tile, return lead vehicle
+                if (tiles_x[i], tiles_y[i]) in self.supervisor.game.occupancy_dict:
+                    agent = self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+                    # only find agents that are facing in the same direction
+                    if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == state.heading)):
+                        if not must_not_be_in_intersection:
                             return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-        return None
+                        else:
+                            if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
+                                return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
+        
+            return None
+
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
         #__import__('ipdb').set_trace(context=21)
@@ -1183,7 +1226,35 @@ class Car(Agent):
         #or intention_forward_action_conflict(agent)
 
     #=== helper methods for computing the agent bubble ===================#
-    def get_default_bubble(self, vel):
+    def get_default_bubble(self, vel, front_back_only=False):
+        def get_states_where_backup_plan_reaches_resources(resources): 
+            # brute force search for whether state reaches forward reachable gripts
+            x_min = -self.v_max*5
+            x_max = self.v_max*5
+            x_grid = np.arange(x_min, x_max+1, 1)
+            y_grid = np.arange(x_min, x_max+1, 1)
+            v_grid = np.arange(self.v_min, self.v_max+1, 1)
+            all_dir = ['north', 'south', 'east', 'west']
+            bp_plan_states = []
+            for x in x_grid:
+                for y in y_grid:
+                    for v in v_grid: 
+                        for heading in all_dir: 
+                            # check whether agent at this state will reach the forward reachable gridpoints if it executes the back-up plan
+                            st = self.hack_state(self.state, x=x, y=y, heading=heading, v=v)
+                            occ = self.query_occupancy(self.get_backup_plan_ctrl(), state=st)
+                            if len(occ)>1:
+                                occ = occ[1:]
+                            gridpt_occ = [(state.x, state.y) for state in occ]
+                            # check whether intersection between backup plan and resources
+                            gridpts_intersect = list(set(resources) & set(gridpt_occ))
+                            check_overlap = len(gridpts_intersect) > 1
+                            # if overlap, append to list of states
+                            if check_overlap:
+                                bp_plan_states.append(st)
+            return bp_plan_states
+
+
         # get all possible future reources car can occupy
         def get_resources():
             # set car state to have velocity v
@@ -1210,17 +1281,29 @@ class Car(Agent):
             resources_unique = []
             [resources_unique.append(x) for x in resources if x not in resources_unique]
             return resources_unique
+        
 
         # gridpoints
         bubble = []
         resources = get_resources()
-        # get all possible reachable states
+
+        # get all possible reachable states to resources
         for xy in resources:
             # get all possible states to that resource
             # TODO: Right now, assuming all other agents have the same dynamics as itself!!
-            states = self.get_backwards_reachable_states_from_gridpoint(xy)
+            states = self.get_backwards_reachable_states_from_gridpoint(xy, front_back_only=front_back_only)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
+        
+        # get all states where backup plan intersects with resources
+        backup_plan_states = get_states_where_backup_plan_reaches_resources(resources)
+        
+        # get all gridpoints from which the backup plan states are backwards reachable
+        for state_to in backup_plan_states: 
+            states_from, actions_to = self.get_backwards_reachable_states(state_to, front_back_only=front_back_only)
+            # transform all states from into gridpoints
+            more_gridpts = [(state.x, state.y) for state in states_from]
+            bubble.extend(more_gridpts)
 
         # remove repeat elements
         bubble_unique = []
@@ -1282,8 +1365,9 @@ class Car(Agent):
         return state_from[0]
 
     # compute all backwards reachable states and actions to get to state specified
-    def get_backwards_reachable_states(self, state_to):
+    def get_backwards_reachable_states(self, state_to, front_back_only=False):
         # just need a car object to call get_all_ctrl function
+        filter_dir = [self.default_state.heading] 
         all_inv_ctrl = self.get_all_ctrl(state=state_to, inverse=True)
         states = [None]*len(all_inv_ctrl) # will be too large but saves time pre-allocating
         actions = [None]*len(all_inv_ctrl)
@@ -1291,27 +1375,35 @@ class Car(Agent):
         for inv_ctrl in all_inv_ctrl:
             occupancy = self.compute_state_from(state_to, inv_ctrl)
             if occupancy is not None:
-                states[cnt] = occupancy
-                actions[cnt] = inv_ctrl
-                cnt = cnt+1
+                # remove all states without east west heading
+                if front_back_only: 
+                    if occupancy.heading in filter_dir: 
+                        states[cnt] = occupancy
+                        actions[cnt] = inv_ctrl
+                        cnt = cnt+1
+                else: 
+                    states[cnt] = occupancy
+                    actions[cnt] = inv_ctrl
+                    cnt = cnt+1
         # remove all the none
         states = states[0:cnt]
         actions = actions[0:cnt]
         return states, actions
 
     # get all backwards reachable states from a gridpoint
-    def get_backwards_reachable_states_from_gridpoint(self, xy, filter_dir=None):
-        directions = list(DIRECTION_TO_VECTOR.keys())
+    def get_backwards_reachable_states_from_gridpoint(self, xy, front_back_only=False):
+        all_directions = ['north', 'south', 'east', 'west']
+        filter_dir = [self.default_state.heading]
         vel_arr = np.arange(self.v_min, self.v_max+1)
         backwards_reachable_states = []
-        for dir in directions:
+        for dir in all_directions:
             for vel in vel_arr:
                 # create a pseudo state
                 state_to = self.hack_state(self.state, x=xy[0], y=xy[1], heading=dir, v=vel)
                 states, _ = self.get_backwards_reachable_states(state_to)
                 # filter for cars coming from certain direction
-                if filter_dir is not None:
-                    states = [state for state in states if state.heading == filter_dir]
+                if front_back_only:
+                    states = [state for state in states if state.heading in filter_dir]
                 backwards_reachable_states.extend(states)
         return backwards_reachable_states
 
@@ -1629,7 +1721,7 @@ class Game:
     def check_config_safety(self):
         for agent in agent_set:
             x, y, v = agent.state.x, agent.state.y, agent.state.v
-            lead_agent = plant.find_lead_agent()
+            lead_agent = plant.find_lead_agent(inside_bubble=True)
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
@@ -3199,7 +3291,7 @@ class BackupPlanSafetyOracle(Oracle):
             next_state = plant.query_occupancy(ctrl_action)[-1]
 
             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
-            lead_agent = plant.find_lead_agent(state=next_state, same_heading_required=False)
+            lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
 
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
@@ -3850,7 +3942,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=25)
+    game.play(outfile=output_filename, t_end=30)
 #    game.animate(frequency=0.01)
 
     # print debug info
