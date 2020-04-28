@@ -3836,8 +3836,8 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 111
 
-    map_name = 'city_blocks_cramped'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.2, seed=seed)
+    map_name = 'city_blocks_asymmetric'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.05, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3845,7 +3845,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=500)
 #    game.animate(frequency=0.01)
 
     # print debug info
