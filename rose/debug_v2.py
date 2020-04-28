@@ -64,9 +64,9 @@ def write_info(out_file, t, trace):
     out_file.write('\n')
 
     # print out which agents it checked conflict with
-    #out_file.write('checked for agent conflict with:\n')
-    #for agent in trace['checked_for_conflict']:
-    #    out_file.write(str(agent)+'\n')
+    out_file.write('checked for agent conflict with:\n')
+    for agent in trace['checked_for_conflict']:
+        out_file.write(str(agent)+'\n')
 
     # print out the conflict requests it sent out
     out_file.write('sent requests to:\n')
@@ -123,7 +123,7 @@ def print_one_agent_trace(filename, x, y, heading, time, outfile):
 
     t_end = int(max(traces.keys()))
     #print(t_end)
-    for t in range(1,t_end):
+    for t in range(0,t_end):
         agents_dict = traces[t]
         # search through all agents at time t
         for ag_id, agent_trace in agents_dict.items():
@@ -147,6 +147,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("======================AGENT IS LOCATED ATTTT==================\n")
         out_file.write(str(agent_trace['state'])+'\n')
         out_file.write(str(agent_trace['color'])+'\n')
+
+        out_file.write("AGENT GOAL IS:\n")
+        out_file.write(str((agent_trace['goals']))+'\n')
 
         out_file.write("agent intention is:\n")
         out_file.write(str(agent_trace['intention'])+'\n')
@@ -177,10 +180,10 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("ACTION TAKEN: \n")
         out_file.write(str(agent_trace['action'])+'\n')
         
-        #out_file.write('checked for agent conflict with:\n')
-        #if agent_trace['checked_for_conflict'] is not None: 
-        #    for agent in agent_trace['checked_for_conflict']:
-        #        out_file.write(str(agent)+'\n')
+        out_file.write('checked for agent conflict with:\n')
+        if agent_trace['checked_for_conflict'] is not None: 
+            for agent in agent_trace['checked_for_conflict']:
+                out_file.write(str(agent)+'\n')
 
         out_file.write('agent max braking flag :\n')
         out_file.write(str(agent_trace['max_braking_not_enough'])+'\n')
@@ -195,7 +198,7 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 13, 15, 'south', 28, outfile)
+    print_one_agent_trace(traces_file, 24, 25, 'south', 16, outfile)
 
-    outfile_cc = os.getcwd()+'/saved_traces/debug_cc_28.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 28)
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    print_all_agents_at_time_t(traces_file, outfile_cc, 16)
