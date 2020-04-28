@@ -2370,8 +2370,9 @@ class Map:
             vtiles = vleft + vright
             if htiles or vtiles:
                 light_id = len(traffic_lights)
-                traffic_light = TrafficLight(light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init, seed=seed)
+                traffic_light = TrafficLight(count=traffic_light_cnt, light_id=light_id,htiles=htiles,vtiles=vtiles, random_init=random_traffic_lights_init, seed=seed)
                 traffic_lights[traffic_light] = intersection
+                traffic_light_cnt += 1
 
         return traffic_lights
 
@@ -3433,8 +3434,9 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    def __init__(self, light_id, htiles, vtiles, seed, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, seed, count, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
         self.id = light_id
+        self.count = count
         self.durations = od()
         self.durations['green'] = t_green
         self.durations['yellow'] = t_yellow
@@ -3444,7 +3446,10 @@ class TrafficLight:
 
 
         if random_init:
-            set_seed(seed)
+            #if seed is not None: 
+                #print(self.count)
+                #print (seed + self.count)
+            set_seed(seed,self.count*3)
             self.hstate = np.random.choice([color for color in self.durations])
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
@@ -3845,7 +3850,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=25)
 #    game.animate(frequency=0.01)
 
     # print debug info
