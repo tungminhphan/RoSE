@@ -2733,13 +2733,18 @@ class IntersectionClearanceOracle(Oracle):
         x_curr, y_curr = current_state
         next_state = plant.query_next_state(ctrl_action)
         x_next, y_next = next_state.x, next_state.y
+        # need to check whether agent backup plan at next state will be in intersection
+        bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
+        x_next_bp, y_next_bp = bp_state.x, bp_state.y
+
         # check if not crossing into an intersection
         try:
             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
+            bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
         except:
             return True
-        if currently_in_intersection or not will_be_in_intersection:
+        if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
             return True
         else:
             #print("action crossing into intersection") 
@@ -2751,7 +2756,6 @@ class IntersectionClearanceOracle(Oracle):
             current_heading = plant.state.heading
             # confirm intention to perform left turn; TODO: generalize this check
             if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
-                #print("trying to turn left!!")
                 # left turn is confirmed
                 heading_degrees = Car.convert_orientation(current_heading)
                 left_heading_degrees  = (heading_degrees + 90) % 360
@@ -3967,7 +3971,7 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 111
 
-    map_name = 'city_blocks_cramped'
+    map_name = 'city_blocks_med'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.2, seed=seed)
     output_filename = 'game'
 
@@ -3976,7 +3980,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=500)
 #    game.animate(frequency=0.01)
 
     # print debug info
