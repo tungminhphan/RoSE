@@ -36,6 +36,11 @@ def write_info(out_file, t, trace):
     out_file.write("AGENT GOAL IS:\n")
     out_file.write(str((trace['goals']))+'\n')
 
+    # print the agent's subgoals
+    out_file.write("AGENT SUBGOALS IS:\n")
+    out_file.write(str((trace['subgoals']))+'\n')
+
+
     # print out the oracle scores
     for ctrl, oracle_scores in trace['spec_struct_info'].items():
         out_file.write("control action\n")
@@ -151,6 +156,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((agent_trace['goals']))+'\n')
 
+        out_file.write("AGENT SUBGOALS IS:\n")
+        out_file.write(str((agent_trace['subgoals']))+'\n')
+
         out_file.write("agent intention is:\n")
         out_file.write(str(agent_trace['intention'])+'\n')
 
@@ -198,7 +206,7 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 24, 25, 'south', 16, outfile)
+    print_one_agent_trace(traces_file, 33, 25, 'east', 31, outfile)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     print_all_agents_at_time_t(traces_file, outfile_cc, 16)
