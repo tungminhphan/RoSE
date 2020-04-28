@@ -197,7 +197,7 @@ def make_bubble_figure(bubble_file):
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         for grid in bubble:
-            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.25,facecolor='orange', alpha=0.2)
+            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=0.5,facecolor='orange', alpha=0.2)
             ax.add_patch(rect)
         plt_car(ax, car_tuple)
     plt.show()
@@ -242,6 +242,6 @@ if __name__ == '__main__':
     #animate_images(output_dir)
 
     # bubbles figure for the paper
-    # for dynamics a:-1,1, v=3
-    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1.p'
+    #for dynamics a:-1,1, v=3
+    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_filtered.p'
     #make_bubble_figure(bubble_file)

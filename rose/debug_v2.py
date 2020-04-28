@@ -60,12 +60,20 @@ def write_info(out_file, t, trace):
         out_file.write(str(ctrl)+'\n')
         for key, value in oracle_scores.items():
             out_file.write(key + ' ' + str(value)+'\n')
+    
+    # lead agent found for backup plan evaluation
+    out_file.write("lead agent is:\n")
+    out_file.write(str(trace['lead_agent'])+'\n')
 
     out_file.write('\n')
     out_file.write('left turn gap info:\n')
     for tup in trace['left_turn_gap_arr']:
         out_file.write(str(tup)+'\n')
+    out_file.write('\n')
 
+    out_file.write('\n')
+    out_file.write('clearance straight info :\n')
+    out_file.write(str(trace['clearance_straight_info'])+'\n')
     out_file.write('\n')
 
     # print out which agents it checked conflict with
@@ -206,7 +214,7 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 33, 25, 'east', 31, outfile)
+    print_one_agent_trace(traces_file, 19, 11, 'north', 32, outfile)
 
     outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 16)
+    print_all_agents_at_time_t(traces_file, outfile_cc, 32)
