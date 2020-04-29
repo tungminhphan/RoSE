@@ -1024,6 +1024,21 @@ class Car(Agent):
             return is_safe
 
     def find_lead_agent(self, state=None, inside_bubble=False, must_not_be_in_intersection=False, same_heading_required=True):
+        '''def check_agent_ahead_other_agent(agent_state, other_agent_state):
+            try: 
+                length_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(((agent_state.x, agent_state.y), agent_state.heading))
+            except:
+                return False, None
+            try: 
+                length_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((other_agent_state.x, other_agent_state.y), other_agent_state.heading))
+            except:
+                return False, None
+            return length_1 >= length_2, length_1-length_2
+
+        def check_agent_is_ahead(agent_state, other_agent):
+            check_same_lane = self.check_same_lane(agent_state, other_agent.state)
+            check_ahead, norm = check_agent_ahead_other_agent(agent_state, other_agent.state)
+            return (check_same_lane and check_ahead), norm'''
         def check_agent_is_ahead(agent_state, other_agent):
             d_vec = np.array(DIRECTION_TO_VECTOR[agent_state.heading])
             diff_vec = np.array([other_agent.state.x, other_agent.state.y]) - np.array([agent_state.x, agent_state.y])
@@ -1031,7 +1046,7 @@ class Car(Agent):
             norm = np.linalg.norm(diff_vec)
             if norm != 0:
                 diff_vec_norm = diff_vec/norm
-            
+
             #print(agent_state)
             #print(other_agent.state)
             #print(d_vec, diff_vec_norm)
@@ -1042,10 +1057,6 @@ class Car(Agent):
 
         if state is None:
             state = self.state
-        try:
-            arc_l, bundle = self.get_length_along_bundle()
-        except:
-            return None
 
         # if only looking for lead agent inside of bubble
         if inside_bubble:
@@ -1055,20 +1066,25 @@ class Car(Agent):
             for agent in self.agents_in_bubble:
                 # check if agent is in front
                 chk_ahead, norm = check_agent_is_ahead(state, agent)
-                if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == state.heading)):
-                    if not must_not_be_in_intersection:
-                        if norm < min_dist: 
-                            closest_agent = agent
-                            min_dist = norm
-                    else:
-                        if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
+                if chk_ahead: 
+                    if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == state.heading)):
+                        if not must_not_be_in_intersection:
                             if norm < min_dist: 
                                 closest_agent = agent
                                 min_dist = norm
+                        else:
+                            if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
+                                if norm < min_dist: 
+                                    closest_agent = agent
+                                    min_dist = norm
 
             return closest_agent
 
         else:
+            try:
+                arc_l, bundle = self.get_length_along_bundle()
+            except:
+                return None
             d_vec = DIRECTION_TO_VECTOR[state.heading]
             # get tiles in front
             tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
@@ -1112,6 +1128,17 @@ class Car(Agent):
         chk_safe_end_config = self.check_safe_config(ag_1, ag_2, occ_1[-1], occ_2[-1])
         # return if occupancies don't intersect and safe end config
         return (not chk_occupancy_intersection) and chk_safe_end_config
+    
+    def check_same_lane(self, st_1, st_2):
+        try: 
+            width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
+        except:
+            return False
+        try: 
+            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
+        except:
+            return False
+        return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
@@ -1123,17 +1150,7 @@ class Car(Agent):
             st_2 = ag_2.state
 
         # check agents are in the same lane
-        def check_same_lane(st_1, st_2):
-            try: 
-                width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
-            except:
-                return False
-            try: 
-                width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
-            except:
-                return False
 
-            return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
             '''try:
                 width_1, bundle_1 = ag_1.get_width_along_bundle()
             except:
@@ -1162,7 +1179,7 @@ class Car(Agent):
                 return None, None, None, None
 
         # first check same lane
-        same_lane_chk = check_same_lane(st_1, st_2)
+        same_lane_chk = self.check_same_lane(st_1, st_2)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
         if not same_lane_chk: 
             #print("not same lane check")
@@ -1954,6 +1971,16 @@ class Map:
         for bundle in current_bundles:
             if bundle.direction == heading:
                 return bundle.tile_to_relative_width((x,y)), bundle
+    
+    def directed_tile_to_relative_length(self, directed_tile):
+        #__import__('ipdb').set_trace(context=21)
+        x, y = directed_tile[0]
+        heading = directed_tile[1]
+
+        current_bundles = self.tile_to_bundle_map[x,y]
+        for bundle in current_bundles:
+            if bundle.direction == heading:
+                return bundle.tile_to_relative_length((x,y)), bundle
 
     # for now, we are assuming default car dynamics; TODO: generalize this
     def get_left_turn_to_opposing_traffic_map(self):
@@ -3318,9 +3345,6 @@ class BackupPlanSafetyOracle(Oracle):
     def evaluate(self, ctrl_action, plant, game):
         # check if collision occurs by taking that action
         collision_chk = plant.check_collision_in_bubble(ctrl_action)
-        #if ctrl_action['acceleration'] == 1:
-        #print("COLLISION CHECK RESULT")
-        #print(collision_chk)
         if collision_chk:
             #print('collison occurred, returning false')
             return False
@@ -3338,14 +3362,6 @@ class BackupPlanSafetyOracle(Oracle):
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap
                 plant.gap_curr = gap_curr
-                #if ctrl_action['acceleration'] == 1:
-                #print("LEAD AGENT CHECK")
-                #print(lead_agent.state)
-                #print(plant.a_min, v)
-                #print(plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v))
-                #print(gap_curr)
-                #print(plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr)
-
                 return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
                 return True
@@ -3980,7 +3996,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=500)
+    game.play(outfile=output_filename, t_end=250)
 #    game.animate(frequency=0.01)
 
     # print debug info
