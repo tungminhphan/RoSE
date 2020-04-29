@@ -899,15 +899,21 @@ class Car(Agent):
                 if chk_lon and self.state.heading == agent.state.heading:
                     #agents_checked_for_conflict.append(agent)
                     # send request to agent behind if intentions conflict
+                    #print('checking to send request')
+                    #print(agent.state)
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
+                    #print(chk_to_send_request)
                     if chk_to_send_request:
                         send_requests_list.append(agent)
                     # check whether max yield is not enough; if not, set flag
-                    chk_max_braking_not_enough = self.intention_bp_conflict(agent)
+                    #print('checking max braking not enough flag')
+                    #print(agent.state)
+                    chk_max_braking_not_enough, flag_a, flag_b = self.intention_bp_conflict(agent)
+                    #print(chk_max_braking_not_enough, flag_a, flag_b)
                     if chk_max_braking_not_enough:
                         self.agent_max_braking_not_enough = agent
                         # save this info
-                        self.agent_max_braking_not_enough_sv = agent.state.__tuple__()
+                        self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
                         return []
         self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
         return send_requests_list
@@ -1115,39 +1121,45 @@ class Car(Agent):
 
 
     # check if a set of actions is valid for a pair of agents
-    def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2):
+    def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2, debug=False):
+        #print("checking valid actions")
+        #print(ag_1.state, ctrl_1, ag_2.state, ctrl_2)
         # get occupancy for both actions
         occ_1 = ag_1.query_occupancy(ctrl_1)
         occ_2 = ag_2.query_occupancy(ctrl_2)
         # if invalid actions, print an error
         if occ_1 is None or occ_2 is None:
-            return False
+            if debug:
+                return False, 0, 0
+            else:
+                return False
         # check occupancy intersection
         chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
         #print("occupancy check in check valid actions complete")
         chk_safe_end_config = self.check_safe_config(ag_1, ag_2, occ_1[-1], occ_2[-1])
         # return if occupancies don't intersect and safe end config
-        return (not chk_occupancy_intersection) and chk_safe_end_config
+        if not debug:
+            return (not chk_occupancy_intersection) and chk_safe_end_config
+        else: 
+            return ((not chk_occupancy_intersection) and chk_safe_end_config), not chk_occupancy_intersection, chk_safe_end_config
     
-    def check_same_lane(self, st_1, st_2):
-        try: 
-            width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
-        except:
-            return False
-        try: 
-            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
-        except:
-            return False
-        return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
+    
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
-        #print(st_1)
-        #print(st_2)
-        if st_1 is None:
-            st_1 = ag_1.state
-        if st_2 is None:
-            st_2 = ag_2.state
+        def check_same_lane(st_1, st_2):
+            try: 
+                width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
+            except:
+                return False
+            try: 
+                width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
+            except:
+                return False
+            #print(st_1)
+            ##print(st_2)
+            #print(width_1, width_2)
+            return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
 
         # check agents are in the same lane
 
@@ -1162,13 +1174,13 @@ class Car(Agent):
             return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2'''
 
         # returns agent_lead, agent_behind in that order
-        def sort_agents(ag_1, ag_2):
+        def sort_agents(st_1, st_2):
             try:
-                l_1 = ag_1.get_length_along_bundle()[0]
+                l_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(((st_1.x, st_1.y), st_1.heading))
             except:
                 return None, None, None, None
             try:
-                l_2 = ag_2.get_length_along_bundle()[0]
+                l_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_length(((st_2.x, st_2.y), st_2.heading))
             except:
                 return None, None, None, None
             if l_1 > l_2:
@@ -1177,28 +1189,40 @@ class Car(Agent):
                 return ag_2, ag_1, st_2, st_1
             else:
                 return None, None, None, None
+        
+        if st_1 is None:
+            st_1 = ag_1.state
+        if st_2 is None:
+            st_2 = ag_2.state
 
+        #print("safe config check")
+        #print(ag_1.state, ag_2.state, st_1, st_2)
         # first check same lane
-        same_lane_chk = self.check_same_lane(st_1, st_2)
+        same_lane_chk = check_same_lane(st_1, st_2)
+        #print('same lane check')
+        #print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
         if not same_lane_chk: 
             #print("not same lane check")
             return True
         # then check which agent is lead and which one is behind
-        ag_lead, ag_behind, st_lead, st_behind = sort_agents(ag_1, ag_2)
+        ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2)
         # if None, agents are on top of each other
         if ag_lead is None: 
             #print("agents on top of each other ")
+            #print()
             return False
 
         gap_req = self.compute_gap_req(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
         gap_curr = np.linalg.norm(np.array([st_lead.x-st_behind.x, st_lead.y-st_behind.y]))
-        #print("gap curr, gap req")
-        #print(gap_curr, gap_req)
+        #print("gap check")
+        #print(gap_req, gap_curr)
+
         return gap_curr >= gap_req
 
     def check_occupancy_intersection(self, occ_a, occ_b):
         # convert list of agent states to grid points if not already list of tuples
+        #print("checking occupancy intersection")
         if len(occ_a)>1:
             occ_a = occ_a[1:]
         if len(occ_b)>1:
@@ -1220,12 +1244,12 @@ class Car(Agent):
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
-            chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl())
+            chk_valid_actions, flag_a, flag_b = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(), debug=True)
             #if not chk_valid_actions:
             #    print("max yield flag is set")
-            return not chk_valid_actions
+            return not chk_valid_actions, flag_a, flag_b
         else:
-            return False
+            return False, flag_a, flag_b
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
     def check_to_send_conflict_request(self, agent):
@@ -1234,8 +1258,8 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                if not chk_valid_actions:
-                    print("sending conflict request")
+                #if not chk_valid_actions:
+                #    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1540,7 +1564,7 @@ class SpawningContract():
 
 class Game:
     # combines scenario + agents for game
-    def __init__(self, game_map, agent_set=[]):
+    def __init__(self, game_map, save_debug_info=True, agent_set=[]):
         self.time = 0
         self.map = game_map
         self.agent_set = agent_set
@@ -1554,6 +1578,7 @@ class Game:
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
+        self.save_debug_info = save_debug_info
 
     def update_occupancy_dict(self):
         occupancy_dict = od()
@@ -1670,6 +1695,7 @@ class Game:
         self.traces["unsafe_joint_state_dict"] = self.unsafe_joint_state_dict
         self.traces["t_end"] = t_end
         self.traces["special_heading_tiles"] = self.map.special_goal_tiles
+        self.traces['seed'] = self.map.seed
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         filename = filename + '.p'
@@ -1758,6 +1784,8 @@ class Game:
             agent.reset_conflict_lists()
 
         for agent in self.agent_set:
+            #print("========SENDING AND RECEIVING CONFLICT REQUESTS FOR: ======")
+            #print(agent.state)
             # set list to send requests to
             agent.send_conflict_requests_to = agent.find_agents_to_send_conflict_request()
             # for each agent receiving request, update their receive list
@@ -1774,7 +1802,8 @@ class Game:
             self.play_step()
             # need to save data after time step has occured
             if write_bool and self.time >= 0:
-                self.write_agents_to_traces()
+                if self.save_debug_info:
+                    self.write_agents_to_traces()
 
             self.time_forward()
 
@@ -2289,10 +2318,6 @@ class Map:
                 # performs the check
                 check, nxt = self.check_if_left_turn_tile(directed_tile)
                 if check:
-                    # if check succeeds, add directed tile as a key to the
-                    # dictionary corresponding to the bundle with the
-                    # corresponding value nxt being the remaining tiles
-                    # required to complete the left-turn
                     left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
@@ -3580,7 +3605,7 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    def __init__(self, light_id, htiles, vtiles, seed, count, t_green=20,t_yellow=3,t_buffer=10, random_init=True):
+    def __init__(self, light_id, htiles, vtiles, seed, count, t_green=20,t_yellow=3,t_buffer=10, random_init=False):
         self.id = light_id
         self.count = count
         self.durations = od()
@@ -3869,21 +3894,11 @@ class QuasiSimultaneousGame(Game):
 
     def determine_conflict_cluster_resolutions(self):
         for agent in self.agent_set:
-            #print("=======================AGENT at STATE===========================================")
-            #print(agent.state)
             agent.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.send_conflict_requests_to]
             agent.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.received_conflict_requests_from]
-            #print("AGENT SENT REQUESTS TO:")
-            #for ag in agent.sent_sv:
-            #    print(ag)
-            #print("AGENT RECEIVED REQUESTS FROM:")
-            #for ag in agent.received_sv: 
-            #    print(ag)
             agent.is_winner, agent.conflict_winner = agent.check_conflict_resolution_winner()
             if agent.conflict_winner is not None:
                 agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
-            #print("AGENT CONFLICT RESOLUTION")
-            #print(agent.conflict_winner_sv, agent.is_winner)
 
     def sys_step(self):
         # set all agent intentions
@@ -3988,7 +4003,7 @@ if __name__ == '__main__':
     seed = 111
 
     map_name = 'city_blocks_med'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.2, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3996,7 +4011,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=250)
+    game.play(outfile=output_filename, t_end=500)
 #    game.animate(frequency=0.01)
 
     # print debug info
