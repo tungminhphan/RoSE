@@ -4008,7 +4008,7 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 777
+    seed = 1000
 
     map_name = 'city_blocks_med'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
@@ -4019,7 +4019,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=500)
+    game.play(outfile=output_filename, t_end=1000)
 #    game.animate(frequency=0.01)
 
     # print debug info
