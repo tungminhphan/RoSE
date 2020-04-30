@@ -5,7 +5,7 @@
     Date created: 1/10/2020
 '''
 from typing import List, Any
-from itertools import cycle
+from itertools import cycle, tee
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import curses
@@ -26,6 +26,7 @@ import json
 import copy as cp
 #from plotting import traces_to_animation
 
+DEBUGGING = False
 FIND_LEAD_AGENT_THRESHOLD = 15 #TODO: compute this automatically
 CAR_COLORS = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
 IOMap = namedtuple('IOMap', ['sources','sinks','map'])
@@ -258,11 +259,12 @@ class Agent:
         self.ctrl_chosen = ctrl
         self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
-        chk_joint_safety = self.check_joint_state_safety(return_list=True)
-        self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
-
-
-
+        if DEBUGGING:
+            chk_joint_safety = self.check_joint_state_safety(return_list=True)
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
+        else:
+            chk_joint_safety = True
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = True
 class Gridder(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Gridder'
@@ -1533,7 +1535,10 @@ class SpawningContract():
         valid_joint_state = True
         occupancy_dict_chk = self.game.occupancy_dict.copy()
         occupancy_dict_chk[(self.new_agent.state.x, self.new_agent.state.y)] = self.new_agent
-        valid_joint_state = self.new_agent.check_joint_state_safety(occupancy_dict=occupancy_dict_chk)
+        if DEBUGGING:
+            valid_joint_state = self.new_agent.check_joint_state_safety(occupancy_dict=occupancy_dict_chk)
+        else:
+            valid_joint_state = True
         return valid_joint_state and valid_static_obs
 
     # check to make sure agent isn't in a state that makes it impossible to follow
@@ -3639,14 +3644,46 @@ class TrafficLight:
         self.htimer = htimer
 
     def check_light_N_turns_from_now(self, N):
-        dummy_traffic_light = cp.deepcopy(self)
-        for t in range(N):
-            dummy_traffic_light.run()
+        hstate, htimer = self.ghost_run_N_time_steps(N)
 
         state = od()
-        state['horizontal'] = dummy_traffic_light.get_hstate()
-        state['vertical'] = dummy_traffic_light.get_vstate()
+        state['horizontal'] = hstate, htimer
+        state['vertical'] = self.get_vstate_given_hstate(hstate, htimer)
         return state
+
+    def ghost_run_N_time_steps(self, N):
+        hstate = self.hstate
+        htimer = self.htimer
+        _, states = tee(self.states) # make copy of iterator
+        for i in range(N):
+            htimer += 1
+            if htimer >= self.durations[hstate]:
+                hstate = next(states)
+                htimer = 0
+        return hstate, htimer
+
+    def get_vstate_given_hstate(self, hstate, htimer):
+        if hstate == 'green' or hstate == 'yellow':
+            color = 'red'
+            if hstate == 'green':
+                timer = self.t_buffer + htimer
+            elif hstate == 'yellow':
+                timer = self.t_buffer + self.durations['green'] + htimer
+        else: # if red
+            if htimer < self.t_buffer:
+                color = 'red'
+                timer = htimer + self.durations['green'] + self.durations['yellow'] + self.t_buffer
+            elif htimer < self.t_buffer + self.durations['green']:
+                color = 'green'
+                timer = htimer - self.t_buffer
+            elif htimer < self.t_buffer + self.durations['green'] + self.durations['yellow']:
+                color = 'yellow'
+                timer = htimer - self.t_buffer - self.durations['green']
+            else:
+                color = 'red'
+                timer = htimer - self.t_buffer - self.durations['green'] - self.durations['yellow']
+        return color, timer
+
 
     def run(self):
         self.htimer += 1
@@ -3658,26 +3695,7 @@ class TrafficLight:
         return self.hstate, self.htimer
 
     def get_vstate(self):
-        if self.hstate == 'green' or self.hstate == 'yellow':
-            color = 'red'
-            if self.hstate == 'green':
-                timer = self.t_buffer + self.htimer
-            elif self.hstate == 'yellow':
-                timer = self.t_buffer + self.durations['green'] + self.htimer
-        else: # if red
-            if self.htimer < self.t_buffer:
-                color = 'red'
-                timer = self.htimer + self.durations['green'] + self.durations['yellow'] + self.t_buffer
-            elif self.htimer < self.t_buffer + self.durations['green']:
-                color = 'green'
-                timer = self.htimer - self.t_buffer
-            elif self.htimer < self.t_buffer + self.durations['green'] + self.durations['yellow']:
-                color = 'yellow'
-                timer = self.htimer - self.t_buffer - self.durations['green']
-            else:
-                color = 'red'
-                timer = self.htimer - self.t_buffer - self.durations['green'] - self.durations['yellow']
-        return color, timer
+        return self.get_vstate_given_hstate(self.hstate, self.htimer)
 
     def get_drawables(self):
         def state_to_symb(state, tile):
