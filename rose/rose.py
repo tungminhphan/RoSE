@@ -1049,7 +1049,8 @@ class Car(Agent):
             d_vec = np.array(DIRECTION_TO_VECTOR[agent_state.heading])
             diff_vec = np.array([other_agent.state.x, other_agent.state.y]) - np.array([agent_state.x, agent_state.y])
             diff_vec_norm = diff_vec
-            norm = np.linalg.norm(diff_vec)
+            norm = np.hypot(diff_vec[0],diff_vec[1]) 
+            #np.linalg.norm(diff_vec)
             if norm != 0:
                 diff_vec_norm = diff_vec/norm
 
@@ -3614,7 +3615,6 @@ class TrafficLight:
         self.t_buffer = t_buffer
         self.durations['red'] = self.durations['green'] + self.durations['yellow'] + self.t_buffer * 2
         self.states = cycle([color for color in self.durations])
-
 
         if random_init:
             #if seed is not None: 
