@@ -5,7 +5,6 @@
     Date created: 1/10/2020
 '''
 from typing import List, Any
-from itertools import cycle, tee
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import curses
@@ -3609,7 +3608,6 @@ class TrafficLight:
         self.durations['yellow'] = t_yellow
         self.t_buffer = t_buffer
         self.durations['red'] = self.durations['green'] + self.durations['yellow'] + self.t_buffer * 2
-        self.states = cycle([color for color in self.durations])
 
         if random_init:
             #if seed is not None: 
@@ -3620,9 +3618,17 @@ class TrafficLight:
             self.htimer = np.random.choice(self.durations[self.hstate])
         else:
             self.htimer = 0
-            self.hstate = next(self.states)
+            self.hstate = self.get_next_state(self.hstate)
         self.htiles = htiles
         self.vtiles = vtiles
+
+    def get_next_state(self, state):
+        if state == 'green':
+            return 'yellow'
+        elif state == 'yellow':
+            return 'red'
+        else:
+            return 'green'
 
     def check_directed_light_in_N_turns(self, direction, N):
         future_lights = self.check_light_N_turns_from_now(N)
@@ -3653,11 +3659,10 @@ class TrafficLight:
     def ghost_run_N_time_steps(self, N):
         hstate = self.hstate
         htimer = self.htimer
-        _, states = tee(self.states) # make copy of iterator
         for i in range(N):
             htimer += 1
             if htimer >= self.durations[hstate]:
-                hstate = next(states)
+                hstate = self.get_next_state(hstate)
                 htimer = 0
         return hstate, htimer
 
@@ -3687,7 +3692,7 @@ class TrafficLight:
     def run(self):
         self.htimer += 1
         if self.htimer >= self.durations[self.hstate]:
-            self.hstate = next(self.states)
+            self.hstate = self.get_next_state(self.hstate)
             self.htimer = 0
 
     def get_hstate(self):
@@ -4010,7 +4015,7 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 777
 
-    map_name = 'city_blocks_med'
+    map_name = 'city_blocks_small'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
     output_filename = 'game'
 
@@ -4019,7 +4024,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=500)
+    game.play(outfile=output_filename, t_end=600)
 #    game.animate(frequency=0.01)
 
     # print debug info
