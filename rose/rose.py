@@ -26,6 +26,7 @@ import json
 import copy as cp
 #from plotting import traces_to_animation
 
+FIND_LEAD_AGENT_THRESHOLD = 15 #TODO: compute this automatically
 CAR_COLORS = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
 IOMap = namedtuple('IOMap', ['sources','sinks','map'])
 TLNode = namedtuple('TLNode', ['xy', 'green', 'yellow', 'red'])
@@ -50,16 +51,39 @@ class Memoize:
 
     def __call__(self, *args):
         # check if args is memoizable
-        if any([isinstance(arg, collections.Hashable) for arg in args]):
-            args = list(args)
-            for idx, arg in enumerate(args):
-                if not isinstance(arg, collections.Hashable):
-                    args[idx] = tuple(arg)
-            args = tuple(args)
+        signature = str(args)
         # check cache
-        if args not in self.memo:
-            self.memo[args] = self.fn(*args)
-        return self.memo[args]
+        if signature not in self.memo:
+            self.memo[signature] = self.fn(*args)
+        return self.memo[signature]
+
+def check_agent_is_ahead(agent_x, agent_y, agent_heading, other_agent_x, other_agent_y):
+    dx = other_agent_x-agent_x
+    dy = other_agent_y-agent_y
+
+    if agent_heading in ['north', 'south']:
+        if dy != 0:
+            is_ahead = False
+        elif agent_heading == 'north':
+            is_ahead = dx < 0
+        else: # agent facing south
+            is_ahead = dx > 0
+    else: # facing east/west
+        if dx != 0:
+            is_ahead = False
+        elif agent_heading == 'east':
+            is_ahead = dy > 0
+        else: # agent facing west
+            is_ahead = dy < 0
+    return is_ahead
+
+@Memoize
+def compute_gap_req_fast(lead_max_dec, lead_vel, follow_max_dec, follow_vel):
+    #__import__('ipdb').set_trace(context=21)
+    dx_lead = compute_dx_fast(lead_max_dec, lead_vel)
+    dx_behind = compute_dx_fast(follow_max_dec, follow_vel)
+    gap = max(dx_behind-dx_lead+1, 1)
+    return gap
 
 @Memoize
 def compute_dx_fast(a_min, vel):
@@ -564,8 +588,8 @@ class Car(Agent):
                 offset = np.array([state.x, state.y])
                 for displacement in abs_dis:
                     heading = Car.convert_orientation(state.heading) * np.pi/180
-                    rel_dis.append(offset + rotate_vector(displacement, heading))
-                    offset_reverse = rotate_vector(displacement, heading)
+                    rel_dis.append(offset + rotate_vector(tuple(displacement), heading))
+                    offset_reverse = rotate_vector(tuple(displacement), heading)
                 if inverse:
                     rel_dis = [x-offset_reverse for x in rel_dis]
                 return rel_dis
@@ -1009,7 +1033,8 @@ class Car(Agent):
             print("ERROR: Updated state makes agent out of bounds!!")
 
     def check_joint_state_safety(self, occupancy_dict=None, return_list=False):
-        if occupancy_dict is None: occupancy_dict = self.supervisor.game.occupancy_dict
+        if occupancy_dict is None:
+            occupancy_dict = self.supervisor.game.occupancy_dict
         is_safe = True
         for gridpt, agent in occupancy_dict.items():
             x, y, v = agent.state.x, agent.state.y, agent.state.v
@@ -1020,7 +1045,7 @@ class Car(Agent):
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (self.compute_gap_req(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
                     is_safe = False
                     agents_no_bp.append(agent.state.__tuple__())
 
@@ -1030,43 +1055,6 @@ class Car(Agent):
             return is_safe
 
     def find_lead_agent(self, state=None, inside_bubble=False, must_not_be_in_intersection=False, same_heading_required=True):
-        '''def check_agent_ahead_other_agent(agent_state, other_agent_state):
-            try: 
-                length_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(((agent_state.x, agent_state.y), agent_state.heading))
-            except:
-                return False, None
-            try: 
-                length_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((other_agent_state.x, other_agent_state.y), other_agent_state.heading))
-            except:
-                return False, None
-            return length_1 >= length_2, length_1-length_2
-
-        def check_agent_is_ahead(agent_state, other_agent):
-            check_same_lane = self.check_same_lane(agent_state, other_agent.state)
-            check_ahead, norm = check_agent_ahead_other_agent(agent_state, other_agent.state)
-            return (check_same_lane and check_ahead), norm'''
-        def check_agent_is_ahead(agent_state, other_agent):
-            agent_heading = agent_state.heading
-            dx = other_agent.state.x-agent_state.x
-            dy = other_agent.state.y-agent_state.y
-            norm = math.sqrt(dx**2 + dy**2)
-
-            if agent_heading in ['north', 'south']:
-                if dy != 0:
-                    is_ahead = False
-                elif agent_heading == 'north':
-                    is_ahead = dx < 0
-                else: # agent facing south
-                    is_ahead = dx > 0
-            else: # facing east/west
-                if dx != 0:
-                    is_ahead = False
-                elif agent_heading == 'east':
-                    is_ahead = dy > 0
-                else: # agent facing west
-                    is_ahead = dy < 0
-            return is_ahead, norm
-
         if state is None:
             state = self.state
 
@@ -1077,21 +1065,22 @@ class Car(Agent):
             min_dist = np.inf
             for agent in self.agents_in_bubble:
                 # check if agent is in front
-                chk_ahead, norm = check_agent_is_ahead(state, agent)
-                if chk_ahead: 
+                chk_ahead = check_agent_is_ahead(state.x, state.y, state.heading, agent.state.x, agent.state.y)
+                if chk_ahead:
+                    dx = agent.state.x-state.x
+                    dy = agent.state.y-state.y
+                    norm = math.sqrt(dx**2 + dy**2)
                     if (agent.get_id() != self.get_id()) and (not same_heading_required or (agent.state.heading == state.heading)):
                         if not must_not_be_in_intersection:
-                            if norm < min_dist: 
+                            if norm < min_dist:
                                 closest_agent = agent
                                 min_dist = norm
                         else:
                             if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
-                                if norm < min_dist: 
+                                if norm < min_dist:
                                     closest_agent = agent
                                     min_dist = norm
-
             return closest_agent
-
         else:
             try:
                 arc_l, bundle = self.get_length_along_bundle()
@@ -1099,8 +1088,11 @@ class Car(Agent):
                 return None
             d_vec = DIRECTION_TO_VECTOR[state.heading]
             # get tiles in front
-            tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
-            tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
+#            tiles_x = np.arange(0,bundle.length-arc_l)*d_vec[0]+state.x
+#            tiles_y = np.arange(0,bundle.length-arc_l)*d_vec[1]+state.y
+
+            tiles_x = np.arange(0,min(FIND_LEAD_AGENT_THRESHOLD, bundle.length-arc_l))*d_vec[0]+state.x
+            tiles_y = np.arange(0,min(FIND_LEAD_AGENT_THRESHOLD, bundle.length-arc_l))*d_vec[1]+state.y
 
             # check agents in these tiles
             for i in range(0, len(tiles_x)):
@@ -1114,9 +1106,7 @@ class Car(Agent):
                         else:
                             if not self.supervisor.game.map.tile_is_in_intersection((agent.state.x, agent.state.y)):
                                 return self.supervisor.game.occupancy_dict[(tiles_x[i], tiles_y[i])]
-        
             return None
-
 
     def compute_gap_req(self, lead_max_dec, lead_vel, follow_max_dec, follow_vel):
         #__import__('ipdb').set_trace(context=21)
@@ -1124,7 +1114,6 @@ class Car(Agent):
         dx_behind = compute_dx_fast(follow_max_dec, follow_vel)
         gap = max(dx_behind-dx_lead+1, 1)
         return gap
-
 
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2, debug=False):
@@ -1219,7 +1208,7 @@ class Car(Agent):
             #print()
             return False
 
-        gap_req = self.compute_gap_req(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
+        gap_req = compute_gap_req_fast(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
         gap_curr = math.sqrt((st_lead.x-st_behind.x)**2+(st_lead.y-st_behind.y)**2)
 
         return gap_curr >= gap_req
@@ -1458,7 +1447,7 @@ class Car(Agent):
     # can be for tuple coordinate (x, y) or tuple state (x,y, heading, v)
     def transform_state(self, state, dx, dy, dtheta, assign_heading=False):
         # rotate and translate the vector
-        arr = rotate_vector([state[0],state[1]], dtheta*np.pi/180)
+        arr = rotate_vector(tuple([state[0],state[1]]), dtheta*np.pi/180)
         if assign_heading:
             return (arr[0]+dx, arr[1]+dy, \
                 Car.convert_orientation(Car.convert_orientation(state[2])+dtheta), state[3])
@@ -1776,7 +1765,7 @@ class Game:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
                     return False
         # all agents have backup plan
         return True
@@ -2200,7 +2189,7 @@ class Map:
         next_direction_degrees = (direction_degrees - 90)%360
         next_direction = Car.convert_orientation(next_direction_degrees)
         forward = DIRECTION_TO_VECTOR[direction]
-        right = rotate_vector(forward, -np.pi/2)
+        right = rotate_vector(tuple(forward), -np.pi/2)
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(right))
         try:
             next_bundle = self.directed_tile_to_bundle((next_tile, next_direction))
@@ -2219,7 +2208,7 @@ class Map:
         next_direction = Car.convert_orientation(next_direction_degrees)
 
         forward = DIRECTION_TO_VECTOR[direction]
-        left = rotate_vector(forward, np.pi/2)
+        left = rotate_vector(tuple(forward), np.pi/2)
         next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
         first_stop = (next_tile, next_direction)
 
@@ -2254,7 +2243,7 @@ class Map:
             next_direction = Car.convert_orientation(next_direction_degrees)
 
             forward = DIRECTION_TO_VECTOR[direction]
-            left = rotate_vector(forward, np.pi/2)
+            left = rotate_vector(tuple(forward), np.pi/2)
             next_tile = tuple(np.array(tile) + np.array(forward) + np.array(left))
             next_stop = (next_tile, next_direction)
             try:
@@ -2594,7 +2583,7 @@ class Map:
                 weight = east_neighbor.weight
                 neighbor_name = east_neighbor.name
                 nex, ney, nangle = xyt
-                dx, dy = rotate_vector(np.array([nex, ney]), rangle)
+                dx, dy = rotate_vector(tuple(np.array([nex, ney])), rangle)
                 fangle = Car.convert_orientation((angle + Car.convert_orientation(nangle)) % 360)
                 neighbor_xyt = (x+dx, y+dy, fangle)
                 cell_neighbors.append(Neighbor(xyt=neighbor_xyt, weight=weight, name=neighbor_name))
@@ -3391,7 +3380,7 @@ class BackupPlanSafetyOracle(Oracle):
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap
                 plant.gap_curr = gap_curr
-                return plant.compute_gap_req(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
+                return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
                 return True
 
@@ -3401,18 +3390,16 @@ class StaticObstacleOracle(Oracle):
     def evaluate(self, ctrl_action, plant, game):
         # check if action is safe
         next_occupancy = plant.query_occupancy(ctrl_action)
-        action_is_safe = all([(occ_state.x, occ_state.y) in
-            game.map.drivable_nodes for occ_state in
-            next_occupancy])
-        if not action_is_safe:
-            return False
+        for occ_state in next_occupancy:
+            if not ((occ_state.x, occ_state.y) in game.map.drivable_nodes):
+                return False
         else:
         # check if backup plan would be safe
             next_state = next_occupancy[-1]
             tile_sequence_chain = plant.query_backup_plan(state=next_state)
-            tiles = list(od.fromkeys([tile for tiles in [tile_turn[-1]
+            tiles = set([tile for tiles in [tile_turn[-1]
                 for tile_turn in tile_sequence_chain] for tile in
-                tiles]))
+                tiles])
             for tile in tiles:
                 if not (tile in game.map.drivable_nodes):
                     return False
@@ -4015,7 +4002,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=300)
+    game.play(outfile=output_filename, t_end=100)
 #    game.animate(frequency=0.01)
 
     # print debug info
