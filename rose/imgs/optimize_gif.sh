@@ -1,4 +1,5 @@
-gifsicle -i png_to_gif.gif --optimize=3 --colors=256 -o small_slow.gif
-convert -delay 7x100 small_slow.gif small_fast.gif
-
+ffmpeg -y -i plot_%05d.png -vf palettegen palette.png
+ffmpeg -y -i plot_%05d.png -i palette.png -filter_complex paletteuse cartoon.gif
+#ffmpeg  -vf "fps=20, scale=640:-1:"  cartoon.gif
+#gifsicle -i cartoon.gif -O3 --colors 64 -o anim-opt.gif
 
