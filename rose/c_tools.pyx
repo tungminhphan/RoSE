@@ -33,7 +33,7 @@ def compute_dx_fast(a_min, vel):
     memoized version of compute_dx
     """
     dt = math.ceil(-vel/a_min)-1
-    dx = int(np.sum([vel+(k+1)*a_min for k in range(dt)]))
+    dx = int(sum([vel+(k+1)*a_min for k in range(dt)]))
     return dx
 
 @Memoize
@@ -641,3 +641,8 @@ class BackupPlanSafetyOracle(Oracle):
                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
             else:
                 return True
+
+def run(runnable_set):
+    for runnable in runnable_set:
+        runnable.run()
+
