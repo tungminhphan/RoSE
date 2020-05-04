@@ -176,7 +176,6 @@ class Agent:
 
     def apply(self, ctrl):
         self.state = self.query_next_state(ctrl)
-<<<<<<< HEAD
         self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
         # check if agent reached it's goal and update number agents exited count
         if (self.state.x, self.state.y, self.state.heading) == self.supervisor.goals: 
@@ -193,8 +192,6 @@ class Agent:
         else:
             chk_joint_safety = True
             self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = True
-=======
->>>>>>> 980cb8542e80f8d93c50062fa1ae43c52f395eae
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -3347,10 +3344,10 @@ class QuasiSimultaneousGame(Game):
 
     def set_agent_bubbles(self):
         for agent in self.agent_set:
-            self.bubble = agent.get_bubble()
+            agent.bubble = agent.get_bubble()
             agent.agents_in_bubble = agent.find_agents_in_bubble()
             # write to trace format
-            if self.supervisor.game.save_debug_info: 
+            if agent.supervisor.game.save_debug_info: 
                 agent.agents_in_bubble_before_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
         pass
 
@@ -3363,11 +3360,11 @@ class QuasiSimultaneousGame(Game):
 
     def determine_conflict_cluster_resolutions(self):
         for agent in self.agent_set:
-            if self.supervisor.game.save_debug_info: 
+            if agent.supervisor.game.save_debug_info: 
                 agent.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.send_conflict_requests_to]
                 agent.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.received_conflict_requests_from]
             agent.is_winner, agent.conflict_winner = agent.check_conflict_resolution_winner()
-            if self.supervisor.game.save_debug_info: 
+            if agent.supervisor.game.save_debug_info: 
                 if agent.conflict_winner is not None:
                     agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
 
@@ -3389,7 +3386,7 @@ class QuasiSimultaneousGame(Game):
                 for agent in self.bundle_to_agent_precedence[bundle][precedence]:
                     # reset agents in bubble list bc of quasi-game
                     agent.agents_in_bubble = agent.find_agents_in_bubble()
-                    if self.supervisor.game.save_debug_info: 
+                    if agent.supervisor.game.save_debug_info: 
                         agent.agents_in_bubble_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
                     state = agent.state
                     agent.run()
