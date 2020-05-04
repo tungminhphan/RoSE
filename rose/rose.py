@@ -23,6 +23,7 @@ import os
 import _pickle as pickle
 import json
 import copy as cp
+from c_tools import *
 #from plotting import traces_to_animation
 
 DEBUGGING = False
@@ -39,74 +40,11 @@ DIRECTION_TO_VECTOR['north'] = [-1, 0]
 DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
 CHOSEN_IDs = []
-CAR_OCCUPANCY_DICT = od()
 
-class Memoize:
-    """
-    caching class intended to be used as a decorator
-    """
-    def __init__(self, fn):
-        self.fn = fn
-        self.memo = {}
-
-    def __call__(self, *args):
-        # check if args is memoizable
-        signature = str(args)
-        # check cache
-        if signature not in self.memo:
-            self.memo[signature] = self.fn(*args)
-        return self.memo[signature]
-
-def check_agent_is_ahead(agent_x, agent_y, agent_heading, other_agent_x, other_agent_y):
-    dx = other_agent_x-agent_x
-    dy = other_agent_y-agent_y
-
-    if agent_heading in ['north', 'south']:
-        if dy != 0:
-            is_ahead = False
-        elif agent_heading == 'north':
-            is_ahead = dx < 0
-        else: # agent facing south
-            is_ahead = dx > 0
-    else: # facing east/west
-        if dx != 0:
-            is_ahead = False
-        elif agent_heading == 'east':
-            is_ahead = dy > 0
-        else: # agent facing west
-            is_ahead = dy < 0
-    return is_ahead
-
-@Memoize
-def compute_gap_req_fast(lead_max_dec, lead_vel, follow_max_dec, follow_vel):
-    #__import__('ipdb').set_trace(context=21)
-    dx_lead = compute_dx_fast(lead_max_dec, lead_vel)
-    dx_behind = compute_dx_fast(follow_max_dec, follow_vel)
-    gap = max(dx_behind-dx_lead+1, 1)
-    return gap
-
-@Memoize
-def compute_dx_fast(a_min, vel):
-    """
-    memoized version of compute_dx
-    """
-    dt = math.ceil(-vel/a_min)-1
-    dx = int(np.sum([vel+(k+1)*a_min for k in range(dt)]))
-    return dx
-
-@Memoize
-def rotate_vector(vec, theta):
-    """
-    take in a 2D vector and an angle in radians and outputs the same vector
-    rotated by the amount specified by the input angle in a CCW fashion.
-    """
-    # create rotation matrix
-    rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-    return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
 
 def set_seed(seed, other_param=0):
     #other_param = 0
-    if seed is not None: 
+    if seed is not None:
         np.random.seed(seed+other_param)
         random.seed(seed+other_param)
         np.random.RandomState(seed+other_param)
@@ -191,22 +129,12 @@ class Agent:
             self.supervisor = kwargs.get('supervisor')
         else:
             self.supervisor = None
-        self.id = self.set_id()
-        if 'agent_color' in kwargs:
-            self.agent_color = kwargs.get('agent_color')
-        else:
-            self.agent_color = self.get_random_color()
 
-    # for reproducibility
-    def set_id(self):
-        set_seed(self.seed, self.car_count)
-        while True:
-            random_id = np.random.uniform()
-            if random_id not in CHOSEN_IDs:
-                CHOSEN_IDs.append(random_id)
-                #print("car id")
-                #print(random_id)
-                return random_id
+    def get_drawables(self):
+        drawables = []
+        drawable = Drawable((self.state.x, self.state.y), self.get_symbol())
+        drawables.append(drawable)
+        return drawables
 
     # return a random color from an array
     def get_random_color(self):
@@ -224,7 +152,6 @@ class Agent:
 
     def run(self):
         assert self.controller, "Agent has no controller"
-        #self.set_intention()
         self.controller.run_on(self)
         if self.supervisor:
             self.supervisor.run()
@@ -248,11 +175,8 @@ class Agent:
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
-        self.prior_state = self.state
-        #print(self.prior_state)
-        # check for collision with any of the other agents
-        self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
+<<<<<<< HEAD
         self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
         # check if agent reached it's goal and update number agents exited count
         if (self.state.x, self.state.y, self.state.heading) == self.supervisor.goals: 
@@ -269,6 +193,8 @@ class Agent:
         else:
             chk_joint_safety = True
             self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = True
+=======
+>>>>>>> 980cb8542e80f8d93c50062fa1ae43c52f395eae
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -306,7 +232,7 @@ class Car(Agent):
         state_variable_names = ['x', 'y', 'heading', 'v']
         #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
-        self.acc_vals = np.arange(self.a_min, self.a_max+1)
+        self.acc_vals = np.arange(self.a_max, self.a_min-1,-1)
         self.default_state = Car.hack_state(self.state, x=0, y=0, heading='east', v=0)
         self.default_bubbles = self.get_default_bubbles()
         self.default_filtered_bubbles = self.get_default_bubbles(front_back_only=True)
@@ -319,6 +245,11 @@ class Car(Agent):
         self.intention = None
         self.turn_signal = None
         self.is_winner = None
+        self.id = self.set_id()
+        if 'agent_color' in kwargs:
+            self.agent_color = kwargs.get('agent_color')
+        else:
+            self.agent_color = self.get_random_color()
 
         # attributes for saving agent info
         self.spec_struct_trace = od()
@@ -333,7 +264,7 @@ class Car(Agent):
         self.conflict_winner_sv = None
         self.received_sv = []
         self.sent_sv = []
-        self.token_count_sv = 0 
+        self.token_count_sv = 0
         self.agent_max_braking_not_enough_sv = None
         self.agents_in_bubble_sv = []
         self.agents_checked_for_conflict_sv = []
@@ -342,6 +273,35 @@ class Car(Agent):
         #self.lead_vehicle = None
         self.lead_agent = None
         self.prior_state = None
+
+    def apply(self, ctrl):
+        self.prior_state = self.state
+        #print(self.prior_state)
+        # check for collision with any of the other agents
+        self.check_collision(ctrl)
+        self.state = self.query_next_state(ctrl)
+        self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
+        # save action that was chosen
+        self.ctrl_chosen = ctrl
+        self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
+        # check whether the updated joint state is safe
+        if DEBUGGING:
+            chk_joint_safety = self.check_joint_state_safety(return_list=True)
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
+        else:
+            chk_joint_safety = True
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = True
+
+    # for reproducibility
+    def set_id(self):
+        set_seed(self.seed, self.car_count)
+        while True:
+            random_id = np.random.uniform()
+            if random_id not in CHOSEN_IDs:
+                CHOSEN_IDs.append(random_id)
+                #print("car id")
+                #print(random_id)
+                return random_id
 
     @classmethod
     def get_ctrl_od(cls, acc, steer):
@@ -353,16 +313,7 @@ class Car(Agent):
     # optimized hack_state method for Car agents
     @classmethod
     def hack_state(cls, state, **kwargs):
-        new_state = cp.copy(state)
-        if 'x' in kwargs:
-            new_state.x = kwargs.get('x')
-        if 'y' in kwargs:
-            new_state.y = kwargs.get('y')
-        if 'heading' in kwargs:
-            new_state.heading = kwargs.get('heading')
-        if 'v' in kwargs:
-            new_state.v = kwargs.get('v')
-        return new_state
+        return hack_car_state(state, **kwargs)
 
     # signal should be 'left' or 'right' or None
     def set_turn_signal(self, signal):
@@ -378,10 +329,7 @@ class Car(Agent):
     def set_debug_intention(self, intention):
         self.intention = intention
 
-    # only works when used with specification structure controller
-    def set_intention(self):
-        def ctrl_dict_to_tuple(ctrl):
-            return (ctrl['steer'], ctrl['acceleration'])
+    def set_intention_slow(self):
         scores = []
         all_ctrls = self.get_all_ctrl()
         spec_struct_trace = od()
@@ -400,13 +348,54 @@ class Car(Agent):
                 scores_sv[oracle.name] = o_score
 
             scores.append(score)
-
             scores_sv['total'] = score
             spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
 
         set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
         choice = np.random.choice(np.where(scores == np.max(scores))[0])
         self.intention = all_ctrls[choice]
+        self.spec_struct_trace = spec_struct_trace
+
+    # only works when used with specification structure controller
+    def set_intention(self):
+        scores = []
+        all_ctrls = self.get_all_ctrl()
+        spec_struct_trace = od()
+
+        best_ctrls = []
+        best_score = 0
+        for ctrl in all_ctrls:
+            skipped = False # whether this ctrl action should be skipped
+            max_possible_score = self.controller.specification_structure.max_score
+            score = 0
+            scores_sv = od()
+            for oracle in self.controller.specification_structure.sorted_oracle_set:
+                o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
+                o_tier = self.controller.specification_structure.tier[oracle]
+                if oracle.name != 'backup_plan_safety':
+                    score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
+                    max_possible_score -= (1-int(o_score))*self.controller.specification_structure.tier_weights[o_tier]
+                if max_possible_score < best_score:
+                    skipped = True
+                    break
+
+            if not skipped:
+                if score == best_score:
+                    scores.append(score)
+                    best_ctrls.append(ctrl)
+                elif score > best_score:
+                    best_score = score
+                    scores = [score]
+                    best_ctrls = [ctrl]
+                else:
+                    print('error! this section should never be entered')
+
+                scores_sv['total'] = score
+                spec_struct_trace[ctrl_dict_to_tuple(ctrl)] = scores_sv
+
+        set_seed(self.supervisor.game.map.seed, self.supervisor.game.time)
+        choice = np.random.choice(best_ctrls)
+        self.intention = choice
         self.spec_struct_trace = spec_struct_trace
 
     def set_token_count(self, cnt):
@@ -467,7 +456,6 @@ class Car(Agent):
             if bundle.direction == self.state.heading:
                 return bundle.tile_to_relative_width((x,y)), bundle
 
-
     def get_default_bubbles(self, front_back_only=False):
         # caching the agent bubbles
         def create_pickle_file(filename):
@@ -523,12 +511,6 @@ class Car(Agent):
             step += 1
         return tile_sequence_chain
 
-    def get_drawables(self):
-        drawables = []
-        drawable = Drawable([self.state.x, self.state.y], self.get_symbol())
-        drawables.append(drawable)
-        return drawables
-
     def get_symbol(self):
         if self.state.heading == 'west':
             return '🠴'
@@ -541,24 +523,7 @@ class Car(Agent):
 
     @classmethod
     def convert_orientation(cls, inp):
-        if inp == 'east':
-            return 0
-        elif inp == 'north':
-            return 90
-        elif inp == 'west':
-            return 180
-        elif inp == 'south':
-            return 270
-        elif inp%360 == 0:
-            return 'east'
-        elif inp%360 == 90:
-            return 'north'
-        elif inp%360 == 180:
-            return 'west'
-        elif inp%360 == 270:
-            return 'south'
-        else:
-            raise TypeError('Check your input!')
+        return convert_car_orientation(inp)
 
     @classmethod
     def get_all_class_ctrl(cls, state, acc_vals, inverse=False, straight_only=False):
@@ -574,70 +539,7 @@ class Car(Agent):
 
     @classmethod
     def query_class_occupancy(cls, ctrl, state, v_min, v_max, inverse=False):
-        signature = str(cls) + str(ctrl) + str(state) + str(v_min) + \
-                    str(v_max) + str(inverse)
-        if signature in CAR_OCCUPANCY_DICT:
-            return CAR_OCCUPANCY_DICT[signature]
-        else:
-            acc = ctrl['acceleration']
-            steer = ctrl['steer']
-
-            def get_new_heading(act):
-                heading = Car.convert_orientation(state.heading)
-                if act == 'left-turn':
-                    heading += 90
-                elif act == 'right-turn':
-                    heading -= 90
-                return Car.convert_orientation(heading)
-
-            def relativize_absolute_displacement(abs_dis, inverse=False):
-                rel_dis = []
-                offset = np.array([state.x, state.y])
-                for displacement in abs_dis:
-                    heading = Car.convert_orientation(state.heading) * np.pi/180
-                    rel_dis.append(offset + rotate_vector(tuple(displacement), heading))
-                    offset_reverse = rotate_vector(tuple(displacement), heading)
-                if inverse:
-                    rel_dis = [x-offset_reverse for x in rel_dis]
-                return rel_dis
-
-            abs_displacements = []
-            final_heading = state.heading
-            init_heading = final_heading
-            final_v = min(max(acc + state.v, v_min), v_max)
-            if steer == 'straight':
-                num_moves = final_v
-                num_moves_sign = np.sign(num_moves)
-                num_moves_abs = np.abs(num_moves)
-                if num_moves_sign == 0:
-                    num_moves_sign = 1
-                for k in np.arange(0, num_moves_sign * (num_moves_abs + 1), num_moves_sign):
-                    dx = 0
-                    dy = k
-                    abs_displacements.append(np.array([dx, dy]))
-            elif steer == 'left-lane' and final_v == 1:
-                abs_displacements = [[0, 0], [0, 1], [-1, 1]]
-            elif steer == 'left-turn' and final_v == 1:
-                abs_displacements = [[0, 0], [0, 1], [-1, 1]]
-                final_heading = get_new_heading('left-turn')
-            elif steer == 'right-lane' and final_v == 1:
-                abs_displacements = [[0, 0], [0, 1], [1, 1]]
-            elif steer == 'right-turn' and final_v == 1:
-                abs_displacements = [[0, 0], [0, 1], [1, 1]]
-                final_heading = get_new_heading('right-turn')
-            else:
-                return None
-
-            # assign occupancy list
-            occupancy_list = [None]*len(abs_displacements)
-            for i, xy in enumerate(relativize_absolute_displacement(abs_displacements, inverse=inverse)):
-                heading = init_heading if i == 0 else final_heading
-                vel = final_v if not inverse else state.v-acc
-                if vel < v_min or vel > v_max: return None
-                occupancy_list[i] = Car.hack_state(state, x=xy[0], y=xy[1], heading=heading, v=vel)
-
-            CAR_OCCUPANCY_DICT[signature] = occupancy_list
-            return occupancy_list
+        return query_car_occupancy(ctrl, state, v_min, v_max, inverse=inverse)
 
     def query_occupancy(self, ctrl, state=None, inverse=False):
         if state is None: state = self.state
@@ -777,7 +679,7 @@ class Car(Agent):
         # True means no conflict with agents in bubble with higher precedence
         bubble_chk = not check_conflict_with_higher_precedence_agents()
         # if no conflict, then the agent is a winner
-        if self.is_winner is None: 
+        if self.is_winner is None:
             cluster_chk = True
         else:
             cluster_chk = self.is_winner
@@ -1143,19 +1045,19 @@ class Car(Agent):
         # return if occupancies don't intersect and safe end config
         if not debug:
             return (not chk_occupancy_intersection) and chk_safe_end_config
-        else: 
+        else:
             return ((not chk_occupancy_intersection) and chk_safe_end_config), not chk_occupancy_intersection, chk_safe_end_config
-    
-    
+
+
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
         def check_same_lane(st_1, st_2):
-            try: 
+            try:
                 width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
             except:
                 return False
-            try: 
+            try:
                 width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
             except:
                 return False
@@ -1192,7 +1094,7 @@ class Car(Agent):
                 return ag_2, ag_1, st_2, st_1
             else:
                 return None, None, None, None
-        
+
         if st_1 is None:
             st_1 = ag_1.state
         if st_2 is None:
@@ -1205,13 +1107,13 @@ class Car(Agent):
         #print('same lane check')
         #print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
-        if not same_lane_chk: 
+        if not same_lane_chk:
             #print("not same lane check")
             return True
         # then check which agent is lead and which one is behind
         ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2)
         # if None, agents are on top of each other
-        if ag_lead is None: 
+        if ag_lead is None:
             #print("agents on top of each other ")
             #print()
             return False
@@ -1271,7 +1173,7 @@ class Car(Agent):
 
     #=== helper methods for computing the agent bubble ===================#
     def get_default_bubble(self, vel, front_back_only=False):
-        def get_states_where_backup_plan_reaches_resources(resources): 
+        def get_states_where_backup_plan_reaches_resources(resources):
             # brute force search for whether state reaches forward reachable gripts
             x_min = -self.v_max*5
             x_max = self.v_max*5
@@ -1282,8 +1184,8 @@ class Car(Agent):
             bp_plan_states = []
             for x in x_grid:
                 for y in y_grid:
-                    for v in v_grid: 
-                        for heading in all_dir: 
+                    for v in v_grid:
+                        for heading in all_dir:
                             # check whether agent at this state will reach the forward reachable gridpoints if it executes the back-up plan
                             st = self.hack_state(self.state, x=x, y=y, heading=heading, v=v)
                             occ = self.query_occupancy(self.get_backup_plan_ctrl(), state=st)
@@ -1325,7 +1227,7 @@ class Car(Agent):
             resources_unique = []
             [resources_unique.append(x) for x in resources if x not in resources_unique]
             return resources_unique
-        
+
 
         # gridpoints
         bubble = []
@@ -1338,12 +1240,12 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy, front_back_only=front_back_only)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
-        
+
         # get all states where backup plan intersects with resources
         backup_plan_states = get_states_where_backup_plan_reaches_resources(resources)
-        
+
         # get all gridpoints from which the backup plan states are backwards reachable
-        for state_to in backup_plan_states: 
+        for state_to in backup_plan_states:
             states_from, actions_to = self.get_backwards_reachable_states(state_to, front_back_only=front_back_only)
             # transform all states from into gridpoints
             more_gridpts = [(state.x, state.y) for state in states_from]
@@ -1411,7 +1313,7 @@ class Car(Agent):
     # compute all backwards reachable states and actions to get to state specified
     def get_backwards_reachable_states(self, state_to, front_back_only=False):
         # just need a car object to call get_all_ctrl function
-        filter_dir = [self.default_state.heading] 
+        filter_dir = [self.default_state.heading]
         all_inv_ctrl = self.get_all_ctrl(state=state_to, inverse=True)
         states = [None]*len(all_inv_ctrl) # will be too large but saves time pre-allocating
         actions = [None]*len(all_inv_ctrl)
@@ -1420,12 +1322,12 @@ class Car(Agent):
             occupancy = self.compute_state_from(state_to, inv_ctrl)
             if occupancy is not None:
                 # remove all states without east west heading
-                if front_back_only: 
-                    if occupancy.heading in filter_dir: 
+                if front_back_only:
+                    if occupancy.heading in filter_dir:
                         states[cnt] = occupancy
                         actions[cnt] = inv_ctrl
                         cnt = cnt+1
-                else: 
+                else:
                     states[cnt] = occupancy
                     actions[cnt] = inv_ctrl
                     cnt = cnt+1
@@ -1566,12 +1468,62 @@ class SpawningContract():
         orientation = self.game.map.legal_orientations[(self.new_agent.state.x, self.new_agent.state.y)]
         return orientation[0] == self.new_agent.state.heading
 
-class Game:
+class Simulation:
+    def __init__(self, the_map, agent_set=[]):
+        self.map = the_map
+        self.time = 0
+        self.agent_set = agent_set
+        self.draw_sets = [self.map.drivable_tiles, self.agent_set] # list ordering determines draw ordering
+
+    def time_forward(self):
+        self.time += 1
+
+    def sys_step(self):
+        run(self.agent_set)
+
+    def env_step(self):
+        pass
+
+    def play_step(self):
+        self.sys_step()
+        self.env_step()
+
+    def animate(self, frequency, t_end=np.inf):
+        stdscr = curses.initscr()
+        height,width = stdscr.getmaxyx()
+        artist = Artist(stdscr, [0, 0], [height, width])
+        try:
+            curses.noecho()
+            curses.cbreak()
+            curses.curs_set(0)
+            stdscr.keypad(True)
+            stdscr.nodelay(True)
+            while self.time < t_end:
+                artist.enable_window_moving()
+                stdscr.clear()
+                # draw world and agents
+                for draw_set in self.draw_sets:
+                    artist.draw_set(draw_set)
+                # update states
+                self.play_step()
+                self.time += 1
+                # draw objects
+                stdscr.refresh()
+                time.sleep(frequency)
+                self.time_forward()
+        finally:
+            curses.nocbreak()
+            stdscr.keypad(False)
+            curses.echo()
+            curses.endwin()
+
+class Game(Simulation):
+    """
+    Traffic game class
+    """
     # combines scenario + agents for game
     def __init__(self, game_map, save_debug_info=True, agent_set=[]):
-        self.time = 0
-        self.map = game_map
-        self.agent_set = agent_set
+        super(Game, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
         self.traces['agent_ids'] = []
@@ -1592,16 +1544,11 @@ class Game:
             x, y = agent.state.x, agent.state.y
             occupancy_dict[x,y] = agent
         self.occupancy_dict = occupancy_dict
-    
+
     def update_occupancy_dict_for_one_agent(self, agent, prior_state):
-        if prior_state is not None: 
+        if prior_state is not None:
             self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
         self.occupancy_dict[agent.state.x, agent.state.y] = agent
-        #occupancy_dict = od()
-        #for agent in self.agent_set:
-        #    x, y = agent.state.x, agent.state.y
-        #    occupancy_dict[x,y] = agent
-        #self.occupancy_dict = occupancy_dict
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1616,7 +1563,7 @@ class Game:
         #print(rand_arr1)
         #print(rand_arr2)
 
-        for i, source in enumerate(self.map.IO_map.sources):  
+        for i, source in enumerate(self.map.IO_map.sources):
             #print('source to check')
             #print(source.node)
             if rand_arr1[i] <= source.p:
@@ -1639,8 +1586,6 @@ class Game:
 
     def add_agent(self, agent):
         self.agent_set.append(agent)
-    def time_forward(self):
-        self.time += 1
     def save_plotting_info(self):
         lights = []
         agents = []
@@ -1673,20 +1618,29 @@ class Game:
                 #print("final state of agent")
                 #print(prior_state)
             # save all data in trace
-            agent_trace_dict = {'subgoals': agent.supervisor.subgoals, 'state':prior_state, 'action': agent.ctrl_chosen, \
-                'color':agent.agent_color, 'bubble':agent.bubble, 'goals': agent.supervisor.goals, \
-                    'spec_struct_info': agent.spec_struct_trace, 'agents_in_bubble': agent.agents_in_bubble_sv, \
-                        'sent': agent.sent_sv, 'received': agent.received_sv, 'token_count':agent.token_count_sv, \
-                            'max_braking_not_enough': agent.agent_max_braking_not_enough_sv, \
-                                'straight_action_eval': agent.straight_action_eval, \
-                                    'action_selection_flags': agent.action_selection_flags, \
-                                        'intention': agent.intention, 'conflict_winner': agent.conflict_winner_sv, \
-                                            'token_count_before': agent.token_count_before, \
-                                                'agent_id':agent.get_id(), 'left_turn_gap_arr':agent.left_turn_gap_arr, \
-                                                    'lead_agent':agent.lead_agent, 'checked_for_conflict':agent.agents_checked_for_conflict_sv, \
-                                                        'agents_in_bubble_before': agent.agents_in_bubble_before_sv, \
-                                                            'clearance_straight_info': agent.clearance_straight_info}
-            #agent.conflict_winner = None
+            agent_trace_dict = {'subgoals': agent.supervisor.subgoals,
+                                'state':prior_state,
+                                'action': agent.ctrl_chosen,
+                                'color':agent.agent_color,
+                                'bubble':agent.bubble,
+                                'goals': agent.supervisor.goals,
+                                'spec_struct_info':agent.spec_struct_trace,
+                                'agents_in_bubble': agent.agents_in_bubble_sv,
+                                'sent': agent.sent_sv,
+                                'received': agent.received_sv,
+                                'token_count':agent.token_count_sv,
+                                'max_braking_not_enough': agent.agent_max_braking_not_enough_sv,
+                                'straight_action_eval': agent.straight_action_eval,
+                                'action_selection_flags': agent.action_selection_flags,
+                                'intention': agent.intention,
+                                'conflict_winner': agent.conflict_winner_sv,
+                                'token_count_before': agent.token_count_before,
+                                'agent_id':agent.get_id(),
+                                'left_turn_gap_arr':agent.left_turn_gap_arr,
+                                'lead_agent':agent.lead_agent,
+                                'checked_for_conflict':agent.agents_checked_for_conflict_sv,
+                                'agents_in_bubble_before': agent.agents_in_bubble_before_sv,
+                                'clearance_straight_info': agent.clearance_straight_info}
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
         self.traces_debug[self.time] = all_agent_info_at_time_t_dict
@@ -1713,53 +1667,6 @@ class Game:
         with open(filename, 'wb+') as pckl_file:
             pickle.dump(traces, pckl_file)
 
-    # outfile flag is if you want to save data to file, it should be in pickle format
-    def animate(self, frequency, t_end=np.inf):
-        stdscr = curses.initscr()
-        height,width = stdscr.getmaxyx()
-        artist = Artist(stdscr, [0, 0], [height, width])
-        try:
-            curses.noecho()
-            curses.cbreak()
-            curses.curs_set(0)
-            stdscr.keypad(True)
-            stdscr.nodelay(True)
-
-            while self.time < t_end:
-                artist.enable_window_moving()
-
-                stdscr.clear()
-                for node in self.map.nodes:
-                    node_x, node_y = node
-                    if self.map.grid[node] == '-':
-                        draw_str = '.'
-                    else:
-                        draw_str = self.map.grid[node]
-                    artist.draw(node_x, node_y, draw_str)
-
-                for traffic_light in self.map.traffic_lights:
-                    drawables = traffic_light.get_drawables()
-                    for drawable in drawables:
-                        x, y = drawable.xy
-                        artist.draw(x, y, drawable.drawstr)
-
-                for agent in self.agent_set:
-                    artist.draw(agent.state.x, agent.state.y, agent.get_symbol())
-
-                stdscr.clear()
-                # update states
-                self.play_step()
-                # draw objects
-                for draw_set in self.draw_sets:
-                    artist.draw_set(draw_set)
-                stdscr.refresh()
-                time.sleep(frequency)
-                self.time_forward()
-        finally:
-            curses.nocbreak()
-            stdscr.keypad(False)
-            curses.echo()
-            curses.endwin()
 
     def sys_step(self):
         run(self.agent_set)
@@ -1767,10 +1674,6 @@ class Game:
     def env_step(self):
         run(self.map.traffic_lights)
         self.spawn_agents()
-
-    def play_step(self):
-        self.sys_step()
-        self.env_step()
 
     # check that all agents in the current config have a backup plan
     def check_config_safety(self):
@@ -1944,14 +1847,45 @@ def append_or_create_new_list(dictionary, key, item):
     else:
         dictionary[key] = [item]
 
-class Map:
-    def __init__(self, csv_filename, default_spawn_probability=0.9, seed=None, random_traffic_lights_init=True):
-        self.seed = seed
-        self.map_name = csv_filename
-        self.grid = self.get_grid(csv_filename)
-        self.default_spawn_probability = default_spawn_probability
+class Field:
+    def __init__(self, csv_filename):
+        self.csv_filename = csv_filename
+        self.grid = self.get_grid(self.csv_filename)
         self.nodes = list(self.grid.keys())
         self.drivable_tiles, self.drivable_nodes, self.non_drivable_nodes = self.get_drivable_tiles()
+
+    def get_grid(self, csv_filename):
+        grid = od()
+        obstacles = od()
+        with open(csv_filename + '.csv', 'rt') as f:
+            graph = csv.reader(f)
+            for i, row in enumerate(graph):
+                for j, item in enumerate(row):
+                    if item != 'x':
+                        grid[i,j] = item
+        return grid
+
+    def get_drivable_tiles(self):
+        drivable_tiles = []
+        non_drivable_nodes = []
+        drivable_nodes = []
+        for xy in self.nodes:
+            if self.grid[xy] == '-':
+                symbol = '.'
+                non_drivable_nodes.append(xy)
+            else:
+                drivable_nodes.append(xy)
+                symbol = self.grid[xy]
+            tile = DrivableTile(xy,symbol)
+            drivable_tiles.append(tile)
+        return drivable_tiles, drivable_nodes, non_drivable_nodes
+
+class Map(Field):
+    def __init__(self, csv_filename, default_spawn_probability=0.9, seed=None, random_traffic_lights_init=True):
+        super(Map, self).__init__(csv_filename=csv_filename)
+        self.map_name = csv_filename
+        self.seed = seed
+        self.default_spawn_probability = default_spawn_probability
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
         self.intersections = self.get_intersections()
@@ -1971,6 +1905,7 @@ class Map:
         self.bundle_graph = self.get_bundle_graph()
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
+
 
     def tile_is_in_intersection(self, xy):
         """
@@ -1999,7 +1934,7 @@ class Map:
         with open(path, 'wb') as f:
             pickle.dump(self.bundle_plan_cache, f)
         print('done!')
-    
+
     def directed_tile_to_relative_width(self, directed_tile):
         #__import__('ipdb').set_trace(context=21)
         x, y = directed_tile[0]
@@ -2009,9 +1944,8 @@ class Map:
         for bundle in current_bundles:
             if bundle.direction == heading:
                 return bundle.tile_to_relative_width((x,y)), bundle
-    
+
     def directed_tile_to_relative_length(self, directed_tile):
-        #__import__('ipdb').set_trace(context=21)
         x, y = directed_tile[0]
         heading = directed_tile[1]
 
@@ -2449,32 +2383,6 @@ class Map:
                 bundles.append(bundle)
         return bundles
 
-    def get_drivable_tiles(self):
-        drivable_tiles = []
-        non_drivable_nodes = []
-        drivable_nodes = []
-        for xy in self.nodes:
-            if self.grid[xy] == '-':
-                symbol = '.'
-                non_drivable_nodes.append(xy)
-            else:
-                drivable_nodes.append(xy)
-                symbol = self.grid[xy]
-            tile = DrivableTile(xy,symbol)
-            drivable_tiles.append(tile)
-        return drivable_tiles, drivable_nodes, non_drivable_nodes
-
-    def get_grid(self, csv_filename):
-        grid = od()
-        obstacles = od()
-        with open(csv_filename + '.csv', 'rt') as f:
-            graph = csv.reader(f)
-            for i, row in enumerate(graph):
-                for j, item in enumerate(row):
-                    if item != 'x':
-                        grid[i,j] = item
-        return grid
-
     def get_IO_map(self):
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
@@ -2512,7 +2420,7 @@ class Map:
                     nodes.append(tl_node)
             return nodes
 
-        traffic_light_cnt = 0 
+        traffic_light_cnt = 0
         traffic_lights = od()
         for intersection in self.intersections:
             mcorner = intersection.mcorner
@@ -2663,21 +2571,28 @@ class Map:
         return legal_orientations
 
 class Controller:
-    def __init__(self, game):
-        self.game = game
+    def __init__(self):
+        pass
     def run_on(self, plant):
         raise NotImplementedError
 
+class CompassController(Controller):
+    def __init__(self):
+        super(CompassController, self).__init__()
+    def run_on(self, plant):
+        plant.apply(random.choice([action for action in
+            plant.get_all_ctrl() if plant]))
+
 class RandomController(Controller):
-    def __init__(self, plant):
-        super(RandomController, self).__init__(plant=plant,game=None)
+    def __init__(self):
+        super(RandomController, self).__init__()
     def run_on(self, plant):
         plant.apply(random.choice([action for action in
             plant.get_all_ctrl() if plant]))
 
 class ObstacleAvoidingRandomController(Controller):
-    def __init__(self, game):
-        super(ObstacleAvoidingRandomController, self).__init__(game=game)
+    def __init__(self):
+        super(ObstacleAvoidingRandomController, self).__init__()
     def run_on(self, plant):
         safe_ctrl = []
         for ctrl in plant.get_all_ctrl():
@@ -2749,13 +2664,6 @@ class GridPlanner(Planner):
             plan.append(new_xy)
         return plan
 
-class Oracle():
-    def __init__(self, name):
-        self.name = name
-        pass
-    def evaluate(self, ctrl_action, plant, game):
-        raise NotImplementedError
-
 class ReplanProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
@@ -2785,7 +2693,7 @@ class IntersectionClearanceOracle(Oracle):
             for i in range(1, intersection_gap):
                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
                 # if there is an agent there, then count it
-                if next_tile_tuple in game.occupancy_dict: 
+                if next_tile_tuple in game.occupancy_dict:
                     cnt = cnt + 1
             return cnt
 
@@ -2808,7 +2716,7 @@ class IntersectionClearanceOracle(Oracle):
         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
             return True
         else:
-            #print("action crossing into intersection") 
+            #print("action crossing into intersection")
             # if indeed crossing into an intersection
             # check if attempting to perform a left turn
             current_subgoal = plant.supervisor.subgoals[0]
@@ -2843,7 +2751,7 @@ class IntersectionClearanceOracle(Oracle):
 
             else: # going straight
                 #print("entering intersection straight with intention to move straight")
-                # save intersection gap, 
+                # save intersection gap,
                 if current_heading in ['east', 'west']:
                     intersection_gap = next_intersection.width
                 else:
@@ -2856,13 +2764,13 @@ class IntersectionClearanceOracle(Oracle):
                 else:
                     clearance = np.inf
 
-                if lead_agent is None: 
+                if lead_agent is None:
                     x_sv = None
                     y_sv = None
-                else: 
+                else:
                     x_sv = lead_agent.state.x
                     y_sv = lead_agent.state.y
-    
+
                 self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
                 return clearance > intersection_gap #TODO: find a better bound
 
@@ -2962,493 +2870,11 @@ class BundleProgressOracle(Oracle):
         else:
             return False
 
-class ImprovementBundleProgressOracle(Oracle):
-    # requires a supervisor controller
-    def __init__(self):
-        super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
-    def evaluate(self, ctrl_action, plant, game):
-
-        # get current state
-        current_xy = plant.state.x, plant.state.y
-        current_dir = plant.state.heading
-        current_directed_tile = (current_xy, current_dir)
-
-        # query next state
-        queried_state = plant.query_occupancy(ctrl_action)[-1]
-        queried_xy = queried_state.x, queried_state.y
-        queried_dir = queried_state.heading
-        queried_directed_tile = (queried_xy, queried_dir)
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # if current subgoal is special, namely, attempting to move toward special tile
-        # for now, we are assuming default car dynamics; TODO: generalize this
-        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
-            return (queried_directed_tile == current_subgoal)
-        # if moving away from special tile
-        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
-            return (queried_directed_tile == current_subgoal)
-        # if current subgoal isn't special
-        else:
-            # get bundle corresponding to the current subgoal
-            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-            # get bundle corresponding to the current state
-            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
-
-            try:
-                # get bundle for the queried state, if bundle doesn't exist, return False
-                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-            except:
-                return False
-
-            if current_bundle != subgoal_bundle:
-                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                    return True
-                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
-                    return False
-                else:
-                    return False
-            elif queried_bundle == subgoal_bundle:
-                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
-                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
-                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
-
-                dlong_curr = rel_goal[1]-rel_curr[1]
-                dlong_next = rel_goal[1]-rel_next[1]
-
-                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
-                dlatt_next = abs(rel_next[0]-rel_goal[0])
-
-                # check if strictly improving longitudinal/lateral distance
-                latt_improves = dlatt_next < dlatt_curr
-                long_improves = dlong_next < dlong_curr
-                improves = latt_improves or long_improves
-
-                # only need to check reachability for braking backup plan because this implies reachability for current action
-                return improves
-            else:
-                return False
-
-class MaintenanceBundleProgressOracle(Oracle):
-    # requires a supervisor controller
-    def __init__(self):
-        super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
-    def evaluate(self, ctrl_action, plant, game):
-        # get current state
-        current_xy = plant.state.x, plant.state.y
-        current_dir = plant.state.heading
-        current_directed_tile = (current_xy, current_dir)
-
-        # query next state
-        queried_state = plant.query_occupancy(ctrl_action)[-1]
-        queried_xy = queried_state.x, queried_state.y
-        queried_dir = queried_state.heading
-        queried_directed_tile = (queried_xy, queried_dir)
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # if current subgoal is special, namely, attempting to move toward special tile
-        # for now, we are assuming default car dynamics; TODO: generalize this
-        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
-            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
-        # if moving away from special tile
-        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
-            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
-        # if current subgoal isn't special
-        else:
-            # get bundle corresponding to the current subgoal
-            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-            # get bundle corresponding to the current state
-            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
-            try:
-                # get bundle for the queried state, if bundle doesn't exist, return False
-                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-            except:
-                return False
-
-            if current_bundle != subgoal_bundle:
-                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                    return True
-                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
-                    return True
-                else:
-                    return False
-            elif queried_bundle == subgoal_bundle:
-                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
-                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
-                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
-
-                dlong_curr = rel_goal[1]-rel_curr[1]
-                dlong_next = rel_goal[1]-rel_next[1]
-
-                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
-                dlatt_next = abs(rel_next[0]-rel_goal[0])
-
-                # check if at least maintaining longitudinal/lateral distance
-                latt_maintains = dlatt_next <= dlatt_curr
-                long_maintains = dlong_next <= dlong_curr
-                maintains = latt_maintains and long_maintains
-
-                # TODO: separate into two different oracles to distinguish cases
-                # only need to check reachability for braking backup plan because this implies reachability for current action
-                return maintains
-            else:
-                return False
-
-
-class BackUpPlanBundleProgressOracle(Oracle):
-    # requires a supervisor controller
-    def __init__(self):
-        super(BackUpPlanBundleProgressOracle, self).__init__(name='backup_plan_progress')
-    def evaluate(self, ctrl_action, plant, game):
-        def backup_plan_is_ok_from_state(state, current_subgoal):
-            tile_sequence_chain = plant.query_backup_plan(state=state)
-            # time-stamp, occupancy-tiles, which tile
-            last_xy = tile_sequence_chain[-1][-1][-1]
-            backup_xy = last_xy
-            # heading is unchanged because maximal braking backup plan does not change heading
-            backup_dir = state.heading
-            try:
-                return plant.supervisor.game.map.check_directed_tile_reachability((backup_xy, backup_dir), current_subgoal)
-            except:
-                return False
-
-        # get current state
-        current_xy = plant.state.x, plant.state.y
-        current_dir = plant.state.heading
-        current_directed_tile = (current_xy, current_dir)
-
-        # query next state
-        queried_state = plant.query_occupancy(ctrl_action)[-1]
-        queried_xy = queried_state.x, queried_state.y
-        queried_dir = queried_state.heading
-        queried_directed_tile = (queried_xy, queried_dir)
-        # get current subgoal
-        current_subgoal = plant.supervisor.subgoals[0]
-        # if current subgoal is special, namely, attempting to move toward special tile
-        # for now, we are assuming default car dynamics; TODO: generalize this
-        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
-            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
-        # if moving away from special tile
-        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
-            return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
-        # if current subgoal isn't special
-        else:
-            # get bundle corresponding to the current subgoal
-            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
-            # get bundle corresponding to the current state
-            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
-            try:
-                # get bundle for the queried state, if bundle doesn't exist, return False
-                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
-            except:
-                return False
-
-            # this is where a bundle change may happen
-            if current_bundle != subgoal_bundle:
-                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
-                    if len(plant.supervisor.subgoals) > 1:
-                        next_subgoal = plant.supervisor.subgoals[1]
-                        return backup_plan_is_ok_from_state(queried_state, next_subgoal)
-                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
-                    return backup_plan_is_ok_from_state(queried_state, current_subgoal)
-                else:
-                    return False
-            elif queried_bundle == subgoal_bundle:
-                # only need to check reachability for braking backup plan because this implies reachability for current action
-                return backup_plan_is_ok_from_state(queried_state, current_subgoal)
-            else:
-                return False
-
-
-class UnprotectedLeftTurnOracle(Oracle):
-    def __init__(self):
-        super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
-    def evaluate(self, ctrl_action, plant, game):
-        current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
-        queried_state = plant.query_occupancy(ctrl_action)[-1]
-        queried_xy = queried_state.x, queried_state.y
-        queried_dir = queried_state.heading
-        queried_directed_tile = (queried_xy, queried_dir)
-        # check if agent needs to reason about making an unprotected left turn
-        if current_directed_tile in game.map.all_left_turns:
-            current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)
-            if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
-                return True
-            else: # if commit to turning
-                opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
-                # idx indicates the lane number on the opposing traffic bundle
-                # (bigger means closer to left-most lane)
-                relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
-                relative_tiles.reverse()
-                current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
-                # get traffic light
-                traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
-                light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
-                if light_color == 'red':
-                    # find agents in intersection to check if collision might occur during red light
-                    for N, occupancy_tile in enumerate(relative_tiles):
-                        abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
-                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
-                        if lead_agent is not None:
-                            # if agent is in intersection
-                            if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:
-                                # get other agent intention
-                                if lead_agent.turn_signal == 'left':
-                                    pass
-                                else:
-                                    # check collision, make conservative and assume other agent bundle hasn't gone
-                                    gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))
-                                    gap_requirement = self.get_conservative_gap(lead_agent, N+1)
-                                    if gap > gap_requirement:
-                                        pass
-                                    else:
-                                        return False
-                            # other agent is not in intersection, don't need to check
-                            else:
-                                pass
-                        else:
-                            pass
-                    return True
-                else:
-                    #print("checking for gap")
-                    opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]
-                    # idx indicates the lane number on the opposing traffic bundle
-                    # (bigger means closer to left-most lane)
-                    relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
-                    relative_tiles.reverse() # sort so temporal order is achieved
-                    gaps = []
-                    #fake_heading = opposing_bundle.direction
-                    left_turn_gap_arr = []
-                    for N, occupancy_tile in enumerate(relative_tiles):
-                        abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
-                        fake_state = Car.hack_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
-                        lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
-
-                        if lead_agent is None:
-                            #print('no lead agent')
-                            pass
-                        else:
-                            gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))
-                            # TODO: complete gap conditions
-                            gap_requirement = self.get_conservative_gap(lead_agent, N+1)
-                            left_turn_gap_arr.append((gap_requirement, gap, N+1, lead_agent.state.x, lead_agent.state.y, abs_x, abs_y))
-                            if gap > gap_requirement:
-                                pass
-                            else:
-                                plant.left_turn_gap_arr = left_turn_gap_arr
-                                return False
-                    plant.left_turn_gap_arr = left_turn_gap_arr
-                    return True
-        else: # if the agent is not trying to perform a left turn
-            return True
-
-    def get_conservative_gap(self, lead_agent, N):
-        """
-        compute how much gap is needed for a continuous left turn for N
-        time steps assuming maximum acceleration at each time step
-        """
-        gap = 0
-        v_init = lead_agent.state.v
-        for idx in range(N):
-            v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
-            gap += v_init
-        return gap
-
-
-class TrafficLightOracle(Oracle):
-    def __init__(self):
-        super(TrafficLightOracle, self).__init__(name='traffic_light')
-
-    def tile_sequence_not_running_a_red_light_on_N_turn(self, tile_sequence, game, N):
-        light_checks = []
-        for tile in tile_sequence:
-            if tile in game.map.tile_to_traffic_light_map:
-                # figure out traffic_light orientation
-                legal_orientation = game.map.legal_orientations[tile][0]
-                light_checks.append([tile, legal_orientation])
-
-        for light_check in light_checks:
-            light_tile, legal_orientation = light_check
-            will_be_crossing = self.check_if_crossing(light_tile, tile_sequence, legal_orientation)
-            # get traffic light
-            traffic_light = game.map.tile_to_traffic_light_map[light_tile]
-            red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
-            if will_be_crossing and red_light_on:
-                return False
-        return True
-
-    def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
-        color = traffic_light.check_directed_light_in_N_turns(direction, N)
-        return color == 'red'
-
-    def action_not_running_a_red_light(self, ctrl_action, plant, game):
-        occ_states = plant.query_occupancy(ctrl_action)
-        occ_tiles = [(state.x, state.y) for state in occ_states]
-        return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
-
-    def check_if_crossing(self, light_tile, tiles, direction):
-        if direction in ['west', 'east']:
-            k = 1
-        elif direction in ['north', 'south']:
-            k = 0
-        light_tile_projection = light_tile[k]
-        tile_projections = [tile[k] for tile in tiles]
-        if direction in ['east', 'south']:
-            return np.min(tile_projections) <= light_tile_projection and np.max(tile_projections) > light_tile_projection
-        elif direction in ['west', 'north']:
-            return np.min(tile_projections) < light_tile_projection and np.max(tile_projections) >= light_tile_projection
-
-    def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
-        next_state = plant.query_occupancy(ctrl_action)[-1]
-        tile_sequence_chain = plant.query_backup_plan(state=next_state)
-        for tile_sequence in tile_sequence_chain:
-            N, required_tiles = tile_sequence
-            if self.tile_sequence_not_running_a_red_light_on_N_turn(required_tiles, game, N=N):
-                pass
-            else:
-                return False
-        return True
-
-    def evaluate(self, ctrl_action, plant, game):
-        action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
-        backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
-        # if you're at the critical right-turn tile and red light
-        bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
-        # special left turn lane bandage
-        if bundle is None:
-            #print(plant.state.x, plant.state.y, plant.state.heading)
-            return False
-        # check whether the right-turn action is okay
-        if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
-            traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
-            light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
-            if light_is_red:
-                # check if right turn is valid
-                return plant.check_right_turn_is_clear(ctrl_action)
-            else:
-                return action_not_running_a_red_light and backup_plant_will_still_be_ok
-        else:
-            return action_not_running_a_red_light and backup_plant_will_still_be_ok
-
-# oracle in charge of checking actions of agents if they are in an intersection
-# action is invalid if agent is in intersection and wants to change lanes
-class TrafficIntersectionOracle(Oracle):
-    def __init__(self):
-        super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
-    def evaluate(self, ctrl_action, plant, game):
-        def check_heading_matches_bundle_heading(bundles, heading):
-            for bundle in bundles:
-                if bundle.direction == heading:
-                    return True
-            return False
-
-        # if agent isn't in intersection return true
-        if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
-            return True
-        elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:
-            return True
-        # else check if action is a lane change move (which isn't allowed)
-        else:
-            ego_tile = plant.state.x, plant.state.y
-            ego_heading = plant.state.heading
-            bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
-            # check if ego_heading aligns with any of bundles at the tile
-            chk_heading_match = check_heading_matches_bundle_heading(bundles, ego_heading)
-
-            # TODO: change
-            if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:
-                return True
-            # else don't make a lane change in an intersection
-            else:
-                if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
-                    return False
-                else:
-                    return True
-
-class TrafficLightTurningLanesOracle(Oracle):
-    def __init__(self):
-        super(TrafficLightTurningLanesOracle, self).__init__(name='traffic_light_turning_lanes')
-    def evaluate(self, ctrl_action, plant, game):
-        pass
-
-
 #TODO: improve some calc here...
-class BackupPlanSafetyOracle(Oracle):
-    def __init__(self):
-        super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
-    def evaluate(self, ctrl_action, plant, game):
-        # check if collision occurs by taking that action
-        collision_chk = plant.check_collision_in_bubble(ctrl_action)
-        if collision_chk:
-            #print('collison occurred, returning false')
-            return False
-        else:
-            # check if makes collision with agent during action
-            next_state = plant.query_occupancy(ctrl_action)[-1]
-
-            x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
-            lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
-
-            if lead_agent:
-                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-                gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
-                # record lead agent
-                plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
-                # record computed gap
-                plant.gap_curr = gap_curr
-                return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
-            else:
-                return True
-
-class StaticObstacleOracle(Oracle):
-    def __init__(self):
-        super(StaticObstacleOracle, self).__init__(name='static_obstacle')
-    def evaluate(self, ctrl_action, plant, game):
-        # check if action is safe
-        next_occupancy = plant.query_occupancy(ctrl_action)
-        for occ_state in next_occupancy:
-            if not ((occ_state.x, occ_state.y) in game.map.drivable_nodes):
-                return False
-        else:
-        # check if backup plan would be safe
-            next_state = next_occupancy[-1]
-            tile_sequence_chain = plant.query_backup_plan(state=next_state)
-            tiles = set([tile for tiles in [tile_turn[-1]
-                for tile_turn in tile_sequence_chain] for tile in
-                tiles])
-            for tile in tiles:
-                if not (tile in game.map.drivable_nodes):
-                    return False
-            return True
-
-    def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
-        next_state = plant.query_occupancy(ctrl_action)[-1]
-        for tile_sequence in tile_sequence_chain:
-            N, required_tiles = tile_sequence
-        return True
-
-class LegalOrientationOracle(Oracle):
-    """
-    check if next heading is legal
-
-    """
-    def __init__(self):
-        super(LegalOrientationOracle, self).__init__(name='legal_orientation')
-    def evaluate(self, ctrl_action, plant, game):
-        final_state = plant.query_occupancy(ctrl_action)[-1]
-        final_node = final_state.x, final_state.y
-        if final_node in game.map.drivable_nodes:
-            legal_headings = game.map.legal_orientations[final_node]
-            if not legal_headings: # check if node is off road
-                return False
-            else: # check if next heading is legal
-                return final_state.heading in legal_headings
-        else:
-            return False # if node is an obstacle or out of bounds
 
 class OracleController(Controller):
-    def __init__(self, game, oracle_set):
-        super(OracleController, self).__init__(game=game)
+    def __init__(self, oracle_set):
+        super(OracleController, self).__init__()
         self.oracle_set = oracle_set
     def run_on(self, plant):
         sat_ctrl = []
@@ -3461,8 +2887,8 @@ class OracleController(Controller):
             RuntimeError('No satisfactory control input found for these oracles!')
 
 class SpecificationStructureController(Controller):
-    def __init__(self, game, specification_structure):
-        super(SpecificationStructureController, self).__init__(game=game)
+    def __init__(self, specification_structure):
+        super(SpecificationStructureController, self).__init__()
         self.specification_structure = specification_structure
 
     def manage_turn_signals(self, plant, ctrl):
@@ -3471,12 +2897,12 @@ class SpecificationStructureController(Controller):
         next_directed_tile = ((x_nxt,y_nxt), heading_nxt)
         # turn left signal on if ctrl ends up in first left turn tile and
         # agent subgoal is in left turn tiles
-        if plant.supervisor.subgoals[0] in self.game.map.all_left_turns and \
+        if plant.supervisor.subgoals[0] in plant.supervisor.game.map.all_left_turns and \
             plant.supervisor.subgoals[0] == next_directed_tile:
             plant.set_turn_signal('left')
         # turn off signal when ctrl makes agent leave the intersection
         x, y = plant.state.x, plant.state.y
-        if len(self.game.map.legal_orientations[x,y]) > 1 and len(self.game.map.legal_orientations[x_nxt,y_nxt]) == 1:
+        if len(plant.supervisor.game.map.legal_orientations[x,y]) > 1 and len(plant.supervisor.game.map.legal_orientations[x_nxt,y_nxt]) == 1:
             plant.reset_turn_signal()
 
     def run_on(self, plant):
@@ -3489,16 +2915,6 @@ class SupervisoryController():
     def _init__(self):
         self.plant = None
         self.game = None
-
-    def add_headings_to_goals(self, goals):
-        new_goals = []
-        for goal in goals:
-            if len(goal) < 3:
-                heading = self.game.map.legal_orientations[goal][0] # take first one if multiple
-                new_goals.append((goal[0], goal[1], heading))
-            else:
-                new_goals.append(goal)
-        return new_goals
 
     def set_plant(self, plant):
         plant.supervisor = self
@@ -3514,9 +2930,19 @@ class SupervisoryController():
     def run(self):
         self.check_goals()
 
+class LocalContractController(SupervisoryController):
+    def __init__(self, game, goal):
+        self.game = game
+        self.goal = goal
+
+    def get_next_goal_and_plan(self):
+        return self.goal, None
+
+    def check_goals(self):
+        pass
+
 class GoalExit(SupervisoryController):
     def __init__(self, game, goals=None):
-        super(SupervisoryController, self).__init__()
         self.game = game
         self.goals = goals[0] # only consider first goal
     def get_next_goal_and_plan(self):
@@ -3532,9 +2958,18 @@ class GoalExit(SupervisoryController):
 
 class GoalCycler(SupervisoryController):
     def __init__(self, game, goals=None):
-        super(SupervisoryController, self).__init__()
         self.game = game
         self.goals = cycle(self.add_headings_to_goals(goals))
+
+    def add_headings_to_goals(self, goals):
+        new_goals = []
+        for goal in goals:
+            if len(goal) < 3:
+                heading = self.game.map.legal_orientations[goal][0] # take first one if multiple
+                new_goals.append((goal[0], goal[1], heading))
+            else:
+                new_goals.append(goal)
+        return new_goals
 
     def get_next_goal_and_plan(self):
         next_goal = next(self.goals)
@@ -3550,7 +2985,6 @@ class GoalCycler(SupervisoryController):
 
 class BundleGoalExit(SupervisoryController):
     def __init__(self, game, goals=None):
-        super(SupervisoryController, self).__init__()
         self.game = game
         self.goals = goals[0] # only consider first goal
         self.subgoals = None
@@ -3574,7 +3008,6 @@ class BundleGoalExit(SupervisoryController):
         subgoals = subgoals[1:] # remove first node
         return subgoals
 
-
     def check_subgoals(self):
         if self.plant:
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.subgoals[0][0][0], self.subgoals[0][0][1]]))) == 0:
@@ -3592,6 +3025,21 @@ class SpecificationStructure():
         self.oracle_set = oracle_list
         self.tier = self.set_tier(oracle_tier)
         self.tier_weights = self.set_tier_weights(oracle_tier)
+        self.max_score = self.get_max_score()
+        self.sorted_oracle_set = self.get_sorted_oracle_set()
+
+    def get_sorted_oracle_set(self):
+        sorted_oracle_set  = sorted(self.oracle_set, key=lambda oracle: self.tier[oracle])
+        return sorted_oracle_set
+
+    def get_max_score(self):
+        score = 0
+        for oracle in self.oracle_set:
+            o_score = True
+            o_tier = self.tier[oracle]
+            if oracle.name != 'backup_plan_safety':
+                score += int(o_score) * self.tier_weights[o_tier]
+        return score
 
     def set_tier(self, oracle_tier):
         tier = od()
@@ -3622,7 +3070,7 @@ class TrafficLight:
         self.durations['red'] = self.durations['green'] + self.durations['yellow'] + self.t_buffer * 2
 
         if random_init:
-            #if seed is not None: 
+            #if seed is not None:
                 #print(self.count)
                 #print (seed + self.count)
             set_seed(seed,self.count*3)
@@ -3700,7 +3148,6 @@ class TrafficLight:
                 timer = htimer - self.t_buffer - self.durations['green'] - self.durations['yellow']
         return color, timer
 
-
     def run(self):
         self.htimer += 1
         if self.htimer >= self.durations[self.hstate]:
@@ -3773,7 +3220,7 @@ def get_default_car_ss():
 
 def create_default_car(source, sink, game, car_count):
     ss = get_default_car_ss()
-    spec_struct_controller = SpecificationStructureController(game=game,specification_structure=ss)
+    spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start = source.node
     end = sink.node
     car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
@@ -3798,7 +3245,7 @@ def create_specified_car(attributes, game):
     if 'controller' not in attributes:
         ss = get_default_car_ss()
         # default to SpecificationStructureController
-        controller = SpecificationStructureController(game=game,specification_structure=ss)
+        controller = SpecificationStructureController(specification_structure=ss)
         attributes['controller'] = controller
     if 'agent_color' not in attributes:
         # if not specified choose a random color
@@ -3827,10 +3274,6 @@ def create_specified_car(attributes, game):
     supervisor = BundleGoalExit(game=game, goals=[attributes['goal']])
     car.set_supervisor(supervisor)
     return car
-
-def run(runnable_set):
-    for runnable in runnable_set:
-        runnable.run()
 
 class QuasiSimultaneousGame(Game):
     def __init__(self, game_map, save_debug_info=True):
@@ -3960,10 +3403,6 @@ class QuasiSimultaneousGame(Game):
                     self.done_simulating_agent(agent)
         self.done_simulating_everyone()
 
-    def play_step(self):
-        self.sys_step()
-        self.env_step()
-
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
@@ -4038,10 +3477,9 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 1000
-
+    seed = 6221
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.01, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -4049,8 +3487,8 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=950)
-#    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=500)
+    #game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
