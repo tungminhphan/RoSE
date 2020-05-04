@@ -8,6 +8,7 @@ def get_agent_id(filename, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
     agents = traces[t]['agents']
+    
     # search through all agents at time t
     for agent in agents:
         ag_x, ag_y, ag_theta, ag_v, ag_color, ag_bubble, ag_id = agent
@@ -19,53 +20,66 @@ def get_agent_id(filename, x, y, heading, t):
     print('agent not found')
     return None
 
-def check_consistent_conflict_cluster_resolution(filename, outfile):
+# print out all agents and the conflict at a given time
+def print_all_agents_and_conflict_requests_at_time_t(filename, outfile, time_step=None):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
 
     out_file = open(outfile,"w")
+    agents = traces[time_step]['agents']
 
-    t_end = traces['t_end']
-    # for each time step, loop through all agents and
-    for t in range(t_end):
-        agents = traces[t]['agents']
-        out_file.write("TIME\n")
-        out_file.write(str(t+1)+'\n')
-        # print out send and received conflict requests
-        for agent in agents:
-            x, y, theta, v, color, bubble, ag_id = agent
+    for agent in agents:
+        x, y, theta, v, color, bubble, ag_id = agent
+        tup = (x, y, theta, v, color, ag_id)
+        print("======================AGENT IS LOCATED ATTTT==================")
+        print(str(tup))
+    
+        try: 
+            #print(str(tup))
+            agent_info = traces[int(ag_id)][time_step]
+            agents = agent_info['agents_in_bubble']
+            print("agents in bubble")
+            for agent in agents: 
+                print(agent)
+            #for key, value in agent_info.items():
+            #    print(key)
+            #print("agents in bubble")
+            #agents = agent_info['agents_in_bubble']
+            #for agent in agents: 
+            #    print(agent)
 
-            try:
-                agent_info = traces[ag_id][t+1]
-            except:
-                break
+            #out_file.write("======================AGENT IS LOCATED ATTTT================== \n")
+            #out_file.write(str(tup)+'\n')
+        except:
+            break
+        
+        out_file.write("agent intention is:\n")
+        out_file.write(str(agent_info['intention'])+'\n')
 
-            out_file.write(str(agent_info['state'])+'\n')
-            out_file.write(str(agent_info['agent_id'])+'\n')
-            # print out agent conflict sent
-            out_file.write('sent requests to:\n')
-            for agent in agent_info['sent']:
-                out_file.write(str(agent)+'\n')
+        # print the other agents in its bubble
+        out_file.write("other agents in bubble located at: \n")
+        [out_file.write(str(ag)+'\n') for ag in agent_info['agents_in_bubble']]
 
-            out_file.write('received requests from\n')
-            for agent in agent_info['received']:
-                out_file.write(str(agent)+'\n')
+        # print the other agents in its bubble
+        out_file.write("other agents in bubble before request located at: \n")
+        [out_file.write(str(ag)+'\n') for ag in agent_info['agents_in_bubble_before']]
 
-            # print out agent conflict received
-            out_file.write('max braking flag sent\n')
-            out_file.write(str(agent_info['max_braking_not_enough'])+'\n')
-
-            # print out agent conflict winner
-            out_file.write('conflict winner\n')
-            out_file.write(str(agent_info['conflict_winner'])+'\n')
-
-            # print out token count during bid
-            out_file.write('token count during bid \n')
-            out_file.write(str(agent_info['token_count_before'])+'\n')
-
-            # add in some spaces
-            out_file.write('\n')
-
+        out_file.write("sent requests to \n")
+        for agent in agent_info['sent']:
+            out_file.write(str(agent)+'\n')
+            #out_file.write(str(agent)+'\n')
+        
+        out_file.write('received requests from\n')
+        #print("received requests from")
+        for agent in agent_info['received']:
+            #print(agent)
+            out_file.write(str(agent)+'\n')
+        
+        out_file.write('checked for agent conflict with:\n')
+        #print("checked agent conflict with")
+        for agent in agent_info['checked_for_conflict']:
+            #print(agent)
+            out_file.write(str(agent)+'\n')
 
 def print_one_agent_trace(filename, outfile, x, y, heading, t):
     with open(filename, 'rb') as pckl_file:
@@ -81,7 +95,6 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
     del agent_trace['agent_param']
     t_end = traces['t_end']
 
-
     #print(agent_trace.keys())
     # inspect the agent trace over time (how the agent is making it's decisions)
     for t in sorted(agent_trace.keys()):
@@ -90,6 +103,10 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
 
         out_file.write("Time Step \n")
         out_file.write(str(t)+'\n')
+
+        # print the agent id
+        out_file.write("AGENT IS LOCATED AT: \n")
+        out_file.write(str(trace_t['agent_id'])+'\n')
 
         # print the agent state
         out_file.write("AGENT IS LOCATED AT: \n")
@@ -106,6 +123,7 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
         # print the agents goal
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((trace_t['goals']))+'\n')
+
 
         # print out oracle dict
         if t != list(sorted(agent_trace.keys()))[-1]:
@@ -140,6 +158,11 @@ def print_one_agent_trace(filename, outfile, x, y, heading, t):
                 out_file.write(str(tup)+'\n')
 
             out_file.write('\n')
+
+            # print out which agents it checked conflict with
+            out_file.write('checked for agent conflict with:\n')
+            for agent in trace_nxt['checked_for_conflict']:
+                out_file.write(str(agent)+'\n')
 
             # print out the conflict requests it sent out
             out_file.write('sent requests to:\n')
@@ -178,7 +201,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game.p'
 
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, outfile, 18, 42, 'south', 47)
+    #print_one_agent_trace(traces_file, outfile, 17,2, 'east', 2)
 
-    #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    #check_consistent_conflict_cluster_resolution(traces_file, outfile_cc)
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    print_all_agents_and_conflict_requests_at_time_t(traces_file, outfile_cc, 5)
