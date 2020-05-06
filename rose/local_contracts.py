@@ -66,7 +66,7 @@ class LocalFrame:
     def __equal__(self):
         pass
 
-class LocalContract:
+class LocalContractSupervisor:
     def __init__(self, local_frame):
         self.frame_to_forbidden_actions = od()
         self.local_frame = local_frame
@@ -88,9 +88,12 @@ if __name__ == '__main__':
     agent_set = [gridder1, gridder2]
     the_game = rs.Simulation(the_map=the_field,agent_set=agent_set)
 
-    contract_controller1 = rs.LocalContractController(the_game, goal1)
+    local_frame1 = LocalFrame(agent=gridder1, radius=3)
+    local_frame2 = LocalFrame(agent=gridder2, radius=3)
+
+    contract_controller1 = rs.LocalContractController(the_game, goal1, local_frame1)
     contract_controller1.set_plant(gridder1)
-    contract_controller2 = rs.LocalContractController(the_game, goal2)
+    contract_controller2 = rs.LocalContractController(the_game, goal2, local_frame2)
     contract_controller2.set_plant(gridder2)
 
     compass_controller = rs.CompassController()
@@ -98,15 +101,10 @@ if __name__ == '__main__':
     gridder2.set_controller(compass_controller)
 
     sim = rs.Simulation(the_map=the_field, agent_set=agent_set)
-    sim.animate(frequency=0.1)
+    sim.play()
+#    sim.animate(frequency=0.1)
 
-    local_frame1 = LocalFrame(agent=gridder1, radius=3)
-    local_frame2 = LocalFrame(agent=gridder2, radius=3)
-    print(local_frame1.rel_tiles)
-    print(local_frame2.rel_tiles)
-    print('after')
-    print(local_frame1.get_mask())
-    print(local_frame2.get_mask())
+
     st()
 
 #    vec0 = [1, -1]

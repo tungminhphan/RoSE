@@ -41,7 +41,6 @@ DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
 CHOSEN_IDs = []
 
-
 def set_seed(seed, other_param=0):
     #other_param = 0
     if seed is not None:
@@ -1455,6 +1454,12 @@ class Simulation:
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.agent_set] # list ordering determines draw ordering
 
+    def play(self, t_end=np.inf, outfile=None):
+        write_bool = outfile is not None and t_end is not np.inf
+        while self.time < t_end:
+            print("TIME: " + str(self.time))
+            self.play_step()
+
     def time_forward(self):
         self.time += 1
 
@@ -1467,6 +1472,7 @@ class Simulation:
     def play_step(self):
         self.sys_step()
         self.env_step()
+        self.time_forward()
 
     def animate(self, frequency, t_end=np.inf):
         stdscr = curses.initscr()
@@ -1486,11 +1492,9 @@ class Simulation:
                     artist.draw_set(draw_set)
                 # update states
                 self.play_step()
-                self.time += 1
                 # draw objects
                 stdscr.refresh()
                 time.sleep(frequency)
-                self.time_forward()
         finally:
             curses.nocbreak()
             stdscr.keypad(False)
@@ -1692,7 +1696,6 @@ class Game(Simulation):
                 if self.save_debug_info:
                     self.write_agents_to_traces()
 
-            self.time_forward()
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
@@ -2906,9 +2909,10 @@ class SupervisoryController():
         self.check_goals()
 
 class LocalContractController(SupervisoryController):
-    def __init__(self, game, goal):
+    def __init__(self, game, goal, frame):
         self.game = game
         self.goal = goal
+        self.frame = frame
 
     def get_next_goal_and_plan(self):
         return self.goal, None
@@ -3449,8 +3453,8 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-#    game.play(outfile=output_filename, t_end=500)
-    game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=50)
+#    game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
