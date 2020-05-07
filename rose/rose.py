@@ -175,16 +175,14 @@ class Agent:
         return self.query_occupancy(ctrl)[-1]
 
     def apply(self, ctrl):
+        #print(ctrl)
         self.state = self.query_next_state(ctrl)
         self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
-        # check if agent reached it's goal and update number agents exited count
-        if (self.state.x, self.state.y, self.state.heading) == self.supervisor.goals: 
-            #print("agent reached goal")
-            self.supervisor.game.agents_reached_goal_count += 1
 
         # save action that was chosen
         self.ctrl_chosen = ctrl
         self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
+        
         # check whether the updated joint state is safe
         if DEBUGGING:
             chk_joint_safety = self.check_joint_state_safety(return_list=True)
@@ -458,11 +456,14 @@ class Car(Agent):
         def create_pickle_file(filename):
             vel = np.arange(self.v_min, self.v_max+1)
             bubble_dict = od()
+            # for paper figure
+            saved_bubble = od()
             for v in vel:
-                bubble_dict[v] = self.get_default_bubble(v, front_back_only=front_back_only)
+                bubble_dict[v], saved_bubble[v] = self.get_default_bubble(v, front_back_only=front_back_only)
             with open(filename, 'wb+') as pckl_file:
                 pickle.dump(bubble_dict, pckl_file)
-            pass
+            with open(filename[:-2]+'_saved.p', 'wb+') as pckl_file:
+                pickle.dump(saved_bubble, pckl_file)
 
         # string assumes v_min and a_min are negative
         car_param = 'v_' + 'n' + str(abs(self.v_min)) + '_' + str(self.v_max) + \
@@ -827,17 +828,13 @@ class Car(Agent):
                 except:
                     break
                 if chk_lon and self.state.heading == agent.state.heading:
-                    #agents_checked_for_conflict.append(agent)
-                    # send request to agent behind if intentions conflict
-                    #print('checking to send request')
-                    #print(agent.state)
+                    # one last check to see whether agents are in the same lane and the agent behind doesn't also want to switch lanes
+                    
+
                     chk_to_send_request = self.check_to_send_conflict_request(agent)
-                    #print(chk_to_send_request)
+                    # add in check to see if agents are currently in the same lane
                     if chk_to_send_request:
                         send_requests_list.append(agent)
-                    # check whether max yield is not enough; if not, set flag
-                    #print('checking max braking not enough flag')
-                    #print(agent.state)
                     chk_max_braking_not_enough, flag_a, flag_b = self.intention_bp_conflict(agent)
                     #print(chk_max_braking_not_enough, flag_a, flag_b)
                     if chk_max_braking_not_enough:
@@ -1145,8 +1142,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
             chk_valid_actions, flag_a, flag_b = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(), debug=True)
-            #if not chk_valid_actions:
-            #    print("max yield flag is set")
+            if not chk_valid_actions:
+                print("max yield flag is set")
             return not chk_valid_actions, flag_a, flag_b
         else:
             return False, flag_a, flag_b
@@ -1159,7 +1156,9 @@ class Car(Agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
                 #if not chk_valid_actions:
-                #    print("sending conflict request")
+                    #if agent.state.heading == 'east':
+                    #    print(self.state)
+                    #    print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1203,6 +1202,8 @@ class Car(Agent):
             # set car state to have velocity v
             st = self.hack_state(self.state, x=self.default_state.x, y=self.default_state.y, heading=self.default_state.heading, v=vel)
             resources = []
+            bubb_0 = []
+            bubb_1 = []
             # make fake state here
             for ctrl in self.get_all_ctrl(state=st):
                 #__import__('ipdb').set_trace(context=21)
@@ -1212,6 +1213,7 @@ class Car(Agent):
                 if occ is not None:
                     resources_to_add = [(state.x, state.y) for state in occ]
                     resources.extend(resources_to_add)
+                    bubb_0.extend(resources_to_add)
                     #print(resources)
                     # add in elements where car might need to execute emergency braking from the final state
                     final_st = occ[-1]
@@ -1219,17 +1221,17 @@ class Car(Agent):
                         y=final_st.y, heading=final_st.heading, v=final_st.v)
                     safety_plan_resources = self.get_tiles_for_safety_plan(state=state_to_chk)
                     resources.extend(safety_plan_resources)
+                    bubb_1.extend(safety_plan_resources)
 
             # remove any elements already inside
             resources_unique = []
             [resources_unique.append(x) for x in resources if x not in resources_unique]
-            return resources_unique
-
+            return resources_unique, list(set(bubb_0)), list(set(bubb_1))
 
         # gridpoints
         bubble = []
-        resources = get_resources()
-
+        resources, bubb_0, bubb_1 = get_resources()
+        bubb_2 = []
         # get all possible reachable states to resources
         for xy in resources:
             # get all possible states to that resource
@@ -1237,21 +1239,32 @@ class Car(Agent):
             states = self.get_backwards_reachable_states_from_gridpoint(xy, front_back_only=front_back_only)
             gridpts = [(state.x, state.y) for state in states]
             bubble.extend(gridpts)
+            bubb_2.extend(gridpts)
 
         # get all states where backup plan intersects with resources
         backup_plan_states = get_states_where_backup_plan_reaches_resources(resources)
+        # save the backup-plan states
+        bubb_3 = []
+        for state in backup_plan_states:
+            bubb_3.append((state.x, state.y))
 
         # get all gridpoints from which the backup plan states are backwards reachable
+        bubb_4 = []
         for state_to in backup_plan_states:
             states_from, actions_to = self.get_backwards_reachable_states(state_to, front_back_only=front_back_only)
             # transform all states from into gridpoints
             more_gridpts = [(state.x, state.y) for state in states_from]
             bubble.extend(more_gridpts)
+            bubb_4.extend(more_gridpts)
 
         # remove repeat elements
         bubble_unique = []
         [bubble_unique.append(x) for x in bubble if x not in bubble_unique]
+        bubb_2 = list(set(bubb_2))
+        bubb_3 = list(set(bubb_3))
+        bubb_4 = list(set(bubb_4))
 
+        bubbles_sv = [bubb_0, bubb_1, bubb_2, bubb_3, bubb_4]
         # plot the bubble
         '''fig, ax = plt.subplots()
         ax.set_xlim(-10, 10)
@@ -1261,7 +1274,7 @@ class Car(Agent):
             ax.add_patch(rect)
         plt.show()'''
 
-        return bubble_unique
+        return bubble_unique, bubbles_sv
 
     # compute number of tiles when applying brakes maximally
     def compute_dx(self, a_min, vel):
@@ -2906,7 +2919,11 @@ class SpecificationStructureController(Controller):
         # choose action according to action selection strategy
         ctrl = plant.action_selection_strategy()
         self.manage_turn_signals(plant, ctrl)
+        #print("applying control")
         plant.apply(ctrl)
+        # heading check to see if agent reached goal
+        if (plant.state.x, plant.state.y, plant.state.heading) == plant.supervisor.goals: 
+            plant.supervisor.game.agents_reached_goal_count += 1
 
 class SupervisoryController():
     def _init__(self):
@@ -3475,16 +3492,16 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 6221
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.01, seed=seed)
+    map_name = 'straight_road'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map, save_debug_info=False)
+    game = QuasiSimultaneousGame(game_map=the_map)
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=500)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
     # print debug info
