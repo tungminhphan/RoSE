@@ -2886,7 +2886,7 @@ class SpecificationStructureController(Controller):
         self.manage_turn_signals(plant, ctrl)
         plant.apply(ctrl)
 
-class SupervisoryController():
+class Supervisor():
     def _init__(self):
         self.plant = None
         self.game = None
@@ -2905,7 +2905,7 @@ class SupervisoryController():
     def run(self):
         self.check_goals()
 
-class LocalContractController(SupervisoryController):
+class LocalContractSupervisor(Supervisor):
     def __init__(self, game, goal):
         self.game = game
         self.goal = goal
@@ -2916,7 +2916,7 @@ class LocalContractController(SupervisoryController):
     def check_goals(self):
         pass
 
-class GoalExit(SupervisoryController):
+class GoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal
@@ -2931,7 +2931,7 @@ class GoalExit(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) <= 1: # if close enough
                 self.game.agent_set.remove(self.plant)
 
-class GoalCycler(SupervisoryController):
+class GoalCycler(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = cycle(self.add_headings_to_goals(goals))
@@ -2958,7 +2958,7 @@ class GoalCycler(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.current_goal, self.current_plan = self.get_next_goal_and_plan()
 
-class BundleGoalExit(SupervisoryController):
+class BundleGoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal

@@ -63,8 +63,14 @@ class LocalFrame:
             rotated_tile_list.append(new_tile)
         return tuple(rotated_tile_list)
 
-    def __equal__(self):
-        pass
+    def get_signature(self, game):
+        mask = self.get_mask()
+        signature = []
+        for tile in mask:
+            for tile in agent.supervisor.game.map:
+                feature = None
+                signature.append(feature)
+        return signature
 
 class LocalContract:
     def __init__(self, local_frame):
@@ -88,17 +94,16 @@ if __name__ == '__main__':
     agent_set = [gridder1, gridder2]
     the_game = rs.Simulation(the_map=the_field,agent_set=agent_set)
 
-    contract_controller1 = rs.LocalContractController(the_game, goal1)
-    contract_controller1.set_plant(gridder1)
-    contract_controller2 = rs.LocalContractController(the_game, goal2)
-    contract_controller2.set_plant(gridder2)
+    contract_supervisor1 = rs.LocalContractSupervisor(the_game, goal1)
+    gridder1.set_supervisor(contract_supervisor1)
+    contract_supervisor2 = rs.LocalContractSupervisor(the_game, goal2)
+    gridder2.set_supervisor(contract_supervisor2)
 
     compass_controller = rs.CompassController()
     gridder1.set_controller(compass_controller)
     gridder2.set_controller(compass_controller)
 
-    sim = rs.Simulation(the_map=the_field, agent_set=agent_set)
-    sim.animate(frequency=0.1)
+#    sim.animate(frequency=0.1)
 
     local_frame1 = LocalFrame(agent=gridder1, radius=3)
     local_frame2 = LocalFrame(agent=gridder2, radius=3)
