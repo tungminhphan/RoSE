@@ -194,9 +194,9 @@ class Gridder(Agent):
         if state == None:
             state = self.state
         if ctrl == 'up':
-            next_state = Agent.hack_state(state, y = state.y + 1)
-        elif ctrl == 'down':
             next_state = Agent.hack_state(state, y = state.y - 1)
+        elif ctrl == 'down':
+            next_state = Agent.hack_state(state, y = state.y + 1)
         elif ctrl == 'left':
             next_state = Agent.hack_state(state, x = state.x - 1)
         elif ctrl == 'right':
@@ -1526,12 +1526,14 @@ class ContractGame(Simulation):
 
     # requires contract supervisor
     def learn(self):
-        agent_to_legal_action_dict = od()
+        agent_to_legal_action_map = od()
         agent_set = list(self.agent_set)
-        for agent_idx, agent in enumerate(agent_set):
+        agent_to_signature_map = dict()
+        for agent in agent_set:
             signature, mask = agent.supervisor.contract.frame.get_signature(game=agent.supervisor.game,
                                                                       agent=agent)
             xy_to_feature_map = dict(zip(mask, signature))
+            agent_to_signature_map[agent] = signature, xy_to_feature_map
             if signature in agent.supervisor.contract.contract_draft:
                 # if signature already has been encountered
                 forbidden_actions = agent.supervisor.contract[signature]
@@ -1543,11 +1545,50 @@ class ContractGame(Simulation):
                     assert next_tile in xy_to_feature_map # the frame must satisfy this assertion
                     if xy_to_feature_map[next_tile] == 'out':
                         forbidden_actions.append(act)
-                print(forbidden_actions)
+                agent.supervisor.contract[signature] = forbidden_actions
+            agent_to_legal_action_map[agent] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
 
-            agent_to_legal_action_dict[agent_idx] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
-        action_set = [agent_to_legal_action_dict[agent_idx] for agent_idx in range(len(agent_set))]
-        product_set = itertools.product(action_set)
+        action_set = [agent_to_legal_action_map[agent] for agent in agent_set]
+        action_product_set = itertools.product(*action_set) # note ordering is not preserved here
+
+        existential_dictionary = dict()
+        bad_joint_actions = []
+        for joint_action in action_product_set:
+            next_tiles = []
+            is_bad_joint_action = False
+            for agent_idx, agent_action in enumerate(joint_action):
+                agent_next_state = agent_set[agent_idx].query_next_state(agent_action)
+                agent_next_xy = agent_next_state.x, agent_next_state.y
+                if agent_next_xy not in next_tiles:
+                    next_tiles.append(agent_next_xy)
+                else: # collision will happen
+                    bad_joint_actions.append(joint_action)
+                    is_bad_joint_action = True
+                    break
+            # collect (existential) proofs of good actions
+            if not is_bad_joint_action:
+                for agent_idx, agent_action in enumerate(joint_action):
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    if agent_signature in existential_dictionary:
+                        existential_dictionary[agent_signature].append(agent_action)
+                    else:
+                        existential_dictionary[agent_signature] = [agent_action]
+            # forbid any action for which we have no proof of it being good
+            for bad_joint_action in enumerate(bad_joint_actions):
+                for agent_idx, agent_action in bad_joint_action:
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    assert agent_signature in existential_dictionary # if this check fails, it's gameover
+                    if agent_action in existential_dictionary[agent_signature]:
+                        pass # this is a good action keep it
+                    else:
+                        agent.supervisor.contract[agent_signature] = [agent_action]
+                        #TODO: this line must be executed, so if there are
+                        #multiple proofs, it's ok to prune some to
+                        #prevent this from not being entered
 
 class TrafficGame(Simulation):
     """
