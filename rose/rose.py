@@ -4,6 +4,7 @@
     Authors: Tung Phan, Karena Cai
     Date created: 1/10/2020
 '''
+import itertools
 from typing import List, Any
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -1453,6 +1454,24 @@ class Simulation:
         self.time = 0
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.agent_set] # list ordering determines draw ordering
+        self.occupancy_dict = od()
+        self.update_occupancy_dict()
+
+    def update_occupancy_dict(self):
+        occupancy_dict = od()
+        for agent in self.agent_set:
+            x, y = agent.state.x, agent.state.y
+            occupancy_dict[x,y] = agent
+        self.occupancy_dict = occupancy_dict
+
+    def update_occupancy_dict_for_one_agent(self, agent, prior_state, delete=False):
+        if not delete:
+            if prior_state is not None:
+                self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
+            self.occupancy_dict[agent.state.x, agent.state.y] = agent
+        else:
+            self.occupancy_dict.pop((agent.state.x, agent.state.y), None)
+
 
     def play(self, t_end=np.inf, outfile=None):
         write_bool = outfile is not None and t_end is not np.inf
@@ -1501,36 +1520,51 @@ class Simulation:
             curses.echo()
             curses.endwin()
 
-class Game(Simulation):
+class ContractGame(Simulation):
+    def __init__(self, the_map, agent_set=[]):
+        super(ContractGame, self).__init__(the_map, agent_set)
+
+    # requires contract supervisor
+    def learn(self):
+        agent_to_legal_action_dict = od()
+        agent_set = list(self.agent_set)
+        for agent_idx, agent in enumerate(agent_set):
+            signature, mask = agent.supervisor.contract.frame.get_signature(game=agent.supervisor.game,
+                                                                      agent=agent)
+            xy_to_feature_map = dict(zip(mask, signature))
+            if signature in agent.supervisor.contract.contract_draft:
+                # if signature already has been encountered
+                forbidden_actions = agent.supervisor.contract[signature]
+            else:
+                forbidden_actions = []
+                for act in agent.get_all_ctrl():
+                    next_state = agent.query_next_state(act)
+                    next_tile = next_state.x, next_state.y
+                    assert next_tile in xy_to_feature_map # the frame must satisfy this assertion
+                    if xy_to_feature_map[next_tile] == 'out':
+                        forbidden_actions.append(act)
+                print(forbidden_actions)
+
+            agent_to_legal_action_dict[agent_idx] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
+        action_set = [agent_to_legal_action_dict[agent_idx] for agent_idx in range(len(agent_set))]
+        product_set = itertools.product(action_set)
+
+class TrafficGame(Simulation):
     """
     Traffic game class
     """
     # combines scenario + agents for game
     def __init__(self, game_map, save_debug_info=True, agent_set=[]):
-        super(Game, self).__init__(the_map=game_map, agent_set=agent_set)
+        super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
-        self.occupancy_dict = od()
         self.car_count = 0
-        self.update_occupancy_dict()
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
         self.save_debug_info = save_debug_info
-
-    def update_occupancy_dict(self):
-        occupancy_dict = od()
-        for agent in self.agent_set:
-            x, y = agent.state.x, agent.state.y
-            occupancy_dict[x,y] = agent
-        self.occupancy_dict = occupancy_dict
-
-    def update_occupancy_dict_for_one_agent(self, agent, prior_state):
-        if prior_state is not None:
-            self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
-        self.occupancy_dict[agent.state.x, agent.state.y] = agent
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1563,7 +1597,7 @@ class Game(Simulation):
                 if spawning_contract.okay_to_spawn_flag:
                     #print(new_car.supervisor.goals)
                     self.agent_set.append(new_car)
-                    self.update_occupancy_dict()
+                    self.update_occupancy_dict_for_one_agent(new_car,prior_state=None)
                     self.car_count = self.car_count+1
 
     def add_agent(self, agent):
@@ -2909,10 +2943,10 @@ class Supervisor():
         self.check_goals()
 
 class LocalContractSupervisor(Supervisor):
-    def __init__(self, game, goal, frame):
+    def __init__(self, game, goal, contract):
         self.game = game
         self.goal = goal
-        self.frame = frame
+        self.contract = contract
 
     def get_next_goal_and_plan(self):
         return self.goal, None
@@ -2997,6 +3031,7 @@ class BundleGoalExit(Supervisor):
         if self.plant:
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.game.agent_set.remove(self.plant)
+                self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
 class SpecificationStructure():
     def __init__(self, oracle_list, oracle_tier):
@@ -3254,7 +3289,7 @@ def create_specified_car(attributes, game):
     car.set_supervisor(supervisor)
     return car
 
-class QuasiSimultaneousGame(Game):
+class QuasiSimultaneousGame(TrafficGame):
     def __init__(self, game_map):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
@@ -3445,7 +3480,7 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 6221
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.01, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.05, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3453,7 +3488,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=50)
+    game.play(outfile=output_filename, t_end=300)
 #    game.animate(frequency=0.01)
 
     # print debug info
