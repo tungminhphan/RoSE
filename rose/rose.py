@@ -4,6 +4,7 @@
     Authors: Tung Phan, Karena Cai
     Date created: 1/10/2020
 '''
+import itertools
 from typing import List, Any
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -40,7 +41,6 @@ DIRECTION_TO_VECTOR['north'] = [-1, 0]
 DIRECTION_TO_VECTOR['south'] = [1, 0]
 AGENT_CHAR = [str(i) for i in range(10)]
 CHOSEN_IDs = []
-
 
 def set_seed(seed, other_param=0):
     #other_param = 0
@@ -208,9 +208,9 @@ class Gridder(Agent):
         if state == None:
             state = self.state
         if ctrl == 'up':
-            next_state = Agent.hack_state(state, y = state.y + 1)
-        elif ctrl == 'down':
             next_state = Agent.hack_state(state, y = state.y - 1)
+        elif ctrl == 'down':
+            next_state = Agent.hack_state(state, y = state.y + 1)
         elif ctrl == 'left':
             next_state = Agent.hack_state(state, x = state.x - 1)
         elif ctrl == 'right':
@@ -1484,6 +1484,30 @@ class Simulation:
         self.time = 0
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.agent_set] # list ordering determines draw ordering
+        self.occupancy_dict = od()
+        self.update_occupancy_dict()
+
+    def update_occupancy_dict(self):
+        occupancy_dict = od()
+        for agent in self.agent_set:
+            x, y = agent.state.x, agent.state.y
+            occupancy_dict[x,y] = agent
+        self.occupancy_dict = occupancy_dict
+
+    def update_occupancy_dict_for_one_agent(self, agent, prior_state, delete=False):
+        if not delete:
+            if prior_state is not None:
+                self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
+            self.occupancy_dict[agent.state.x, agent.state.y] = agent
+        else:
+            self.occupancy_dict.pop((agent.state.x, agent.state.y), None)
+
+
+    def play(self, t_end=np.inf, outfile=None):
+        write_bool = outfile is not None and t_end is not np.inf
+        while self.time < t_end:
+            print("TIME: " + str(self.time))
+            self.play_step()
 
     def time_forward(self):
         self.time += 1
@@ -1497,6 +1521,7 @@ class Simulation:
     def play_step(self):
         self.sys_step()
         self.env_step()
+        self.time_forward()
 
     def animate(self, frequency, t_end=np.inf):
         stdscr = curses.initscr()
@@ -1516,30 +1541,99 @@ class Simulation:
                     artist.draw_set(draw_set)
                 # update states
                 self.play_step()
-                self.time += 1
                 # draw objects
                 stdscr.refresh()
                 time.sleep(frequency)
-                self.time_forward()
         finally:
             curses.nocbreak()
             stdscr.keypad(False)
             curses.echo()
             curses.endwin()
 
-class Game(Simulation):
+class ContractGame(Simulation):
+    def __init__(self, the_map, agent_set=[]):
+        super(ContractGame, self).__init__(the_map, agent_set)
+
+    # requires contract supervisor
+    def learn(self):
+        agent_to_legal_action_map = od()
+        agent_set = list(self.agent_set)
+        agent_to_signature_map = dict()
+        for agent in agent_set:
+            signature, mask = agent.supervisor.contract.frame.get_signature(game=agent.supervisor.game,
+                                                                      agent=agent)
+            xy_to_feature_map = dict(zip(mask, signature))
+            agent_to_signature_map[agent] = signature, xy_to_feature_map
+            if signature in agent.supervisor.contract.contract_draft:
+                # if signature already has been encountered
+                forbidden_actions = agent.supervisor.contract[signature]
+            else:
+                forbidden_actions = []
+                for act in agent.get_all_ctrl():
+                    next_state = agent.query_next_state(act)
+                    next_tile = next_state.x, next_state.y
+                    assert next_tile in xy_to_feature_map # the frame must satisfy this assertion
+                    if xy_to_feature_map[next_tile] == 'out':
+                        forbidden_actions.append(act)
+                agent.supervisor.contract[signature] = forbidden_actions
+            agent_to_legal_action_map[agent] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
+
+        action_set = [agent_to_legal_action_map[agent] for agent in agent_set]
+        action_product_set = itertools.product(*action_set) # note ordering is not preserved here
+
+        existential_dictionary = dict()
+        bad_joint_actions = []
+        for joint_action in action_product_set:
+            next_tiles = []
+            is_bad_joint_action = False
+            for agent_idx, agent_action in enumerate(joint_action):
+                agent_next_state = agent_set[agent_idx].query_next_state(agent_action)
+                agent_next_xy = agent_next_state.x, agent_next_state.y
+                if agent_next_xy not in next_tiles:
+                    next_tiles.append(agent_next_xy)
+                else: # collision will happen
+                    bad_joint_actions.append(joint_action)
+                    is_bad_joint_action = True
+                    break
+            # collect (existential) proofs of good actions
+            if not is_bad_joint_action:
+                for agent_idx, agent_action in enumerate(joint_action):
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    if agent_signature in existential_dictionary:
+                        existential_dictionary[agent_signature].append(agent_action)
+                    else:
+                        existential_dictionary[agent_signature] = [agent_action]
+            # forbid any action for which we have no proof of it being good
+            for bad_joint_action in enumerate(bad_joint_actions):
+                for agent_idx, agent_action in bad_joint_action:
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    assert agent_signature in existential_dictionary # if this check fails, it's gameover
+                    if agent_action in existential_dictionary[agent_signature]:
+                        pass # this is a good action keep it
+                    else:
+                        agent.supervisor.contract[agent_signature] = [agent_action]
+                        #TODO: this line must be executed, so if there are
+                        #multiple proofs, it's ok to prune some to
+                        #prevent this from not being entered
+
+class TrafficGame(Simulation):
     """
     Traffic game class
     """
     # combines scenario + agents for game
     def __init__(self, game_map, save_debug_info=True, agent_set=[]):
-        super(Game, self).__init__(the_map=game_map, agent_set=agent_set)
+        super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
         self.occupancy_dict = od()
         self.update_occupancy_dict()
+        self.car_count = 0
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
@@ -1547,18 +1641,6 @@ class Game(Simulation):
         # save interesting numbers
         self.car_count = 0
         self.agents_reached_goal_count = 0 
-
-    def update_occupancy_dict(self):
-        occupancy_dict = od()
-        for agent in self.agent_set:
-            x, y = agent.state.x, agent.state.y
-            occupancy_dict[x,y] = agent
-        self.occupancy_dict = occupancy_dict
-
-    def update_occupancy_dict_for_one_agent(self, agent, prior_state):
-        if prior_state is not None:
-            self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
-        self.occupancy_dict[agent.state.x, agent.state.y] = agent
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1591,7 +1673,7 @@ class Game(Simulation):
                 if spawning_contract.okay_to_spawn_flag:
                     #print(new_car.supervisor.goals)
                     self.agent_set.append(new_car)
-                    self.update_occupancy_dict()
+                    self.update_occupancy_dict_for_one_agent(new_car,prior_state=None)
                     self.car_count = self.car_count+1
 
     def add_agent(self, agent):
@@ -1727,7 +1809,6 @@ class Game(Simulation):
                 if self.save_debug_info:
                     self.write_agents_to_traces()
 
-            self.time_forward()
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
@@ -2925,7 +3006,7 @@ class SpecificationStructureController(Controller):
         if (plant.state.x, plant.state.y, plant.state.heading) == plant.supervisor.goals: 
             plant.supervisor.game.agents_reached_goal_count += 1
 
-class SupervisoryController():
+class Supervisor():
     def _init__(self):
         self.plant = None
         self.game = None
@@ -2944,10 +3025,11 @@ class SupervisoryController():
     def run(self):
         self.check_goals()
 
-class LocalContractController(SupervisoryController):
-    def __init__(self, game, goal):
+class LocalContractSupervisor(Supervisor):
+    def __init__(self, game, goal, contract):
         self.game = game
         self.goal = goal
+        self.contract = contract
 
     def get_next_goal_and_plan(self):
         return self.goal, None
@@ -2955,7 +3037,7 @@ class LocalContractController(SupervisoryController):
     def check_goals(self):
         pass
 
-class GoalExit(SupervisoryController):
+class GoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal
@@ -2970,7 +3052,7 @@ class GoalExit(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) <= 1: # if close enough
                 self.game.agent_set.remove(self.plant)
 
-class GoalCycler(SupervisoryController):
+class GoalCycler(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = cycle(self.add_headings_to_goals(goals))
@@ -2997,7 +3079,7 @@ class GoalCycler(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.current_goal, self.current_plan = self.get_next_goal_and_plan()
 
-class BundleGoalExit(SupervisoryController):
+class BundleGoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal
@@ -3032,6 +3114,7 @@ class BundleGoalExit(SupervisoryController):
         if self.plant:
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.game.agent_set.remove(self.plant)
+                self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
 class SpecificationStructure():
     def __init__(self, oracle_list, oracle_tier):
@@ -3289,9 +3372,15 @@ def create_specified_car(attributes, game):
     car.set_supervisor(supervisor)
     return car
 
+<<<<<<< HEAD
 class QuasiSimultaneousGame(Game):
     def __init__(self, game_map, save_debug_info=True):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
+=======
+class QuasiSimultaneousGame(TrafficGame):
+    def __init__(self, game_map):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
+>>>>>>> deb83401a660aeafd22eb1070036933d7004f850
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         self.bundle_to_agent_precedence = None
         self.simulated_agents = []
