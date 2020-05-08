@@ -1614,18 +1614,15 @@ class TrafficGame(Simulation):
         # generate random array
         set_seed(self.map.seed, self.time)
         # create two random arrays from this seed
-        rand_arr1 = np.random.random(len(self.map.IO_map.sources))
-        source = self.map.IO_map.sources[0]
-        rand_arr2 = np.random.randint(len(self.map.IO_map.map[source]), size=len(rand_arr1))
-        #print(rand_arr1)
-        #print(rand_arr2)
+        source_spawn_probabilities = np.random.rand(len(self.map.IO_map.sources))
+        sinks = [np.random.randint(len(self.map.IO_map.map[source])) for source in self.map.IO_map.sources]
 
         for i, source in enumerate(self.map.IO_map.sources):
             #print('source to check')
             #print(source.node)
-            if rand_arr1[i] <= source.p:
+            if source_spawn_probabilities[i] <= source.p:
                 #print(len(self.map.IO_map.map[source]))
-                sink = self.map.IO_map.map[source][rand_arr2[i]]
+                sink = self.map.IO_map.map[source][sinks[i]]
                 # check if new car satisfies spawning safety contract
                 #print('sources and sinks')
                 #print(source.node, sink.node)
@@ -1947,7 +1944,6 @@ class Map(Field):
         self.tile_to_intersection_map = self.get_tile_to_intersection_map()
         self.bundles = self.get_bundles()
         self.tile_to_bundle_map = self.get_tile_to_bundle_map()
-        self.IO_map = self.get_IO_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.special_goal_tiles = []
@@ -1958,6 +1954,7 @@ class Map(Field):
         self.bundle_graph = self.get_bundle_graph()
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
+        self.IO_map = self.get_IO_map()
 
 
     def tile_is_in_intersection(self, xy):
@@ -2338,13 +2335,6 @@ class Map(Field):
             if heading == bundle.direction:
                 return bundle
         return None
-        # try:
-        #bundle_bool = np.nonzero([b.direction == heading for b in bundles])
-        #if len(bundle_bool) == 0:
-        #    return None
-        #else:
-        #    bundle_idx = bundle_bool[0][0]
-        #    bundle = bundles[bundle_idx]
 
     def get_tile_to_traffic_light_map(self):
         tile_to_traffic_light_map = od()
@@ -2436,7 +2426,21 @@ class Map(Field):
                 bundles.append(bundle)
         return bundles
 
+    # this is the bunlde IO map
     def get_IO_map(self):
+        sources, sinks = self.get_sources_sinks()
+        IO_map = IOMap(sources=sources,sinks=sinks,map=od())
+        for source in IO_map.sources:
+            IO_map.map[source] = []
+            for sink in IO_map.sinks:
+                try:
+                    self.get_bundle_plan(source.node, sink.node)
+                    IO_map.map[source].append(sink)
+                except:
+                    pass
+        return IO_map
+
+    def get_pure_IO_map(self): # not based on bundles
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
         for source in IO_map.sources:
@@ -2450,9 +2454,9 @@ class Map(Field):
         presources = []
         presinks = []
         for tile in self.legal_orientations:
-            if self.legal_orientations[tile]:
+            if self.legal_orientations[tile] and len(self.legal_orientations[tile])==1:
                 for orientation in self.legal_orientations[tile]:
-                    inp = tile[0], tile[1], orientation
+                    inp = ((tile[0], tile[1]), orientation)
                     is_sink = self.road_map.out_degree(inp) == 0
                     is_source = self.road_map.in_degree(inp) == 0
                 if is_sink:
@@ -2545,11 +2549,11 @@ class Map(Field):
         directions = ['south', 'north', 'east', 'west']
         road_map = nx.DiGraph()
         east_neighbors = []
-        east_neighbors.append(Neighbor(xyt=(0,1,'east'), weight=1, name='forward'))
-        east_neighbors.append(Neighbor(xyt=(-1,1,'east'), weight=2, name='left-lane'))
-        east_neighbors.append(Neighbor(xyt=(1,1,'east'), weight=2, name='right-lane'))
-        east_neighbors.append(Neighbor(xyt=(-1,1,'north'), weight=2, name='left-turn'))
-        east_neighbors.append(Neighbor(xyt=(1,1,'south'), weight=2, name='right-turn'))
+        east_neighbors.append(Neighbor(xyt=((0,1),'east'), weight=1, name='forward'))
+        east_neighbors.append(Neighbor(xyt=((-1,1),'east'), weight=2, name='left-lane'))
+        east_neighbors.append(Neighbor(xyt=((1,1),'east'), weight=2, name='right-lane'))
+        east_neighbors.append(Neighbor(xyt=((-1,1),'north'), weight=2, name='left-turn'))
+        east_neighbors.append(Neighbor(xyt=((1,1),'south'), weight=2, name='right-turn'))
         def get_cell_neighbors(cell, direction):
             x, y = cell
             cell_neighbors = []
@@ -2559,10 +2563,11 @@ class Map(Field):
                 xyt = east_neighbor.xyt
                 weight = east_neighbor.weight
                 neighbor_name = east_neighbor.name
-                nex, ney, nangle = xyt
+                nexney, nangle = xyt
+                nex, ney = nexney
                 dx, dy = rotate_vector(tuple(np.array([nex, ney])), rangle)
                 fangle = Car.convert_orientation((angle + Car.convert_orientation(nangle)) % 360)
-                neighbor_xyt = (x+dx, y+dy, fangle)
+                neighbor_xyt = ((x+dx, y+dy), fangle)
                 cell_neighbors.append(Neighbor(xyt=neighbor_xyt, weight=weight, name=neighbor_name))
             return cell_neighbors
 
@@ -2570,9 +2575,10 @@ class Map(Field):
 
         for cell in road_cells:
             for direction in directions:
-                source = (cell[0], cell[1], direction)
+                source = ((cell[0], cell[1]), direction)
                 for neighbor in get_cell_neighbors(cell, direction):
-                    nex, ney, neheading = neighbor.xyt
+                    nexney, neheading = neighbor.xyt
+                    nex, ney = nexney
                     weight = neighbor.weight
                     neighbor_name = neighbor.name
                     if (nex, ney) in self.legal_orientations and self.legal_orientations[nex, ney]:
@@ -3046,7 +3052,7 @@ class BundleGoalExit(Supervisor):
     def get_next_goal_and_plan(self):
         next_goal = self.goals
         source = ((self.plant.state.x, self.plant.state.y), self.plant.state.heading)
-        target = ((next_goal[0], next_goal[1]), next_goal[2])
+        target = next_goal
         next_plan = self.game.map.get_bundle_plan(source, target)
         self.subgoals = self.get_subgoals(next_plan)
         return next_goal, next_plan
@@ -3070,7 +3076,9 @@ class BundleGoalExit(Supervisor):
     def check_goals(self):
         self.check_subgoals()
         if self.plant:
-            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
+            if np.sum(np.abs(np.array([self.plant.state.x,
+                self.plant.state.y]) -
+                np.array([self.current_goal[0][0], self.current_goal[0][1]]))) == 0: # if close enough
                 self.game.agent_set.remove(self.plant)
                 self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
@@ -3276,9 +3284,9 @@ def get_default_car_ss():
 def create_default_car(source, sink, game, car_count):
     ss = get_default_car_ss()
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
-    start = source.node
+    start_xy, start_heading = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
+    car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3520,7 +3528,7 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 6221
-    map_name = 'city_blocks_small'
+    map_name = 'city_blocks_tiny'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.05, seed=seed)
     output_filename = 'game'
 
