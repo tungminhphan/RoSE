@@ -675,7 +675,13 @@ class Car(Agent):
         # switch statements that define the outcome of the decision tree
         agent_type = get_agent_type()
         # True means no conflict with agents in bubble with higher precedence
-        bubble_chk = not check_conflict_with_higher_precedence_agents()
+
+        safety_oracle = self.controller.specification_structure.oracle_set[6]
+        assert safety_oracle.name == 'backup_plan_safety'
+
+        #bubble_chk = not check_conflict_with_higher_precedence_agents()
+        safety_check = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+
         # if no conflict, then the agent is a winner
         if self.is_winner is None:
             cluster_chk = True
@@ -686,13 +692,11 @@ class Car(Agent):
 
         flag_dict = od()
         flag_dict['agent_type'] = agent_type
-        flag_dict['higher_prec_chk'] = bubble_chk
+        #flag_dict['higher_prec_chk'] = bubble_chk
+        flag_dict['safety_check'] = safety_check
         flag_dict['resolution_winner'] = cluster_chk
         flag_dict['max_braking_enough'] = max_braking_enough
         self.action_selection_flags = flag_dict
-
-        safety_oracle = self.controller.specification_structure.oracle_set[6]
-        assert safety_oracle.name == 'backup_plan_safety'
 
         # save info about sending and receiving requests
         #print("======================EVALUATING ACTION FOR AGENT AT STATE ======================")
@@ -711,17 +715,17 @@ class Car(Agent):
                 self.token_count = self.token_count+1
         else:
             # list of all possible scenarios and what action to take
-            if agent_type == 'none' and bubble_chk and max_braking_enough:
+            if agent_type == 'none' and safety_check and max_braking_enough:
                 #print(3)
-                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action:
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
+                #valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                #if valid_action:
+                ctrl = self.intention
+                self.token_count = 0
+                #else:
+                #ctrl = self.get_best_straight_action()
+                #self.token_count = self.token_count+1
 
-            elif agent_type == 'none' and not bubble_chk:
+            elif agent_type == 'none' and not safety_check:
                 # TODO: take straight action, best safe one that aligns with intention
                 #print(4)
                 self.token_count = self.token_count+1
@@ -731,43 +735,34 @@ class Car(Agent):
                 # TODO: take straight action, best safe one that aligns with intention
                 self.token_count = self.token_count+1
                 ctrl = self.get_best_straight_action()
-            elif agent_type == 'sender' and cluster_chk and not bubble_chk:
+            elif agent_type == 'sender' and cluster_chk and not safety_check:
                 #print(6)
                 # TODO: take straight action, best safe one that aligns with intention
                 self.token_count = self.token_count+1
                 ctrl = self.get_best_straight_action()
-            elif agent_type == 'sender' and cluster_chk and bubble_chk:
-                #print(7)
-                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action:
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
+            elif agent_type == 'sender' and cluster_chk and safety_check:
+                ctrl = self.intention
+                self.token_count = 0
+
+                #ctrl = self.get_best_straight_action()
+                #self.token_count = self.token_count+1
             elif (agent_type == 'receiver' or agent_type == 'both') and not cluster_chk:
                 #print(8)
-                # yield as much as needed for conflict winner to move
-                # assumes winner has already taken its action!!!
                 ctrl = check_min_dec_yield_req(self.conflict_winner)
                 self.token_count = self.token_count+1
-            elif (agent_type == 'receiver' or agent_type =='both') and bubble_chk and cluster_chk:
+            elif (agent_type == 'receiver' or agent_type =='both') and safety_check and cluster_chk:
                 #print(9)
                 valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
-                if valid_action:
-                    ctrl = self.intention
-                    self.token_count = 0
-                else:
-                    ctrl = self.get_best_straight_action()
-                    self.token_count = self.token_count+1
-            elif (agent_type == 'receiver' or agent_type =='both') and not bubble_chk and cluster_chk:
+                ctrl = self.intention
+                self.token_count = 0
+            elif (agent_type == 'receiver' or agent_type =='both') and not safety_check and cluster_chk:
                 #print(10)
                 # TODO: take straight action, best safe one that aligns with intention
                 ctrl = self.get_best_straight_action()
                 self.token_count = self.token_count+1
             else:
                 print(agent_type)
-                print(bubble_chk)
+                print(safety_check)
                 print(cluster_chk)
                 print("Error: invalid combination of inputs to action selection strategy!")
                 ctrl = None
@@ -3561,7 +3556,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=2)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
     # print debug info
