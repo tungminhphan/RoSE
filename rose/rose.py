@@ -829,19 +829,19 @@ class Car(Agent):
                     break
                 if chk_lon and self.state.heading == agent.state.heading:
                     # one last check to see whether agents are in the same lane and the agent behind doesn't also want to switch lanes
-                    
-
-                    chk_to_send_request = self.check_to_send_conflict_request(agent)
-                    # add in check to see if agents are currently in the same lane
-                    if chk_to_send_request:
-                        send_requests_list.append(agent)
-                    chk_max_braking_not_enough, flag_a, flag_b = self.intention_bp_conflict(agent)
-                    #print(chk_max_braking_not_enough, flag_a, flag_b)
-                    if chk_max_braking_not_enough:
-                        self.agent_max_braking_not_enough = agent
-                        # save this info
-                        self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
-                        return []
+                    same_lane_chk = self.check_same_lane(self.state, agent.state)
+                    if (not same_lane_chk) or (same_lane_chk and agent.intention['steer'] == 'left-lane' or agent.intention['steer'] == 'right-lane'):
+                        chk_to_send_request = self.check_to_send_conflict_request(agent)
+                        # add in check to see if agents are currently in the same lane
+                        if chk_to_send_request:
+                            send_requests_list.append(agent)
+                        chk_max_braking_not_enough, flag_a, flag_b = self.intention_bp_conflict(agent)
+                        #print(chk_max_braking_not_enough, flag_a, flag_b)
+                        if chk_max_braking_not_enough:
+                            self.agent_max_braking_not_enough = agent
+                            # save this info
+                            self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
+                            return []
         if self.supervisor.game.save_debug_info: 
             self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
         return send_requests_list
@@ -874,28 +874,17 @@ class Car(Agent):
 
     def check_collision_in_bubble(self, ctrl):
         # get agents in bubble
-        #print(ctrl)
-        #print("checking collision in bubble")
         agents_in_bubble = self.agents_in_bubble
-
-        #print("agents in bubble")
-        #print(self.agents_in_bubble)
-        #print("agents in agent set")
         all_agent_gridpts = [(agent.state.x, agent.state.y) for agent in agents_in_bubble if agent.get_id()!=self.get_id()]
-        #print('all agent gridpoints')
-        #print(all_agent_gridpts)
         # don't check the first gridpoint in occupancy if list is greater than one
         occ = self.query_occupancy(ctrl)
         if len(occ) > 1:
             occ = occ[1:]
         action_gridpts = [(state.x, state.y) for state in occ]
-        #print('action gridpoints')
-        #print(action_gridpts)
         gridpts_intersect = list(set(all_agent_gridpts) & set(action_gridpts))
         return len(gridpts_intersect) > 0
 
     #============verifying agent back-up plan invariance===================#
-
     # check for collision with occupancy dict
     def check_collision(self, ctrl):
         # collect all grid points from occupancy dict except for own agent
@@ -1042,35 +1031,23 @@ class Car(Agent):
         else:
             return ((not chk_occupancy_intersection) and chk_safe_end_config), not chk_occupancy_intersection, chk_safe_end_config
 
+    def check_same_lane(self, st_1, st_2):
+        try:
+            width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
+        except:
+            return False
+        try:
+            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
+        except:
+            return False
+            #print(st_1)
+            ##print(st_2)
+            #print(width_1, width_2)
+        return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
 
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
-        def check_same_lane(st_1, st_2):
-            try:
-                width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
-            except:
-                return False
-            try:
-                width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
-            except:
-                return False
-            #print(st_1)
-            ##print(st_2)
-            #print(width_1, width_2)
-            return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
-
-        # check agents are in the same lane
-
-            '''try:
-                width_1, bundle_1 = ag_1.get_width_along_bundle()
-            except:
-                return False
-            try:
-                width_2, bundle_2 = ag_2.get_width_along_bundle()
-            except:
-                return False
-            return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2'''
 
         # returns agent_lead, agent_behind in that order
         def sort_agents(st_1, st_2):
@@ -1097,7 +1074,7 @@ class Car(Agent):
         #print("safe config check")
         #print(ag_1.state, ag_2.state, st_1, st_2)
         # first check same lane
-        same_lane_chk = check_same_lane(st_1, st_2)
+        same_lane_chk = self.check_same_lane(st_1, st_2)
         #print('same lane check')
         #print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
@@ -1155,10 +1132,10 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                #if not chk_valid_actions:
-                    #if agent.state.heading == 'east':
-                    #    print(self.state)
-                    #    print("sending conflict request")
+                if not chk_valid_actions:
+                    if agent.state.heading == 'east':
+                        #print(self.state)
+                        print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1264,7 +1241,7 @@ class Car(Agent):
         bubb_3 = list(set(bubb_3))
         bubb_4 = list(set(bubb_4))
 
-        bubbles_sv = [bubb_0, bubb_1, bubb_2, bubb_3, bubb_4]
+        bubbles_sv = [bubb_0, bubb_1, bubb_2, bubb_4]
         # plot the bubble
         '''fig, ax = plt.subplots()
         ax.set_xlim(-10, 10)
@@ -3372,15 +3349,9 @@ def create_specified_car(attributes, game):
     car.set_supervisor(supervisor)
     return car
 
-<<<<<<< HEAD
-class QuasiSimultaneousGame(Game):
+class QuasiSimultaneousGame(TrafficGame):
     def __init__(self, game_map, save_debug_info=True):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
-=======
-class QuasiSimultaneousGame(TrafficGame):
-    def __init__(self, game_map):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
->>>>>>> deb83401a660aeafd22eb1070036933d7004f850
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         self.bundle_to_agent_precedence = None
         self.simulated_agents = []
@@ -3580,7 +3551,7 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 6221
+    seed = 1205
     map_name = 'straight_road'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
     output_filename = 'game'
@@ -3590,7 +3561,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=100)
+    game.play(outfile=output_filename, t_end=2)
     #game.animate(frequency=0.01)
 
     # print debug info

@@ -202,26 +202,41 @@ def make_bubble_figure(bubble_file):
         plt_car(ax, car_tuple)
     plt.show()
 
-def make_second_bubble_figure(bubble_file):
+def make_second_bubble_figure(bubble_file, output_dir):
     with open(bubble_file, 'rb') as pckl_file:
         all_bubbles = pickle.load(pckl_file)
     
-    titles = ['$Z_F(Ag)$', '$Z_{F,BP}(Ag)$', '$Z_F(Ag, Ag\')$', '$Z_{BP}(Ag,Ag\')$', '$Z_{BP, B}(Ag,Ag\')$']
+    titles = ['$G_F(Ag)$', '$G_{F,BP}(Ag)$', '$G_{F, B}(Ag, Ag\')$', '$G_{F, BP}(Ag,Ag\')$']
+    colors = ['red', 'orange']
+
     fig = plt.figure()
     cum_bubb = []
-    for i, bubble_step in enumerate(all_bubbles[1]):
-        cum_bubb.extend(bubble_step)
-        ax = fig.add_subplot(1,5, i+1)
-        ax.set_title(titles[i], fontdict={'fontsize': 18, 'fontweight': 'medium', 'family':'serif'})
+    v = 1
+    for i, bubble_step in enumerate(all_bubbles[v]):
+        #cum_bubb.extend(bubble_step)
+        ax = fig.add_subplot(1,1,1)
+        ax.set_title(titles[i], fontdict={'fontsize': 25, 'fontweight': 'medium', 'family':'serif'})
         ax.set_xlim(-5, 11)
         ax.set_ylim(-5, 6)
         ax.set_yticklabels([])
         ax.set_xticklabels([])
-        for grid in cum_bubb:
-            rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=1.0, edgecolor='orange',facecolor='orange', alpha=0.5)
-            ax.add_patch(rect)
+        #ax.set_title(titles[i])
+        # plot cumulative bubble one bubble at a time
+        for j, gridpts in enumerate(all_bubbles[v]):
+            if j <= i: 
+                for grid in gridpts: 
+                    if j <= 1:
+                        color = 'orange'
+                    else:
+                        color = 'red'
+                    rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=1.0, edgecolor='gray',facecolor=color, alpha=0.25)
+                    ax.add_patch(rect)
         
-    plt.show()
+        img_name = output_dir+'/build_bubble_'+str(i)+'.png'
+        fig.savefig(img_name)
+        ax.cla()
+        
+    #plt.show()
     pass
 
 def animate_images(output_dir):
@@ -258,13 +273,13 @@ if __name__ == '__main__':
     output_dir = os.getcwd()+'/imgs/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
-    start, end = argv_to_start_end()
-    traces_to_animation(traces_file, output_dir, start=start, end=end)
+    #traces_file = os.getcwd()+'/saved_traces/game.p'
+    #start, end = argv_to_start_end()
+    #traces_to_animation(traces_file, output_dir, start=start, end=end)
     #animate_images(output_dir)
 
     # bubbles figure for the paper
     #for dynamics a:-1,1, v=3
-    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_saved.p'
+    bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_saved.p'
     #make_bubble_figure(bubble_file)
-    #make_second_bubble_figure(bubble_file)
+    make_second_bubble_figure(bubble_file, output_dir)
