@@ -1,6 +1,6 @@
 '''
     File name: local_contracts.py
-    Author: 潘明松
+    Author: Tung Phan
     Date created: 4/30/2020
 '''
 import os
@@ -83,6 +83,7 @@ class LocalGridderFrame:
             signature.append(feature)
         return tuple(signature), mask
 
+
 class LocalContract:
     def __init__(self, name, frame):
         self.name = name
@@ -138,14 +139,13 @@ if __name__ == '__main__':
     contract_supervisor2 = rs.LocalContractSupervisor(the_game, goal2, contract)
     gridder2.set_supervisor(contract_supervisor2)
 
-    compass_controller = rs.CompassController()
-    gridder1.set_controller(compass_controller)
-    gridder2.set_controller(compass_controller)
+    contract_enforcer = rs.ContractEnforcingController()
+    gridder1.set_controller(contract_enforcer)
+    gridder2.set_controller(contract_enforcer)
 
     game = rs.ContractGame(the_map=the_field, agent_set=agent_set)
-    game.learn()
-
-#    sim.play()
+    game.play()
+    #game.learn()
 
 #    vec0 = [1, -1]
 #    vec1 = [-1, 1]
