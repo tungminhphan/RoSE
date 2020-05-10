@@ -155,9 +155,11 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
-    def query_next_state(self, ctrl):
+    def query_next_state(self, ctrl, state=None):
+        if state is None:
+            state = self.state
         assert ctrl in self.get_all_ctrl()
-        return self.query_occupancy(ctrl)[-1]
+        return self.query_occupancy(ctrl, state)[-1]
 
     def apply(self, ctrl):
         self.state = self.query_next_state(ctrl)
@@ -172,11 +174,36 @@ class Gridder(Agent):
     def get_symbol(self):
         return '🤖'
 
-    def get_all_ctrl(self, state=None):
+    @classmethod
+    def get_all_ctrl(cls, state=None):
         return ['up', 'down', 'left', 'right', 'stay']
 
+    def get_pushforward(self, state=None):
+        if state is None:
+            state = self.state
+        forward_set = []
+        for ctrl in self.get_all_ctrl():
+            next_state = self.query_next_state(ctrl, state)
+            forward_set.append(next_state)
+        return forward_set
+
+    def get_pullback(self, state=None):
+        if state is None:
+            state = self.state
+        pullback_set = []
+        ego_state = Agent.hack_state(state, x=0, y=0)
+        ego_state_pushforward = self.get_pushforward(state=ego_state)
+        for forward_state in ego_state_pushforward:
+            dx = -forward_state.x
+            dy = -forward_state.y
+            pullback_state = Agent.hack_state(state=state,
+                                              x=state.x + dx,
+                                              y=state.y + dy)
+            pullback_set.append(pullback_state)
+        return pullback_set
+
     def query_occupancy(self, ctrl, state=None):
-        if state == None:
+        if state is None:
             state = self.state
         if ctrl == 'up':
             next_state = Agent.hack_state(state, y = state.y - 1)
@@ -2727,7 +2754,6 @@ class ReplanProgressOracle(Oracle):
             next_distance = np.inf
         return next_distance < current_distance
 
-
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
     def __init__(self):
@@ -2899,7 +2925,11 @@ class LocalContractSupervisor(Supervisor):
 
     def get_allowable_actions(self):
         signature, mask = self.contract.frame.get_signature(game=self.game, agent=self.plant)
-        return self.contract.contract_draft[signature]
+        try:
+            return self.contract.contract_draft[signature]
+        except KeyError:
+            print('signature is not in contract so allowing everything')
+            return self.plant.get_all_ctrl()
 
 class GoalExit(Supervisor):
     def __init__(self, game, goals=None):
@@ -3437,7 +3467,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=1000)
+    game.play(outfile=output_filename, t_end=100)
 #    game.animate(frequency=0.01)
 
     # print debug info
