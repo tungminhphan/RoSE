@@ -1,6 +1,55 @@
+"""
+Tung Phan
+"""
+
 from ipdb import set_trace as st
-from pysmt.shortcuts import Symbol, LE, GE, Int, And, Equals, Plus, Solver, ExactlyOne, Iff
+from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Equals, Plus,
+                             Minus, Solver, ExactlyOne, Iff,
+                             AtMostOne, Max)
 from pysmt.typing import INT, BOOL
+
+def Abs(x):
+    return Max(x, Minus(Int(0),-x))
+
+class SMTGridder:
+    def __init__(self, name, init_state, goal_state):
+        self.init_state = init_state
+        self.goal_state = goal_state
+        self.name = name
+        self.state_variables = ['x', 'y']
+
+    def get_constraints(self, T):
+        for state_variable in self.state_variables:
+            setattr(self, state_variable, [None] * T)
+            for t in range(T):
+                var = getattr(self, state_variable)
+                var[t] = Symbol(self.name+'_'+state_variable+str(t), INT)
+
+        init_state_constraint = And(Equals(self.x[0], Int(self.init_state[0])),
+                                    Equals(self.y[0], Int(self.init_state[1])))
+
+        all_dynamic_constraints = []
+        # TODO: may need to try a different encoding to avoid using
+        # max/abs?
+        for t in range(T-1):
+            all_dynamic_constraints.append(LE(Plus(Abs(Minus(self.x[t+1], self.x[t])),
+                                                   Abs(Minus(self.y[t+1], self.y[t]))),
+                                                   Int(1)))
+        final_state_constraint = And(Equals(self.x[T-1], Int(self.goal_state[0])),
+                                     Equals(self.y[T-1], Int(self.goal_state[1])))
+
+        return And([init_state_constraint]+all_dynamic_constraints+[final_state_constraint]
+
+#        print(self.x)
+#        print(self.y)
+#        print(init_state_constraint)
+#        print(all_dynamic_constraints)
+#        print(final_state_constraint)
+
+gridder0 = SMTGridder(init_state=[0,0], goal_state=[5,5], name='robot0')
+constraints = gridder0.get_constraints(15)
+print(constraints)
+st()
 
 x0 = Symbol('x0', INT)
 y0 = Symbol('y0', INT)
