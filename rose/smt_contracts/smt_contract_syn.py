@@ -9,7 +9,7 @@ from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Equals, Plus,
 from pysmt.typing import INT, BOOL
 
 def Abs(x):
-    return Max(x, Minus(Int(0),-x))
+    return Max(x, -x)
 
 class SMTGridder:
     def __init__(self, name, init_state, goal_state):
@@ -17,6 +17,7 @@ class SMTGridder:
         self.goal_state = goal_state
         self.name = name
         self.state_variables = ['x', 'y']
+        self.state_variable_types = [INT, INT]
 
     def get_constraints(self, T):
         for state_variable in self.state_variables:
@@ -37,93 +38,27 @@ class SMTGridder:
                                                    Int(1)))
         final_state_constraint = And(Equals(self.x[T-1], Int(self.goal_state[0])),
                                      Equals(self.y[T-1], Int(self.goal_state[1])))
+        return And([init_state_constraint]+all_dynamic_constraints+[final_state_constraint])
 
-        return And([init_state_constraint]+all_dynamic_constraints+[final_state_constraint]
+    def get_solved_values(self, solver, T):
+        t = 0
+        while t<T:
+            printout = []
+            for variable_idx, state_variable  in enumerate(self.state_variables):
+                var = Symbol(self.name + '_' + state_variable + str(t),
+                        self.state_variable_types[variable_idx])
+                printout.append("%s = %s" %(var, solver.get_value(var)))
+            print(printout)
+            t += 1
+        st()
 
-#        print(self.x)
-#        print(self.y)
-#        print(init_state_constraint)
-#        print(all_dynamic_constraints)
-#        print(final_state_constraint)
-
-gridder0 = SMTGridder(init_state=[0,0], goal_state=[5,5], name='robot0')
-constraints = gridder0.get_constraints(15)
-print(constraints)
-st()
-
-x0 = Symbol('x0', INT)
-y0 = Symbol('y0', INT)
-
-init_state_constraint = And(Equals(x0, Int(0)),
-                            Equals(y0, Int(0)))
-
-up0 = Symbol('up0', BOOL)
-down0 = Symbol('down0', BOOL)
-left0 = Symbol('left0', BOOL)
-right0 = Symbol('right0', BOOL)
-stay0 = Symbol('stay0', BOOL)
-
-act0 = [up0, down0, left0, right0, stay0]
-
-x1 = Symbol('x1', INT)
-y1 = Symbol('y1', INT)
-
-up1 = Symbol('up1', BOOL)
-down1 = Symbol('down1', BOOL)
-left1 = Symbol('left1', BOOL)
-right1 = Symbol('right1', BOOL)
-stay1 = Symbol('stay1', BOOL)
-
-act1 = [up1, down1, left1, right1, stay1]
-
-x2 = Symbol('x2', INT)
-y2 = Symbol('y2', INT)
-
-state_variables = [x0, y0, x1, y1, x2, y2]
-state_space_constraint = And(And(LE(Int(0), l),
-                          GE(Int(2), l)) for l in state_variables)
-
-one_action_constraint = And(ExactlyOne(act0),
-                            ExactlyOne(act1))
-
-################ define dynamics #####################
-dynamics_constraint = And(left0.Implies(And(Equals(x1, Plus(x0, Int(-1))),
-                                            Equals(y1, y0))),
-                          right0.Implies(And(Equals(x1, Plus(x0, Int(1))),
-                                             Equals(y1, y0))),
-                          up0.Implies(And(Equals(y1, Plus(y0, Int(-1))),
-                                          Equals(x1, x0))),
-                          down0.Implies(And(Equals(y1, Plus(y0, Int(1))),
-                                            Equals(x1, x0))),
-                          stay0.Implies(And(Equals(x1, x0),
-                                            Equals(y1, y0))),
-                          left1.Implies(And(Equals(x2, Plus(x1, Int(-1))),
-                                             Equals(y2, y1))),
-                          right1.Implies(And(Equals(x2, Plus(x1, Int(1))),
-                                             Equals(y2, y1))),
-                          up1.Implies(And(Equals(y2, Plus(y1, Int(-1))),
-                                          Equals(x2, x1))),
-                          down1.Implies(And(Equals(y2, Plus(y1, Int(1))),
-                                            Equals(x2, x1))),
-                          stay1.Implies(And(Equals(x2, x1),
-                                            Equals(y2, y1))))
-######################################################
-final_state_constraint = And(Equals(x2, Int(1)),
-                            Equals(y2, Int(1)))
-
-problem = And(init_state_constraint,
-              state_space_constraint,
-              one_action_constraint,
-              final_state_constraint,
-              dynamics_constraint)
-
-print("Serialization of the formula:")
-print(problem)
+T = 20
+gridder0 = SMTGridder(init_state=[2,1], goal_state=[6,5], name='robot0')
+constraints = gridder0.get_constraints(T)
 
 with Solver(name='cvc4', logic="QF_LIA") as solver:
-    solver.add_assertion(problem)
+    solver.add_assertion(constraints)
     if solver.solve():
-        for l in state_variables:
-            print("%s = %s" %(l, solver.get_value(l)))
+        gridder0.get_solved_values(solver, T)
     else:
         print("No solution found")
