@@ -156,15 +156,15 @@ def create_random_gridders(N, extent):
 
 if __name__ == '__main__':
     np.random.seed(0)
-    T = 10
-    x_extent = [0, 10]
-    y_extent = [0, 10]
+    T = 9
+    x_extent = [0, 5]
+    y_extent = [0, 5]
     extent = x_extent + y_extent
-    gridders = create_random_gridders(N=7, extent=extent)
+    gridders = create_random_gridders(N=9, extent=extent)
 
     game = SMTGame(agents=gridders, T=T, extent=extent)
     constraints = game.get_constraints()
-    with Solver(name='cvc4', logic="QF_LIA") as solver:
+    with Solver(name='z3', logic='QF_LIA') as solver:
         solver.add_assertion(constraints)
         plt.axis('equal')
         # clear all figures in /figs/
@@ -174,15 +174,41 @@ if __name__ == '__main__':
             for t in range(game.T):
                 fig = plt.figure()
                 for agent in game.agents:
+                    dotted_lines = []
+                    if t > 2:
+                        # plot agent states two steps back
+                        agent_states = agent.get_solved_states_at(solver, t-3)
+                        x = int(str(agent_states['x']))
+                        y = int(str(agent_states['y']))
+                        dotted_lines.append([x,y])
+                    if t > 1:
+                        # plot agent states two steps back
+                        agent_states = agent.get_solved_states_at(solver, t-2)
+                        x = int(str(agent_states['x']))
+                        y = int(str(agent_states['y']))
+                        dotted_lines.append([x,y])
+                    if t > 0:
+                        # plot previous agent states
+                        agent_states = agent.get_solved_states_at(solver, t-1)
+                        x = int(str(agent_states['x']))
+                        y = int(str(agent_states['y']))
+                        dotted_lines.append([x,y])
+
                     agent_states = agent.get_solved_states_at(solver, t)
                     x = int(str(agent_states['x']))
                     y = int(str(agent_states['y']))
-                    plt.plot(x, y, agent.color+'o', markersize=20)
+                    dotted_lines.append([x,y])
+                    plt.plot(x, y, agent.color+'o', markersize=20,
+                            alpha=1)
+                    if len(dotted_lines) > 1:
+                        dotted_lines = np.array(dotted_lines)
+                        plt.plot(dotted_lines[:,0], dotted_lines[:,1],
+                                agent.color+'--', alpha=0.5)
                     gx, gy = agent.goal_state
                     plt.plot(gx, gy, agent.color+'x', markersize=20)
                 print(t)
-                plt.xlim(game.extent[0], game.extent[1])
-                plt.ylim(game.extent[2], game.extent[3])
+                plt.xlim(game.extent[0]-1, game.extent[1]+1)
+                plt.ylim(game.extent[2]-1, game.extent[3]+1)
                 fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
         else:
             print('No solution found')
