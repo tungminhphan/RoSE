@@ -13,11 +13,12 @@ def Abs(x):
     return Max(x, -x)
 
 class SMTGridder:
-    def __init__(self, name, init_state, goal_state):
+    def __init__(self, name, init_state, goal_state, color='r'):
         self.init_state = init_state
         self.goal_state = goal_state
         self.name = name
         self.state_variables = od.fromkeys(['x', 'y'], INT)
+        self.color = color
 
     def get_constraints(self, T):
         for state_variable in self.state_variables:
@@ -58,7 +59,7 @@ class SMTGridder:
             print(printout)
             t += 1
 
-def get_agent_pair_collision_constraint(agent1, agent2, T):
+def get_pairwise_collision_constraints(agent1, agent2, T):
     constraints = []
     for t in range(T):
         equals = []
@@ -81,22 +82,20 @@ def get_agent_pair_collision_constraint(agent1, agent2, T):
         if t < T:
             constraints.append(AtMostOne(exchange))
 
-        if t != T-1: # if not last time step must disallow exchange as well
-            for state_variable in agent1.state_variables:
-                var1 = Symbol(agent1.name + '_' + state_variable +
-                        str(t+1),
-                        agent1.state_variables[state_variable])
-                var2 = Symbol(agent2.name + '_' + state_variable +
-                        str(t+1),
-                        agent2.state_variables[state_variable])
-                equals.append(Equals(var1, var2))
-
     return And(constraints)
 
 class SMTGame:
-    def __init__(self, agents, T):
+    def __init__(self, agents, T, extent=[]):
         self.agents = agents
         self.T = T
+        self.extent = extent
+
+    def get_agent_extent_constraints(self, agent):
+        for t in range(T):
+            for state_variable in agent.state_variables:
+                var = Symbol(agent.name + '_' + state_variable +
+                        str(t+1),
+                        agent1.state_variables[state_variable])
 
     def get_constraints(self):
         agent_constraint_list = []
@@ -105,25 +104,33 @@ class SMTGame:
 
         collision_constraints = []
         for agent_idx in range(len(self.agents)-1):
-            agent = self.agents[agent_idx]
-            next_agent = self.agents[agent_idx+1]
-            collision_constraints.append(get_agent_pair_collision_constraint(agent,
-                                            next_agent, self.T))
+            for next_agent_idx in range(agent_idx+1, len(self.agents)):
+                agent = self.agents[agent_idx]
+                next_agent = self.agents[next_agent_idx]
+                collision_constraints.append(get_pairwise_collision_constraints(agent,
+                                             next_agent, self.T))
         agent_constraint_list = agent_constraint_list + collision_constraints
         return And(agent_constraint_list)
 
-T = 6
+T = 11
 gridders = []
-gridder0 = SMTGridder(init_state=[0,0], goal_state=[1,3], name='robot0')
+gridder0 = SMTGridder(init_state=[1,2], goal_state=[1,-3],
+        name='robot0', color='r')
 gridders.append(gridder0)
-gridder1 = SMTGridder(init_state=[1,0], goal_state=[2,3], name='robot1')
+gridder1 = SMTGridder(init_state=[0,2], goal_state=[8,2],
+        name='robot1', color='b')
 gridders.append(gridder1)
-gridder2 = SMTGridder(init_state=[2,0], goal_state=[1,2], name='robot2')
+gridder2 = SMTGridder(init_state=[3,3], goal_state=[1,6],
+        name='robot2',color='g')
 gridders.append(gridder2)
-gridder3 = SMTGridder(init_state=[1,3], goal_state=[3,5], name='robot3')
+gridder3 = SMTGridder(init_state=[2,6], goal_state=[7,1],
+        name='robot3',color='k')
 gridders.append(gridder3)
+gridder4 = SMTGridder(init_state=[9,8], goal_state=[7,3],
+        name='robot4',color='c')
+gridders.append(gridder4)
 
-game = SMTGame(agents=gridders, T=T, exent=[0,0,10, 10])
+game = SMTGame(agents=gridders, T=T, extent=[-10,10,-10,10])
 constraints = game.get_constraints()
 
 with Solver(name='cvc4', logic="QF_LIA") as solver:
@@ -132,12 +139,15 @@ with Solver(name='cvc4', logic="QF_LIA") as solver:
         for t in range(game.T):
             plt.axis('equal')
             plt.grid('on')
+            plt.xlim(game.extent[0:2])
+            plt.ylim(game.extent[2:])
             for agent in game.agents:
                 agent_states = agent.get_solved_states_at(solver, t)
                 x = int(str(agent_states['x']))
                 y = int(str(agent_states['y']))
-                plt.plot(x, y, 'o', markersize=20)
+                plt.plot(x, y, agent.color+'o', markersize=20)
+                gx, gy = agent.goal_state
+                plt.plot(gx, gy, agent.color+'x', markersize=20)
             plt.show()
     else:
         print('No solution found')
-
