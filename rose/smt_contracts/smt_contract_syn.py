@@ -1,6 +1,7 @@
 """
 Tung Phan
 """
+import scipy.interpolate
 import subprocess
 from ipdb import set_trace as st
 from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Or, Equals,
@@ -155,6 +156,7 @@ def create_random_gridders(N, extent):
 
 
 if __name__ == '__main__':
+    N_interp = 5
     np.random.seed(0)
     T = 9
     x_extent = [0, 5]
@@ -169,41 +171,28 @@ if __name__ == '__main__':
         plt.axis('equal')
         # clear all figures in /figs/
         subprocess.run('rm ./figs/*.png', shell=True)
+        fig = plt.figure()
         if solver.solve():
             print('Found a solution!')
-            for t in range(game.T):
-                fig = plt.figure()
+            for t in range((game.T-1) * N_interp + 1):
+                fig.clf()
+                lower_t = t // N_interp
+                higher_t = lower_t + 1
                 for agent in game.agents:
-                    dotted_lines = []
-                    if t > 2:
-                        # plot agent states two steps back
-                        agent_states = agent.get_solved_states_at(solver, t-3)
-                        x = int(str(agent_states['x']))
-                        y = int(str(agent_states['y']))
-                        dotted_lines.append([x,y])
-                    if t > 1:
-                        # plot agent states two steps back
-                        agent_states = agent.get_solved_states_at(solver, t-2)
-                        x = int(str(agent_states['x']))
-                        y = int(str(agent_states['y']))
-                        dotted_lines.append([x,y])
-                    if t > 0:
-                        # plot previous agent states
-                        agent_states = agent.get_solved_states_at(solver, t-1)
-                        x = int(str(agent_states['x']))
-                        y = int(str(agent_states['y']))
-                        dotted_lines.append([x,y])
+                    prev_agent_states = agent.get_solved_states_at(solver, lower_t)
+                    prev_x = int(str(prev_agent_states['x']))
+                    prev_y = int(str(prev_agent_states['y']))
 
-                    agent_states = agent.get_solved_states_at(solver, t)
-                    x = int(str(agent_states['x']))
-                    y = int(str(agent_states['y']))
-                    dotted_lines.append([x,y])
+                    next_agent_states = agent.get_solved_states_at(solver, higher_t)
+                    next_x = int(str(next_agent_states['x']))
+                    next_y = int(str(next_agent_states['y']))
+
+                    x_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_x, next_x])
+                    y_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_y, next_y])
+                    x = x_interp(t / N_interp)
+                    y = y_interp(t / N_interp)
                     plt.plot(x, y, agent.color+'o', markersize=20,
                             alpha=1)
-                    if len(dotted_lines) > 1:
-                        dotted_lines = np.array(dotted_lines)
-                        plt.plot(dotted_lines[:,0], dotted_lines[:,1],
-                                agent.color+'--', alpha=0.5)
                     gx, gy = agent.goal_state
                     plt.plot(gx, gy, agent.color+'x', markersize=20)
                 print(t)
