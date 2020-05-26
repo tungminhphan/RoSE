@@ -1,12 +1,14 @@
 """
 Tung Phan
 """
+import subprocess
 from ipdb import set_trace as st
-from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Equals, Plus,
-                             Minus, Solver, ExactlyOne, Iff, Not,
-                             AtMostOne, Max)
+from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Or, Equals,
+        NotEquals, Plus, Minus, Solver, ExactlyOne, Iff, Not,
+        AtMostOne, Max)
 from pysmt.typing import INT, BOOL
 from collections import OrderedDict as od
+import numpy as np
 import matplotlib.pyplot as plt
 
 def Abs(x):
@@ -76,11 +78,11 @@ def get_pairwise_collision_constraints(agent1, agent2, T):
                         agent1.state_variables[state_variable])
                 var2_next = Symbol(agent2.name + '_' + state_variable + str(t+1),
                         agent2.state_variables[state_variable])
-                exchange.append(Equals(var1, var2_next))
-                exchange.append(Equals(var2, var1_next))
+                exchange.append(NotEquals(var1, var2_next))
+                exchange.append(NotEquals(var2, var1_next))
         constraints.append(AtMostOne(equals))
         if t < T:
-            constraints.append(AtMostOne(exchange))
+            constraints.append(Or(exchange))
 
     return And(constraints)
 
@@ -91,16 +93,28 @@ class SMTGame:
         self.extent = extent
 
     def get_agent_extent_constraints(self, agent):
-        for t in range(T):
-            for state_variable in agent.state_variables:
-                var = Symbol(agent.name + '_' + state_variable +
-                        str(t+1),
-                        agent1.state_variables[state_variable])
+        extent_constraints = []
+        if self.extent:
+            xmin = Int(self.extent[0])
+            xmax = Int(self.extent[1])
+            ymin = Int(self.extent[2])
+            ymax = Int(self.extent[3])
+            for t in range(T):
+                xt = Symbol(agent.name + '_' + 'x' + str(t), agent.state_variables['x'])
+                yt = Symbol(agent.name + '_' + 'y' + str(t), agent.state_variables['y'])
+                extent_constraints.append(And(LE(xmin, xt),
+                                              LE(xt, xmax),
+                                              LE(ymin, yt),
+                                              LE(yt, ymax)))
+        return extent_constraints
 
     def get_constraints(self):
         agent_constraint_list = []
         for agent in self.agents:
+            # get agent dynamical constraints
             agent_constraint_list.append(agent.get_constraints(self.T))
+            # get game extent constraints for agent
+            agent_constraint_list = agent_constraint_list + self.get_agent_extent_constraints(agent)
 
         collision_constraints = []
         for agent_idx in range(len(self.agents)-1):
@@ -112,42 +126,74 @@ class SMTGame:
         agent_constraint_list = agent_constraint_list + collision_constraints
         return And(agent_constraint_list)
 
-T = 11
-gridders = []
-gridder0 = SMTGridder(init_state=[1,2], goal_state=[1,-3],
-        name='robot0', color='r')
-gridders.append(gridder0)
-gridder1 = SMTGridder(init_state=[0,2], goal_state=[8,2],
-        name='robot1', color='b')
-gridders.append(gridder1)
-gridder2 = SMTGridder(init_state=[3,3], goal_state=[1,6],
-        name='robot2',color='g')
-gridders.append(gridder2)
-gridder3 = SMTGridder(init_state=[2,6], goal_state=[7,1],
-        name='robot3',color='k')
-gridders.append(gridder3)
-gridder4 = SMTGridder(init_state=[9,8], goal_state=[7,3],
-        name='robot4',color='c')
-gridders.append(gridder4)
+def create_random_gridders(N, extent):
+    x_extent = extent[0:2]
+    y_extent = extent[2:]
+    gridders = []
+    used_positions = []
+    for i in range(N):
+        # sample start position
+        x_s = np.random.choice(range(x_extent[0], x_extent[1]))
+        y_s = np.random.choice(range(y_extent[0], y_extent[1]))
+        while (x_s, y_s) in used_positions:
+            x_s = np.random.choice(range(x_extent[0], x_extent[1]))
+            y_s = np.random.choice(range(y_extent[0], y_extent[1]))
+        start_pos = (int(x_s), int(y_s))
+        used_positions.append(start_pos)
+        # sample end position
+        x_e = np.random.choice(range(x_extent[0], x_extent[1]))
+        y_e = np.random.choice(range(y_extent[0], y_extent[1]))
+        while (x_e, y_e) in used_positions:
+            x_e = np.random.choice(range(x_extent[0], x_extent[1]))
+            y_e = np.random.choice(range(y_extent[0], y_extent[1]))
+        end_pos = (int(x_e), int(y_e))
+        used_positions.append(end_pos)
+        gridder = SMTGridder(init_state=start_pos, goal_state=end_pos,
+                             name='gridder' + str(i), color='C' + str(i))
+        gridders.append(gridder)
+    return gridders
 
-game = SMTGame(agents=gridders, T=T, extent=[-10,10,-10,10])
-constraints = game.get_constraints()
 
-with Solver(name='cvc4', logic="QF_LIA") as solver:
-    solver.add_assertion(constraints)
-    if solver.solve():
-        for t in range(game.T):
-            plt.axis('equal')
-            plt.grid('on')
-            plt.xlim(game.extent[0:2])
-            plt.ylim(game.extent[2:])
+if __name__ == '__main__':
+    np.random.seed(0)
+    T = 10
+    x_extent = [0, 10]
+    y_extent = [0, 10]
+    extent = x_extent + y_extent
+    gridders = create_random_gridders(N=7, extent=extent)
+
+    game = SMTGame(agents=gridders, T=T, extent=extent)
+    constraints = game.get_constraints()
+    with Solver(name='cvc4', logic="QF_LIA") as solver:
+        solver.add_assertion(constraints)
+        plt.axis('equal')
+        # clear all figures in /figs/
+        subprocess.run('rm ./figs/*.png', shell=True)
+        if solver.solve():
+            print('Found a solution!')
+            for t in range(game.T):
+                fig = plt.figure()
+                for agent in game.agents:
+                    agent_states = agent.get_solved_states_at(solver, t)
+                    x = int(str(agent_states['x']))
+                    y = int(str(agent_states['y']))
+                    plt.plot(x, y, agent.color+'o', markersize=20)
+                    gx, gy = agent.goal_state
+                    plt.plot(gx, gy, agent.color+'x', markersize=20)
+                print(t)
+                plt.xlim(game.extent[0], game.extent[1])
+                plt.ylim(game.extent[2], game.extent[3])
+                fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
+        else:
+            print('No solution found')
+            fig = plt.figure()
             for agent in game.agents:
-                agent_states = agent.get_solved_states_at(solver, t)
-                x = int(str(agent_states['x']))
-                y = int(str(agent_states['y']))
+                agent_states = agent.init_state
+                x = agent_states[0]
+                y = agent_states[1]
                 plt.plot(x, y, agent.color+'o', markersize=20)
                 gx, gy = agent.goal_state
                 plt.plot(gx, gy, agent.color+'x', markersize=20)
-            plt.show()
-    else:
-        print('No solution found')
+            plt.xlim(game.extent[0], game.extent[1])
+            plt.ylim(game.extent[2], game.extent[3])
+            fig.savefig('./figs/'+str(0).zfill(5)+'.png', dpi=fig.dpi)
