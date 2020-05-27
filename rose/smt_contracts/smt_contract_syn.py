@@ -10,6 +10,7 @@ from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Or, Equals,
 from pysmt.typing import INT, BOOL
 from collections import OrderedDict as od
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 
 def Abs(x):
@@ -62,6 +63,18 @@ class SMTGridder:
             print(printout)
             t += 1
 
+def get_obstacle_collision_constraints(agent, obstacles, T):
+    constraints = []
+    for t in range(T):
+        for obstacle in obstacles:
+            ox, oy = obstacle
+            x = Symbol(agent.name + '_' + 'x' + str(t),
+                        agent.state_variables['x'])
+            y = Symbol(agent.name + '_' + 'y' + str(t),
+                        agent.state_variables['y'])
+            constraints.append(AtMostOne(Equals(x, Int(ox)), Equals(y, Int(oy))))
+    return constraints
+
 def get_pairwise_collision_constraints(agent1, agent2, T):
     constraints = []
     for t in range(T):
@@ -88,10 +101,11 @@ def get_pairwise_collision_constraints(agent1, agent2, T):
     return And(constraints)
 
 class SMTGame:
-    def __init__(self, agents, T, extent=[]):
+    def __init__(self, agents, T, extent=[], obstacles=[]):
         self.agents = agents
         self.T = T
         self.extent = extent
+        self.obstacles = obstacles
 
     def get_agent_extent_constraints(self, agent):
         extent_constraints = []
@@ -124,49 +138,57 @@ class SMTGame:
                 next_agent = self.agents[next_agent_idx]
                 collision_constraints.append(get_pairwise_collision_constraints(agent,
                                              next_agent, self.T))
-        agent_constraint_list = agent_constraint_list + collision_constraints
+
+        obstacle_constraints = []
+        for agent in self.agents:
+             obstacle_constraints = obstacle_constraints + get_obstacle_collision_constraints(agent, obstacles, T)
+
+        agent_constraint_list = agent_constraint_list + collision_constraints + obstacle_constraints
         return And(agent_constraint_list)
 
 def create_random_gridders(N, extent):
     x_extent = extent[0:2]
     y_extent = extent[2:]
     gridders = []
-    used_positions = []
+    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
+            for y in range(y_extent[0], y_extent[1])]
     for i in range(N):
         # sample start position
-        x_s = np.random.choice(range(x_extent[0], x_extent[1]))
-        y_s = np.random.choice(range(y_extent[0], y_extent[1]))
-        while (x_s, y_s) in used_positions:
-            x_s = np.random.choice(range(x_extent[0], x_extent[1]))
-            y_s = np.random.choice(range(y_extent[0], y_extent[1]))
-        start_pos = (int(x_s), int(y_s))
-        used_positions.append(start_pos)
-        # sample end position
-        x_e = np.random.choice(range(x_extent[0], x_extent[1]))
-        y_e = np.random.choice(range(y_extent[0], y_extent[1]))
-        while (x_e, y_e) in used_positions:
-            x_e = np.random.choice(range(x_extent[0], x_extent[1]))
-            y_e = np.random.choice(range(y_extent[0], y_extent[1]))
-        end_pos = (int(x_e), int(y_e))
-        used_positions.append(end_pos)
+        start_pos, end_pos = random.sample(unused_locations, 2)
+        unused_locations.remove(start_pos)
+        unused_locations.remove(end_pos)
         gridder = SMTGridder(init_state=start_pos, goal_state=end_pos,
                              name='gridder' + str(i), color='C' + str(i))
         gridders.append(gridder)
     return gridders
 
+def create_random_obstacles(N, extent, agents):
+    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
+            for y in range(y_extent[0], y_extent[1])]
+    for agent in agents:
+        init_state = agent.init_state
+        goal_state = agent.goal_state
+        unused_locations.remove(init_state)
+        unused_locations.remove(goal_state)
+    obstacles = random.sample(unused_locations, N)
+    return obstacles
+
 
 if __name__ == '__main__':
-    N_interp = 5
-    np.random.seed(0)
-    T = 9
-    x_extent = [0, 5]
-    y_extent = [0, 5]
+    random.seed(0)
+    N_obstacles = 5
+    T = 10
+    x_extent = [0, 10]
+    y_extent = [0, 10]
     extent = x_extent + y_extent
-    gridders = create_random_gridders(N=9, extent=extent)
-
-    game = SMTGame(agents=gridders, T=T, extent=extent)
+    # randomly create robots
+    gridders = create_random_gridders(N=4, extent=extent)
+    # randomly generate obstacles
+    obstacles = create_random_obstacles(N=10, extent=extent, agents=gridders)
+    game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
     constraints = game.get_constraints()
-    with Solver(name='z3', logic='QF_LIA') as solver:
+    N_interp = 3
+    with Solver(name='cvc4') as solver:
         solver.add_assertion(constraints)
         plt.axis('equal')
         # clear all figures in /figs/
@@ -178,6 +200,9 @@ if __name__ == '__main__':
                 fig.clf()
                 lower_t = t // N_interp
                 higher_t = lower_t + 1
+                for obstacle in game.obstacles:
+                    ox, oy = obstacle
+                    plt.plot(ox, oy, 'ks', markersize=30)
                 for agent in game.agents:
                     prev_agent_states = agent.get_solved_states_at(solver, lower_t)
                     prev_x = int(str(prev_agent_states['x']))
@@ -191,13 +216,14 @@ if __name__ == '__main__':
                     y_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_y, next_y])
                     x = x_interp(t / N_interp)
                     y = y_interp(t / N_interp)
-                    plt.plot(x, y, agent.color+'o', markersize=20,
+                    plt.plot(x, y, agent.color+'o', markersize=15,
                             alpha=1)
                     gx, gy = agent.goal_state
                     plt.plot(gx, gy, agent.color+'x', markersize=20)
                 print(t)
-                plt.xlim(game.extent[0]-1, game.extent[1]+1)
-                plt.ylim(game.extent[2]-1, game.extent[3]+1)
+                padding = 0.1
+                plt.xlim(game.extent[0]-padding, game.extent[1]+padding)
+                plt.ylim(game.extent[2]-padding, game.extent[3]+padding)
                 fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
         else:
             print('No solution found')
