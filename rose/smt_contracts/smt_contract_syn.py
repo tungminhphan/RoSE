@@ -1,6 +1,7 @@
 """
 Tung Phan
 """
+import timeout_decorator
 import scipy.interpolate
 import subprocess
 from ipdb import set_trace as st
@@ -184,6 +185,8 @@ def create_random_gridders(N, extent):
     return gridders
 
 def create_random_obstacles(N, extent, agents):
+    x_extent = extent[0:2]
+    y_extent = extent[2:]
     unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
             for y in range(y_extent[0], y_extent[1])]
     for agent in agents:
@@ -196,19 +199,22 @@ def create_random_obstacles(N, extent, agents):
 
 if __name__ == '__main__':
     random.seed(0)
-    N_obstacles = 5
-    T = 9
-    x_extent = [0, 6]
-    y_extent = [0, 6]
+    T = 40
+    N_obstacles = 30
+    N_gridders = 1
+    step_count_max = 45
+    map_length = 40
+    x_extent = [0, map_length]
+    y_extent = [0, map_length]
     extent = x_extent + y_extent
     # randomly create robots
-    gridders = create_random_gridders(N=8, extent=extent)
+    gridders = create_random_gridders(N=N_gridders, extent=extent)
     # randomly generate obstacles
-    obstacles = create_random_obstacles(N=10, extent=extent, agents=gridders)
+    obstacles = create_random_obstacles(N=N_obstacles, extent=extent, agents=gridders)
     game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
-    constraints = game.get_constraints(counter_constraint=40)
+    constraints = game.get_constraints(counter_constraint=step_count_max)
     N_interp = 4
-    with Solver(name='cvc4') as solver:
+    with Solver(name='z3') as solver:
         solver.add_assertion(constraints)
         # clear all figures in /figs/
         subprocess.run('rm ./figs/*.png', shell=True)
@@ -221,7 +227,7 @@ if __name__ == '__main__':
                 higher_t = lower_t + 1
                 for obstacle in game.obstacles:
                     ox, oy = obstacle
-                    plt.plot(ox, oy, 'bs', markersize=40)
+                    plt.plot(ox, oy, 'bs', markersize=10)
                 for agent in game.agents:
                     prev_agent_states = agent.get_solved_states_at(solver, lower_t)
                     prev_x = int(str(prev_agent_states['x']))
@@ -248,6 +254,9 @@ if __name__ == '__main__':
         else:
             print('No solution found')
             fig = plt.figure()
+            for obstacle in game.obstacles:
+                ox, oy = obstacle
+                plt.plot(ox, oy, 'bs', markersize=40)
             for agent in game.agents:
                 agent_states = agent.init_state
                 x = agent_states[0]
