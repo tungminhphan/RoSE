@@ -5,7 +5,7 @@ import scipy.interpolate
 import subprocess
 from ipdb import set_trace as st
 from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Or, Equals,
-        NotEquals, Plus, Minus, Solver, ExactlyOne, Iff, Not,
+        NotEquals, Plus, Minus, Solver, ExactlyOne, Iff, Ite, Not,
         AtMostOne, Max)
 from pysmt.typing import INT, BOOL
 from collections import OrderedDict as od
@@ -29,7 +29,7 @@ class SMTGridder:
             setattr(self, state_variable, [None] * T)
             for t in range(T):
                 var = getattr(self, state_variable)
-                var[t] = Symbol(self.name+'_'+state_variable+str(t), INT)
+                var[t] = Symbol(self.name+'_'+state_variable+str(t), self.state_variables[state_variable])
 
         init_state_constraint = And(Equals(self.x[0], Int(self.init_state[0])),
                                     Equals(self.y[0], Int(self.init_state[1])))
@@ -44,6 +44,25 @@ class SMTGridder:
         final_state_constraint = And(Equals(self.x[T-1], Int(self.goal_state[0])),
                                      Equals(self.y[T-1], Int(self.goal_state[1])))
         return And([init_state_constraint]+all_dynamic_constraints+[final_state_constraint])
+
+    def get_step_counter_variable(self, T):
+        return Symbol(self.name+'_'+'counter'+'_'+str(T), INT)
+
+    def get_state_variables_at(self, t):
+        x = Symbol(self.name + '_' + 'x' + str(t),
+                    self.state_variables['x'])
+        y = Symbol(self.name + '_' + 'y' + str(t),
+                    self.state_variables['y'])
+        return x, y
+
+    def get_step_count_constraint(self, T):
+        moves = []
+        counter_var = self.get_step_counter_variable(T)
+        for t in range(T-1):
+            x, y = self.get_state_variables_at(t)
+            x_next, y_next = self.get_state_variables_at(t+1)
+            moves.append(Ite(And(Equals(x, x_next), Equals(y, y_next)), Int(0), Int(1)))
+        return Equals(counter_var, Plus(moves))
 
     def get_solved_states_at(self, solver, t):
         states = od()
@@ -68,10 +87,7 @@ def get_obstacle_collision_constraints(agent, obstacles, T):
     for t in range(T):
         for obstacle in obstacles:
             ox, oy = obstacle
-            x = Symbol(agent.name + '_' + 'x' + str(t),
-                        agent.state_variables['x'])
-            y = Symbol(agent.name + '_' + 'y' + str(t),
-                        agent.state_variables['y'])
+            x, y = agent.get_state_variables_at(t)
             constraints.append(AtMostOne(Equals(x, Int(ox)), Equals(y, Int(oy))))
     return constraints
 
@@ -79,25 +95,19 @@ def get_pairwise_collision_constraints(agent1, agent2, T):
     constraints = []
     for t in range(T):
         equals = []
+        x1, y1 = agent1.get_state_variables_at(t)
+        x2, y2 = agent2.get_state_variables_at(t)
+        constraints.append(Or(NotEquals(x1, x2),
+                              NotEquals(y1, y2)))
         if t < T:
             exchange = []
-        for state_variable in agent1.state_variables:
-            var1 = Symbol(agent1.name + '_' + state_variable + str(t),
-                    agent1.state_variables[state_variable])
-            var2 = Symbol(agent2.name + '_' + state_variable + str(t),
-                    agent2.state_variables[state_variable])
-            equals.append(Equals(var1, var2))
-            if t < T:
-                var1_next = Symbol(agent1.name + '_' + state_variable + str(t+1),
-                        agent1.state_variables[state_variable])
-                var2_next = Symbol(agent2.name + '_' + state_variable + str(t+1),
-                        agent2.state_variables[state_variable])
-                exchange.append(NotEquals(var1, var2_next))
-                exchange.append(NotEquals(var2, var1_next))
-        constraints.append(AtMostOne(equals))
-        if t < T:
+            x1n, y1n = agent1.get_state_variables_at(t+1)
+            x2n, y2n = agent2.get_state_variables_at(t+1)
+            exchange.append(NotEquals(x1, x2n))
+            exchange.append(NotEquals(y1, y2n))
+            exchange.append(NotEquals(x2, x1n))
+            exchange.append(NotEquals(y2, y1n))
             constraints.append(Or(exchange))
-
     return And(constraints)
 
 class SMTGame:
@@ -115,15 +125,16 @@ class SMTGame:
             ymin = Int(self.extent[2])
             ymax = Int(self.extent[3])
             for t in range(T):
-                xt = Symbol(agent.name + '_' + 'x' + str(t), agent.state_variables['x'])
-                yt = Symbol(agent.name + '_' + 'y' + str(t), agent.state_variables['y'])
+                xt, yt = agent.get_state_variables_at(t)
                 extent_constraints.append(And(LE(xmin, xt),
                                               LE(xt, xmax),
                                               LE(ymin, yt),
                                               LE(yt, ymax)))
         return extent_constraints
 
-    def get_constraints(self):
+    def get_constraints(self, counter_constraint=None):
+
+        # individual agent constrants
         agent_constraint_list = []
         for agent in self.agents:
             # get agent dynamical constraints
@@ -131,6 +142,7 @@ class SMTGame:
             # get game extent constraints for agent
             agent_constraint_list = agent_constraint_list + self.get_agent_extent_constraints(agent)
 
+        # collision constraints
         collision_constraints = []
         for agent_idx in range(len(self.agents)-1):
             for next_agent_idx in range(agent_idx+1, len(self.agents)):
@@ -139,11 +151,20 @@ class SMTGame:
                 collision_constraints.append(get_pairwise_collision_constraints(agent,
                                              next_agent, self.T))
 
+        # obstacle constraints
         obstacle_constraints = []
         for agent in self.agents:
              obstacle_constraints = obstacle_constraints + get_obstacle_collision_constraints(agent, obstacles, T)
 
-        agent_constraint_list = agent_constraint_list + collision_constraints + obstacle_constraints
+        # counter constraint
+        if counter_constraint:
+            c_constraints = []
+            c_vars = []
+            for agent in self.agents:
+                c_constraints.append(agent.get_step_count_constraint(T))
+                c_vars.append(agent.get_step_counter_variable(T))
+            counter_sat = [LE(Plus(c_vars), Int(counter_constraint))]
+        agent_constraint_list = agent_constraint_list + collision_constraints + obstacle_constraints + c_constraints + counter_sat
         return And(agent_constraint_list)
 
 def create_random_gridders(N, extent):
@@ -173,24 +194,22 @@ def create_random_obstacles(N, extent, agents):
     obstacles = random.sample(unused_locations, N)
     return obstacles
 
-
 if __name__ == '__main__':
     random.seed(0)
     N_obstacles = 5
-    T = 10
-    x_extent = [0, 10]
-    y_extent = [0, 10]
+    T = 9
+    x_extent = [0, 6]
+    y_extent = [0, 6]
     extent = x_extent + y_extent
     # randomly create robots
-    gridders = create_random_gridders(N=4, extent=extent)
+    gridders = create_random_gridders(N=8, extent=extent)
     # randomly generate obstacles
     obstacles = create_random_obstacles(N=10, extent=extent, agents=gridders)
     game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
-    constraints = game.get_constraints()
-    N_interp = 3
+    constraints = game.get_constraints(counter_constraint=40)
+    N_interp = 4
     with Solver(name='cvc4') as solver:
         solver.add_assertion(constraints)
-        plt.axis('equal')
         # clear all figures in /figs/
         subprocess.run('rm ./figs/*.png', shell=True)
         fig = plt.figure()
@@ -202,7 +221,7 @@ if __name__ == '__main__':
                 higher_t = lower_t + 1
                 for obstacle in game.obstacles:
                     ox, oy = obstacle
-                    plt.plot(ox, oy, 'ks', markersize=30)
+                    plt.plot(ox, oy, 'bs', markersize=40)
                 for agent in game.agents:
                     prev_agent_states = agent.get_solved_states_at(solver, lower_t)
                     prev_x = int(str(prev_agent_states['x']))
@@ -221,7 +240,8 @@ if __name__ == '__main__':
                     gx, gy = agent.goal_state
                     plt.plot(gx, gy, agent.color+'x', markersize=20)
                 print(t)
-                padding = 0.1
+                padding = 0.2
+                plt.axis('scaled')
                 plt.xlim(game.extent[0]-padding, game.extent[1]+padding)
                 plt.ylim(game.extent[2]-padding, game.extent[3]+padding)
                 fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
