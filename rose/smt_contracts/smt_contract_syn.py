@@ -199,11 +199,11 @@ def create_random_obstacles(N, extent, agents):
 
 if __name__ == '__main__':
     random.seed(0)
-    T = 40
-    N_obstacles = 30
-    N_gridders = 1
-    step_count_max = 45
-    map_length = 40
+    T = 15
+    N_obstacles = 6
+    N_gridders = 4
+    step_count_max = 25
+    map_length = 7
     x_extent = [0, map_length]
     y_extent = [0, map_length]
     extent = x_extent + y_extent
