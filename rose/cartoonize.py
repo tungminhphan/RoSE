@@ -19,6 +19,8 @@ car_figs = dict()
 for color in CAR_COLORS:
     car_figs[color] = main_dir + '/rose/cars/' + color + '_car.png'
 
+nice_blue_color=(0/255, 85/255, 212/255)
+
 
 # animate the files completely
 def traces_to_animation(filename, output_dir, start=0, end=-1):
@@ -203,10 +205,24 @@ def make_bubble_figure(bubble_file):
     plt.show()
 
 def make_second_bubble_figure(bubble_file, output_dir):
+    def plt_car(ax, car_tuple):
+        x, y, theta, v, color, bubble, ag_id = car_tuple
+        theta_d = Car.convert_orientation(theta)
+        car_fig = Image.open(car_figs[color])
+        # need to flip since cars are inverted
+        if theta_d == np.pi/2:
+            theta_d = np.pi
+        elif theta_d == np.pi:
+            theta_d = np.pi/2
+
+        car_fig = car_fig.rotate(theta_d, expand=False)
+        offset = 0.1
+        ax.imshow(car_fig, zorder=1, interpolation='none', extent=[y+offset, y+1-offset, x+offset, x+1-offset])
+
     with open(bubble_file, 'rb') as pckl_file:
         all_bubbles = pickle.load(pckl_file)
     
-    titles = ['$G_F(Ag)$', '$G_{F,BP}(Ag)$', '$G_{F, B}(Ag, Ag\')$', '$G_{F, BP}(Ag,Ag\')$']
+    #titles = ['$G_F(Ag)$', '$G_{F,BP}(Ag)$', '$G_{F, B}(Ag, Ag\')$', '$G_{F, BP}(Ag,Ag\')$']
     colors = ['red', 'orange']
 
     fig = plt.figure()
@@ -215,24 +231,26 @@ def make_second_bubble_figure(bubble_file, output_dir):
     for i, bubble_step in enumerate(all_bubbles[v]):
         #cum_bubb.extend(bubble_step)
         ax = fig.add_subplot(1,1,1)
-        ax.set_title(titles[i], fontdict={'fontsize': 25, 'fontweight': 'medium', 'family':'serif'})
+        #ax.set_title(titles[i], fontdict={'fontsize': 25, 'fontweight': 'medium', 'family':'serif'})
         ax.set_xlim(-5, 11)
         ax.set_ylim(-5, 6)
-        ax.set_yticklabels([])
-        ax.set_xticklabels([])
+        #ax.set_yticklabels([])
+        #ax.set_xticklabels([])
         #ax.set_title(titles[i])
         # plot cumulative bubble one bubble at a time
         for j, gridpts in enumerate(all_bubbles[v]):
             if j <= i: 
                 for grid in gridpts: 
                     if j <= 1:
-                        color = 'orange'
+                        color = nice_blue_color
                     else:
-                        color = 'red'
-                    rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=1.0, edgecolor='gray',facecolor=color, alpha=0.25)
+                        color = 'lightblue'
+                    rect = patches.Rectangle((grid[1],grid[0]),1,1,linewidth=1.0, edgecolor='lightgray',facecolor=color, alpha=0.35)
                     ax.add_patch(rect)
-        
+        car_tuple = (0, 0, 'east', 0, 'blue', [(0,0)], 0)
+        plt_car(ax, car_tuple)
         img_name = output_dir+'/build_bubble_'+str(i)+'.png'
+        plt.axis('off')
         fig.savefig(img_name)
         ax.cla()
         
