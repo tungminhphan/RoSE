@@ -163,6 +163,22 @@ class Agent:
 
     def apply(self, ctrl):
         self.state = self.query_next_state(ctrl)
+        self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
+        # check if agent reached it's goal and update number agents exited count
+        if (self.state.x, self.state.y, self.state.heading) == self.supervisor.goals: 
+            #print("agent reached goal")
+            self.supervisor.game.agents_reached_goal_count += 1
+
+        # save action that was chosen
+        self.ctrl_chosen = ctrl
+        self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
+        # check whether the updated joint state is safe
+        if DEBUGGING:
+            chk_joint_safety = self.check_joint_state_safety(return_list=True)
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
+        else:
+            chk_joint_safety = True
+            self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = True
 
 class Gridder(Agent):
     def __init__(self, **kwargs):
@@ -841,7 +857,8 @@ class Car(Agent):
                         # save this info
                         self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
                         return []
-        self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
+        if self.supervisor.game.save_debug_info: 
+            self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
         return send_requests_list
 
     #======add in code for checking whether agent can go for right turn=========#
@@ -1619,6 +1636,9 @@ class TrafficGame(Simulation):
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
         self.save_debug_info = save_debug_info
+        # save interesting numbers
+        self.car_count = 0
+        self.agents_reached_goal_count = 0 
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1723,6 +1743,9 @@ class TrafficGame(Simulation):
         self.traces["t_end"] = t_end
         self.traces["special_heading_tiles"] = self.map.special_goal_tiles
         self.traces['seed'] = self.map.seed
+        self.traces['total_agent_count'] = self.car_count
+        self.traces['agents_reached_goal_count'] = self.agents_reached_goal_count
+        self.traces['agents_in_map'] = len(self.agent_set)
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         filename = filename + '.p'
@@ -3340,10 +3363,11 @@ class QuasiSimultaneousGame(TrafficGame):
 
     def set_agent_bubbles(self):
         for agent in self.agent_set:
-            self.bubble = agent.get_bubble()
+            agent.bubble = agent.get_bubble()
             agent.agents_in_bubble = agent.find_agents_in_bubble()
             # write to trace format
-            agent.agents_in_bubble_before_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
+            if agent.supervisor.game.save_debug_info: 
+                agent.agents_in_bubble_before_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
         pass
 
     def set_agent_intentions(self):
@@ -3355,11 +3379,13 @@ class QuasiSimultaneousGame(TrafficGame):
 
     def determine_conflict_cluster_resolutions(self):
         for agent in self.agent_set:
-            agent.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.send_conflict_requests_to]
-            agent.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.received_conflict_requests_from]
+            if agent.supervisor.game.save_debug_info: 
+                agent.sent_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.send_conflict_requests_to]
+                agent.received_sv = [(ag.state.__tuple__(), ag.intention, ag.token_count, ag.get_id()) for ag in agent.received_conflict_requests_from]
             agent.is_winner, agent.conflict_winner = agent.check_conflict_resolution_winner()
-            if agent.conflict_winner is not None:
-                agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
+            if agent.supervisor.game.save_debug_info: 
+                if agent.conflict_winner is not None:
+                    agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
 
     def sys_step(self):
         # set all agent intentions
@@ -3379,7 +3405,8 @@ class QuasiSimultaneousGame(TrafficGame):
                 for agent in self.bundle_to_agent_precedence[bundle][precedence]:
                     # reset agents in bubble list bc of quasi-game
                     agent.agents_in_bubble = agent.find_agents_in_bubble()
-                    agent.agents_in_bubble_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
+                    if agent.supervisor.game.save_debug_info: 
+                        agent.agents_in_bubble_sv = [[agent.state.__tuple__(), agent.agent_color, agent.get_id()] for agent in agent.agents_in_bubble]
                     state = agent.state
                     agent.run()
                     # add in occupancy of agent when it took its action
@@ -3404,7 +3431,16 @@ def print_debug_info(filename):
     print("Out of bounds")
     for key, value in traces['out_of_bounds_dict'].items():
         print(key, value)
-#    print(traces['global_traces'])
+    
+    print("total agents spawned")
+    print(traces['total_agent_count'])
+
+    print("total agents that reached goal")
+    print(traces['agents_reached_goal_count'])
+    
+    print("agents currently in map at end of game")
+    print(traces['agents_in_map'])
+
 
 def parse_config(csv_file_path, config_file_path):
     """
@@ -3463,12 +3499,11 @@ if __name__ == '__main__':
     output_filename = 'game'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map)
+    game = QuasiSimultaneousGame(game_map=the_map, save_debug_info=False)
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
     game.play(outfile=output_filename, t_end=500)
-#    game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
