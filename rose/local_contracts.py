@@ -1,14 +1,19 @@
 '''
     File name: local_contracts.py
-    Authors: Tung Phan
+    Author: Tung Phan
     Date created: 4/30/2020
 '''
+import os
 import numpy as np
 from collections import OrderedDict as od
 import rose as rs
 from ipdb import set_trace as st
 import numpy as np
 import math
+import json as js
+import _pickle as pickle
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 def translate_tile_list_by_xy(tile_list, xy):
     return [tuple(np.array(tile) + np.array(xy)) for tile in tile_list]
@@ -22,35 +27,52 @@ def find_directed_angle_between_vectors(vec1, vec2):
     sin_val = (vec1[0]*vec2[1] - vec1[1]*vec2[0])/(d1*d2)
     return np.arctan2(sin_val, cos_val)
 
-class LocalFrame:
-    def __init__(self, agent, radius):
-        self.agent = agent
-        self.radius = radius
-        self.rel_tiles = self.get_rel_tiles()
+class LocalGridderFrame:
+    def __init__(self):
+        self.rel_tiles = self.get_min_vision_set()
 
-    def get_rel_tiles(self):
-        N = self.radius
-        # using set to get rid of repetitions
-        reference_tile_set = set()
-        for i in range(-N, N+1):
-            reference_tile_set.add((i,0))
-        for j in range(-N, N+1):
-            reference_tile_set.add((0,j))
-        reference_tile_list = list(reference_tile_set)
-        reference_tile_list.sort()
-        return tuple(reference_tile_list)
+    # minimal bubble for reasoning about safety
+    def get_min_vision_set(self):
+        reference_tile_set = []
+        dummy_gridder = rs.Gridder(x=0, y=0)
+        pushforward_set = self.reduce_state_set(dummy_gridder.get_pushforward())
+        vision_set = pushforward_set
+        for pushforward_state in pushforward_set:
+            pullback_set = dummy_gridder.get_pullback(pushforward_state)
+            vision_set = vision_set + pullback_set
+        vision_set = self.reduce_state_set(vision_set)
+        vision_tile_set = [(state.x, state.y) for state in vision_set]
+        return vision_tile_set
 
-    def get_goal_compass_dir(self):
-        x, y = self.agent.state.x, self.agent.state.y
-        goal, _ = self.agent.supervisor.get_next_goal_and_plan()
+    def draw_vision_set(self):
+        fig, ax = plt.subplots(1)
+        for tile in self.rel_tiles:
+            rect = patches.Rectangle((tile[1],tile[0]),1,1,edgecolor='black',facecolor='blue', alpha=0.5)
+            ax.add_patch(rect)
+        ax.autoscale_view()
+        plt.show()
+
+    def reduce_state_set(self, state_set):
+        projections=[]
+        reduced_set = []
+        for state in state_set:
+            if (state.x, state.y) not in projections:
+                projections.append((state.x, state.y))
+                reduced_set.append(state)
+        return reduced_set
+
+    def get_goal_compass_dir(self, agent):
+        x, y = agent.state.x, agent.state.y
+        goal, _ = agent.supervisor.get_next_goal_and_plan()
         x_goal, y_goal = goal
         dx = np.sign(x_goal-x)
         dy = np.sign(y_goal-y)
         return (dx, dy)
 
-    def get_mask(self):
+    def get_mask(self, agent):
         rel_tiles = self.rel_tiles
-        compass_dir = self.get_goal_compass_dir()
+        compass_dir = self.get_goal_compass_dir(agent)
+        angle_of_rotation = 0
         if sum(np.abs(compass_dir)) == 2: # if diagonal
             angle_of_rotation = find_directed_angle_between_vectors(compass_dir, [1, 1])
         elif sum(np.abs(compass_dir)) == 1: # straight ahead
@@ -61,53 +83,103 @@ class LocalFrame:
             # rotate to match
             new_tile = tuple(rs.rotate_vector(tile, angle_of_rotation))
             rotated_tile_list.append(new_tile)
-        return tuple(rotated_tile_list)
+        mask = translate_tile_list_by_xy(rotated_tile_list, (agent.state.x, agent.state.y))
+        return tuple(mask)
 
-    def __equal__(self):
-        pass
+    def get_signature(self, game, agent):
+        mask = self.get_mask(agent)
+        signature = []
+        for tile in mask:
+            # if tile is in map at all
+            if tile == (agent.state.x, agent.state.y): # if at ego
+                feature = 'self'
+            elif tile in agent.supervisor.game.map.nodes:
+                if tile in agent.supervisor.game.occupancy_dict:
+                    feature = 'occupied'
+                else:
+                    feature = 'free'
+            else: # out of bounds
+                feature = 'out'
+            signature.append(feature)
+        return tuple(signature), mask
 
 class LocalContract:
-    def __init__(self, local_frame):
-        self.frame_to_forbidden_actions = od()
-        self.local_frame = local_frame
+    def __init__(self, name, frame):
+        self.name = name
+        self.draft_name = name + '_draft'
+        self.frame = frame
+        if not os.path.exists(self.name):
+            self.contract_draft = dict()
+        else: # load dictionary if already exists
+            self.contract_draft = self.load_contract()
 
-    def forbid_action(self, action):
-        if frame not in self.frame_to_forbidden_actions:
-            self.frame_to_forbidden_actions[frame] = [action]
+    def make_contract_draft_effective(self):
+        self.contract = self.contract_draft
+
+    def forbid_action(self, signature, action):
+        if signature not in self.contract_draft:
+            self.contract_draft[signature] = [action]
         else:
-            self.frame_to_forbidden_actions[frame].append(action)
+            self.contract_draft[signature].append(action)
+
+    def load_contract(self):
+        with open(self.name + '.pkl', 'rb') as f:
+            contract_draft = pickle.load(f)
+        return contract_draft
+
+    def load_draft_contract(self):
+        with open(self.draft_name + '.pkl', 'rb') as f:
+            contract_draft = pickle.load(f)
+        return contract_draft
+
+    def dump_contract(self):
+        with open(self.draft_name + '.pkl', 'wb') as f:
+            pickle.dump(self.contract_draft, f)
+
+    def dump_draft_contract(self):
+        with open(self.name + '.pkl', 'wb') as f:
+            pickle.dump(self.contract_draft, f)
 
 if __name__ == '__main__':
-    map_name = '10x10_field'
+    # specify the map name
+    map_name = '3x3_field'
     the_field = rs.Field('./maps/'+map_name)
+
+    # intialize gridder objects
     gridder1 = rs.Gridder(x=0,y=0)
-    gridder2 = rs.Gridder(x=9,y=9)
+    gridder2 = rs.Gridder(x=2,y=2)
+
+    # specify gridder objects' goals
     goal1 = (gridder2.state.x, gridder2.state.y)
     goal2 = (gridder1.state.x, gridder1.state.y)
 
+    # create agent set
     agent_set = [gridder1, gridder2]
+
+    # create game from map and agent set
     the_game = rs.Simulation(the_map=the_field,agent_set=agent_set)
 
-    contract_controller1 = rs.LocalContractController(the_game, goal1)
-    contract_controller1.set_plant(gridder1)
-    contract_controller2 = rs.LocalContractController(the_game, goal2)
-    contract_controller2.set_plant(gridder2)
+    # define local frames
+    gridder_frame = LocalGridderFrame()
+    gridder_frame.draw_vision_set()
 
-    compass_controller = rs.CompassController()
-    gridder1.set_controller(compass_controller)
-    gridder2.set_controller(compass_controller)
+    # define the local contract object
+    contract = LocalContract(name='test', frame=gridder_frame)
 
-    sim = rs.Simulation(the_map=the_field, agent_set=agent_set)
-    sim.animate(frequency=0.1)
+    # define and set supervisors for the robots
+    contract_supervisor1 = rs.LocalContractSupervisor(the_game, goal1, contract)
+    gridder1.set_supervisor(contract_supervisor1)
+    contract_supervisor2 = rs.LocalContractSupervisor(the_game, goal2, contract)
+    gridder2.set_supervisor(contract_supervisor2)
 
-    local_frame1 = LocalFrame(agent=gridder1, radius=3)
-    local_frame2 = LocalFrame(agent=gridder2, radius=3)
-    print(local_frame1.rel_tiles)
-    print(local_frame2.rel_tiles)
-    print('after')
-    print(local_frame1.get_mask())
-    print(local_frame2.get_mask())
-    st()
+    contract_enforcer = rs.ContractEnforcingController()
+    gridder1.set_controller(contract_enforcer)
+    gridder2.set_controller(contract_enforcer)
+
+    game = rs.ContractGame(the_map=the_field, agent_set=agent_set)
+    game.animate(0.2)
+    #game.play()
+    #game.learn()
 
 #    vec0 = [1, -1]
 #    vec1 = [-1, 1]

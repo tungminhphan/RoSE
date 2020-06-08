@@ -4,6 +4,7 @@
     Authors: Tung Phan, Karena Cai
     Date created: 1/10/2020
 '''
+import itertools
 from typing import List, Any
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -17,29 +18,13 @@ from ipdb import set_trace as st
 import csv
 import networkx as nx
 from collections import OrderedDict as od
-from collections import namedtuple
 import collections
 import os
 import _pickle as pickle
 import json
 import copy as cp
 from c_tools import *
-#from plotting import traces_to_animation
-
-DEBUGGING = False
-FIND_LEAD_AGENT_THRESHOLD = 15 #TODO: compute this automatically
-CAR_COLORS = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
-IOMap = namedtuple('IOMap', ['sources','sinks','map'])
-TLNode = namedtuple('TLNode', ['xy', 'green', 'yellow', 'red'])
-Intersection = namedtuple('Intersection', ['tiles', 'pcorner', 'mcorner', 'height', 'width'])
-Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
-DIRECTION_TO_VECTOR  = od()
-DIRECTION_TO_VECTOR['east'] = [0, 1]
-DIRECTION_TO_VECTOR['west'] = [0, -1]
-DIRECTION_TO_VECTOR['north'] = [-1, 0]
-DIRECTION_TO_VECTOR['south'] = [1, 0]
-AGENT_CHAR = [str(i) for i in range(10)]
-CHOSEN_IDs = []
+from global_constants import *
 
 
 def set_seed(seed, other_param=0):
@@ -170,9 +155,11 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
-    def query_next_state(self, ctrl):
+    def query_next_state(self, ctrl, state=None):
+        if state is None:
+            state = self.state
         assert ctrl in self.get_all_ctrl()
-        return self.query_occupancy(ctrl)[-1]
+        return self.query_occupancy(ctrl, state)[-1]
 
     def apply(self, ctrl):
         self.state = self.query_next_state(ctrl)
@@ -203,16 +190,41 @@ class Gridder(Agent):
     def get_symbol(self):
         return '🤖'
 
-    def get_all_ctrl(self, state=None):
+    @classmethod
+    def get_all_ctrl(cls, state=None):
         return ['up', 'down', 'left', 'right', 'stay']
 
+    def get_pushforward(self, state=None):
+        if state is None:
+            state = self.state
+        forward_set = []
+        for ctrl in self.get_all_ctrl():
+            next_state = self.query_next_state(ctrl, state)
+            forward_set.append(next_state)
+        return forward_set
+
+    def get_pullback(self, state=None):
+        if state is None:
+            state = self.state
+        pullback_set = []
+        ego_state = Agent.hack_state(state, x=0, y=0)
+        ego_state_pushforward = self.get_pushforward(state=ego_state)
+        for forward_state in ego_state_pushforward:
+            dx = -forward_state.x
+            dy = -forward_state.y
+            pullback_state = Agent.hack_state(state=state,
+                                              x=state.x + dx,
+                                              y=state.y + dy)
+            pullback_set.append(pullback_state)
+        return pullback_set
+
     def query_occupancy(self, ctrl, state=None):
-        if state == None:
+        if state is None:
             state = self.state
         if ctrl == 'up':
-            next_state = Agent.hack_state(state, y = state.y + 1)
-        elif ctrl == 'down':
             next_state = Agent.hack_state(state, y = state.y - 1)
+        elif ctrl == 'down':
+            next_state = Agent.hack_state(state, y = state.y + 1)
         elif ctrl == 'left':
             next_state = Agent.hack_state(state, x = state.x - 1)
         elif ctrl == 'right':
@@ -1471,6 +1483,30 @@ class Simulation:
         self.time = 0
         self.agent_set = agent_set
         self.draw_sets = [self.map.drivable_tiles, self.agent_set] # list ordering determines draw ordering
+        self.occupancy_dict = od()
+        self.update_occupancy_dict()
+
+    def update_occupancy_dict(self):
+        occupancy_dict = od()
+        for agent in self.agent_set:
+            x, y = agent.state.x, agent.state.y
+            occupancy_dict[x,y] = agent
+        self.occupancy_dict = occupancy_dict
+
+    def update_occupancy_dict_for_one_agent(self, agent, prior_state, delete=False):
+        if not delete:
+            if prior_state is not None:
+                self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
+            self.occupancy_dict[agent.state.x, agent.state.y] = agent
+        else:
+            self.occupancy_dict.pop((agent.state.x, agent.state.y), None)
+
+
+    def play(self, t_end=np.inf, outfile=None):
+        write_bool = outfile is not None and t_end is not np.inf
+        while self.time < t_end:
+            print("TIME: " + str(self.time))
+            self.play_step()
 
     def time_forward(self):
         self.time += 1
@@ -1484,6 +1520,7 @@ class Simulation:
     def play_step(self):
         self.sys_step()
         self.env_step()
+        self.time_forward()
 
     def animate(self, frequency, t_end=np.inf):
         stdscr = curses.initscr()
@@ -1503,30 +1540,98 @@ class Simulation:
                     artist.draw_set(draw_set)
                 # update states
                 self.play_step()
-                self.time += 1
                 # draw objects
                 stdscr.refresh()
                 time.sleep(frequency)
-                self.time_forward()
         finally:
             curses.nocbreak()
             stdscr.keypad(False)
             curses.echo()
             curses.endwin()
 
-class Game(Simulation):
+class ContractGame(Simulation):
+    def __init__(self, the_map, agent_set=[]):
+        super(ContractGame, self).__init__(the_map, agent_set)
+
+    # requires contract supervisor
+    def learn(self):
+        agent_to_legal_action_map = od()
+        agent_set = list(self.agent_set)
+        agent_to_signature_map = dict()
+        for agent in agent_set:
+            signature, mask = agent.supervisor.contract.frame.get_signature(game=agent.supervisor.game,
+                                                                      agent=agent)
+            xy_to_feature_map = dict(zip(mask, signature))
+            agent_to_signature_map[agent] = signature, xy_to_feature_map
+            if signature in agent.supervisor.contract.contract_draft:
+                # if signature already has been encountered
+                forbidden_actions = agent.supervisor.contract.contract_draft[signature]
+            else:
+                forbidden_actions = []
+                for act in agent.get_all_ctrl():
+                    next_state = agent.query_next_state(act)
+                    next_tile = next_state.x, next_state.y
+                    assert next_tile in xy_to_feature_map # the frame must satisfy this assertion
+                    if xy_to_feature_map[next_tile] == 'out':
+                        forbidden_actions.append(act)
+                # prevent agents from going out of bounds
+                agent.supervisor.contract.contract_draft[signature] = forbidden_actions
+            agent_to_legal_action_map[agent] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
+
+        action_set = [agent_to_legal_action_map[agent] for agent in agent_set]
+        action_product_set = itertools.product(*action_set) # note ordering is not preserved here
+
+        existential_dictionary = dict()
+        bad_joint_actions = []
+        for joint_action in action_product_set:
+            next_tiles = []
+            is_bad_joint_action = False
+            for agent_idx, agent_action in enumerate(joint_action):
+                agent_next_state = agent_set[agent_idx].query_next_state(agent_action)
+                agent_next_xy = agent_next_state.x, agent_next_state.y
+                if agent_next_xy not in next_tiles:
+                    next_tiles.append(agent_next_xy)
+                else: # collision will happen
+                    bad_joint_actions.append(joint_action)
+                    is_bad_joint_action = True
+                    break
+            # collect (existential) proofs of good actions
+            if not is_bad_joint_action:
+                for agent_idx, agent_action in enumerate(joint_action):
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    if agent_signature in existential_dictionary:
+                        existential_dictionary[agent_signature].append(agent_action)
+                    else:
+                        existential_dictionary[agent_signature] = [agent_action]
+            # forbid any action for which we have no proof of it being good
+            for bad_joint_action in enumerate(bad_joint_actions):
+                for agent_idx, agent_action in bad_joint_action:
+                    agent = agent_set[agent_idx]
+                    # get the signature to compute the quotient
+                    agent_signature, _ = agent_to_signature_map[agent]
+                    assert agent_signature in existential_dictionary # if this check fails, it's gameover
+                    if agent_action in existential_dictionary[agent_signature]:
+                        pass # this is a good action keep it
+                    else:
+                        agent.supervisor.contract[agent_signature] = [agent_action]
+                        #TODO: this line must be executed, so if there are
+                        #multiple proofs, it's ok to prune some to
+                        #prevent this from not being entered
+
+class TrafficGame(Simulation):
     """
     Traffic game class
     """
     # combines scenario + agents for game
     def __init__(self, game_map, save_debug_info=True, agent_set=[]):
-        super(Game, self).__init__(the_map=game_map, agent_set=agent_set)
+        super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
-        self.occupancy_dict = od()
-        self.update_occupancy_dict()
+        self.car_count = 0
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
@@ -1535,18 +1640,6 @@ class Game(Simulation):
         self.car_count = 0
         self.agents_reached_goal_count = 0 
 
-    def update_occupancy_dict(self):
-        occupancy_dict = od()
-        for agent in self.agent_set:
-            x, y = agent.state.x, agent.state.y
-            occupancy_dict[x,y] = agent
-        self.occupancy_dict = occupancy_dict
-
-    def update_occupancy_dict_for_one_agent(self, agent, prior_state):
-        if prior_state is not None:
-            self.occupancy_dict.pop((prior_state.x, prior_state.y), None)
-        self.occupancy_dict[agent.state.x, agent.state.y] = agent
-
     def spawn_agents(self):
         def valid_source_sink(source, sink):
             return not (source.node[0] == sink.node[0] or source.node[1] == sink.node[1])
@@ -1554,18 +1647,15 @@ class Game(Simulation):
         # generate random array
         set_seed(self.map.seed, self.time)
         # create two random arrays from this seed
-        rand_arr1 = np.random.random(len(self.map.IO_map.sources))
-        source = self.map.IO_map.sources[0]
-        rand_arr2 = np.random.randint(len(self.map.IO_map.map[source]), size=len(rand_arr1))
-        #print(rand_arr1)
-        #print(rand_arr2)
+        source_spawn_probabilities = np.random.rand(len(self.map.IO_map.sources))
+        sinks = [np.random.randint(len(self.map.IO_map.map[source])) for source in self.map.IO_map.sources]
 
         for i, source in enumerate(self.map.IO_map.sources):
             #print('source to check')
             #print(source.node)
-            if rand_arr1[i] <= source.p:
+            if source_spawn_probabilities[i] <= source.p:
                 #print(len(self.map.IO_map.map[source]))
-                sink = self.map.IO_map.map[source][rand_arr2[i]]
+                sink = self.map.IO_map.map[source][sinks[i]]
                 # check if new car satisfies spawning safety contract
                 #print('sources and sinks')
                 #print(source.node, sink.node)
@@ -1578,7 +1668,7 @@ class Game(Simulation):
                 if spawning_contract.okay_to_spawn_flag:
                     #print(new_car.supervisor.goals)
                     self.agent_set.append(new_car)
-                    self.update_occupancy_dict()
+                    self.update_occupancy_dict_for_one_agent(new_car,prior_state=None)
                     self.car_count = self.car_count+1
 
     def add_agent(self, agent):
@@ -1714,7 +1804,6 @@ class Game(Simulation):
                 if self.save_debug_info:
                     self.write_agents_to_traces()
 
-            self.time_forward()
 
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
@@ -1891,7 +1980,6 @@ class Map(Field):
         self.tile_to_intersection_map = self.get_tile_to_intersection_map()
         self.bundles = self.get_bundles()
         self.tile_to_bundle_map = self.get_tile_to_bundle_map()
-        self.IO_map = self.get_IO_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
         self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
         self.special_goal_tiles = []
@@ -1902,6 +1990,7 @@ class Map(Field):
         self.bundle_graph = self.get_bundle_graph()
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
+        self.IO_map = self.get_IO_map()
 
 
     def tile_is_in_intersection(self, xy):
@@ -2282,13 +2371,6 @@ class Map(Field):
             if heading == bundle.direction:
                 return bundle
         return None
-        # try:
-        #bundle_bool = np.nonzero([b.direction == heading for b in bundles])
-        #if len(bundle_bool) == 0:
-        #    return None
-        #else:
-        #    bundle_idx = bundle_bool[0][0]
-        #    bundle = bundles[bundle_idx]
 
     def get_tile_to_traffic_light_map(self):
         tile_to_traffic_light_map = od()
@@ -2380,7 +2462,21 @@ class Map(Field):
                 bundles.append(bundle)
         return bundles
 
+    # this is the bunlde IO map
     def get_IO_map(self):
+        sources, sinks = self.get_sources_sinks()
+        IO_map = IOMap(sources=sources,sinks=sinks,map=od())
+        for source in IO_map.sources:
+            IO_map.map[source] = []
+            for sink in IO_map.sinks:
+                try:
+                    self.get_bundle_plan(source.node, sink.node)
+                    IO_map.map[source].append(sink)
+                except:
+                    pass
+        return IO_map
+
+    def get_pure_IO_map(self): # not based on bundles
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
         for source in IO_map.sources:
@@ -2394,9 +2490,9 @@ class Map(Field):
         presources = []
         presinks = []
         for tile in self.legal_orientations:
-            if self.legal_orientations[tile]:
+            if self.legal_orientations[tile] and len(self.legal_orientations[tile])==1:
                 for orientation in self.legal_orientations[tile]:
-                    inp = tile[0], tile[1], orientation
+                    inp = ((tile[0], tile[1]), orientation)
                     is_sink = self.road_map.out_degree(inp) == 0
                     is_source = self.road_map.in_degree(inp) == 0
                 if is_sink:
@@ -2489,11 +2585,11 @@ class Map(Field):
         directions = ['south', 'north', 'east', 'west']
         road_map = nx.DiGraph()
         east_neighbors = []
-        east_neighbors.append(Neighbor(xyt=(0,1,'east'), weight=1, name='forward'))
-        east_neighbors.append(Neighbor(xyt=(-1,1,'east'), weight=2, name='left-lane'))
-        east_neighbors.append(Neighbor(xyt=(1,1,'east'), weight=2, name='right-lane'))
-        east_neighbors.append(Neighbor(xyt=(-1,1,'north'), weight=2, name='left-turn'))
-        east_neighbors.append(Neighbor(xyt=(1,1,'south'), weight=2, name='right-turn'))
+        east_neighbors.append(Neighbor(xyt=((0,1),'east'), weight=1, name='forward'))
+        east_neighbors.append(Neighbor(xyt=((-1,1),'east'), weight=2, name='left-lane'))
+        east_neighbors.append(Neighbor(xyt=((1,1),'east'), weight=2, name='right-lane'))
+        east_neighbors.append(Neighbor(xyt=((-1,1),'north'), weight=2, name='left-turn'))
+        east_neighbors.append(Neighbor(xyt=((1,1),'south'), weight=2, name='right-turn'))
         def get_cell_neighbors(cell, direction):
             x, y = cell
             cell_neighbors = []
@@ -2503,10 +2599,11 @@ class Map(Field):
                 xyt = east_neighbor.xyt
                 weight = east_neighbor.weight
                 neighbor_name = east_neighbor.name
-                nex, ney, nangle = xyt
+                nexney, nangle = xyt
+                nex, ney = nexney
                 dx, dy = rotate_vector(tuple(np.array([nex, ney])), rangle)
                 fangle = Car.convert_orientation((angle + Car.convert_orientation(nangle)) % 360)
-                neighbor_xyt = (x+dx, y+dy, fangle)
+                neighbor_xyt = ((x+dx, y+dy), fangle)
                 cell_neighbors.append(Neighbor(xyt=neighbor_xyt, weight=weight, name=neighbor_name))
             return cell_neighbors
 
@@ -2514,9 +2611,10 @@ class Map(Field):
 
         for cell in road_cells:
             for direction in directions:
-                source = (cell[0], cell[1], direction)
+                source = ((cell[0], cell[1]), direction)
                 for neighbor in get_cell_neighbors(cell, direction):
-                    nex, ney, neheading = neighbor.xyt
+                    nexney, neheading = neighbor.xyt
+                    nex, ney = nexney
                     weight = neighbor.weight
                     neighbor_name = neighbor.name
                     if (nex, ney) in self.legal_orientations and self.legal_orientations[nex, ney]:
@@ -2573,12 +2671,14 @@ class Controller:
     def run_on(self, plant):
         raise NotImplementedError
 
-class CompassController(Controller):
+class ContractEnforcingController(Controller):
     def __init__(self):
-        super(CompassController, self).__init__()
+        super(ContractEnforcingController, self).__init__()
     def run_on(self, plant):
-        plant.apply(random.choice([action for action in
-            plant.get_all_ctrl() if plant]))
+        # requires that the plant has a supervisor
+        assert plant.supervisor.contract
+        allowable_actions = plant.supervisor.get_allowable_actions()
+        plant.apply(random.choice(allowable_actions))
 
 class RandomController(Controller):
     def __init__(self):
@@ -2676,100 +2776,6 @@ class ReplanProgressOracle(Oracle):
         except:
             next_distance = np.inf
         return next_distance < current_distance
-
-class IntersectionClearanceOracle(Oracle):
-    def __init__(self):
-        super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
-    def evaluate(self, ctrl_action, plant, game):
-        # return count of number of agents ahead of it in interesection
-        def count_agents_in_intersection_ahead(intersection_gap):
-            cnt = 0
-            # check for number of agents ahead in intersection
-            forward = DIRECTION_TO_VECTOR[plant.state.heading]
-            curr_st = np.array([plant.state.x, plant.state.y])
-            for i in range(1, intersection_gap):
-                next_tile_tuple = tuple(curr_st + i*np.array(forward))
-                # if there is an agent there, then count it
-                if next_tile_tuple in game.occupancy_dict:
-                    cnt = cnt + 1
-            return cnt
-
-        self.clearance_straight_info = None
-        current_state = plant.state.x, plant.state.y
-        x_curr, y_curr = current_state
-        next_state = plant.query_next_state(ctrl_action)
-        x_next, y_next = next_state.x, next_state.y
-        # need to check whether agent backup plan at next state will be in intersection
-        bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
-        x_next_bp, y_next_bp = bp_state.x, bp_state.y
-
-        # check if not crossing into an intersection
-        try:
-            currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
-            will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
-            bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
-        except:
-            return True
-        if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
-            return True
-        else:
-            #print("action crossing into intersection")
-            # if indeed crossing into an intersection
-            # check if attempting to perform a left turn
-            current_subgoal = plant.supervisor.subgoals[0]
-            # figure out what intersection is being entered
-            next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
-            current_heading = plant.state.heading
-            # confirm intention to perform left turn; TODO: generalize this check
-            if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
-                # left turn is confirmed
-                heading_degrees = Car.convert_orientation(current_heading)
-                left_heading_degrees  = (heading_degrees + 90) % 360
-                left_heading = Car.convert_orientation(left_heading_degrees)
-                forward = DIRECTION_TO_VECTOR[current_heading]
-                next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
-                while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
-                    next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
-                reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
-
-                if current_heading in ['east', 'west']:
-                    intersection_gap = next_intersection.height
-                else:
-                    intersection_gap = next_intersection.width
-                lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
-                if lead_agent:
-                    width, _= plant.get_width_along_bundle()
-                    reference_state_bundle_width = width + 1
-                    num_residual_tiles = intersection_gap - reference_state_bundle_width
-                    clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))
-                else:
-                    clearance = np.inf
-                return clearance > intersection_gap #TODO: find a better bound
-
-            else: # going straight
-                #print("entering intersection straight with intention to move straight")
-                # save intersection gap,
-                if current_heading in ['east', 'west']:
-                    intersection_gap = next_intersection.width
-                else:
-                    intersection_gap = next_intersection.height
-                # count the number of agents in intersection ahead of it
-                agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
-                lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
-                if lead_agent:
-                    clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
-                else:
-                    clearance = np.inf
-
-                if lead_agent is None:
-                    x_sv = None
-                    y_sv = None
-                else:
-                    x_sv = lead_agent.state.x
-                    y_sv = lead_agent.state.y
-
-                self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
-                return clearance > intersection_gap #TODO: find a better bound
 
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
@@ -2908,7 +2914,7 @@ class SpecificationStructureController(Controller):
         self.manage_turn_signals(plant, ctrl)
         plant.apply(ctrl)
 
-class SupervisoryController():
+class Supervisor():
     def _init__(self):
         self.plant = None
         self.game = None
@@ -2927,10 +2933,12 @@ class SupervisoryController():
     def run(self):
         self.check_goals()
 
-class LocalContractController(SupervisoryController):
-    def __init__(self, game, goal):
+class LocalContractSupervisor(Supervisor):
+    def __init__(self, game, goal, contract):
         self.game = game
         self.goal = goal
+        self.contract = contract
+        self.plant = None
 
     def get_next_goal_and_plan(self):
         return self.goal, None
@@ -2938,7 +2946,15 @@ class LocalContractController(SupervisoryController):
     def check_goals(self):
         pass
 
-class GoalExit(SupervisoryController):
+    def get_allowable_actions(self):
+        signature, mask = self.contract.frame.get_signature(game=self.game, agent=self.plant)
+        try:
+            return self.contract.contract_draft[signature]
+        except KeyError:
+            print('signature is not in contract so allowing everything')
+            return self.plant.get_all_ctrl()
+
+class GoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal
@@ -2953,7 +2969,7 @@ class GoalExit(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) <= 1: # if close enough
                 self.game.agent_set.remove(self.plant)
 
-class GoalCycler(SupervisoryController):
+class GoalCycler(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = cycle(self.add_headings_to_goals(goals))
@@ -2980,7 +2996,7 @@ class GoalCycler(SupervisoryController):
             if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
                 self.current_goal, self.current_plan = self.get_next_goal_and_plan()
 
-class BundleGoalExit(SupervisoryController):
+class BundleGoalExit(Supervisor):
     def __init__(self, game, goals=None):
         self.game = game
         self.goals = goals[0] # only consider first goal
@@ -2989,7 +3005,7 @@ class BundleGoalExit(SupervisoryController):
     def get_next_goal_and_plan(self):
         next_goal = self.goals
         source = ((self.plant.state.x, self.plant.state.y), self.plant.state.heading)
-        target = ((next_goal[0], next_goal[1]), next_goal[2])
+        target = next_goal
         next_plan = self.game.map.get_bundle_plan(source, target)
         self.subgoals = self.get_subgoals(next_plan)
         return next_goal, next_plan
@@ -3013,8 +3029,11 @@ class BundleGoalExit(SupervisoryController):
     def check_goals(self):
         self.check_subgoals()
         if self.plant:
-            if np.sum(np.abs(np.array([self.plant.state.x, self.plant.state.y]) - np.array([self.current_goal[0], self.current_goal[1]]))) == 0: # if close enough
+            if np.sum(np.abs(np.array([self.plant.state.x,
+                self.plant.state.y]) -
+                np.array([self.current_goal[0][0], self.current_goal[0][1]]))) == 0: # if close enough
                 self.game.agent_set.remove(self.plant)
+                self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
 class SpecificationStructure():
     def __init__(self, oracle_list, oracle_tier):
@@ -3218,9 +3237,9 @@ def get_default_car_ss():
 def create_default_car(source, sink, game, car_count):
     ss = get_default_car_ss()
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
-    start = source.node
+    start_xy, start_heading = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
+    car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3272,9 +3291,9 @@ def create_specified_car(attributes, game):
     car.set_supervisor(supervisor)
     return car
 
-class QuasiSimultaneousGame(Game):
-    def __init__(self, game_map, save_debug_info=True):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
+class QuasiSimultaneousGame(TrafficGame):
+    def __init__(self, game_map):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         self.bundle_to_agent_precedence = None
         self.simulated_agents = []
@@ -3475,8 +3494,8 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 6221
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.01, seed=seed)
+    map_name = 'city_blocks_small_junction'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3485,7 +3504,6 @@ if __name__ == '__main__':
 
     # play or animate a normal game
     game.play(outfile=output_filename, t_end=500)
-    #game.animate(frequency=0.01)
 
     # print debug info
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
