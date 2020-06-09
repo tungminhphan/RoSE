@@ -54,11 +54,76 @@ class Map:
             node_to_cluster_dict[node] = cluster
         return node_to_cluster_dict
 
+class Region:
+    def __init__(self, nodes, region_id):
+        self.nodes = nodes
+        self.id = region_id
+        self.boundary_nodes = self.find_boundary_nodes()
+
+    def find_boundary_nodes(self):
+        boundary_nodes = []
+        for node in self.nodes:
+            if self.is_boundary_node(node):
+                boundary_nodes.append(node)
+        return boundary_nodes
+
+    def is_boundary_node(self, node):
+        """
+        Check if node is not an internal node
+        """
+        assert node in self.nodes
+        displacements = [[1,0],[0,1],[-1,0],[0,-1]]
+        for displacement in displacements:
+            adjacent_node = (node[0]+displacement[0], node[1]+displacement[1])
+            if adjacent_node not in self.nodes:
+                return True
+        return False
+
+class InterRegion:
+    def __init__(self, list_of_regions):
+        self.regions = list_of_regions
+        self.region_id_to_region_map = self.get_region_id_to_region_map()
+        self.connectivity_map = self.get_connectivity_map()
+
+    def get_region_id_to_region_map(self):
+        region_id_to_region_map = {region.id for region in
+                self.regions}
+        return region_id_to_region_map
+
+    def get_connectivity_map(self):
+        connectivity_map = dict()
+        for from_region_idx in range(len(self.regions)):
+            from_region = self.regions[from_region_idx]
+            for to_region_idx in range(from_region_idx, len(self.regions)):
+                to_region = self.regions[to_region_idx]
+                for from_node in from_region.nodes:
+                    for to_node in to_region.nodes:
+                        if abs(from_node[0]-to_node[0]) + abs(from_node[1]-to_node[1]) <= 1:
+                            if (from_region, to_region) in connectivity_map:
+                                connectivity_map[(from_region, to_region)].append((from_node, to_node))
+                                connectivity_map[(to_region, from_region)].append((to_node, from_node))
+                            else:
+                                connectivity_map[(from_region, to_region)] = [(from_node, to_node)]
+                                connectivity_map[(to_region, from_region)] = [(to_node, from_node)]
+        return connectivity_map
+
+def clusters_to_regions(cluster_map):
+    regions = []
+    all_cluster_ids = list(set(cluster_map.values()))
+    all_cluster_ids.sort()
+    all_clusters = {k: [] for k in all_cluster_ids}
+    for node in cluster_map:
+        all_clusters[cluster_map[node]].append(node)
+    for cluster_id in all_clusters:
+        region = Region(all_clusters[cluster_id], cluster_id)
+        regions.append(region)
+    return regions
+
 if __name__ == '__main__':
     random.seed(0)
-    N_obstacles = 150
+    N_obstacles = 15
     N_clusters = 10
-    map_length = 50
+    map_length = 15
     x_extent = [0, map_length]
     y_extent = [0, map_length]
     extent = x_extent + y_extent
@@ -66,10 +131,20 @@ if __name__ == '__main__':
             agents=[])
     the_map = Map(extent, obstacles)
     cluster_map = the_map.get_clusters(N=N_clusters)
-    for node in cluster_map:
-        x, y = node
-        color = 'C' + str(cluster_map[node]) + '.'
-        plt.plot(x, y, color, markersize='10')
+    regions = clusters_to_regions(cluster_map)
+    interregion = InterRegion(regions)
+    for region in regions:
+        region_id = region.id
+        for node in region.nodes:
+            x, y = node
+            color = 'C' + str(region_id)
+            if node not in region.boundary_nodes:
+                markersize = '10'
+                symbol = 'x'
+            else:
+                markersize = '10'
+                symbol = 'o'
+            plt.plot(x, y, color+symbol, markersize=markersize)
     plt.axis('scaled')
     plt.show()
 
