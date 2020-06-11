@@ -5,6 +5,8 @@ import smt_contract_syn as scs
 from sklearn.cluster import SpectralClustering
 from ipdb import set_trace as st
 import matplotlib.pyplot as plt
+import smt_contract_syn as syn
+
 class Map:
     def __init__(self, extent, obstacles):
         self.extent = extent
@@ -59,6 +61,17 @@ class Region:
         self.nodes = nodes
         self.id = region_id
         self.boundary_nodes = self.find_boundary_nodes()
+        self.box_extent = self.find_box_extent()
+        self.box_obstacles = self.find_box_obstacles()
+
+    def find_box_obstacles(self):
+        box_obstacles = []
+        x_min, x_max, y_min, y_max = self.box_extent
+        for x in range(x_min, x_max+1):
+            for y in range(y_min, y_max+1):
+                if (x, y) not in self.nodes:
+                    box_obstacles.append((x,y))
+        return box_obstacles
 
     def find_boundary_nodes(self):
         boundary_nodes = []
@@ -66,6 +79,13 @@ class Region:
             if self.is_boundary_node(node):
                 boundary_nodes.append(node)
         return boundary_nodes
+
+    def find_box_extent(self):
+        x_coords = [node[0] for node in self.boundary_nodes]
+        y_coords = [node[1] for node in self.boundary_nodes]
+        x_extent = [min(x_coords), max(x_coords)]
+        y_extent = [min(y_coords), max(y_coords)]
+        return x_extent + y_extent
 
     def is_boundary_node(self, node):
         """
@@ -79,6 +99,28 @@ class Region:
                 return True
         return False
 
+    def get_game_constraints(self, inputs, outputs, T, step_count_max):
+        assert len(inputs) == len(outputs)
+        assert len(inputs+outputs) == len(set(inputs)) + len(set(outputs))
+        gridders = []
+        for idx, io in enumerate(zip(inputs,outputs)):
+            start_pos, end_pos = io
+            gridder = SMTGridder(init_state=start_pos, goal_state=end_pos,
+                                 name='gridder' + str(i), color='C' + str(i))
+            gridders.append(gridder)
+        game = SMTGame(agents=gridders, T=T, extent=self.box_extent, obstacles=self.box_obstacles)
+        game_constraints = game.get_constraints(counter_constraint=step_count_max)
+        return game_constraints
+
+    def find_contract(self, inputs, outputs, optimal=True):
+        T_upperbound = 100
+        step_count_max_upperbound = 200
+        constraints = get_game_constraints(inputs, outputs, T, step_count_max)
+        with Solver(name='z3') as solver:
+            solver.add_assertion(constraints)
+            if solver.solve():
+                pass
+
 class InterRegion:
     def __init__(self, list_of_regions):
         self.regions = list_of_regions
@@ -86,7 +128,7 @@ class InterRegion:
         self.connectivity_map = self.get_connectivity_map()
 
     def get_region_id_to_region_map(self):
-        region_id_to_region_map = {region.id for region in
+        region_id_to_region_map = {region.id: region for region in
                 self.regions}
         return region_id_to_region_map
 
@@ -94,7 +136,7 @@ class InterRegion:
         connectivity_map = dict()
         for from_region_idx in range(len(self.regions)):
             from_region = self.regions[from_region_idx]
-            for to_region_idx in range(from_region_idx, len(self.regions)):
+            for to_region_idx in range(from_region_idx+1, len(self.regions)):
                 to_region = self.regions[to_region_idx]
                 for from_node in from_region.nodes:
                     for to_node in to_region.nodes:
@@ -147,5 +189,3 @@ if __name__ == '__main__':
             plt.plot(x, y, color+symbol, markersize=markersize)
     plt.axis('scaled')
     plt.show()
-
-

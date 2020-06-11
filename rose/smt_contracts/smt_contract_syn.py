@@ -1,6 +1,7 @@
 """
 Tung Phan
 """
+from eventlet.timeout import Timeout
 import timeout_decorator
 import scipy.interpolate
 import subprocess
@@ -197,15 +198,102 @@ def create_random_obstacles(N, extent, agents):
     obstacles = random.sample(unused_locations, N)
     return obstacles
 
+
+def make_partition_game():
+    N = 6
+    all_nodes = [(i,j) for i in range(N) for j in range(N)]
+    node_to_index_dict = {node: node_idx for node_idx, node in enumerate(all_nodes)}
+
+    io_map = od()
+    io_map[(0,0)] = [(2,N-1), (3,N-1)] # input to outputs
+    io_map[(4,0)] = [(N-1,N-1)]
+
+    # for each of these, we will create a different color
+
+    # build variable dictionary for whole grid
+    vars_dict = od()
+    for inp_idx, inp in enumerate(io_map.keys()):
+        input_var_name = 'in'+str(inp_idx)
+        output_var_name = 'out'+str(inp_idx)
+        vars_dict[inp] = [None] * len(all_nodes)
+        for out in io_map[inp]:
+            vars_dict[out] = [None] * len(all_nodes)
+        for node_idx, node in enumerate(all_nodes):
+            var_name = input_var_name+'_'+str(node_idx)
+            vars_dict[inp][node_idx] = Symbol(var_name)
+            for out_idx, out in enumerate(io_map[inp]):
+                var_name = output_var_name + '_' + str(out_idx) + '_' + str(node_idx) # out + in_idx + out_idx + node_idx
+                vars_dict[out][node_idx] = Symbol(var_name)
+
+    vars_io_map = od() # I/O map/variable (name) version
+    vars_dict_with_var_key = od() # same as vars_dict but with variables as keys
+    for inp in io_map:
+        node_idx = node_to_index_dict[inp]
+        inp_var = vars_dict[inp][node_idx]
+        vars_io_map[inp_var] = []
+        vars_dict_with_var_key[inp_var] = vars_dict[inp]
+        for out in io_map[inp]:
+            node_idx = node_to_index_dict[out]
+            out_var = vars_dict[out][node_idx]
+            vars_io_map[inp_var].append(out_var)
+            vars_dict_with_var_key[out_var] = vars_dict[out]
+
+    return vars_io_map, vars_dict_with_var_key
+
+def add_game_constraints(io_map, vars_dict):
+    constraints = []
+    all_vars = [var for io_var in vars_dict for var in vars_dict[io_var]]
+    init_vars = []
+    for io_var in vars_dict:
+        # input/output must be colored correctly
+        constraints.append(io_var)
+        init_vars.append(io_var)
+        io_var_idx = vars_dict[io_var].index(io_var)
+        # input/output must not be colored with anything else
+        other_colors = [vars_dict[var][io_var_idx] for var in vars_dict if var != io_var]
+        init_vars = init_vars + other_colors
+        constraints.append(Not(Or(other_colors)))
+
+    # each non-initial node must belong to a unique player
+    players = dict()
+    for inp in io_map:
+        players[inp] = []
+        for inp_var_idx, inp_var in enumerate(vars_dict[inp]):
+            player_vars = []
+            if inp_var not in init_vars:
+                player_vars.append(inp_var)
+                for out in io_map[inp]:
+                    player_vars.append(vars_dict[out][inp_var_idx])
+                players[inp].append(player_vars)
+    N = len(players[inp]) # depends on loop before
+
+    prod_set = [[And(players[player][node_idx]) for player in players] for
+        node_idx in range(N)]
+
+    # add unique player constraints
+    for constr in prod_set:
+        constraints.append(ExactlyOne(constr))
+
+    # add connectivity constraints
+
+
+
+
+    return constraints
+
+infos = make_partition_game()
+add_game_constraints(infos[0], infos[1])
+st()
+
 if __name__ == '__main__':
     random.seed(0)
-    T = 15
+    T = 6
     N_obstacles = 6
     N_gridders = 4
-    step_count_max = 25
+    step_count_max = 15
     map_length = 7
-    x_extent = [0, map_length]
-    y_extent = [0, map_length]
+    x_extent = [2, map_length]
+    y_extent = [2, map_length]
     extent = x_extent + y_extent
     # randomly create robots
     gridders = create_random_gridders(N=N_gridders, extent=extent)
@@ -214,6 +302,13 @@ if __name__ == '__main__':
     game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
     constraints = game.get_constraints(counter_constraint=step_count_max)
     N_interp = 4
+#    try:
+#        timeout = Timeout(2, 'timed out!!')
+#        while timeout:
+#            pass
+#    finally:
+#        timeout.cancel()
+
     with Solver(name='z3') as solver:
         solver.add_assertion(constraints)
         # clear all figures in /figs/
