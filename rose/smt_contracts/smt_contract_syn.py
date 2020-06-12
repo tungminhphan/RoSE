@@ -275,11 +275,14 @@ def add_game_constraints(io_map, vars_dict):
         constraints.append(ExactlyOne(constr))
 
     # add connectivity constraints
-
-
-
+    st()
 
     return constraints
+
+def find_neighbors(node, node_list):
+    return [(node[0]+i*j, node[1]+(i+1)%2*j) for i in [0, 1]
+            for j in [-1, 1] if (node[0]+i*j,
+            node[1]+(i+1)%2*j) in node_list]
 
 infos = make_partition_game()
 add_game_constraints(infos[0], infos[1])
