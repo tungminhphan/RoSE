@@ -8,7 +8,7 @@ import subprocess
 from ipdb import set_trace as st
 from pysmt.shortcuts import (Symbol, LE, GE, Int, And, Or, Equals,
         NotEquals, Plus, Minus, Solver, ExactlyOne, Iff, Ite, Not,
-        AtMostOne, Max)
+        AtMostOne, Max, Implies)
 from pysmt.typing import INT, BOOL
 from collections import OrderedDict as od
 import numpy as np
@@ -198,95 +198,140 @@ def create_random_obstacles(N, extent, agents):
     obstacles = random.sample(unused_locations, N)
     return obstacles
 
+class PartitionQuery:
+    def __init__(self, node_list, io_map):
+        self.node_list = node_list
+        self.io_map = io_map
+        self.vars_io_map, self.vars_dict_with_var_key = self.create_variable_maps()
+        self.player_color_dict = self.get_player_colors()
 
-def make_partition_game():
-    N = 6
-    all_nodes = [(i,j) for i in range(N) for j in range(N)]
-    node_to_index_dict = {node: node_idx for node_idx, node in enumerate(all_nodes)}
+    def create_variable_maps(self):
+        # build variable dictionary for whole grid
+        # each player controlling an input
+        vars_dict = od()
+        for inp_idx, inp in enumerate(io_map.keys()):
+            input_var_name = 'player'+str(inp_idx)
+            vars_dict[inp] = [None] * len(node_list)
+            for node_idx, node in enumerate(node_list):
+                var_name = input_var_name+'_'+str(node_idx)
+                vars_dict[inp][node_idx] = Symbol(var_name, INT)
 
-    io_map = od()
-    io_map[(0,0)] = [(2,N-1), (3,N-1)] # input to outputs
-    io_map[(4,0)] = [(N-1,N-1)]
+        vars_io_map = od() # I/O map/variable (name) version
+        vars_dict_with_var_key = od()
+        for inp in io_map:
+            node_idx = node_list.index(inp)
+            inp_var = vars_dict[inp][node_idx]
+            vars_dict_with_var_key[inp_var] = vars_dict[inp]
+            vars_io_map[inp_var] = []
+            for out in io_map[inp]:
+                node_idx = node_list.index(out)
+                out_var = vars_dict[inp][node_idx]
+                vars_io_map[inp_var].append(out_var)
 
-    # for each of these, we will create a different color
+        return vars_io_map, vars_dict_with_var_key
 
-    # build variable dictionary for whole grid
-    vars_dict = od()
-    for inp_idx, inp in enumerate(io_map.keys()):
-        input_var_name = 'in'+str(inp_idx)
-        output_var_name = 'out'+str(inp_idx)
-        vars_dict[inp] = [None] * len(all_nodes)
-        for out in io_map[inp]:
-            vars_dict[out] = [None] * len(all_nodes)
-        for node_idx, node in enumerate(all_nodes):
-            var_name = input_var_name+'_'+str(node_idx)
-            vars_dict[inp][node_idx] = Symbol(var_name)
-            for out_idx, out in enumerate(io_map[inp]):
-                var_name = output_var_name + '_' + str(out_idx) + '_' + str(node_idx) # out + in_idx + out_idx + node_idx
-                vars_dict[out][node_idx] = Symbol(var_name)
+    def get_constraints(self):
+        io_map = self.vars_io_map
+        vars_dict = self.vars_dict_with_var_key
+        constraints = []
+        for inp_var in vars_dict:
+            # inputs must have 0 distances
+            constraints.append(Equals(inp_var, Int(0)))
+            for other_var in [var for var in vars_dict[inp_var] if var != inp_var]:
+                if other_var in io_map[inp_var]:
+                    # if is an output var, must be reachable
+                    constraints.append(GE(other_var, Int(1)))
+                else:
+                    # if is not i/o var
+                    constraints.append(Or(GE(other_var, Int(1)), Equals(other_var, Int(-1))))
 
-    vars_io_map = od() # I/O map/variable (name) version
-    vars_dict_with_var_key = od() # same as vars_dict but with variables as keys
-    for inp in io_map:
-        node_idx = node_to_index_dict[inp]
-        inp_var = vars_dict[inp][node_idx]
-        vars_io_map[inp_var] = []
-        vars_dict_with_var_key[inp_var] = vars_dict[inp]
-        for out in io_map[inp]:
-            node_idx = node_to_index_dict[out]
-            out_var = vars_dict[out][node_idx]
-            vars_io_map[inp_var].append(out_var)
-            vars_dict_with_var_key[out_var] = vars_dict[out]
+        # each non-initial node must belong to a unique player
+        N = len(vars_dict[list(vars_dict.keys())[0]])
+        for idx in range(N):
+            player_choices = []
+            for inp_var in vars_dict:
+                var = vars_dict[inp_var][idx]
+                var_chosen = NotEquals(var, Int(-1))
+                player_choices.append(var_chosen)
+            # each is chosen by only one player
+            constraints.append(ExactlyOne(player_choices))
 
-    return vars_io_map, vars_dict_with_var_key
+        # connectivity constraints
+        for var in vars_dict:
+            all_choices = vars_dict[var]
+            for choice_idx, choice in enumerate(all_choices):
+                if choice not in vars_dict:
+                    choice_xy = self.node_list[choice_idx]
+                    choice_neighbors_idx = [self.node_list.index(neighbor_xy) for neighbor_xy in find_neighbors(choice_xy, self.node_list)]
+                    choice_neighbors = [all_choices[idx] for idx in choice_neighbors_idx]
+                    connect = []
+                    for neighbor in choice_neighbors:
+                        connect.append(Implies(NotEquals(choice, Int(-1)),
+                                               Equals(choice, Plus(neighbor, Int(1)))))
+                    constraints.append(Or(connect))
+        return And(constraints)
 
-def add_game_constraints(io_map, vars_dict):
-    constraints = []
-    all_vars = [var for io_var in vars_dict for var in vars_dict[io_var]]
-    init_vars = []
-    for io_var in vars_dict:
-        # input/output must be colored correctly
-        constraints.append(io_var)
-        init_vars.append(io_var)
-        io_var_idx = vars_dict[io_var].index(io_var)
-        # input/output must not be colored with anything else
-        other_colors = [vars_dict[var][io_var_idx] for var in vars_dict if var != io_var]
-        init_vars = init_vars + other_colors
-        constraints.append(Not(Or(other_colors)))
+    def extract_solutions(self, solver):
+        soln = dict()
+        for node_idx, node in enumerate(self.node_list):
+            soln[node] = []
+            for in_var_idx, in_var in enumerate(self.vars_dict_with_var_key):
+                var = self.vars_dict_with_var_key[in_var][node_idx]
+                val = int(str(solver.get_value(var)))
+                if val >= 0:
+                    soln[node].append(list(self.io_map.keys())[in_var_idx])
+        return soln
 
-    # each non-initial node must belong to a unique player
-    players = dict()
-    for inp in io_map:
-        players[inp] = []
-        for inp_var_idx, inp_var in enumerate(vars_dict[inp]):
-            player_vars = []
-            if inp_var not in init_vars:
-                player_vars.append(inp_var)
-                for out in io_map[inp]:
-                    player_vars.append(vars_dict[out][inp_var_idx])
-                players[inp].append(player_vars)
-    N = len(players[inp]) # depends on loop before
+    def solve(self, solver='z3'):
+        soln = None
+        constraints = self.get_constraints()
 
-    prod_set = [[And(players[player][node_idx]) for player in players] for
-        node_idx in range(N)]
+        with Solver(name=solver) as solv:
+            solv.add_assertion(constraints)
+            if solv.solve():
+                print('Found a solution!')
+                soln = self.extract_solutions(solv)
+            else:
+                print('No solution found!')
+        return soln
 
-    # add unique player constraints
-    for constr in prod_set:
-        constraints.append(ExactlyOne(constr))
+    def get_player_colors(self):
+        color_dict = dict()
+        for player_idx, player in enumerate(self.io_map):
+            color_dict[player]= color='C' + str(player_idx)
+        return color_dict
 
-    # add connectivity constraints
-    st()
+    def plot_solution(self):
+        ans = self.solve()
+        if not ans:
+            print('Nothing to plot!')
+        else:
+            for node in ans:
+                for player in ans[node]:
+                    plt.plot(node[0], node[1], 'bs',
+                            markersize=1000/len(self.node_list),
+                            color=self.player_color_dict[player])
+            plt.axis('scaled')
+            plt.show()
 
-    return constraints
 
 def find_neighbors(node, node_list):
     return [(node[0]+i*j, node[1]+(i+1)%2*j) for i in [0, 1]
             for j in [-1, 1] if (node[0]+i*j,
             node[1]+(i+1)%2*j) in node_list]
 
-infos = make_partition_game()
-add_game_constraints(infos[0], infos[1])
+
+N = 6
+node_list = [(i,j) for i in range(N) for j in range(N)]
+io_map = od()
+io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
+io_map[(4,0)] = [(N-1,N-1)]
+io_map[(2,0)] = [(4,N-1)]
+
+query = PartitionQuery(node_list=node_list, io_map=io_map)
+ans = query.plot_solution()
 st()
+
 
 if __name__ == '__main__':
     random.seed(0)
