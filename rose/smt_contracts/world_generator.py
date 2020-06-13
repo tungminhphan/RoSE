@@ -1,3 +1,4 @@
+from zlib import crc32
 import random
 import numpy as np
 import networkx as nx
@@ -6,6 +7,19 @@ from sklearn.cluster import SpectralClustering
 from ipdb import set_trace as st
 import matplotlib.pyplot as plt
 import smt_contract_syn as syn
+import dill as pickle
+import copy as cp
+
+def bytes_to_float(b):
+    return float(crc32(b) & 0xffffffff) / 2**32
+def string_to_float(string, encoding="utf-8"):
+    return bytes_to_float(string.encode(encoding))
+
+def string_to_rgb(string):
+    rgb = []
+    for substr in [string, string+'0', '0'+string]:
+        rgb.append(string_to_float(substr))
+    return rgb
 
 class Map:
     def __init__(self, extent, obstacles):
@@ -60,9 +74,10 @@ class Region:
     def __init__(self, nodes, region_id):
         self.nodes = nodes
         self.id = region_id
-        self.boundary_nodes = self.find_boundary_nodes()
         self.box_extent = self.find_box_extent()
         self.box_obstacles = self.find_box_obstacles()
+        self.internal_obstacles = self.find_internal_obstacles()
+        self.boundary_nodes = self.find_boundary_nodes()
 
     def find_box_obstacles(self):
         box_obstacles = []
@@ -73,6 +88,15 @@ class Region:
                     box_obstacles.append((x,y))
         return box_obstacles
 
+    def find_internal_obstacles(self):
+        internal_obstacles = []
+        for node in self.box_obstacles:
+            displacements = [[1,0],[0,1],[-1,0],[0,-1]]
+            neighbors = [(node[0]+displacement[0], node[1]+displacement[1]) for displacement in displacements]
+            if np.all([neighbor in self.nodes for neighbor in neighbors]):
+                internal_obstacles.append(node)
+        return internal_obstacles
+
     def find_boundary_nodes(self):
         boundary_nodes = []
         for node in self.nodes:
@@ -81,8 +105,8 @@ class Region:
         return boundary_nodes
 
     def find_box_extent(self):
-        x_coords = [node[0] for node in self.boundary_nodes]
-        y_coords = [node[1] for node in self.boundary_nodes]
+        x_coords = [node[0] for node in self.nodes]
+        y_coords = [node[1] for node in self.nodes]
         x_extent = [min(x_coords), max(x_coords)]
         y_extent = [min(y_coords), max(y_coords)]
         return x_extent + y_extent
@@ -95,7 +119,7 @@ class Region:
         displacements = [[1,0],[0,1],[-1,0],[0,-1]]
         for displacement in displacements:
             adjacent_node = (node[0]+displacement[0], node[1]+displacement[1])
-            if adjacent_node not in self.nodes:
+            if adjacent_node not in self.nodes + self.internal_obstacles:
                 return True
         return False
 
@@ -162,30 +186,38 @@ def clusters_to_regions(cluster_map):
     return regions
 
 if __name__ == '__main__':
-    random.seed(0)
-    N_obstacles = 15
-    N_clusters = 10
-    map_length = 15
-    x_extent = [0, map_length]
-    y_extent = [0, map_length]
-    extent = x_extent + y_extent
-    obstacles = scs.create_random_obstacles(N=N_obstacles, extent=extent,
-            agents=[])
-    the_map = Map(extent, obstacles)
-    cluster_map = the_map.get_clusters(N=N_clusters)
-    regions = clusters_to_regions(cluster_map)
-    interregion = InterRegion(regions)
+    load_and_run = True
+    if not load_and_run:
+        random.seed(0)
+        N_obstacles = 200
+        N_clusters = 50
+        map_length = 50
+        x_extent = [0, map_length]
+        y_extent = [0, map_length]
+        extent = x_extent + y_extent
+        obstacles = scs.create_random_obstacles(N=N_obstacles, extent=extent,
+                agents=[])
+        the_map = Map(extent, obstacles)
+        cluster_map = the_map.get_clusters(N=N_clusters)
+        regions = clusters_to_regions(cluster_map)
+        interregion = InterRegion(regions)
+        with open('interregion.pkl', 'wb+') as f:
+            pickle.dump(interregion, f)
+    else:
+        with open('interregion.pkl', 'rb') as f:
+            interregion = pickle.load(f)
+    regions = cp.deepcopy(interregion.regions)
     for region in regions:
         region_id = region.id
         for node in region.nodes:
             x, y = node
-            color = 'C' + str(region_id)
+            color = string_to_rgb(str(region.id))
             if node not in region.boundary_nodes:
                 markersize = '10'
-                symbol = 'x'
+                symbol = 'o'
             else:
                 markersize = '10'
                 symbol = 'o'
-            plt.plot(x, y, color+symbol, markersize=markersize)
+            plt.plot(x, y, symbol, color=color, markersize=markersize)
     plt.axis('scaled')
     plt.show()

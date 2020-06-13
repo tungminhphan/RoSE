@@ -321,16 +321,16 @@ def find_neighbors(node, node_list):
             node[1]+(i+1)%2*j) in node_list]
 
 
-N = 6
-node_list = [(i,j) for i in range(N) for j in range(N)]
-io_map = od()
-io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
-io_map[(4,0)] = [(N-1,N-1)]
-io_map[(2,0)] = [(4,N-1)]
-
-query = PartitionQuery(node_list=node_list, io_map=io_map)
-ans = query.plot_solution()
-st()
+#N = 6
+#node_list = [(i,j) for i in range(N) for j in range(N)]
+#io_map = od()
+#io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
+#io_map[(4,0)] = [(N-1,N-1)]
+#io_map[(2,0)] = [(4,N-1)]
+#
+#query = PartitionQuery(node_list=node_list, io_map=io_map)
+#ans = query.plot_solution()
+#st()
 
 
 if __name__ == '__main__':
