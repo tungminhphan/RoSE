@@ -204,6 +204,7 @@ class PartitionQuery:
         self.io_map = io_map
         self.vars_io_map, self.vars_dict_with_var_key = self.create_variable_maps()
         self.player_color_dict = self.get_player_colors()
+        self.token_dict = self.get_token_dict()
 
     def create_variable_maps(self):
         # build variable dictionary for whole grid
@@ -298,8 +299,17 @@ class PartitionQuery:
     def get_player_colors(self):
         color_dict = dict()
         for player_idx, player in enumerate(self.io_map):
-            color_dict[player]= color='C' + str(player_idx)
+            color_dict[player]= 'C' + str(player_idx)
         return color_dict
+
+    def get_token_dict(self):
+        token_dict = dict()
+        for player_idx, player in enumerate(self.io_map):
+            token_dict[player] = 'X'
+            for sink in self.io_map[player]:
+                if sink not in token_dict:
+                    token_dict[sink] = '^'
+        return token_dict
 
     def plot_solution(self):
         ans = self.solve()
@@ -308,7 +318,11 @@ class PartitionQuery:
         else:
             for node in ans:
                 for player in ans[node]:
-                    plt.plot(node[0], node[1], 'bs',
+                    if node not in self.token_dict:
+                        symbol = 'bs'
+                    else:
+                        symbol = self.token_dict[node]
+                    plt.plot(node[0], node[1], symbol,
                             markersize=1000/len(self.node_list),
                             color=self.player_color_dict[player])
             plt.axis('scaled')
@@ -321,16 +335,16 @@ def find_neighbors(node, node_list):
             node[1]+(i+1)%2*j) in node_list]
 
 
-#N = 6
-#node_list = [(i,j) for i in range(N) for j in range(N)]
-#io_map = od()
-#io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
-#io_map[(4,0)] = [(N-1,N-1)]
-#io_map[(2,0)] = [(4,N-1)]
-#
-#query = PartitionQuery(node_list=node_list, io_map=io_map)
-#ans = query.plot_solution()
-#st()
+N = 6
+node_list = [(i,j) for i in range(N) for j in range(N)]
+io_map = od()
+io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
+io_map[(4,0)] = [(N-1,N-1)]
+io_map[(2,0)] = [(4,N-1)]
+
+query = PartitionQuery(node_list=node_list, io_map=io_map)
+ans = query.plot_solution()
+st()
 
 
 if __name__ == '__main__':
