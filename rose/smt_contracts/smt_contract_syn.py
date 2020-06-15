@@ -231,10 +231,38 @@ class PartitionQuery:
 
         return vars_io_map, vars_dict_with_var_key
 
-    def get_constraints(self):
+    def get_conflict_counter_variable(self):
+        io_map = self.vars_io_map
+        vars_dict = self.vars_dict_with_var_key
+        counter_vars_indicator_list = dict()
+        for var in vars_dict:
+            all_choices = vars_dict[var]
+            for choice_idx, choice in enumerate(all_choices):
+                if choice not in io_map:
+                    choice_xy = self.node_list[choice_idx]
+                    var = all_choices[choice_idx]
+                    indicator_var = Ite(GE(var, Int(0)), Int(1), Int(0))
+                    if choice_xy not in counter_vars_indicator_list:
+                        counter_vars_indicator_list[choice_xy] = [indicator_var]
+                    else:
+                        counter_vars_indicator_list[choice_xy].append(indicator_var)
+        all_conflicts = []
+        for xy in counter_vars_indicator_list:
+            sum_indicators = Minus(Plus(counter_vars_indicator_list[xy]), Int(1))
+            all_conflicts.append(sum_indicators)
+
+        all_conflict_count = Plus(all_conflicts)
+        return all_conflict_count
+
+    def get_constraints(self, max_conflict_num = 1):
+        self.get_conflict_counter_variable()
+        ##
         io_map = self.vars_io_map
         vars_dict = self.vars_dict_with_var_key
         constraints = []
+        if max_conflict_num != 0:
+            conflict_counter = self.get_conflict_counter_variable()
+            constraints.append(LE(conflict_counter, Int(max_conflict_num)))
         for inp_var in vars_dict:
             # inputs must have 0 distances
             constraints.append(Equals(inp_var, Int(0)))
@@ -324,7 +352,8 @@ class PartitionQuery:
                         symbol = self.token_dict[node]
                     plt.plot(node[0], node[1], symbol,
                             markersize=1000/len(self.node_list),
-                            color=self.player_color_dict[player])
+                            color=self.player_color_dict[player],
+                            alpha=0.5)
             plt.axis('scaled')
             plt.show()
 
@@ -333,7 +362,6 @@ def find_neighbors(node, node_list):
     return [(node[0]+i*j, node[1]+(i+1)%2*j) for i in [0, 1]
             for j in [-1, 1] if (node[0]+i*j,
             node[1]+(i+1)%2*j) in node_list]
-
 
 N = 6
 node_list = [(i,j) for i in range(N) for j in range(N)]
@@ -345,7 +373,6 @@ io_map[(2,0)] = [(4,N-1)]
 query = PartitionQuery(node_list=node_list, io_map=io_map)
 ans = query.plot_solution()
 st()
-
 
 if __name__ == '__main__':
     random.seed(0)
