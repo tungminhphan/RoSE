@@ -238,14 +238,13 @@ class PartitionQuery:
         for var in vars_dict:
             all_choices = vars_dict[var]
             for choice_idx, choice in enumerate(all_choices):
-                if choice not in io_map:
-                    choice_xy = self.node_list[choice_idx]
-                    var = all_choices[choice_idx]
-                    indicator_var = Ite(GE(var, Int(0)), Int(1), Int(0))
-                    if choice_xy not in counter_vars_indicator_list:
-                        counter_vars_indicator_list[choice_xy] = [indicator_var]
-                    else:
-                        counter_vars_indicator_list[choice_xy].append(indicator_var)
+                choice_xy = self.node_list[choice_idx]
+                var = all_choices[choice_idx]
+                indicator_var = Ite(GE(var, Int(0)), Int(1), Int(0))
+                if choice_xy not in counter_vars_indicator_list:
+                    counter_vars_indicator_list[choice_xy] = [indicator_var]
+                else:
+                    counter_vars_indicator_list[choice_xy].append(indicator_var)
         all_conflicts = []
         for xy in counter_vars_indicator_list:
             sum_indicators = Minus(Plus(counter_vars_indicator_list[xy]), Int(1))
@@ -254,15 +253,10 @@ class PartitionQuery:
         all_conflict_count = Plus(all_conflicts)
         return all_conflict_count
 
-    def get_constraints(self, max_conflict_num = 1):
-        self.get_conflict_counter_variable()
-        ##
+    def get_constraints(self, max_conflict_num):
         io_map = self.vars_io_map
         vars_dict = self.vars_dict_with_var_key
         constraints = []
-        if max_conflict_num != 0:
-            conflict_counter = self.get_conflict_counter_variable()
-            constraints.append(LE(conflict_counter, Int(max_conflict_num)))
         for inp_var in vars_dict:
             # inputs must have 0 distances
             constraints.append(Equals(inp_var, Int(0)))
@@ -274,16 +268,20 @@ class PartitionQuery:
                     # if is not i/o var
                     constraints.append(Or(GE(other_var, Int(1)), Equals(other_var, Int(-1))))
 
-        # each non-initial node must belong to a unique player
-        N = len(vars_dict[list(vars_dict.keys())[0]])
-        for idx in range(N):
-            player_choices = []
-            for inp_var in vars_dict:
-                var = vars_dict[inp_var][idx]
-                var_chosen = NotEquals(var, Int(-1))
-                player_choices.append(var_chosen)
-            # each is chosen by only one player
-            constraints.append(ExactlyOne(player_choices))
+            # each non-initial node must belong to a unique player
+            N = len(vars_dict[list(vars_dict.keys())[0]])
+            for idx in range(N):
+                player_choices = []
+                for inp_var in vars_dict:
+                    var = vars_dict[inp_var][idx]
+                    var_chosen = NotEquals(var, Int(-1))
+                    player_choices.append(var_chosen)
+                if max_conflict_num > 0:
+                    # each is chosen by at least one player
+                    constraints.append(Or(player_choices))
+                else:
+                    # each is chosen by only one player
+                    constraints.append(ExactlyOne(player_choices))
 
         # connectivity constraints
         for var in vars_dict:
@@ -298,6 +296,9 @@ class PartitionQuery:
                         connect.append(Implies(NotEquals(choice, Int(-1)),
                                                Equals(choice, Plus(neighbor, Int(1)))))
                     constraints.append(Or(connect))
+        if max_conflict_num > 0:
+            conflict_counter = self.get_conflict_counter_variable()
+            constraints.append(LE(conflict_counter, Int(max_conflict_num)))
         return And(constraints)
 
     def extract_solutions(self, solver):
@@ -311,9 +312,9 @@ class PartitionQuery:
                     soln[node].append(list(self.io_map.keys())[in_var_idx])
         return soln
 
-    def solve(self, solver='z3'):
+    def solve(self, max_conflict_num, solver='z3'):
         soln = None
-        constraints = self.get_constraints()
+        constraints = self.get_constraints(max_conflict_num=max_conflict_num)
 
         with Solver(name=solver) as solv:
             solv.add_assertion(constraints)
@@ -339,8 +340,8 @@ class PartitionQuery:
                     token_dict[sink] = '^'
         return token_dict
 
-    def plot_solution(self):
-        ans = self.solve()
+    def plot_solution(self, max_conflict_num=0):
+        ans = self.solve(max_conflict_num=max_conflict_num)
         if not ans:
             print('Nothing to plot!')
         else:
@@ -353,7 +354,7 @@ class PartitionQuery:
                     plt.plot(node[0], node[1], symbol,
                             markersize=1000/len(self.node_list),
                             color=self.player_color_dict[player],
-                            alpha=0.5)
+                            alpha=0.3)
             plt.axis('scaled')
             plt.show()
 
@@ -363,15 +364,22 @@ def find_neighbors(node, node_list):
             for j in [-1, 1] if (node[0]+i*j,
             node[1]+(i+1)%2*j) in node_list]
 
-N = 6
-node_list = [(i,j) for i in range(N) for j in range(N)]
-io_map = od()
-io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
-io_map[(4,0)] = [(N-1,N-1)]
-io_map[(2,0)] = [(4,N-1)]
+#max_conflict_num = 0
+#N = 6
+#node_list = [(i,j) for i in range(N) for j in range(N)]
+#io_map = od()
+#io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
+#io_map[(4,0)] = [(N-1,N-1)]
+#io_map[(2,0)] = [(4,N-1)]
+
+#max_conflict_num = 1
+#node_list = [(-1,0),(0,0),(1,0),(2,0),(3,0),(1,-2),(1,-1),(1,1),(1,2)]
+#io_map = od()
+#io_map[(-1,0)] = [(3,0)] # input to outputs
+#io_map[(1,-2)] = [(1,2)] # input to outputs
 
 query = PartitionQuery(node_list=node_list, io_map=io_map)
-ans = query.plot_solution()
+ans = query.plot_solution(max_conflict_num=max_conflict_num)
 st()
 
 if __name__ == '__main__':
