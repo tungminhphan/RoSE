@@ -18,29 +18,14 @@ from ipdb import set_trace as st
 import csv
 import networkx as nx
 from collections import OrderedDict as od
-from collections import namedtuple
 import collections
 import os
 import _pickle as pickle
 import json
 import copy as cp
 from c_tools import *
-#from plotting import traces_to_animation
+from global_constants import *
 
-DEBUGGING = False
-FIND_LEAD_AGENT_THRESHOLD = 15 #TODO: compute this automatically
-CAR_COLORS = ['blue', 'brown', 'gray', 'green', 'light_green', 'orange', 'red', 'yellow']
-IOMap = namedtuple('IOMap', ['sources','sinks','map'])
-TLNode = namedtuple('TLNode', ['xy', 'green', 'yellow', 'red'])
-Intersection = namedtuple('Intersection', ['tiles', 'pcorner', 'mcorner', 'height', 'width'])
-Neighbor = namedtuple('Neighbor', ['xyt', 'weight', 'name'])
-DIRECTION_TO_VECTOR  = od()
-DIRECTION_TO_VECTOR['east'] = [0, 1]
-DIRECTION_TO_VECTOR['west'] = [0, -1]
-DIRECTION_TO_VECTOR['north'] = [-1, 0]
-DIRECTION_TO_VECTOR['south'] = [1, 0]
-AGENT_CHAR = [str(i) for i in range(10)]
-CHOSEN_IDs = []
 
 def set_seed(seed, other_param=0):
     #other_param = 0
@@ -170,9 +155,11 @@ class Agent:
     def query_occupancy(self, ctrl, state=None):
         raise NotImplementedError
 
-    def query_next_state(self, ctrl):
+    def query_next_state(self, ctrl, state=None):
+        if state is None:
+            state = self.state
         assert ctrl in self.get_all_ctrl()
-        return self.query_occupancy(ctrl)[-1]
+        return self.query_occupancy(ctrl, state)[-1]
 
     def apply(self, ctrl):
         #print(ctrl)
@@ -201,11 +188,36 @@ class Gridder(Agent):
     def get_symbol(self):
         return '🤖'
 
-    def get_all_ctrl(self, state=None):
+    @classmethod
+    def get_all_ctrl(cls, state=None):
         return ['up', 'down', 'left', 'right', 'stay']
 
+    def get_pushforward(self, state=None):
+        if state is None:
+            state = self.state
+        forward_set = []
+        for ctrl in self.get_all_ctrl():
+            next_state = self.query_next_state(ctrl, state)
+            forward_set.append(next_state)
+        return forward_set
+
+    def get_pullback(self, state=None):
+        if state is None:
+            state = self.state
+        pullback_set = []
+        ego_state = Agent.hack_state(state, x=0, y=0)
+        ego_state_pushforward = self.get_pushforward(state=ego_state)
+        for forward_state in ego_state_pushforward:
+            dx = -forward_state.x
+            dy = -forward_state.y
+            pullback_state = Agent.hack_state(state=state,
+                                              x=state.x + dx,
+                                              y=state.y + dy)
+            pullback_set.append(pullback_state)
+        return pullback_set
+
     def query_occupancy(self, ctrl, state=None):
-        if state == None:
+        if state is None:
             state = self.state
         if ctrl == 'up':
             next_state = Agent.hack_state(state, y = state.y - 1)
@@ -1538,7 +1550,7 @@ class ContractGame(Simulation):
             agent_to_signature_map[agent] = signature, xy_to_feature_map
             if signature in agent.supervisor.contract.contract_draft:
                 # if signature already has been encountered
-                forbidden_actions = agent.supervisor.contract[signature]
+                forbidden_actions = agent.supervisor.contract.contract_draft[signature]
             else:
                 forbidden_actions = []
                 for act in agent.get_all_ctrl():
@@ -1547,7 +1559,8 @@ class ContractGame(Simulation):
                     assert next_tile in xy_to_feature_map # the frame must satisfy this assertion
                     if xy_to_feature_map[next_tile] == 'out':
                         forbidden_actions.append(act)
-                agent.supervisor.contract[signature] = forbidden_actions
+                # prevent agents from going out of bounds
+                agent.supervisor.contract.contract_draft[signature] = forbidden_actions
             agent_to_legal_action_map[agent] = tuple(set(agent.get_all_ctrl()) - set(forbidden_actions))
 
         action_set = [agent_to_legal_action_map[agent] for agent in agent_set]
@@ -1603,8 +1616,11 @@ class TrafficGame(Simulation):
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
+<<<<<<< HEAD
         self.occupancy_dict = od()
         self.update_occupancy_dict()
+=======
+>>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.car_count = 0
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
@@ -2645,12 +2661,14 @@ class Controller:
     def run_on(self, plant):
         raise NotImplementedError
 
-class CompassController(Controller):
+class ContractEnforcingController(Controller):
     def __init__(self):
-        super(CompassController, self).__init__()
+        super(ContractEnforcingController, self).__init__()
     def run_on(self, plant):
-        plant.apply(random.choice([action for action in
-            plant.get_all_ctrl() if plant]))
+        # requires that the plant has a supervisor
+        assert plant.supervisor.contract
+        allowable_actions = plant.supervisor.get_allowable_actions()
+        plant.apply(random.choice(allowable_actions))
 
 class RandomController(Controller):
     def __init__(self):
@@ -2748,100 +2766,6 @@ class ReplanProgressOracle(Oracle):
         except:
             next_distance = np.inf
         return next_distance < current_distance
-
-class IntersectionClearanceOracle(Oracle):
-    def __init__(self):
-        super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
-    def evaluate(self, ctrl_action, plant, game):
-        # return count of number of agents ahead of it in interesection
-        def count_agents_in_intersection_ahead(intersection_gap):
-            cnt = 0
-            # check for number of agents ahead in intersection
-            forward = DIRECTION_TO_VECTOR[plant.state.heading]
-            curr_st = np.array([plant.state.x, plant.state.y])
-            for i in range(1, intersection_gap):
-                next_tile_tuple = tuple(curr_st + i*np.array(forward))
-                # if there is an agent there, then count it
-                if next_tile_tuple in game.occupancy_dict:
-                    cnt = cnt + 1
-            return cnt
-
-        self.clearance_straight_info = None
-        current_state = plant.state.x, plant.state.y
-        x_curr, y_curr = current_state
-        next_state = plant.query_next_state(ctrl_action)
-        x_next, y_next = next_state.x, next_state.y
-        # need to check whether agent backup plan at next state will be in intersection
-        bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
-        x_next_bp, y_next_bp = bp_state.x, bp_state.y
-
-        # check if not crossing into an intersection
-        try:
-            currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
-            will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
-            bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
-        except:
-            return True
-        if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
-            return True
-        else:
-            #print("action crossing into intersection")
-            # if indeed crossing into an intersection
-            # check if attempting to perform a left turn
-            current_subgoal = plant.supervisor.subgoals[0]
-            # figure out what intersection is being entered
-            next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
-            current_heading = plant.state.heading
-            # confirm intention to perform left turn; TODO: generalize this check
-            if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
-                # left turn is confirmed
-                heading_degrees = Car.convert_orientation(current_heading)
-                left_heading_degrees  = (heading_degrees + 90) % 360
-                left_heading = Car.convert_orientation(left_heading_degrees)
-                forward = DIRECTION_TO_VECTOR[current_heading]
-                next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
-                while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
-                    next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
-                reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
-
-                if current_heading in ['east', 'west']:
-                    intersection_gap = next_intersection.height
-                else:
-                    intersection_gap = next_intersection.width
-                lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
-                if lead_agent:
-                    width, _= plant.get_width_along_bundle()
-                    reference_state_bundle_width = width + 1
-                    num_residual_tiles = intersection_gap - reference_state_bundle_width
-                    clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))
-                else:
-                    clearance = np.inf
-                return clearance > intersection_gap #TODO: find a better bound
-
-            else: # going straight
-                #print("entering intersection straight with intention to move straight")
-                # save intersection gap,
-                if current_heading in ['east', 'west']:
-                    intersection_gap = next_intersection.width
-                else:
-                    intersection_gap = next_intersection.height
-                # count the number of agents in intersection ahead of it
-                agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
-                lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
-                if lead_agent:
-                    clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
-                else:
-                    clearance = np.inf
-
-                if lead_agent is None:
-                    x_sv = None
-                    y_sv = None
-                else:
-                    x_sv = lead_agent.state.x
-                    y_sv = lead_agent.state.y
-
-                self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
-                return clearance > intersection_gap #TODO: find a better bound
 
 class PathProgressOracle(Oracle):
     # requires a supervisor controller
@@ -3008,12 +2932,21 @@ class LocalContractSupervisor(Supervisor):
         self.game = game
         self.goal = goal
         self.contract = contract
+        self.plant = None
 
     def get_next_goal_and_plan(self):
         return self.goal, None
 
     def check_goals(self):
         pass
+
+    def get_allowable_actions(self):
+        signature, mask = self.contract.frame.get_signature(game=self.game, agent=self.plant)
+        try:
+            return self.contract.contract_draft[signature]
+        except KeyError:
+            print('signature is not in contract so allowing everything')
+            return self.plant.get_all_ctrl()
 
 class GoalExit(Supervisor):
     def __init__(self, game, goals=None):
@@ -3354,8 +3287,13 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
+<<<<<<< HEAD
     def __init__(self, game_map, save_debug_info=True):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
+=======
+    def __init__(self, game_map):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
+>>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         self.bundle_to_agent_precedence = None
         self.simulated_agents = []

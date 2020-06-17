@@ -90,7 +90,7 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure
-def plot_map(map, grid_on=True):
+def plot_map(map, grid_on=False):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
     ax.set_xlim(x_min, x_max)
