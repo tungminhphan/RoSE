@@ -1,7 +1,6 @@
 """
 Tung Phan
 """
-from eventlet.timeout import Timeout
 import timeout_decorator
 import scipy.interpolate
 import subprocess
@@ -14,6 +13,7 @@ from collections import OrderedDict as od
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+from pysmt.exceptions import SolverReturnedUnknownResultError
 
 def Abs(x):
     return Max(x, -x)
@@ -325,19 +325,98 @@ class PartitionQuery:
                     soln[node].append(list(self.io_map.keys())[in_var_idx])
         return soln
 
-    def solve(self, max_conflict_num, max_reach_length_sum, solver_name='z3'):
+    def bisect_solve(self, solver_name='z3', timeout=1000):
+        # bisection prioritizing low conflicts then short paths
+        max_conflict_num = len(self.node_list) * len(self.io_map.keys())
+        max_reach_length_sum = max_conflict_num
+
+        conflict_num_upper = max_conflict_num
+        conflict_num_lower = 0
+        reach_length_upper = max_reach_length_sum
+        reach_length_lower = 0
+        soln = None
+        while conflict_num_upper != conflict_num_lower:
+            if conflict_num_upper > conflict_num_lower + 1:
+                conflict_num_mid = (conflict_num_upper + conflict_num_lower) // 2
+            else:
+                if soln:
+                    new_soln = self.solve(max_conflict_num=conflict_num_lower,
+                            max_reach_length_sum=reach_length_upper,
+                            timeout=timeout)
+                    if new_soln:
+                        conflict_num_mid = conflict_num_lower
+                        soln = new_soln
+                        print(conflict_num_mid, reach_length_upper)
+                        break
+                    else:
+                        break
+                else:
+                    conflict_num_lower = conflict_num_upper
+                    conflict_num_mid = conflict_num_upper
+
+            soln = self.solve(max_conflict_num=conflict_num_mid,
+                    max_reach_length_sum=reach_length_upper,
+                    timeout=timeout)
+            if soln:
+                conflict_num_upper = conflict_num_mid
+                print(conflict_num_mid, reach_length_upper)
+            else:
+                conflict_num_lower = conflict_num_mid
+
+        if soln:
+            while reach_length_upper != reach_length_lower:
+                if reach_length_upper > reach_length_lower + 1:
+                    reach_length_mid = (reach_length_upper +
+                            reach_length_lower) // 2
+                else:
+                    if soln:
+                        new_soln = self.solve(max_conflict_num=conflict_num_mid,
+                                max_reach_length_sum=reach_length_lower,
+                                timeout=timeout)
+                        if new_soln:
+                            reach_length_mid = reach_length_lower
+                            soln = new_soln
+                            print(conflict_num_mid, reach_length_mid)
+                            break
+                        else:
+                            break
+                    else:
+                        reach_length_lower = reach_length_upper
+                        reach_length_mid = reach_length_upper
+                soln = self.solve(max_conflict_num=conflict_num_mid,
+                        max_reach_length_sum=reach_length_mid,
+                        timeout=timeout)
+                if soln:
+                    reach_length_upper = reach_length_mid
+                    print(conflict_num_mid, reach_length_mid)
+                else:
+                    if reach_length_lower != reach_length_mid:
+                        reach_length_lower = reach_length_mid
+                    else:
+                        reach_length_lower = reach_length_upper
+                    print('searching between')
+                    print(reach_length_upper, reach_length_lower)
+        return soln
+
+
+    def solve(self, max_conflict_num, max_reach_length_sum,
+            solver_name='z3', timeout=None):
         soln = None
         constraints = self.get_constraints(max_conflict_num=max_conflict_num,max_reach_length_sum=max_reach_length_sum)
 
         options = dict()
-        options['solver_options'] = {'timeout': 500}
+        if timeout:
+            options['solver_options'] = {'timeout': timeout}
         smt_solver = Solver(name=solver_name, logic=None, **options)
         smt_solver.add_assertion(constraints)
-        if smt_solver.solve():
-            print('Found a solution!')
-            soln = self.extract_solutions(smt_solver)
-        else:
-            print('No solution found!')
+        try:
+            if smt_solver.solve():
+                print('Found a solution!')
+                soln = self.extract_solutions(smt_solver)
+            else:
+                print('No solution found!')
+        except SolverReturnedUnknownResultError:
+            print('Timed out!')
         return soln
 
     def get_player_colors(self):
@@ -356,7 +435,8 @@ class PartitionQuery:
         return token_dict
 
     def plot_solution(self, max_conflict_num, max_reach_length_sum):
-        ans = self.solve(max_conflict_num=max_conflict_num, max_reach_length_sum=max_reach_length_sum)
+#        ans = self.solve(max_conflict_num=max_conflict_num, max_reach_length_sum=max_reach_length_sum)
+        ans = self.bisect_solve()
         if not ans:
             print('Nothing to plot!')
         else:
@@ -395,12 +475,6 @@ def run_robot_strategy_synthesis():
     game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
     constraints = game.get_constraints(counter_constraint=step_count_max)
     N_interp = 4
-#    try:
-#        timeout = Timeout(2, 'timed out!!')
-#        while timeout:
-#            pass
-#    finally:
-#        timeout.cancel()
 
     with Solver(name='z3') as solver:
         solver.add_assertion(constraints)
@@ -455,9 +529,6 @@ def run_robot_strategy_synthesis():
             plt.xlim(game.extent[0], game.extent[1])
             plt.ylim(game.extent[2], game.extent[3])
             fig.savefig('./figs/'+str(0).zfill(5)+'.png', dpi=fig.dpi)
-
-def bisection_solve(solver):
-    st()
 
 def run_partition_synthesis():
     #max_conflict_num = 0
