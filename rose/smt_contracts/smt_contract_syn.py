@@ -1,7 +1,6 @@
 """
 Tung Phan
 """
-import timeout_decorator
 import scipy.interpolate
 import subprocess
 from ipdb import set_trace as st
@@ -325,7 +324,7 @@ class PartitionQuery:
                     soln[node].append(list(self.io_map.keys())[in_var_idx])
         return soln
 
-    def bisect_solve(self, solver_name='z3', timeout=1000):
+    def bisect_solve(self, solver_name='z3', timeout=10000):
         # bisection prioritizing low conflicts then short paths
         max_conflict_num = len(self.node_list) * len(self.io_map.keys())
         max_reach_length_sum = max_conflict_num
@@ -334,69 +333,41 @@ class PartitionQuery:
         conflict_num_lower = 0
         reach_length_upper = max_reach_length_sum
         reach_length_lower = 0
-        soln = None
-        while conflict_num_upper != conflict_num_lower:
-            if conflict_num_upper > conflict_num_lower + 1:
-                conflict_num_mid = (conflict_num_upper + conflict_num_lower) // 2
-            else:
-                if soln:
-                    new_soln = self.solve(max_conflict_num=conflict_num_lower,
-                            max_reach_length_sum=reach_length_upper,
-                            timeout=timeout)
-                    if new_soln:
-                        conflict_num_mid = conflict_num_lower
-                        soln = new_soln
-                        print(conflict_num_mid, reach_length_upper)
-                        break
-                    else:
-                        break
-                else:
-                    conflict_num_lower = conflict_num_upper
-                    conflict_num_mid = conflict_num_upper
+        new_soln = None
+        last_soln = None
+        while conflict_num_upper >= conflict_num_lower:
+            conflict_num_mid = (conflict_num_upper + conflict_num_lower) // 2
 
-            soln = self.solve(max_conflict_num=conflict_num_mid,
+            new_soln = self.solve(max_conflict_num=conflict_num_mid,
                     max_reach_length_sum=reach_length_upper,
                     timeout=timeout)
-            if soln:
-                conflict_num_upper = conflict_num_mid
+            if new_soln:
+                last_soln = new_soln
                 print(conflict_num_mid, reach_length_upper)
+                conflict_num_upper = conflict_num_mid - 1
+                if conflict_num_upper == conflict_num_lower:
+                    # break so don't have to resolve
+                    break
             else:
-                conflict_num_lower = conflict_num_mid
+                conflict_num_lower = conflict_num_mid + 1
 
-        if soln:
-            while reach_length_upper != reach_length_lower:
-                if reach_length_upper > reach_length_lower + 1:
-                    reach_length_mid = (reach_length_upper +
-                            reach_length_lower) // 2
-                else:
-                    if soln:
-                        new_soln = self.solve(max_conflict_num=conflict_num_mid,
-                                max_reach_length_sum=reach_length_lower,
-                                timeout=timeout)
-                        if new_soln:
-                            reach_length_mid = reach_length_lower
-                            soln = new_soln
-                            print(conflict_num_mid, reach_length_mid)
-                            break
-                        else:
-                            break
-                    else:
-                        reach_length_lower = reach_length_upper
-                        reach_length_mid = reach_length_upper
-                soln = self.solve(max_conflict_num=conflict_num_mid,
+        if last_soln:
+            while reach_length_upper >= reach_length_lower:
+                reach_length_mid = (reach_length_upper + reach_length_lower) // 2
+                new_soln = self.solve(max_conflict_num=conflict_num_mid,
                         max_reach_length_sum=reach_length_mid,
                         timeout=timeout)
-                if soln:
-                    reach_length_upper = reach_length_mid
+                if new_soln:
+                    last_soln = new_soln
                     print(conflict_num_mid, reach_length_mid)
+                    reach_length_upper = reach_length_mid - 1
+                    if reach_length_upper == reach_length_lower:
+                        # break so don't have to resolve
+                        break
                 else:
-                    if reach_length_lower != reach_length_mid:
-                        reach_length_lower = reach_length_mid
-                    else:
-                        reach_length_lower = reach_length_upper
-                    print('searching between')
-                    print(reach_length_upper, reach_length_lower)
-        return soln
+                    reach_length_lower = reach_length_mid + 1
+                    print('searching between ' + str(reach_length_lower) + ' and ' + str(reach_length_upper))
+        return last_soln
 
 
     def solve(self, max_conflict_num, max_reach_length_sum,
@@ -541,13 +512,14 @@ def run_partition_synthesis():
 
     max_conflict_num = 0
     max_reach_length_sum = 25
-    N = 7
-    node_list = [(i-2,j-2) for i in range(N) for j in range(N)]
+    N = 8
+    node_list = [(i-3,j-3) for i in range(N) for j in range(N)]
     #node_list = [(-1,0),(0,0),(1,0),(2,0),(3,0),(1,-2),(1,-1),(1,1),(1,2)]
     io_map = od()
-    io_map[(-2,0)] = [(3,0)] # input to outputs
+    io_map[(-3,0)] = [(4,0)] # input to outputs
     io_map[(1,-2)] = [(1,3)] # input to outputs
-    io_map[(-2,3)] = [(2,0)] # input to outputs
+    io_map[(-2,3)] = [(3,0)] # input to outputs
+    io_map[(4,2)] = [(2,-2)] # input to outputs
 
     query = PartitionQuery(node_list=node_list, io_map=io_map)
     ans = query.plot_solution(max_conflict_num=max_conflict_num, max_reach_length_sum=max_reach_length_sum)
