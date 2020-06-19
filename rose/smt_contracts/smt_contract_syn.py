@@ -65,11 +65,10 @@ class SMTGridder:
             moves.append(Ite(And(Equals(x, x_next), Equals(y, y_next)), Int(0), Int(1)))
         return Equals(counter_var, Plus(moves))
 
-    def get_solved_states_at(self, solver, t):
+    def get_solved_states_at(self, soln, t):
         states = od()
         for state_variable  in self.state_variables:
-            var = Symbol(self.name + '_' + state_variable + str(t), self.state_variables[state_variable])
-            states[state_variable] = solver.get_value(var)
+            states[state_variable] = soln[self][state_variable][t]
         return states
 
     def print_solved_values(self, solver, T):
@@ -83,40 +82,41 @@ class SMTGridder:
             print(printout)
             t += 1
 
-def get_obstacle_collision_constraints(agent, obstacles, T):
-    constraints = []
-    for t in range(T):
-        for obstacle in obstacles:
-            ox, oy = obstacle
-            x, y = agent.get_state_variables_at(t)
-            constraints.append(AtMostOne(Equals(x, Int(ox)), Equals(y, Int(oy))))
-    return constraints
-
-def get_pairwise_collision_constraints(agent1, agent2, T):
-    constraints = []
-    for t in range(T):
-        equals = []
-        x1, y1 = agent1.get_state_variables_at(t)
-        x2, y2 = agent2.get_state_variables_at(t)
-        constraints.append(Or(NotEquals(x1, x2),
-                              NotEquals(y1, y2)))
-        if t < T:
-            exchange = []
-            x1n, y1n = agent1.get_state_variables_at(t+1)
-            x2n, y2n = agent2.get_state_variables_at(t+1)
-            exchange.append(NotEquals(x1, x2n))
-            exchange.append(NotEquals(y1, y2n))
-            exchange.append(NotEquals(x2, x1n))
-            exchange.append(NotEquals(y2, y1n))
-            constraints.append(Or(exchange))
-    return And(constraints)
-
 class SMTGame:
     def __init__(self, agents, T, extent=[], obstacles=[]):
         self.agents = agents
         self.T = T
         self.extent = extent
         self.obstacles = obstacles
+
+    def get_pairwise_collision_constraints(self, agent1, agent2, T):
+        constraints = []
+        for t in range(T):
+            equals = []
+            x1, y1 = agent1.get_state_variables_at(t)
+            x2, y2 = agent2.get_state_variables_at(t)
+            constraints.append(Or(NotEquals(x1, x2),
+                                  NotEquals(y1, y2)))
+            if t < T:
+                exchange = []
+                x1n, y1n = agent1.get_state_variables_at(t+1)
+                x2n, y2n = agent2.get_state_variables_at(t+1)
+                exchange.append(NotEquals(x1, x2n))
+                exchange.append(NotEquals(y1, y2n))
+                exchange.append(NotEquals(x2, x1n))
+                exchange.append(NotEquals(y2, y1n))
+                constraints.append(Or(exchange))
+        return And(constraints)
+
+    def get_obstacle_collision_constraints(self, agent, obstacles, T):
+        constraints = []
+        for t in range(T):
+            for obstacle in obstacles:
+                ox, oy = obstacle
+                x, y = agent.get_state_variables_at(t)
+                constraints.append(AtMostOne(Equals(x, Int(ox)), Equals(y, Int(oy))))
+        return constraints
+
 
     def get_agent_extent_constraints(self, agent):
         extent_constraints = []
@@ -125,7 +125,7 @@ class SMTGame:
             xmax = Int(self.extent[1])
             ymin = Int(self.extent[2])
             ymax = Int(self.extent[3])
-            for t in range(T):
+            for t in range(self.T):
                 xt, yt = agent.get_state_variables_at(t)
                 extent_constraints.append(And(LE(xmin, xt),
                                               LE(xt, xmax),
@@ -149,53 +149,134 @@ class SMTGame:
             for next_agent_idx in range(agent_idx+1, len(self.agents)):
                 agent = self.agents[agent_idx]
                 next_agent = self.agents[next_agent_idx]
-                collision_constraints.append(get_pairwise_collision_constraints(agent,
+                collision_constraints.append(self.get_pairwise_collision_constraints(agent,
                                              next_agent, self.T))
 
         # obstacle constraints
         obstacle_constraints = []
         for agent in self.agents:
-             obstacle_constraints = obstacle_constraints + get_obstacle_collision_constraints(agent, obstacles, T)
+             obstacle_constraints = obstacle_constraints + self.get_obstacle_collision_constraints(agent, self.obstacles, self.T)
 
         # counter constraint
         if counter_constraint:
             c_constraints = []
             c_vars = []
             for agent in self.agents:
-                c_constraints.append(agent.get_step_count_constraint(T))
-                c_vars.append(agent.get_step_counter_variable(T))
+                c_constraints.append(agent.get_step_count_constraint(self.T))
+                c_vars.append(agent.get_step_counter_variable(self.T))
             counter_sat = [LE(Plus(c_vars), Int(counter_constraint))]
         agent_constraint_list = agent_constraint_list + collision_constraints + obstacle_constraints + c_constraints + counter_sat
         return And(agent_constraint_list)
 
-def create_random_gridders(N, extent):
-    x_extent = extent[0:2]
-    y_extent = extent[2:]
-    gridders = []
-    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
-            for y in range(y_extent[0], y_extent[1])]
-    for i in range(N):
-        # sample start position
-        start_pos, end_pos = random.sample(unused_locations, 2)
-        unused_locations.remove(start_pos)
-        unused_locations.remove(end_pos)
-        gridder = SMTGridder(init_state=start_pos, goal_state=end_pos,
-                             name='gridder' + str(i), color='C' + str(i))
-        gridders.append(gridder)
-    return gridders
+    def solve(self, counter_constraint, solver_name='z3', timeout=None):
+        soln = None
+        constraints = self.get_constraints(counter_constraint=counter_constraint)
 
-def create_random_obstacles(N, extent, agents):
-    x_extent = extent[0:2]
-    y_extent = extent[2:]
-    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
-            for y in range(y_extent[0], y_extent[1])]
-    for agent in agents:
-        init_state = agent.init_state
-        goal_state = agent.goal_state
-        unused_locations.remove(init_state)
-        unused_locations.remove(goal_state)
-    obstacles = random.sample(unused_locations, N)
-    return obstacles
+        options = dict()
+        if timeout:
+            options['solver_options'] = {'timeout': timeout}
+        smt_solver = Solver(name=solver_name, logic=None, **options)
+        smt_solver.add_assertion(constraints)
+        try:
+            if smt_solver.solve():
+                print('Found a solution!')
+                soln = self.extract_solutions(smt_solver)
+            else:
+                print('No solution found!')
+        except SolverReturnedUnknownResultError:
+            print('Timed out!')
+        return soln
+
+    def extract_solutions(self, solver):
+        agent_to_states = od()
+        for agent in self.agents:
+            states = od()
+            for state_variable in agent.state_variables:
+                states[state_variable] = od()
+                for t in range(self.T + 1):
+                    var = Symbol(agent.name + '_' + state_variable +
+                            str(t), agent.state_variables[state_variable])
+                    states[state_variable][t] = solver.get_value(var)
+            agent_to_states[agent] = states
+        return agent_to_states
+
+    def bisect_solve(self, solver_name='z3', timeout=10000):
+        # bisection prioritizing low conflicts then short paths
+        min_num_step = int(sum([np.sum(np.abs(np.array(agent.init_state)-np.array(agent.goal_state)))
+                       for agent in self.agents]))
+        max_num_step = self.T*len(self.agents)
+
+        num_step_upper = max_num_step
+        num_step_lower = min_num_step
+        new_soln = None
+        last_soln = None
+        while num_step_upper >= num_step_lower:
+            num_step_mid = (num_step_upper + num_step_lower) // 2
+
+            new_soln = self.solve(counter_constraint=num_step_mid, solver_name=solver_name, timeout=timeout)
+            if new_soln:
+                last_soln = new_soln
+                print(num_step_mid)
+                num_step_upper = num_step_mid - 1
+                if num_step_upper == num_step_lower:
+                    # break so don't have to resolve
+                    break
+            else:
+                num_step_lower = num_step_mid + 1
+        return last_soln
+
+    def plot_solution(self, N_interp):
+        soln = self.bisect_solve()
+
+        # clear all figures in /figs/
+        subprocess.run('rm ./figs/*.png', shell=True)
+        fig = plt.figure()
+        if soln:
+            for t in range((self.T-1) * N_interp + 1):
+                fig.clf()
+                lower_t = t // N_interp
+                higher_t = lower_t + 1
+                for obstacle in self.obstacles:
+                    ox, oy = obstacle
+                    plt.plot(ox, oy, 'bs', markersize=10)
+                for agent in self.agents:
+                    prev_agent_states = agent.get_solved_states_at(soln, lower_t)
+                    prev_x = int(str(prev_agent_states['x']))
+                    prev_y = int(str(prev_agent_states['y']))
+
+                    next_agent_states = agent.get_solved_states_at(soln, higher_t)
+                    next_x = int(str(next_agent_states['x']))
+                    next_y = int(str(next_agent_states['y']))
+
+                    x_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_x, next_x])
+                    y_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_y, next_y])
+                    x = x_interp(t / N_interp)
+                    y = y_interp(t / N_interp)
+                    plt.plot(x, y, agent.color+'o', markersize=15,
+                            alpha=1)
+                    gx, gy = agent.goal_state
+                    plt.plot(gx, gy, agent.color+'x', markersize=20)
+                print(t)
+                padding = 0.2
+                plt.axis('scaled')
+                plt.xlim(self.extent[0]-padding, self.extent[1]+padding)
+                plt.ylim(self.extent[2]-padding, self.extent[3]+padding)
+                fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
+        else:
+            fig = plt.figure()
+            for obstacle in self.obstacles:
+                ox, oy = obstacle
+                plt.plot(ox, oy, 'bs', markersize=40)
+            for agent in self.agents:
+                agent_states = agent.init_state
+                x = agent_states[0]
+                y = agent_states[1]
+                plt.plot(x, y, agent.color+'o', markersize=20)
+                gx, gy = agent.goal_state
+                plt.plot(gx, gy, agent.color+'x', markersize=20)
+            plt.xlim(self.extent[0], self.extent[1])
+            plt.ylim(self.extent[2], self.extent[3])
+            fig.savefig('./figs/'+str(0).zfill(5)+'.png', dpi=fig.dpi)
 
 class PartitionQuery:
     def __init__(self, node_list, io_map):
@@ -340,6 +421,7 @@ class PartitionQuery:
 
             new_soln = self.solve(max_conflict_num=conflict_num_mid,
                     max_reach_length_sum=reach_length_upper,
+                    solver_name=solver_name,
                     timeout=timeout)
             if new_soln:
                 last_soln = new_soln
@@ -356,6 +438,7 @@ class PartitionQuery:
                 reach_length_mid = (reach_length_upper + reach_length_lower) // 2
                 new_soln = self.solve(max_conflict_num=conflict_num_mid,
                         max_reach_length_sum=reach_length_mid,
+                        solver_name = solver_name,
                         timeout=timeout)
                 if new_soln:
                     last_soln = new_soln
@@ -368,7 +451,6 @@ class PartitionQuery:
                     reach_length_lower = reach_length_mid + 1
                     print('searching between ' + str(reach_length_lower) + ' and ' + str(reach_length_upper))
         return last_soln
-
 
     def solve(self, max_conflict_num, max_reach_length_sum,
             solver_name='z3', timeout=None):
@@ -405,8 +487,7 @@ class PartitionQuery:
                     token_dict[sink] = '^'
         return token_dict
 
-    def plot_solution(self, max_conflict_num, max_reach_length_sum):
-#        ans = self.solve(max_conflict_num=max_conflict_num, max_reach_length_sum=max_reach_length_sum)
+    def plot_solution(self):
         ans = self.bisect_solve()
         if not ans:
             print('Nothing to plot!')
@@ -429,13 +510,41 @@ def find_neighbors(node, node_list):
             for j in [-1, 1] if (node[0]+i*j,
             node[1]+(i+1)%2*j) in node_list]
 
+def create_random_gridders(N, extent):
+    x_extent = extent[0:2]
+    y_extent = extent[2:]
+    gridders = []
+    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
+            for y in range(y_extent[0], y_extent[1])]
+    for i in range(N):
+        # sample start position
+        start_pos, end_pos = random.sample(unused_locations, 2)
+        unused_locations.remove(start_pos)
+        unused_locations.remove(end_pos)
+        gridder = SMTGridder(init_state=start_pos, goal_state=end_pos,
+                             name='gridder' + str(i), color='C' + str(i))
+        gridders.append(gridder)
+    return gridders
+
+def create_random_obstacles(N, extent, agents):
+    x_extent = extent[0:2]
+    y_extent = extent[2:]
+    unused_locations = [(x,y) for x in range(x_extent[0], x_extent[1])
+            for y in range(y_extent[0], y_extent[1])]
+    for agent in agents:
+        init_state = agent.init_state
+        goal_state = agent.goal_state
+        unused_locations.remove(init_state)
+        unused_locations.remove(goal_state)
+    obstacles = random.sample(unused_locations, N)
+    return obstacles
+
 def run_robot_strategy_synthesis():
-    random.seed(0)
-    T = 6
-    N_obstacles = 6
-    N_gridders = 4
-    step_count_max = 15
-    map_length = 7
+    random.seed(3)
+    T = 10
+    N_obstacles = 8
+    N_gridders = 5
+    map_length = 9
     x_extent = [2, map_length]
     y_extent = [2, map_length]
     extent = x_extent + y_extent
@@ -444,62 +553,8 @@ def run_robot_strategy_synthesis():
     # randomly generate obstacles
     obstacles = create_random_obstacles(N=N_obstacles, extent=extent, agents=gridders)
     game = SMTGame(agents=gridders, T=T, extent=extent, obstacles=obstacles)
-    constraints = game.get_constraints(counter_constraint=step_count_max)
     N_interp = 4
-
-    with Solver(name='z3') as solver:
-        solver.add_assertion(constraints)
-        # clear all figures in /figs/
-        subprocess.run('rm ./figs/*.png', shell=True)
-        fig = plt.figure()
-        if solver.solve():
-            print('Found a solution!')
-            for t in range((game.T-1) * N_interp + 1):
-                fig.clf()
-                lower_t = t // N_interp
-                higher_t = lower_t + 1
-                for obstacle in game.obstacles:
-                    ox, oy = obstacle
-                    plt.plot(ox, oy, 'bs', markersize=10)
-                for agent in game.agents:
-                    prev_agent_states = agent.get_solved_states_at(solver, lower_t)
-                    prev_x = int(str(prev_agent_states['x']))
-                    prev_y = int(str(prev_agent_states['y']))
-
-                    next_agent_states = agent.get_solved_states_at(solver, higher_t)
-                    next_x = int(str(next_agent_states['x']))
-                    next_y = int(str(next_agent_states['y']))
-
-                    x_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_x, next_x])
-                    y_interp = scipy.interpolate.interp1d([lower_t, higher_t], [prev_y, next_y])
-                    x = x_interp(t / N_interp)
-                    y = y_interp(t / N_interp)
-                    plt.plot(x, y, agent.color+'o', markersize=15,
-                            alpha=1)
-                    gx, gy = agent.goal_state
-                    plt.plot(gx, gy, agent.color+'x', markersize=20)
-                print(t)
-                padding = 0.2
-                plt.axis('scaled')
-                plt.xlim(game.extent[0]-padding, game.extent[1]+padding)
-                plt.ylim(game.extent[2]-padding, game.extent[3]+padding)
-                fig.savefig('./figs/'+str(t).zfill(5)+'.png', dpi=fig.dpi)
-        else:
-            print('No solution found')
-            fig = plt.figure()
-            for obstacle in game.obstacles:
-                ox, oy = obstacle
-                plt.plot(ox, oy, 'bs', markersize=40)
-            for agent in game.agents:
-                agent_states = agent.init_state
-                x = agent_states[0]
-                y = agent_states[1]
-                plt.plot(x, y, agent.color+'o', markersize=20)
-                gx, gy = agent.goal_state
-                plt.plot(gx, gy, agent.color+'x', markersize=20)
-            plt.xlim(game.extent[0], game.extent[1])
-            plt.ylim(game.extent[2], game.extent[3])
-            fig.savefig('./figs/'+str(0).zfill(5)+'.png', dpi=fig.dpi)
+    game.plot_solution(N_interp=N_interp)
 
 def run_partition_synthesis():
     #max_conflict_num = 0
@@ -510,19 +565,17 @@ def run_partition_synthesis():
     #io_map[(4,0)] = [(N-1,N-1)]
     #io_map[(2,0)] = [(4,N-1)]
 
-    max_conflict_num = 0
-    max_reach_length_sum = 25
-    N = 8
+    N = 7
     node_list = [(i-3,j-3) for i in range(N) for j in range(N)]
-    #node_list = [(-1,0),(0,0),(1,0),(2,0),(3,0),(1,-2),(1,-1),(1,1),(1,2)]
     io_map = od()
-    io_map[(-3,0)] = [(4,0)] # input to outputs
+    io_map[(-3,0)] = [(3,0)] # input to outputs
     io_map[(1,-2)] = [(1,3)] # input to outputs
     io_map[(-2,3)] = [(3,0)] # input to outputs
-    io_map[(4,2)] = [(2,-2)] # input to outputs
+    io_map[(3,2)] = [(2,-2)] # input to outputs
 
     query = PartitionQuery(node_list=node_list, io_map=io_map)
-    ans = query.plot_solution(max_conflict_num=max_conflict_num, max_reach_length_sum=max_reach_length_sum)
+    ans = query.plot_solution()
 
 if __name__ == '__main__':
-    run_partition_synthesis()
+    run_robot_strategy_synthesis()
+#    run_partition_synthesis()
