@@ -229,9 +229,10 @@ class SMTGame:
                 num_steps = self.get_num_steps_from_soln(last_soln)
                 print(num_steps)
                 num_step_upper = num_steps - 1
-                if num_step_upper == num_step_lower:
+                if num_step_upper == num_step_lower and num_step_lower == num_step_mid:
                     # break so don't have to resolve
                     break
+                num_step_mid = num_steps
             else:
                 num_step_lower = num_step_mid + 1
         return last_soln
@@ -331,7 +332,7 @@ class PartitionQuery:
             for choice_idx, choice in enumerate(all_choices):
                 choice_xy = self.node_list[choice_idx]
                 var = all_choices[choice_idx]
-                indicator_var = GE(var, Int(0))
+                indicator_var = GE(var, Int(0)) # distance >= 0
                 if choice_xy not in mark_indicator_list:
                     mark_indicator_list[choice_xy] = [indicator_var]
                 else:
@@ -406,7 +407,7 @@ class PartitionQuery:
         return And(constraints)
 
     def extract_solutions(self, solver):
-        soln = dict()
+        soln = od()
         for node_idx, node in enumerate(self.node_list):
             soln[node] = []
             for in_var_idx, in_var in enumerate(self.vars_dict_with_var_key):
@@ -414,7 +415,23 @@ class PartitionQuery:
                 val = int(str(solver.get_value(var)))
                 if val >= 0:
                     soln[node].append(list(self.io_map.keys())[in_var_idx])
+
+        soln['reach_length_sum'] = 0
+        for in_var in self.vars_io_map:
+            for out_var in self.vars_io_map[in_var]:
+                val = int(str(solver.get_value(out_var)))
+                soln['reach_length_sum'] += val
         return soln
+
+    def get_reach_length_sum_from_soln(self, soln):
+        return soln['reach_length_sum']
+
+    def get_num_conflicts_from_soln(self, soln):
+        num_conflicts = 0
+        for node in self.node_list:
+            if len(soln[node]) > 1:
+                num_conflicts += 1
+        return num_conflicts
 
     def bisect_solve(self, solver_name='z3', timeout=10000):
         # bisection prioritizing low conflicts then short paths
@@ -436,11 +453,13 @@ class PartitionQuery:
                     timeout=timeout)
             if new_soln:
                 last_soln = new_soln
-                print(conflict_num_mid, reach_length_upper)
-                conflict_num_upper = conflict_num_mid - 1
-                if conflict_num_upper == conflict_num_lower:
+                num_conflicts = self.get_num_conflicts_from_soln(last_soln)
+                print(num_conflicts, reach_length_upper)
+                conflict_num_upper = num_conflicts - 1
+                if conflict_num_upper == conflict_num_lower and conflict_num_lower == conflict_num_mid:
                     # break so don't have to resolve
                     break
+                conflict_num_mid = num_conflicts
             else:
                 conflict_num_lower = conflict_num_mid + 1
 
@@ -453,11 +472,13 @@ class PartitionQuery:
                         timeout=timeout)
                 if new_soln:
                     last_soln = new_soln
-                    print(conflict_num_mid, reach_length_mid)
-                    reach_length_upper = reach_length_mid - 1
-                    if reach_length_upper == reach_length_lower:
+                    reach_length_sum = self.get_reach_length_sum_from_soln(last_soln)
+                    reach_length_upper = reach_length_sum - 1
+                    print(conflict_num_mid, reach_length_sum)
+                    if reach_length_upper == reach_length_lower and reach_length_lower == reach_length_mid:
                         # break so don't have to resolve
                         break
+                    reach_length_mid = reach_length_sum
                 else:
                     reach_length_lower = reach_length_mid + 1
                     print('searching between ' + str(reach_length_lower) + ' and ' + str(reach_length_upper))
@@ -504,15 +525,16 @@ class PartitionQuery:
             print('Nothing to plot!')
         else:
             for node in ans:
-                for player in ans[node]:
-                    if node not in self.token_dict:
-                        symbol = 'bs'
-                    else:
-                        symbol = self.token_dict[node]
-                    plt.plot(node[0], node[1], symbol,
-                            markersize=1000/len(self.node_list),
-                            color=self.player_color_dict[player],
-                            alpha=0.3)
+                if node != 'reach_length_sum':
+                    for player in ans[node]:
+                        if node not in self.token_dict:
+                            symbol = 'bs'
+                        else:
+                            symbol = self.token_dict[node]
+                        plt.plot(node[0], node[1], symbol,
+                                markersize=1000/len(self.node_list),
+                                color=self.player_color_dict[player],
+                                alpha=0.3)
             plt.axis('scaled')
             plt.show()
 
@@ -552,7 +574,7 @@ def create_random_obstacles(N, extent, agents):
 
 def run_robot_strategy_synthesis():
     random.seed(3)
-    T = 15
+    T = 13
     N_obstacles = 5
     N_gridders = 7
     map_length = 9
@@ -568,25 +590,24 @@ def run_robot_strategy_synthesis():
     game.plot_solution(N_interp=N_interp)
 
 def run_partition_synthesis():
-    #max_conflict_num = 0
-    #N = 6
-    #node_list = [(i,j) for i in range(N) for j in range(N)]
-    #io_map = od()
-    #io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
-    #io_map[(4,0)] = [(N-1,N-1)]
-    #io_map[(2,0)] = [(4,N-1)]
-
-    N = 7
-    node_list = [(i-3,j-3) for i in range(N) for j in range(N)]
+    N = 6
+    node_list = [(i,j) for i in range(N) for j in range(N)]
     io_map = od()
-    io_map[(-3,0)] = [(3,0)] # input to outputs
-    io_map[(1,-2)] = [(1,3)] # input to outputs
-    io_map[(-2,3)] = [(3,0)] # input to outputs
-    io_map[(3,2)] = [(2,-2)] # input to outputs
+    io_map[(0,0)] = [(1,N-1), (2,N-1)] # input to outputs
+    io_map[(4,0)] = [(N-1,N-1)]
+    io_map[(2,0)] = [(4,N-1)]
+
+    #N = 7
+    #node_list = [(i-3,j-3) for i in range(N) for j in range(N)]
+    #io_map = od()
+    #io_map[(-3,0)] = [(3,0)] # input to outputs
+    #io_map[(1,-2)] = [(1,3)] # input to outputs
+    #io_map[(-2,3)] = [(3,0)] # input to outputs
+    #io_map[(3,2)] = [(2,-2)] # input to outputs
 
     query = PartitionQuery(node_list=node_list, io_map=io_map)
     ans = query.plot_solution()
 
 if __name__ == '__main__':
-#    run_robot_strategy_synthesis()
-    run_partition_synthesis()
+    run_robot_strategy_synthesis()
+#    run_partition_synthesis()
