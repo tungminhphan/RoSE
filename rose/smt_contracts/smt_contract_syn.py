@@ -117,7 +117,6 @@ class SMTGame:
                 constraints.append(AtMostOne(Equals(x, Int(ox)), Equals(y, Int(oy))))
         return constraints
 
-
     def get_agent_extent_constraints(self, agent):
         extent_constraints = []
         if self.extent:
@@ -198,7 +197,18 @@ class SMTGame:
                             str(t), agent.state_variables[state_variable])
                     states[state_variable][t] = solver.get_value(var)
             agent_to_states[agent] = states
+
+        for agent in self.agents:
+            states = agent_to_states[agent]
+            var = Symbol(agent.name+'_'+'counter'+'_'+str(self.T), INT)
+            states['counter'] = solver.get_value(var)
         return agent_to_states
+
+    def get_num_steps_from_soln(self, soln):
+        num_steps = 0
+        for agent in soln:
+            num_steps += int(str(soln[agent]['counter']))
+        return num_steps
 
     def bisect_solve(self, solver_name='z3', timeout=10000):
         # bisection prioritizing low conflicts then short paths
@@ -216,8 +226,9 @@ class SMTGame:
             new_soln = self.solve(counter_constraint=num_step_mid, solver_name=solver_name, timeout=timeout)
             if new_soln:
                 last_soln = new_soln
-                print(num_step_mid)
-                num_step_upper = num_step_mid - 1
+                num_steps = self.get_num_steps_from_soln(last_soln)
+                print(num_steps)
+                num_step_upper = num_steps - 1
                 if num_step_upper == num_step_lower:
                     # break so don't have to resolve
                     break
@@ -541,9 +552,9 @@ def create_random_obstacles(N, extent, agents):
 
 def run_robot_strategy_synthesis():
     random.seed(3)
-    T = 10
-    N_obstacles = 8
-    N_gridders = 5
+    T = 15
+    N_obstacles = 5
+    N_gridders = 7
     map_length = 9
     x_extent = [2, map_length]
     y_extent = [2, map_length]
@@ -577,5 +588,5 @@ def run_partition_synthesis():
     ans = query.plot_solution()
 
 if __name__ == '__main__':
-    run_robot_strategy_synthesis()
-#    run_partition_synthesis()
+#    run_robot_strategy_synthesis()
+    run_partition_synthesis()
