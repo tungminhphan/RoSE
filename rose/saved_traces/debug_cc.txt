@@ -1,0 +1,3415 @@
+======================AGENT IS LOCATED ATTTT==================
+(7, 45, 'east', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 43, 'west', 2), 0.3338732120555258, 'green', 1.0)
+LEAD AGENT STATE: 
+(5, 43, 'west', 2)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 32, 'west', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 49, 'west', 2), 0.7871648425065387, 'yellow', 2.0)
+LEAD AGENT STATE: 
+(4, 49, 'west', 2)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 32, 'west', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 36, 'east', 2), 0.434986695088698, 'blue', 2.0)
+LEAD AGENT STATE: 
+(7, 36, 'east', 2)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 44, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 46, 'east', 1), 0.25931228176827037, 'red', 1.0)
+LEAD AGENT STATE: 
+(7, 46, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 45, 'east', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 36, 'east', 0), 0.25931228176827037, 'red', 1.0)
+LEAD AGENT STATE: 
+(7, 36, 'east', 0)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 45, 'east', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 35, 'east', 1), 0.042991099314433234, 'yellow', 2.0)
+LEAD AGENT STATE: 
+(7, 35, 'east', 1)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 45, 'east', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 43, 'west', 2), 0.3338732120555258, 'green', 2.0)
+LEAD AGENT STATE: 
+(5, 43, 'west', 2)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 33, 'west', 1)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((1, 31, 'west', 1), 0.807619063493113, 'red', 1.0)
+LEAD AGENT STATE: 
+(1, 31, 'west', 1)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(1, 38, 'west', 1), 'gray', 0.296289883299217]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 44, 'east', 1)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((10, 46, 'east', 1), 0.30842287036363536, 'red', 1.0)
+LEAD AGENT STATE: 
+(10, 46, 'east', 1)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 44, 'east', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 46, 'east', 1), 0.3110602291534016, 'gray', 1.0)
+LEAD AGENT STATE: 
+(9, 46, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 32, 'west', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 30, 'east', 3), 0.26379411867214797, 'gray', 1.0)
+LEAD AGENT STATE: 
+(6, 30, 'east', 3)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 43, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 45, 'east', 1), 0.042991099314433234, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(7, 45, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 33, 'west', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 31, 'west', 1), 0.7871648425065387, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(4, 31, 'west', 1)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 43, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 45, 'east', 1), 0.3321805665953167, 'gray', 1.0)
+LEAD AGENT STATE: 
+(9, 45, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 32, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 38, 'east', 1), 0.6037762627406995, 'brown', 2.0)
+LEAD AGENT STATE: 
+(6, 38, 'east', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 44, 'east', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 46, 'east', 1), 0.9285201539025842, 'red', 1.0)
+LEAD AGENT STATE: 
+(8, 46, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 42, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 44, 'east', 1), 0.9955981828907805, 'orange', 1.0)
+LEAD AGENT STATE: 
+(7, 44, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 43, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 45, 'east', 1), 0.19181271910283193, 'green', 1.0)
+LEAD AGENT STATE: 
+(8, 45, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 33, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 31, 'west', 1), 0.44783730036969727, 'red', 1.0)
+LEAD AGENT STATE: 
+(5, 31, 'west', 1)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 42, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 44, 'east', 1), 0.7050270921317003, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(9, 44, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 45, 'east', 1)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 41, 'west', 0), 0.44783730036969727, 'red', 5.0)
+LEAD AGENT STATE: 
+(5, 41, 'west', 0)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 43, 'east', 1)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((10, 45, 'east', 1), 0.318812654374136, 'blue', 1.0)
+LEAD AGENT STATE: 
+(10, 45, 'east', 1)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 44, 'east', 1)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 46, 'east', 1), 0.6037762627406995, 'brown', 1.0)
+LEAD AGENT STATE: 
+(6, 46, 'east', 1)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 34, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 32, 'west', 1), 0.5290767986417101, 'gray', 1.0)
+LEAD AGENT STATE: 
+(5, 32, 'west', 1)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 43, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 45, 'east', 1), 0.38531266576816126, 'light_green', 1.0)
+LEAD AGENT STATE: 
+(6, 45, 'east', 1)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 42, 'east', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 44, 'east', 1), 0.06748527939572457, 'orange', 1.0)
+LEAD AGENT STATE: 
+(8, 44, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 41, 'east', 1)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 43, 'east', 1), 0.4694484830801712, 'orange', 1.0)
+LEAD AGENT STATE: 
+(7, 43, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 33, 'west', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((3, 31, 'west', 1), 0.46498600154789627, 'gray', 1.0)
+LEAD AGENT STATE: 
+(3, 31, 'west', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(2, 32, 'west', 1)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 42, 'west', 0), 0.7188914758045016, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(4, 42, 'west', 0)
+AGENT GOAL IS:
+(2, 0, 'west')
+AGENT SUBGOALS IS:
+[((2, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 41, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 43, 'east', 1), 0.7245644212327997, 'orange', 1.0)
+LEAD AGENT STATE: 
+(9, 43, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 34, 'west', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((3, 32, 'west', 1), 0.5009965666614165, 'red', 1.0)
+LEAD AGENT STATE: 
+(3, 32, 'west', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 41, 'east', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 43, 'east', 1), 0.2770263096018629, 'green', 1.0)
+LEAD AGENT STATE: 
+(8, 43, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 40, 'east', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 42, 'east', 1), 0.1915194503788923, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(9, 42, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 40, 'east', 1)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 42, 'east', 1), 0.434986695088698, 'blue', 1.0)
+LEAD AGENT STATE: 
+(7, 42, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 39, 'east', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 41, 'east', 1), 0.7272802010120374, 'green', 1.0)
+LEAD AGENT STATE: 
+(9, 41, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 40, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 42, 'east', 1), 0.25799883559110326, 'green', 1.0)
+LEAD AGENT STATE: 
+(8, 42, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 35, 'west', 1)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((3, 33, 'west', 1), 0.9537625822517408, 'green', 1.0)
+LEAD AGENT STATE: 
+(3, 33, 'west', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 39, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 41, 'east', 1), 0.9275588256967068, 'light_green', 1.0)
+LEAD AGENT STATE: 
+(7, 41, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 36, 'west', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 32, 'west', 1), 0.7188914758045016, 'yellow', 3.0)
+LEAD AGENT STATE: 
+(4, 32, 'west', 1)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 38, 'west', 1)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 33, 'west', 1), 0.4083596124506853, 'gray', 4.0)
+LEAD AGENT STATE: 
+(5, 33, 'west', 1)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 40, 'west', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 37, 'west', 1), 0.6684033695392199, 'light_green', 2.0)
+LEAD AGENT STATE: 
+(5, 37, 'west', 1)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 36, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((1, 32, 'west', 1), 0.24528720992958886, 'blue', 3.0)
+LEAD AGENT STATE: 
+(1, 32, 'west', 1)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(1, 38, 'west', 1), 'gray', 0.296289883299217]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(2, 35, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((2, 31, 'west', 1), 0.7864374570122125, 'blue', 3.0)
+LEAD AGENT STATE: 
+(2, 31, 'west', 1)
+AGENT GOAL IS:
+(2, 0, 'west')
+AGENT SUBGOALS IS:
+[((2, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(2, 32, 'west', 1), 'blue', 0.7864374570122125]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 38, 'west', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((1, 35, 'west', 1), 0.1632426032886497, 'gray', 2.0)
+LEAD AGENT STATE: 
+(1, 35, 'west', 1)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(1, 33, 'west', 1), 'blue', 0.24528720992958886]
+[(1, 36, 'west', 1), 'gray', 0.1632426032886497]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(2, 35, 'west', 1), 'gray', 0.5506857729959058]
+[(1, 32, 'west', 1), 'red', 0.807619063493113]
+[(1, 38, 'west', 1), 'gray', 0.296289883299217]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 48, 'west', 1)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((1, 40, 'west', 2), 0.296289883299217, 'gray', 10.0)
+LEAD AGENT STATE: 
+(1, 40, 'west', 2)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(1, 48, 'west', 1), 'green', 0.9810266843530705]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(2, 47, 'west', 3), 'blue', 0.6470916319259913]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 42, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 44, 'east', 1), 0.3224364331513222, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(6, 44, 'east', 1)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 44, 'west', 3)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((3, 34, 'west', 1), 0.9970942822407111, 'brown', 7.0)
+LEAD AGENT STATE: 
+(3, 34, 'west', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(1, 38, 'west', 1), 'gray', 0.296289883299217]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 39, 'east', 1)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 41, 'east', 1), 0.7691532813138904, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(8, 41, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 46, 'west', 3)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 35, 'west', 1), 0.9900085756222761, 'green', 8.0)
+LEAD AGENT STATE: 
+(4, 35, 'west', 1)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(2, 47, 'west', 3)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 49, 'west', 2), 0.1590963028999106, 'red', 1.0)
+LEAD AGENT STATE: 
+(4, 49, 'west', 2)
+AGENT GOAL IS:
+(2, 0, 'west')
+AGENT SUBGOALS IS:
+[((2, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(1, 48, 'west', 1), 'green', 0.9810266843530705]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(2, 47, 'west', 3), 'blue', 0.6470916319259913]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 47, 'west', 3)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 43, 'west', 3), 0.1590963028999106, 'red', 1.0)
+LEAD AGENT STATE: 
+(4, 43, 'west', 3)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(2, 47, 'west', 3), 'blue', 0.6470916319259913]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 34, 'east', 1)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 40, 'east', 1), 0.5061564976628008, 'green', 5.0)
+LEAD AGENT STATE: 
+(9, 40, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(9, 29, 'east', 1), 'orange', 0.9698928189941898]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 48, 'west', 3)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 39, 'west', 1), 0.3338732120555258, 'green', 6.0)
+LEAD AGENT STATE: 
+(5, 39, 'west', 1)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(6, 42, 'east', 1), 'orange', 0.04325033148984814]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(6, 43, 'east', 1), 'yellow', 0.3224364331513222]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(6, 44, 'east', 1), 'light_green', 0.38531266576816126]
+[(3, 44, 'west', 3), 'light_green', 0.5864533476136581]
+[(5, 48, 'west', 3), 'light_green', 0.043240164215235466]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(6, 45, 'east', 1), 'brown', 0.6037762627406995]
+[(2, 47, 'west', 3), 'blue', 0.6470916319259913]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 38, 'east', 3)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((10, 44, 'east', 1), 0.41606811214824135, 'brown', 4.0)
+LEAD AGENT STATE: 
+(10, 44, 'east', 1)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+1
+other agents in bubble before request located at: 
+[(9, 45, 'east', 1), 'gray', 0.3110602291534016]
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 44, 'east', 1), 'gray', 0.3321805665953167]
+[(10, 43, 'east', 1), 'brown', 0.41606811214824135]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(10, 44, 'east', 1), 'blue', 0.318812654374136]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(9, 43, 'east', 1), 'yellow', 0.7050270921317003]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(10, 45, 'east', 1), 'red', 0.30842287036363536]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(9, 42, 'east', 1), 'orange', 0.7245644212327997]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', False), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', -1), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(7, 37, 'east', 1)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((7, 40, 'east', 1), 0.8513187359279635, 'yellow', 2.0)
+LEAD AGENT STATE: 
+(7, 40, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(7, 42, 'east', 1), 'orange', 0.4694484830801712]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(7, 45, 'east', 1), 'red', 0.25931228176827037]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(7, 44, 'east', 1), 'yellow', 0.042991099314433234]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(1, 38, 'west', 1), 'gray', 0.296289883299217]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+[(7, 43, 'east', 1), 'orange', 0.9955981828907805]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 57, 'west', 3)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 71, 'west', 1), 0.2496351621917795, 'light_green', 10.0)
+LEAD AGENT STATE: 
+(4, 71, 'west', 1)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 56, 'west', 3), 'gray', 0.16029389023604046]
+[(4, 46, 'west', 3), 'red', 0.1590963028999106]
+[(4, 57, 'west', 3), 'light_green', 0.38954102992726514]
+[(4, 47, 'west', 3), 'light_green', 0.2496351621917795]
+[(4, 62, 'west', 3), 'green', 0.08250927091508742]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 56, 'west', 3)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 89, 'west', 1), 0.38954102992726514, 'light_green', 1.0)
+LEAD AGENT STATE: 
+(5, 89, 'west', 1)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 56, 'west', 3), 'gray', 0.16029389023604046]
+[(4, 57, 'west', 3), 'light_green', 0.38954102992726514]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 31, 'east', 1)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 35, 'east', 1), 0.9728420251507359, 'brown', 3.0)
+LEAD AGENT STATE: 
+(9, 35, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+1
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(9, 29, 'east', 1), 'orange', 0.9698928189941898]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 34, 'east', 3)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 40, 'east', 1), 0.4781455293172847, 'gray', 4.0)
+LEAD AGENT STATE: 
+(8, 40, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+1
+other agents in bubble before request located at: 
+[(8, 44, 'east', 1), 'green', 0.19181271910283193]
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(9, 41, 'east', 1), 'yellow', 0.1915194503788923]
+[(8, 40, 'east', 1), 'yellow', 0.7691532813138904]
+[(8, 45, 'east', 1), 'red', 0.9285201539025842]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(9, 40, 'east', 1), 'green', 0.7272802010120374]
+[(5, 40, 'west', 1), 'green', 0.3338732120555258]
+[(8, 41, 'east', 1), 'green', 0.25799883559110326]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(7, 41, 'east', 1), 'blue', 0.434986695088698]
+[(8, 42, 'east', 1), 'green', 0.2770263096018629]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(7, 40, 'east', 1), 'light_green', 0.9275588256967068]
+[(9, 39, 'east', 1), 'green', 0.5061564976628008]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(5, 38, 'west', 1), 'light_green', 0.6684033695392199]
+[(8, 43, 'east', 1), 'orange', 0.06748527939572457]
+[(7, 39, 'east', 1), 'yellow', 0.8513187359279635]
+[(8, 39, 'east', 1), 'gray', 0.4781455293172847]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', False), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', -1), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 30, 'east', 3)
+gray
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 28, 'east', 2), 0.9698928189941898, 'orange', 2.0)
+LEAD AGENT STATE: 
+(9, 28, 'east', 2)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 35, 'west', 1), 'brown', 0.9970942822407111]
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(4, 36, 'west', 1), 'green', 0.9900085756222761]
+[(5, 32, 'west', 1), 'red', 0.44783730036969727]
+[(4, 33, 'west', 1), 'yellow', 0.7188914758045016]
+[(3, 34, 'west', 1), 'green', 0.9537625822517408]
+[(7, 37, 'east', 1), 'light_green', 0.7957044137892583]
+[(3, 33, 'west', 1), 'red', 0.5009965666614165]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(5, 34, 'west', 1), 'gray', 0.4083596124506853]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+[(3, 32, 'west', 1), 'gray', 0.46498600154789627]
+[(5, 33, 'west', 1), 'gray', 0.5290767986417101]
+[(4, 32, 'west', 1), 'yellow', 0.7871648425065387]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 62, 'west', 3)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 54, 'west', 3), 0.38954102992726514, 'light_green', 5.0)
+LEAD AGENT STATE: 
+(4, 54, 'west', 3)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 56, 'west', 3), 'gray', 0.16029389023604046]
+[(4, 57, 'west', 3), 'light_green', 0.38954102992726514]
+[(4, 62, 'west', 3), 'green', 0.08250927091508742]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 29, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 32, 'east', 1), 0.8294432657966975, 'red', 2.0)
+LEAD AGENT STATE: 
+(9, 32, 'east', 1)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+1
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(9, 29, 'east', 1), 'orange', 0.9698928189941898]
+[(6, 30, 'east', 3), 'gray', 0.26379411867214797]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(10, 28, 'east', 3), 'red', 0.7181762534379166]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(1, 65, 'west', 3)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 89, 'west', 1), 0.08250927091508742, 'green', 1.0)
+LEAD AGENT STATE: 
+(4, 89, 'west', 1)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 62, 'west', 3), 'green', 0.08250927091508742]
+[(1, 65, 'west', 3), 'yellow', 0.7802404292258291]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 16, 'east', 2)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((10, 6, 'east', 3), 0.7181762534379166, 'red', 2.0)
+LEAD AGENT STATE: 
+(10, 6, 'east', 3)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 16, 'east', 2), 'red', 0.9940466384507358]
+[(9, 14, 'east', 2), 'green', 0.6997567469475575]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(5, 65, 'west', 3)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 65, 'west', 2), 0.08250927091508742, 'green', 2.0)
+LEAD AGENT STATE: 
+(4, 65, 'west', 2)
+AGENT GOAL IS:
+(5, 0, 'west')
+AGENT SUBGOALS IS:
+[((5, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(5, 65, 'west', 3), 'green', 0.7904745233993401]
+[(4, 62, 'west', 3), 'green', 0.08250927091508742]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 28, 'east', 3)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 28, 'east', 2), 0.9698928189941898, 'orange', 2.0)
+LEAD AGENT STATE: 
+(9, 28, 'east', 2)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(9, 34, 'east', 1), 'brown', 0.9728420251507359]
+[(9, 29, 'east', 1), 'orange', 0.9698928189941898]
+[(10, 38, 'east', 3), 'brown', 0.2420847222686987]
+[(9, 31, 'east', 1), 'red', 0.8294432657966975]
+[(10, 28, 'east', 3), 'red', 0.7181762534379166]
+[(8, 34, 'east', 3), 'yellow', 0.15133934805826876]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 79, 'west', 2)
+blue
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((5, 84, 'west', 3), 0.7904745233993401, 'green', 4.0)
+LEAD AGENT STATE: 
+(5, 84, 'west', 3)
+AGENT GOAL IS:
+(3, 0, 'west')
+AGENT SUBGOALS IS:
+[((3, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 79, 'west', 2), 'blue', 0.08482016272435144]
+[(4, 82, 'west', 2), 'brown', 0.7765585540253285]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 14, 'east', 2)
+green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 16, 'east', 2), 0.9940466384507358, 'red', 1.0)
+LEAD AGENT STATE: 
+(8, 16, 'east', 2)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 16, 'east', 2), 'red', 0.9940466384507358]
+[(9, 14, 'east', 2), 'green', 0.6997567469475575]
+[(9, 9, 'east', 2), 'red', 0.12662124147833842]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(2, 82, 'west', 2)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+None
+LEAD AGENT STATE: 
+(2, 80, 'west', 2)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(2, 85, 'west', 1), 'light_green', 0.22194782131795476]
+[(4, 79, 'west', 2), 'blue', 0.08482016272435144]
+[(2, 82, 'west', 2), 'yellow', 0.03653445211662654]
+[(4, 82, 'west', 2), 'brown', 0.7765585540253285]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(4, 82, 'west', 2)
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((4, 77, 'west', 2), 0.08482016272435144, 'blue', 3.0)
+LEAD AGENT STATE: 
+(4, 77, 'west', 2)
+AGENT GOAL IS:
+(1, 0, 'west')
+AGENT SUBGOALS IS:
+[((1, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(4, 79, 'west', 2), 'blue', 0.08482016272435144]
+[(2, 82, 'west', 2), 'yellow', 0.03653445211662654]
+[(4, 82, 'west', 2), 'brown', 0.7765585540253285]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(2, 85, 'west', 1)
+light_green
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((2, 80, 'west', 2), 0.03653445211662654, 'yellow', 4.0)
+LEAD AGENT STATE: 
+(2, 80, 'west', 2)
+AGENT GOAL IS:
+(2, 0, 'west')
+AGENT SUBGOALS IS:
+[((2, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 87, 'west', 2), 'orange', 0.2450744863252844]
+[(2, 85, 'west', 1), 'light_green', 0.22194782131795476]
+[(2, 82, 'west', 2), 'yellow', 0.03653445211662654]
+[(4, 82, 'west', 2), 'brown', 0.7765585540253285]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(6, 8, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 9, 'east', 2), 0.12662124147833842, 'red', 2.0)
+LEAD AGENT STATE: 
+(9, 9, 'east', 2)
+AGENT GOAL IS:
+(6, 93, 'east')
+AGENT SUBGOALS IS:
+[((6, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(6, 8, 'east', 1), 'orange', 0.4311909379900477]
+[(9, 9, 'east', 2), 'red', 0.12662124147833842]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(9, 9, 'east', 2)
+red
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((9, 16, 'east', 2), 0.6997567469475575, 'green', 5.0)
+LEAD AGENT STATE: 
+(9, 16, 'east', 2)
+AGENT GOAL IS:
+(10, 93, 'east')
+AGENT SUBGOALS IS:
+[((10, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 16, 'east', 2), 'red', 0.9940466384507358]
+[(9, 14, 'east', 2), 'green', 0.6997567469475575]
+[(9, 9, 'east', 2), 'red', 0.12662124147833842]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(3, 87, 'west', 2)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((2, 85, 'west', 1), 0.22194782131795476, 'light_green', 1.0)
+LEAD AGENT STATE: 
+(2, 85, 'west', 1)
+AGENT GOAL IS:
+(4, 0, 'west')
+AGENT SUBGOALS IS:
+[((4, 0), 'west')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(3, 87, 'west', 2), 'orange', 0.2450744863252844]
+[(2, 85, 'west', 1), 'light_green', 0.22194782131795476]
+[(2, 82, 'west', 2), 'yellow', 0.03653445211662654]
+[(4, 82, 'west', 2), 'brown', 0.7765585540253285]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 4, 'east', 1)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((6, 5, 'east', 2), 0.4311909379900477, 'orange', 3.0)
+LEAD AGENT STATE: 
+(6, 5, 'east', 2)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(10, 4, 'east', 2), 'yellow', 0.2635238166866022]
+[(8, 3, 'east', 1), 'orange', 0.7957386776107547]
+[(8, 4, 'east', 1), 'yellow', 0.8462335948166702]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(8, 3, 'east', 1)
+orange
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 5, 'east', 1), 0.8462335948166702, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(8, 5, 'east', 1)
+AGENT GOAL IS:
+(8, 93, 'east')
+AGENT SUBGOALS IS:
+[((8, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(10, 4, 'east', 2), 'yellow', 0.2635238166866022]
+[(8, 3, 'east', 1), 'orange', 0.7957386776107547]
+[(8, 4, 'east', 1), 'yellow', 0.8462335948166702]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+(10, 4, 'east', 2)
+yellow
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+((8, 3, 'east', 1), 0.8462335948166702, 'yellow', 1.0)
+LEAD AGENT STATE: 
+(8, 3, 'east', 1)
+AGENT GOAL IS:
+(7, 93, 'east')
+AGENT SUBGOALS IS:
+[((7, 93), 'east')]
+agent intention is:
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+[(8, 4, 'east', 1), 'yellow', 0.8462335948166702]
+[(10, 4, 'east', 2), 'yellow', 0.2635238166866022]
+[(9, 9, 'east', 2), 'red', 0.12662124147833842]
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+OrderedDict([('agent_type', 'none'), ('safety_check', True), ('resolution_winner', True), ('max_braking_enough', True)])
+ACTION TAKEN: 
+OrderedDict([('acceleration', 0), ('steer', 'straight')])
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent ======================AGENT IS LOCATED ATTTT==================
+None
+brown
+VELOCITY ESTIMATE: 
+None
+LEAD AGENT: 
+None
+LEAD AGENT STATE: 
+(9, 0, 'east', 0)
+AGENT GOAL IS:
+(9, 93, 'east')
+AGENT SUBGOALS IS:
+[((9, 93), 'east')]
+agent intention is:
+None
+AGENT TOKEN COUNT BEFORE: 
+0
+AGENT TOKEN COUNT AFTER: 
+0
+other agents in bubble before request located at: 
+sent requests to 
+received requests from
+ACTION SELECTION STRATEGY FLAGS: 
+()
+ACTION TAKEN: 
+None
+checked for agent conflict with:
+agent max braking flag :
+None
+conflict cluster winner:
+None
+agent 

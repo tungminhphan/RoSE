@@ -220,10 +220,13 @@ class Gridder(Agent):
         occupancy_list = [next_state]
         return occupancy_list
 
+
+
+
 class Car(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Car'
-        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed']
+        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'error_flag', 'car_count', 'seed']
         state_variable_names = ['x', 'y', 'heading', 'v']
         #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
@@ -267,7 +270,12 @@ class Car(Agent):
 
         #self.lead_vehicle = None
         self.lead_agent = None
+        self.lead_agent_state = []
         self.prior_state = None
+        self.unc_velocity = None
+
+
+
 
     def apply(self, ctrl):
         self.prior_state = self.state
@@ -280,6 +288,7 @@ class Car(Agent):
         self.ctrl_chosen = ctrl
         self.check_out_of_bounds(self, self.prior_state, ctrl, self.state)
         # check whether the updated joint state is safe
+
         if DEBUGGING:
             chk_joint_safety = self.check_joint_state_safety(return_list=True)
             self.supervisor.game.unsafe_joint_state_dict[self.supervisor.game.time] = self.check_joint_state_safety(return_list=True)
@@ -396,6 +405,18 @@ class Car(Agent):
     def set_token_count(self, cnt):
         self.token_count = cnt
 
+
+    def set_lead_agent_state(self):
+        if self.lead_agent is not None:
+            self.lead_agent_state = self.lead_agent[0]
+        else:
+            x = self.state.x
+            y = self.state.y
+            h = self.state.heading
+            v = self.state.v
+            self.lead_agent_state = (x,y,h,v)
+        return self.lead_agent_state
+
     # reset conflict send and receive lists
     def reset_conflict_lists(self):
         self.agent_max_braking_not_enough = None
@@ -411,6 +432,7 @@ class Car(Agent):
         self.conflict_winner_sv = None
         #self.clearance_straight_info = None
         #self.token_count_sv = 0
+
 
     # conflict resolution, returns True if winner and false if not winner
     def check_conflict_resolution_winner(self):
@@ -581,8 +603,22 @@ class Car(Agent):
         lead_agent = self.find_lead_agent(inside_bubble=True)
         if lead_agent is None:
             ctrl = Car.get_ctrl_od(self.a_max, 'straight')
+
             return ctrl
+
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+        #print('1: ', v_a, '\n')
+
+        # Induce error
+        if v_a - self.error_flag < self.v_min:
+
+            v_a = self.v_min
+            #print('2: ', v_a, '\n')
+        else:
+            self.unc_velocity = v_a - self.error_flag
+            v_a = v_a - self.error_flag
+            #print('2: ', v_a, '\n')
+
         # try all acceleration values
         ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
         for acc_val in ctrl_acc:
@@ -837,7 +873,7 @@ class Car(Agent):
                             # save this info
                             self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
                             return []
-        if self.supervisor.game.save_debug_info: 
+        if self.supervisor.game.save_debug_info:
             self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
         return send_requests_list
 
@@ -931,6 +967,14 @@ class Car(Agent):
             agents_no_bp = []
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+
+                # Induce error
+                if v_a - self.error_flag < self.v_min:
+                    v_a = self.v_min
+                else:
+                    self.unc_velocity = v_a - self.error_flag
+                    v_a = v_a - self.error_flag
+
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
                 if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
@@ -1043,7 +1087,7 @@ class Car(Agent):
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
-
+        #ag1 = self
         # returns agent_lead, agent_behind in that order
         def sort_agents(st_1, st_2):
             try:
@@ -1065,6 +1109,19 @@ class Car(Agent):
             st_1 = ag_1.state
         if st_2 is None:
             st_2 = ag_2.state
+
+        #Induce error
+        #print('1: ', st_1, '\n')
+        z = st_1.v - self.error_flag
+
+        if z <= self.v_min:
+            st_1.v = self.v_min
+            #print('2: ', st_1, '\n')
+        else:
+            st_1.v = z
+            #print('2: ', st_1, '\n')
+
+
 
         #print("safe config check")
         #print(ag_1.state, ag_2.state, st_1, st_2)
@@ -1612,7 +1669,10 @@ class TrafficGame(Simulation):
         self.save_debug_info = save_debug_info
         # save interesting numbers
         self.car_count = 0
-        self.agents_reached_goal_count = 0 
+        self.agents_reached_goal_count = 0
+        set_seed(self.map.seed, self.time)
+        self.k = random.randint(1, 10)
+        self.cert = 3 #Uncertainty variable - Ask Karena
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1627,6 +1687,7 @@ class TrafficGame(Simulation):
         #print(rand_arr1)
         #print(rand_arr2)
 
+
         for i, source in enumerate(self.map.IO_map.sources):
             #print('source to check')
             #print(source.node)
@@ -1636,7 +1697,18 @@ class TrafficGame(Simulation):
                 # check if new car satisfies spawning safety contract
                 #print('sources and sinks')
                 #print(source.node, sink.node)
-                new_car = create_default_car(source, sink, self, self.car_count)
+
+                if self.k is self.cert:
+                    flag = 1
+                    self.k = 1
+                    #print(flag,'\n')
+                else:
+                    flag = 1 #0
+                    self.k = self.k + 1
+                    #print(flag,'\n')
+
+                new_car = create_default_car(source, sink, self, self.car_count, flag) #here estimation error
+                #print(flag,'\n')
                 spawning_contract = SpawningContract(self, new_car)
                 #print('state')
                 #print(new_car.state)
@@ -1658,7 +1730,7 @@ class TrafficGame(Simulation):
             spec_struct_trace = od()
             if self.time > 0:
                 spec_struct_trace = agent.spec_struct_trace
-            agents.append((agent.state.x, agent.state.y, \
+            agents.append((agent.state.x, agent.state.y,
                 agent.state.heading, agent.state.v, agent.agent_color, agent.bubble, agent.get_id()))
         # save all the traffic light states
         for traffic_light in self.map.traffic_lights:
@@ -1682,6 +1754,8 @@ class TrafficGame(Simulation):
                 #print("final state of agent")
                 #print(prior_state)
             # save all data in trace
+
+
             agent_trace_dict = {'subgoals': agent.supervisor.subgoals,
                                 'state':prior_state,
                                 'action': agent.ctrl_chosen,
@@ -1702,9 +1776,13 @@ class TrafficGame(Simulation):
                                 'agent_id':agent.get_id(),
                                 'left_turn_gap_arr':agent.left_turn_gap_arr,
                                 'lead_agent':agent.lead_agent,
+                                'lead_agent_state': agent.set_lead_agent_state(),
+                                'unc_velocity': agent.unc_velocity,
                                 'checked_for_conflict':agent.agents_checked_for_conflict_sv,
                                 'agents_in_bubble_before': agent.agents_in_bubble_before_sv,
                                 'clearance_straight_info': agent.clearance_straight_info}
+            #a = agent.set_lead_agent_state()
+            #print(a,'\n')
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
         self.traces_debug[self.time] = all_agent_info_at_time_t_dict
@@ -1746,6 +1824,18 @@ class TrafficGame(Simulation):
             lead_agent = plant.find_lead_agent(inside_bubble=True)
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+
+                #print('1: ', v_a, '\n')
+                # Induce error
+                if v_a - self.error_flag < self.v_min:
+
+                    v_a = self.v_min
+                    #print('2: ', v_a, '\n')
+                else:
+                    self.unc_velocity = v_a - self.error_flag
+                    v_a = v_a - self.error_flag
+                    #print('2: ', v_a, '\n')
+
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
                 if (compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
@@ -3287,12 +3377,12 @@ def get_default_car_ss():
     specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2, 2])
     return specification_structure
 
-def create_default_car(source, sink, game, car_count):
+def create_default_car(source, sink, game, car_count, error_flag):
     ss = get_default_car_ss()
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start = source.node
     end = sink.node
-    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
+    car = Car(x=start[0],y=start[1],heading=start[2],v=0,v_min=0,v_max=3, a_min=-1,a_max=1, error_flag = error_flag ,car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3547,8 +3637,8 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 1205
-    map_name = 'straight_road'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
+    map_name = 'city_blocks_cramped'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.12, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
