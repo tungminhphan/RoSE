@@ -16981,7 +16981,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  * 
  *             if lead_agent:             # <<<<<<<<<<<<<<
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
- *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
+ * 
  */
     __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 634, __pyx_L1_error)
     if (__pyx_t_4) {
@@ -16990,8 +16990,8 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  * 
  *             if lead_agent:
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v             # <<<<<<<<<<<<<<
+ * 
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
- *                 # record lead agent
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 635, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -17015,29 +17015,29 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_v_v_a = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":636
- *             if lead_agent:
+      /* "c_tools.pyx":637
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+ * 
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)             # <<<<<<<<<<<<<<
  *                 # record lead agent
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_math); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_math); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Subtract(__pyx_v_x_a, __pyx_v_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_v_x_a, __pyx_v_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Subtract(__pyx_v_y_a, __pyx_v_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_v_y_a, __pyx_v_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_6 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 636, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -17054,22 +17054,22 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 636, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 637, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_gap_curr = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":638
+      /* "c_tools.pyx":639
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
  *                 # record lead agent
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)             # <<<<<<<<<<<<<<
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tuple); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 638, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tuple); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_3 = NULL;
@@ -17084,10 +17084,10 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       }
       __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 638, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_get_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_get_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_6 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -17101,12 +17101,12 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       }
       __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 638, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_agent_color); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_agent_color); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = PyTuple_New(4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 638, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
@@ -17120,19 +17120,19 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_t_2 = 0;
       __pyx_t_5 = 0;
       __pyx_t_3 = 0;
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_lead_agent, __pyx_t_6) < 0) __PYX_ERR(0, 638, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_lead_agent, __pyx_t_6) < 0) __PYX_ERR(0, 639, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "c_tools.pyx":640
+      /* "c_tools.pyx":641
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr             # <<<<<<<<<<<<<<
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
  *             else:
  */
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_gap_curr, __pyx_v_gap_curr) < 0) __PYX_ERR(0, 640, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_gap_curr, __pyx_v_gap_curr) < 0) __PYX_ERR(0, 641, __pyx_L1_error)
 
-      /* "c_tools.pyx":641
+      /* "c_tools.pyx":642
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr             # <<<<<<<<<<<<<<
@@ -17140,11 +17140,11 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  *                 return True
  */
       __Pyx_XDECREF(__pyx_r);
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_compute_gap_req_fast); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 641, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_compute_gap_req_fast); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 641, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_a_min); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 641, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_a_min); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_1 = NULL;
       __pyx_t_7 = 0;
@@ -17161,7 +17161,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_5, __pyx_v_v_a, __pyx_t_2, __pyx_v_v};
-        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 641, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 642, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -17171,7 +17171,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_5, __pyx_v_v_a, __pyx_t_2, __pyx_v_v};
-        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 641, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 642, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -17179,7 +17179,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 641, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 642, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_1) {
           __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -17196,12 +17196,12 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
         PyTuple_SET_ITEM(__pyx_t_8, 3+__pyx_t_7, __pyx_v_v);
         __pyx_t_5 = 0;
         __pyx_t_2 = 0;
-        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 641, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 642, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyObject_RichCompare(__pyx_t_6, __pyx_v_gap_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 641, __pyx_L1_error)
+      __pyx_t_3 = PyObject_RichCompare(__pyx_t_6, __pyx_v_gap_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 642, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_r = __pyx_t_3;
       __pyx_t_3 = 0;
@@ -17212,11 +17212,11 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  * 
  *             if lead_agent:             # <<<<<<<<<<<<<<
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
- *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
+ * 
  */
     }
 
-    /* "c_tools.pyx":643
+    /* "c_tools.pyx":644
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
  *             else:
  *                 return True             # <<<<<<<<<<<<<<
@@ -17266,7 +17266,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "c_tools.pyx":645
+/* "c_tools.pyx":646
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
@@ -17300,7 +17300,7 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("run", 0);
 
-  /* "c_tools.pyx":646
+  /* "c_tools.pyx":647
  * 
  * def run(runnable_set):
  *     for runnable in runnable_set:             # <<<<<<<<<<<<<<
@@ -17311,26 +17311,26 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __pyx_t_1 = __pyx_v_runnable_set; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_runnable_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 646, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_runnable_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 646, __pyx_L1_error)
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 646, __pyx_L1_error)
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 647, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 646, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 647, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 646, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 647, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 646, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 647, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       }
@@ -17340,7 +17340,7 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 646, __pyx_L1_error)
+          else __PYX_ERR(0, 647, __pyx_L1_error)
         }
         break;
       }
@@ -17349,13 +17349,13 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __Pyx_XDECREF_SET(__pyx_v_runnable, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":647
+    /* "c_tools.pyx":648
  * def run(runnable_set):
  *     for runnable in runnable_set:
  *         runnable.run()             # <<<<<<<<<<<<<<
  * 
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_runnable, __pyx_n_s_run); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 647, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_runnable, __pyx_n_s_run); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -17369,12 +17369,12 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     }
     __pyx_t_4 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 647, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":646
+    /* "c_tools.pyx":647
  * 
  * def run(runnable_set):
  *     for runnable in runnable_set:             # <<<<<<<<<<<<<<
@@ -17384,7 +17384,7 @@ static PyObject *__pyx_pf_7c_tools_16run(CYTHON_UNUSED PyObject *__pyx_self, PyO
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":645
+  /* "c_tools.pyx":646
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
@@ -18499,17 +18499,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__81);
   __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(4, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 621, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) __PYX_ERR(0, 621, __pyx_L1_error)
 
-  /* "c_tools.pyx":645
+  /* "c_tools.pyx":646
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
  *     for runnable in runnable_set:
  *         runnable.run()
  */
-  __pyx_tuple__83 = PyTuple_Pack(2, __pyx_n_s_runnable_set, __pyx_n_s_runnable); if (unlikely(!__pyx_tuple__83)) __PYX_ERR(0, 645, __pyx_L1_error)
+  __pyx_tuple__83 = PyTuple_Pack(2, __pyx_n_s_runnable_set, __pyx_n_s_runnable); if (unlikely(!__pyx_tuple__83)) __PYX_ERR(0, 646, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__83);
   __Pyx_GIVEREF(__pyx_tuple__83);
-  __pyx_codeobj__84 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__83, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_run, 645, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__84)) __PYX_ERR(0, 645, __pyx_L1_error)
+  __pyx_codeobj__84 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__83, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_run, 646, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__84)) __PYX_ERR(0, 646, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -19711,16 +19711,16 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":645
+  /* "c_tools.pyx":646
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
  *     for runnable in runnable_set:
  *         runnable.run()
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7c_tools_17run, NULL, __pyx_n_s_c_tools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 645, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_7c_tools_17run, NULL, __pyx_n_s_c_tools); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 646, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run, __pyx_t_2) < 0) __PYX_ERR(0, 645, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run, __pyx_t_2) < 0) __PYX_ERR(0, 646, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "c_tools.pyx":1

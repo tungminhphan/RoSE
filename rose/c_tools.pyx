@@ -171,7 +171,7 @@ class Oracle():
     def __init__(self, name):
         self.name = name
         pass
-    def evaluate(self, ctrl_action, plant, game):
+    def evaluate(self, ctrl_action, plant, game, error_flag):
         raise NotImplementedError
 
 class StaticObstacleOracle(Oracle):
@@ -633,6 +633,7 @@ class BackupPlanSafetyOracle(Oracle):
 
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+
                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
                 # record lead agent
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)

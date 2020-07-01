@@ -1,0 +1,22 @@
+{
+  "0": {
+    "error_type": "sensor",
+    "error_category": "velocity",
+    "certainty_level": 90
+  },
+  "1": {
+    "error_type": "perception",
+    "error_category": "occlusion",
+    "certainty_level": 100
+  },
+  "2": {
+    "error_type": "communication",
+    "error_category": "traffic_light",
+    "certainty_level": 100
+  },
+  "3": {
+    "error_type": "deliberate",
+    "error_category": "traffic_light",
+    "certainty_level": 100
+  }
+}
