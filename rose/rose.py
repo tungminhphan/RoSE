@@ -1047,15 +1047,11 @@ class Car(Agent):
             width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
         except:
             return False
-            #print(st_1)
-            ##print(st_2)
-            #print(width_1, width_2)
         return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
 
 
     # check if the final configuration of the agents is valid
     def check_safe_config(self, ag_1, ag_2, st_1=None, st_2=None):
-
         # returns agent_lead, agent_behind in that order
         def sort_agents(st_1, st_2):
             try:
@@ -1126,8 +1122,8 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
             chk_valid_actions, flag_a, flag_b = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(), debug=True)
-            if not chk_valid_actions:
-                print("max yield flag is set")
+            #if not chk_valid_actions:
+            #    print("max yield flag is set")
             return not chk_valid_actions, flag_a, flag_b
         else:
             return False, flag_a, flag_b
@@ -1139,10 +1135,10 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                if not chk_valid_actions:
-                    if agent.state.heading == 'east':
+                #if not chk_valid_actions:
+                    #if agent.state.heading == 'east':
                         #print(self.state)
-                        print("sending conflict request")
+                    #   print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1835,9 +1831,11 @@ class Bundle:
         self.length = len(self.length_list)
         self.width = len(self.tube_list)
 
+    # returns the bundle ID
     def get_id(self):
         return id(self)
 
+    # given the relative coordinates with respect to bundle, returns absolute tile values
     def relative_coordinates_to_tile(self, rel_xy):
         x, y = rel_xy
         dvec = DIRECTION_TO_VECTOR[self.direction]
@@ -1847,6 +1845,7 @@ class Bundle:
         tile[1-tube_idx] = self.length_list[y]
         return tuple(tile)
 
+    # returns absolute tile coordinates of all tiles in bundle
     def reconstruct_tiles(self):
         dvec = DIRECTION_TO_VECTOR[self.direction]
         tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
@@ -1857,6 +1856,7 @@ class Bundle:
                 tiles.append(tile)
         return tiles
 
+    # returns the relative coordinates along length of bundle segment
     def get_length_list(self, length_list):
         increasing_dir = DIRECTION_TO_VECTOR[self.direction][np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]]
         reverse = True
@@ -1865,6 +1865,7 @@ class Bundle:
         length_list.sort(reverse=reverse)
         return length_list
 
+    # returns the relative coordinates along width of bundle segment
     def get_width_list(self, tube_list):
         reverse = True
         if self.direction == 'west' or self.direction == 'south':
@@ -1872,25 +1873,31 @@ class Bundle:
         tube_list.sort(reverse=reverse)
         return tube_list
 
+    # returns the relative bundle length for a tile in absolute coordinates
     def tile_to_relative_length(self, tile):
         stp_idx = np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         return self.length_list.index(tile[stp_idx])
 
+    # returns the relative bundle width for a tile in absolute coordinates
     def tile_to_relative_width(self, tile):
         tube_idx = 1-np.nonzero(DIRECTION_TO_VECTOR[self.direction])[0][0]
         return self.tube_list.index(tile[tube_idx])
 
+    # returns the relative width and length of a tile in absolute coordinates
     def tile_to_relative_position(self, tile):
         width = self.tile_to_relative_width(tile)
         length = self.tile_to_relative_length(tile)
         return width, length
 
+    # returns true if tile is in left most lane of bundle
     def is_leftmost_lane(self, tile):
         return self.tile_to_relative_width(tile) == self.width - 1
 
+    # returns true if tile is in right most lane of bundle
     def is_rightmost_lane(self, tile):
         return self.tile_to_relative_width(tile) == 0
 
+# stand alone comparator function
 def get_comparator(cond):
     if cond == 'equal':
         return lambda curr, nxt: nxt is curr
@@ -1899,6 +1906,7 @@ def get_comparator(cond):
     elif cond == 'decreasing':
         return lambda curr, nxt: nxt == curr - 1
 
+# stand alone function that separates lists according to a condition
 def separate_list(lst, cond, sort=False):
     if sort:
         lst.sort()
@@ -1914,6 +1922,7 @@ def separate_list(lst, cond, sort=False):
     partitions.append(part)
     return partitions
 
+# stand alone function to append or create new list
 def append_or_create_new_list(dictionary, key, item):
     if key in dictionary:
         dictionary[key].append(item)
@@ -1927,6 +1936,8 @@ class Field:
         self.nodes = list(self.grid.keys())
         self.drivable_tiles, self.drivable_nodes, self.non_drivable_nodes = self.get_drivable_tiles()
 
+    # parse the csv file into a grid dictionary
+    # keys of dictionary are xy tuple and items are the character from csv file
     def get_grid(self, csv_filename):
         grid = od()
         obstacles = od()
@@ -1938,6 +1949,8 @@ class Field:
                         grid[i,j] = item
         return grid
 
+    # all tiles are included in drivable tiles
+    # any tiles with '-' symbol are considered non-drivable nodes
     def get_drivable_tiles(self):
         drivable_tiles = []
         non_drivable_nodes = []
@@ -1961,20 +1974,20 @@ class Map(Field):
         self.default_spawn_probability = default_spawn_probability
         self.legal_orientations = self.get_legal_orientations()
         self.road_map = self.get_road_map()
-        self.intersections = self.get_intersections()
-        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init, self.seed)
-        self.intersection_to_traffic_light_map = self.get_intersection_to_traffic_light_map()
-        self.tile_to_intersection_map = self.get_tile_to_intersection_map()
-        self.bundles = self.get_bundles()
+        self.intersections = self.get_intersections() 
+        self.traffic_lights = self.get_traffic_lights(random_traffic_lights_init, self.seed) 
+        self.intersection_to_traffic_light_map = self.get_intersection_to_traffic_light_map() 
+        self.tile_to_intersection_map = self.get_tile_to_intersection_map() 
+        self.bundles = self.get_bundles() 
         self.tile_to_bundle_map = self.get_tile_to_bundle_map()
         self.traffic_light_tile_to_bundle_map = self.get_traffic_light_tile_to_bundle_map()
-        self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map()
+        self.tile_to_traffic_light_map = self.get_tile_to_traffic_light_map() 
         self.special_goal_tiles = []
         self.special_heading_tiles = []
-        self.right_turn_tiles = self.find_right_turn_tiles()
+        self.right_turn_tiles = self.find_right_turn_tiles() 
         self.left_turn_tiles = self.find_left_turn_tiles()
         self.all_left_turns = self.get_all_left_turns()
-        self.bundle_graph = self.get_bundle_graph()
+        self.bundle_graph = self.get_bundle_graph() 
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
         self.IO_map = self.get_IO_map()
@@ -2028,6 +2041,8 @@ class Map(Field):
                 return bundle.tile_to_relative_length((x,y)), bundle
 
     # for now, we are assuming default car dynamics; TODO: generalize this
+    # these are the special bundles in which the car does not have to face the direction of the bundles since
+    # they are doing an unprotected left turn
     def get_left_turn_to_opposing_traffic_map(self):
         left_turn_to_opposing_traffic_map = od()
         for bundle in self.left_turn_tiles:
@@ -2047,6 +2062,7 @@ class Map(Field):
                 left_turn_to_opposing_traffic_map[left_turn_tile] = opposing_bundle, relative_occupancy
         return left_turn_to_opposing_traffic_map
 
+    
     def change_traffic_lights(self, traffic_tile, hstate, htimer):
         traffic_light = self.tile_to_traffic_light_map[traffic_tile]
         assert hstate in ['red', 'yellow', 'green']
@@ -2143,7 +2159,9 @@ class Map(Field):
 
     def get_bundle_graph(self):
         '''
-        constructs bundle graph
+        constructs a digraph object where nodes are bundles and the edges
+        mean that bundles are connected if the bundles are reachable to each other
+        via a right or left turn
         '''
         bundle_graph = nx.DiGraph()
         # process right turns
@@ -2277,9 +2295,11 @@ class Map(Field):
             except:
                 return False, None
 
+
     def check_if_left_turn_tile(self, directed_tile):
         """
         given a tile, check if it is ok to perform a left-turn from there
+        returns boolean check and f
 
         """
         tile, direction = directed_tile
@@ -2316,11 +2336,12 @@ class Map(Field):
         return right_turn_tiles
 
     # assuming agents can only legally make a left turn from the leftmost lane into leftmost lane
+    # returns a dictionary where the keys are the bundle and the items
+    # are the map tile, along with a tuple that defines the next left turn tiles (subgoals)
     def find_left_turn_tiles(self):
         """
         collect all (final) left-turn tiles in the map using the check function
         """
-
         left_turn_tiles = od()
         # goes through each bundle
         for bundle in self.bundles:
@@ -2337,6 +2358,7 @@ class Map(Field):
                     left_turn_tiles[bundle][(tile, direction)] = nxt
         return left_turn_tiles
 
+    # returns all the left turn objects in the bundles
     def get_all_left_turns(self):
         all_left_turns = []
         for bundle in self.left_turn_tiles:
@@ -2359,6 +2381,7 @@ class Map(Field):
                 return bundle
         return None
 
+    # returns dictionary that maps tiles to traffic light objects
     def get_tile_to_traffic_light_map(self):
         tile_to_traffic_light_map = od()
         for traffic_light in self.traffic_lights:
@@ -2368,6 +2391,7 @@ class Map(Field):
                 tile_to_traffic_light_map[tile.xy] = traffic_light
         return tile_to_traffic_light_map
 
+    # returns a dictionary that maps traffic light tiles to bundle objects
     def get_traffic_light_tile_to_bundle_map(self):
         tile_to_bundle_map = od()
         for traffic_light in self.traffic_lights:
@@ -2379,6 +2403,7 @@ class Map(Field):
                 append_or_create_new_list(tile_to_bundle_map, tile.xy, bundle)
         return tile_to_bundle_map
 
+    # returns dictionary that maps tile to the map bundle object
     def get_tile_to_bundle_map(self):
         tile_to_bundle_map = od()
         for bundle in self.bundles:
@@ -2408,6 +2433,9 @@ class Map(Field):
         partitions.append(part)
         return partitions
 
+    # parses the road network into single lane objects
+    # then partition neighboring single lanes with same direction into same bundle
+    # returns a collection of these bundle objects
     def get_bundles(self):
         bins = od()
         all_bundles = []
@@ -2449,7 +2477,6 @@ class Map(Field):
                 bundles.append(bundle)
         return bundles
 
-    # this is the bunlde IO map
     def get_IO_map(self):
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
@@ -2463,6 +2490,7 @@ class Map(Field):
                     pass
         return IO_map
 
+    
     def get_pure_IO_map(self): # not based on bundles
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
@@ -2473,6 +2501,9 @@ class Map(Field):
                     IO_map.map[source].append(sink)
         return IO_map
 
+    # gets the sources and sinks
+    # sources are nodes that have no incoming directions
+    # sinks are nodes taht have no outgoing directions
     def get_sources_sinks(self):
         presources = []
         presinks = []
@@ -2490,6 +2521,9 @@ class Map(Field):
                     presources.append(source)
         return presources, presinks
 
+    # search for the traffic lights along the edges of the intersections, 
+    # traffic light objects are defined by cnt, id, htiles, vtiles, random init, seed
+    # one traffic light object per intersection
     def get_traffic_lights(self, random_traffic_lights_init, seed):
         def search_along(start, direction, search_length, green_symbol, yellow_symbol, red_symbol):
             nodes = []
@@ -2520,6 +2554,7 @@ class Map(Field):
 
         return traffic_lights
 
+    # dictionary that maps which intersection object corresponds to which traffic light objects
     def get_intersection_to_traffic_light_map(self):
         intersection_to_traffic_light_map = od()
         for traffic_light in self.traffic_lights:
@@ -2527,6 +2562,7 @@ class Map(Field):
             intersection_to_traffic_light_map[intersection] = traffic_light
         return intersection_to_traffic_light_map
 
+    # dictionary that maps xy tile to the intersection object the tile is in 
     def get_tile_to_intersection_map(self):
         tile_to_intersection_map = od()
         for intersection in self.intersections:
@@ -2534,6 +2570,8 @@ class Map(Field):
                 tile_to_intersection_map[tile] = intersection
         return tile_to_intersection_map
 
+    # searches for clusters of tiles that all have the same intersection symbol and 
+    # creates an intersection object based on these tile clusters
     def get_intersections(self):
         found_intersections = []
         inspected = []
@@ -2568,6 +2606,8 @@ class Map(Field):
                 found_intersections.append(new_intersection)
         return found_intersections
 
+    # creates a DiGraph object where the nodes are (xy, heading) tuples and the edges define
+    # which nodes are reachable to each other
     def get_road_map(self):
         directions = ['south', 'north', 'east', 'west']
         road_map = nx.DiGraph()
@@ -2622,6 +2662,8 @@ class Map(Field):
                                 road_map.add_edge(source, neighbor.xyt, weight=weight)
         return road_map
 
+    # parsing map symbols from csv files to legal directions (north, east, south, west)
+    # key of legal orientations is x-y tuple, the items are list of legal orientations
     def get_legal_orientations(self):
         orientation_set = ['←','→','↓','↑','+','⇠','⇢','⇣','⇡']
 
@@ -2639,6 +2681,7 @@ class Map(Field):
                 found = search_in_direction(node, dvec)
                 if found and found not in found_orientations:
                     found_orientations.append(found)
+
             return found_orientations
 
         legal_orientations = od()
@@ -2650,6 +2693,7 @@ class Map(Field):
                 legal_orientations[node] = [symbol_to_orientation(symb)]
             else:
                 legal_orientations[node] = search_all_directions(node)
+            
         return legal_orientations
 
 class Controller:
@@ -3486,8 +3530,8 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 123
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.15, seed=seed)
+    map_name = 'five_loop'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3495,7 +3539,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=400)
+    game.play(outfile=output_filename, t_end=300)
     #game.animate(frequency=0.01)
 
     # print debug info
