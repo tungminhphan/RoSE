@@ -344,9 +344,11 @@ class Car(Agent):
         for ctrl in all_ctrls:
             score = 0
             scores_sv = od()
+            oracle_eval_sv = od()
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
+                #oracle_eval_sv[oracle.name] = 
                 if oracle.name != 'backup_plan_safety':
                     try:
                         score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
@@ -379,6 +381,8 @@ class Car(Agent):
             for oracle in self.controller.specification_structure.sorted_oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
                 o_tier = self.controller.specification_structure.tier[oracle]
+                scores_sv[oracle.name] = o_score
+
                 if oracle.name != 'backup_plan_safety':
                     score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
                     max_possible_score -= (1-int(o_score))*self.controller.specification_structure.tier_weights[o_tier]
@@ -859,9 +863,10 @@ class Car(Agent):
         #right_turn_ctrl = {'acceleration': 1-self.state.v, 'right-turn'}
         next_st = self.query_occupancy(right_turn_ctrl)[-1]
         bundle = self.supervisor.game.map.get_bundle_from_directed_tile((next_st.x, next_st.y), next_st.heading)
-#        if bundle is None:
-#            TODO: figure why this is necessary...
-        # collect all agents in agent bundle AND in agent bubble
+        # check control action is right turn on valid velocity
+        #if right_turn_ctrl['steer'] == 'right-turn' and right_turn_ctrl['acc']
+
+        # collect all agents in agent bundle that agent will turn into when making a right turn AND in agent bubble
         for agent in self.agents_in_bubble:
             # get the bundle the agent in the bubble is in
             agent_bundle = agent.supervisor.game.map.get_bundle_from_directed_tile((agent.state.x, agent.state.y), agent.state.heading)
@@ -876,7 +881,7 @@ class Car(Agent):
                     if not (chk_valid_1 and chk_valid_2):
                         return False
             else:
-                pass
+                return False
         return True
 
     def check_collision_in_bubble(self, ctrl):
@@ -2593,7 +2598,7 @@ class Map(Field):
                 xm = inspect_in(node, [-1, 0])
                 ym = inspect_in(node, [0, -1])
                 node_p = node[0] + xp, node[1] + yp
-                node_m = node[0] - xm, node[1] - ym
+                node_m = node[0] - xm, node[1] - ym 
                 height = node_p[0] - node_m[0] + 1
                 width = node_p[1] - node_m[1] + 1
                 tiles = []
@@ -3256,6 +3261,7 @@ def get_default_car_ss():
     traffic_intersection_oracle = TrafficIntersectionOracle()
     unprotected_left_turn_oracle = UnprotectedLeftTurnOracle()
     intersection_clearance_oracle = IntersectionClearanceOracle()
+    no_deadlock_oracle = NoDeadlockOracle()
     oracle_set = [static_obstacle_oracle,
                   traffic_light_oracle,
                   legal_orientation_oracle,
@@ -3265,8 +3271,9 @@ def get_default_car_ss():
                   backup_plan_safety_oracle,
                   unprotected_left_turn_oracle,
                   traffic_intersection_oracle,
-                  intersection_clearance_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2, 2])
+                  intersection_clearance_oracle, 
+                  no_deadlock_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 5, 5, 1, 1, 2, 2, 4])
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
@@ -3530,8 +3537,8 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 123
-    map_name = 'five_loop'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.35, seed=seed)
+    map_name = 'city_blocks_small'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.30, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3539,7 +3546,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=300)
+    game.play(outfile=output_filename, t_end=400)
     #game.animate(frequency=0.01)
 
     # print debug info

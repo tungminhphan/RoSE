@@ -541,7 +541,6 @@ class NoDeadlockOracle(Oracle):
     def __init__(self):
         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
 
-
     def evaluate(self, ctrl_action, plant, game):
         ''' action evaluates to True only if action will maintain one-or-two gaps
         depending on whether agent is at an intersection and direction agent wants to turn, i.e.
@@ -559,7 +558,6 @@ class NoDeadlockOracle(Oracle):
                 if next_tile_tuple in game.occupancy_dict:
                     cnt = cnt + 1
             return cnt
-
         
         # find the lead agent in the lane agent will turn left into and number of 
         # agents in intersection that are also making left turn
@@ -591,8 +589,9 @@ class NoDeadlockOracle(Oracle):
                 rel_dis = []
                 offset = np.array([plant.state.x, plant.state.y])
                 for displacement in abs_dis:
-                    heading = convert_car_orientation(state.heading) * np.pi/180
-                    rel_dis.append(offset + rotate_vector(tuple(displacement), heading))
+                    heading = convert_car_orientation(plant.state.heading) * np.pi/180
+                    arr=(offset + rotate_vector(tuple(displacement), heading))
+                    rel_dis.append((arr[0], arr[1]))
                 return rel_dis
 
             # default heading is north
@@ -600,9 +599,9 @@ class NoDeadlockOracle(Oracle):
             right_tiles_default = [[-1, 1], [0, 1], [1, 1]]
             # rotate according to the agent heading
             if left_or_right == 'left':
-                tiles =  relativize_displacement(left_tiles_default)
+                tiles =  relativize_displacement(plant, left_tiles_default)
             elif left_or_right == 'right':
-                tiles = relativize_displacement(right_tiles_default)
+                tiles = relativize_displacement(plant, right_tiles_default)
             else:
                 tiles = None
 
@@ -611,27 +610,25 @@ class NoDeadlockOracle(Oracle):
         # TODO: need to generalize this AND check whether this is right?!
         # returns true if the first tile is open and either second or third tile are unoccupied
         def check_clearance_gap_for_lane_change(plant, tiles):
-            first_tile_unocc = tiles[0] not in plant.map.game.occupancy_dict
-            second_tile_unocc = tiles[1] not in plant.map.game.occupancy_dict
-            third_tile_unocc = tiles[2] not in plant.map.game.occupancy_dict
+            first_tile_unocc = tiles[0] not in plant.supervisor.game.occupancy_dict
+            second_tile_unocc = tiles[1] not in plant.supervisor.game.occupancy_dict
+            third_tile_unocc = tiles[2] not in plant.supervisor.game.occupancy_dict
             return first_tile_unocc and (second_tile_unocc or third_tile_unocc)
 
-        # collect all relevant state info
+        # printing to debug what's happening
+        #print(plant.state)
+        #print(ctrl_action)
+
+        # collect all relevant state info and compute intersection gap
         current_state = plant.state.x, plant.state.y
         x_curr, y_curr = current_state
         next_state = plant.query_next_state(ctrl_action)
         x_next, y_next = next_state.x, next_state.y
         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
         x_next_bp, y_next_bp = bp_state.x, bp_state.y
-
-        # compute intersection gap based on heading
         current_heading = plant.state.heading
-        if current_heading in ['east', 'west']:
-            intersection_gap = next_intersection.height
-        else:
-            intersection_gap = next_intersection.width
 
-        # check if not crossing into an intersection
+        # When agent is NOT CROSSING INTO INTERSECTION
         try:
             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
@@ -639,84 +636,139 @@ class NoDeadlockOracle(Oracle):
         except:
             return True
 
-        # agent will is already in intersection or it will not be in the intersection
-        #if (currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection):
-            # if agent action is a lane change
-            # if agent is not going to make a lane change
-        #    pass
+        if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
+            #====================================================================================================#
+            # CASE E: when agents want to do lane-change AND not go through an intersection
+            # should check whether there are 2 gaps of clearance in loop agent wants to change lanes into
+            #====================================================================================================#
+            if ctrl_action['steer'] == 'left-lane':
+                adj_tiles = get_adjacent_tiles(plant, 'left')
+                return check_clearance_gap_for_lane_change(plant, adj_tiles)
+
+            elif ctrl_action['steer'] == 'right-lane':
+                adj_tiles = get_adjacent_tiles(plant, 'right')
+                return check_clearance_gap_for_lane_change(plant, adj_tiles)
+
+            #====================================================================================================#
+            # CASE F: when agents not doing lane change AND not go through an intersection
+            # oracle should be satisfied vacuously in this case
+            #====================================================================================================#
+            else: 
+                return True
 
         # When the action will take the agent into the intersection
         else:
-            current_subgoal = plant.supervisor.subgoals[0]
-            # figure out what intersection is being entered
+            if (ctrl_action['steer'] == 'right-lane') or (ctrl_action['steer'] == 'left-lane'):
+                return True
+            
             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
+
             # get traffic light information
+            current_subgoal = plant.supervisor.subgoals[0]
             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]
             light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
-
+            
             # TODO: need to generalize to more types of intersections
             # specific left turn check, need to generalize 
             left_turn_chk = plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1]))
+
+
             if left_turn_chk: 
-                # need to check 
-                # find lead agent in road that agent will left-turn into 
-                lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant)
-
-                # compute the clearance gap
-                if lead_agent_left:
-                    # compute the distance between agents 
-                    gap_total = max(abs(lead_agent.state-ref_state.x), abs(lead_agent.state-ref_state.y))
-                    clearance_gaps = gap_total-agent_ahead_cnt
-                    
-                # lead agent is not found
+                #====================================================================================================#
+                # CASE A: when agents wants to do left turn 
+                #====================================================================================================#
+                if light_color == 'red':
+                    return True
                 else:
-                    pass 
-                    
+                    # need to check 
+                    # find lead agent in road that agent will left-turn into 
+                    lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant)
 
-                pass 
+                    # compute the clearance gap
+                    if lead_agent_left:
+                        # compute the distance between agents 
+                        gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
+                        clearance_gaps = gap_total-agent_ahead_cnt
+                        if clearance_gaps > 0: 
+                            return True
+                        else:
+                            return False
+                    # lead agent is not found
+                    else:
+                        return True 
+                    
 
             # if action is to go straight in intersection
-            if ((not left_turn_chk) and ctrl_action['steer'] == 'straight'):
-                # if red light, satisfied vacuously (shouldn't be going)???
-
-
-                # if green light, need at least two gaps of clearance
+            elif ((not left_turn_chk) and ctrl_action['steer'] == 'straight'):
+                #====================================================================================================#
+                # CASE B: going straight ahead into intersection (not in right-most lane)
+                # CASE C: going straight ahead into intersection (in right-most lane), just add into the agent count
+                #====================================================================================================#
+                directed_tile = (current_state, plant.state.heading)
+                in_rightmost_lane = plant.supervisor.game.map.check_if_right_turn_tile(directed_tile)
+                #if not in_rightmost_lane:  
+                    # if red light, satisfied vacuously (shouldn't be going)???
+                    # if green light, need at least two gaps of clearance
                     # find lead agent
+                if light_color == 'red':
+                    return True
+                else: 
                     lead_agent_forward = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
 
                     # count how many agents between lead agent and current agent when there is a lead agent
                     if lead_agent_forward is not None: 
-                        gap_between_agents = max(abs(lead_agent_forward.x-self.state.x), abs(lead_agent_forward.y-self.state.y))
+                        gap_between_agents = max(abs(lead_agent_forward.state.x-plant.state.x), abs(lead_agent_forward.state.y-plant.state.y))
                         agents_ahead = count_agents_ahead(gap_between_agents)
-                        # compute gaps of clearance
-                        clearance_gaps = gap_between_agents-agents_ahead
+                        # compute how many agents in right-turn lane can fill in gaps
+                        if in_rightmost_lane: 
+                            # TODO: ADD IN COUNT, GENERALIZE LATER
+                            #pass
+                            agents_ahead = agents_ahead + 1
+                            # compute gaps of clearance
+                            clearance_gaps = gap_between_agents-agents_ahead
+                            if clearance_gaps > 1: 
+                                return True
+                            else:
+                                return False
 
                         # TODO: if in the right-most lane, then need to figure out how many agents might turn right into
                         # its lane
-                    
+                        return False
                     # no lead agent
                     else:
                         return True
-                
-                pass 
 
-            
+            #====================================================================================================#
+            # CASE D: Making a right-turn into an intersection
+            #====================================================================================================#
             # if action is to turn right across intersection
-            if ctrl_action['steer'] == 'turn-right':
-                # if red light, need to check whether cars in intersection will take up gap
-
-                # if green light, don't need to check
-                right_turn_tile_final = plant.query_occupancy(ctrl_action)[-1]
+            elif ctrl_action['steer'] == 'right-turn':
+                right_turn_state = plant.query_occupancy(ctrl_action)[-1]
+                right_turn_tile = (right_turn_state.x, right_turn_state.y)
                 # if agent is in tile, return false
-                if right_turn_tile_final in plant.supervisor.game.occupancy_dict:
+                if right_turn_tile in plant.supervisor.game.occupancy_dict:
                     return False
-                # if agent is not in tile, there is a gap and return True
+                # if agent is not in tile
                 else:
-                    return True
+                    # when light color is red, other cars might go first
+                    if light_color == 'red':
+                        # TODO: WRITE FUNCTION TO CHECK WHETHER CAR HAS PRECEDENCE
+                        #agent_ahead = check_whether_car_has_precedence()
+                        # there is a car that can go ahead of agent
+                        #if agent_ahead: 
+                        #    return False
+                        #else:
+                        #    return True
+                        return False
+                    # otherwise, no other cars will have precedence over right turn agent
+                    else:
+                        return True
 
-                pass
-
-            pass 
+            # not left turn, straight across intersection OR right turn
+            else: 
+                print(ctrl_action)
+                print(plant.state)
+                print("ERROR!!")
         pass
 
 
@@ -936,3 +988,41 @@ def run(runnable_set):
     for runnable in runnable_set:
         runnable.run()
 
+
+        '''def extract_right_turn_tiles(intersection, heading, cnt):
+            #returns a list of tiles that corresponds to the right-turn tiles at
+            #a specified 'intersection' that are facing the specified 'heading'
+            #the count determines the length of the list of tiles returned
+            
+            def get_intersection_corners(intersection):
+                x_lo, x_hi = min(list(zip(*intersection.grid))[0]), max(list(zip(*intersection.grid))[0])
+                y_lo, y_hi = min(list(zip(*intersection.grid))[1]), max(list(zip(*intersection.grid))[1])
+                return x_lo, x_hi, y_lo, y_hi
+
+            x_min, x_max, y_min, y_max = get_intersection_corners(intersection)
+            right_turn_tiles = []
+
+            # when heading of agents is: north
+            if heading == 'north': 
+                tile_corner = max_x, max_y
+                for i in range(1, cnt):
+                    right_turn_tiles.append(tile_corner[0] + i, tile_corner[1])
+            # east
+            elif heading == 'east':
+                tile_corner = max_x, min_y
+                for i in range(1, cnt):
+                    right_turn_tiles.append(tile_corner[0], tile_corner[1]-i)
+                
+            # south 
+            elif heading == 'south':
+                tile_corner = min_x, min_y
+                for i in range(1, cnt):
+                    right_turn_tiles.append(tile_corner[0] - i, tile_corner[1])
+
+            # west
+            else: 
+                tile_corner = min_x, max_y
+                for i in range(1, cnt):
+                    right_turn_tiles.append(tile_corner[0], tile_corner[1]+i)
+
+            return right_turn_tiles'''
