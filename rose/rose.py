@@ -1616,11 +1616,8 @@ class TrafficGame(Simulation):
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
-<<<<<<< HEAD
         self.occupancy_dict = od()
         self.update_occupancy_dict()
-=======
->>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.car_count = 0
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
@@ -3234,6 +3231,7 @@ def create_default_car(source, sink, game, car_count):
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start_xy, start_heading = source.node
     end = sink.node
+    #print(end)
     car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
@@ -3252,7 +3250,10 @@ def create_specified_car(attributes, game):
         set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     else:
-        attributes['goal'] = parse_goal_string_to_goal_tuple(attributes['goal'])
+        a = parse_goal_string_to_goal_tuple(attributes['goal'])
+        a = ((a[0], a[1]), a[2])
+        attributes['goal'] = a
+        
     if 'controller' not in attributes:
         ss = get_default_car_ss()
         # default to SpecificationStructureController
@@ -3287,15 +3288,9 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
-<<<<<<< HEAD
-    def __init__(self, game_map, save_debug_info=True):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
-=======
     def __init__(self, game_map):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
->>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
-        self.bundle_to_agent_precedence = None
         self.simulated_agents = []
 
     def done_simulating_agent(self, agent):
@@ -3494,16 +3489,16 @@ def create_qs_game_from_config(game_map, config_path):
 
 if __name__ == '__main__':
     seed = 123
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.25, seed=seed)
+    map_name = 'straight_simple'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map)
-    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    #game = QuasiSimultaneousGame(game_map=the_map)
+    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=400)
+    game.play(outfile=output_filename, t_end=100)
     #game.animate(frequency=0.01)
 
     # print debug info

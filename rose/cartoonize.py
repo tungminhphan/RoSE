@@ -46,9 +46,9 @@ def traces_to_animation(filename, output_dir, start=0, end=-1):
         plot_map(the_map)
         agents = traces[t]['agents']
         lights = traces[t]['lights']
-        plot_cars(agents, draw_bubble=False,
-                special_heading_tiles=special_heading_tiles)
-        plot_traffic_lights(lights)
+        plot_cars(agents, draw_bubble=False, special_heading_tiles=special_heading_tiles)
+        if len(lights) != 0:
+            plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
         img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)
@@ -90,7 +90,7 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure
-def plot_map(map, grid_on=False):
+def plot_map(map, grid_on=True):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
     ax.set_xlim(x_min, x_max)

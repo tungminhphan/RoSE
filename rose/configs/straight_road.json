@@ -1,0 +1,14 @@
+{
+  "0": {
+    "heading": "east",
+    "v": 0,
+    "goal": "((6, 93), east)",
+    "agent_color": "red"
+  },
+  "1": {
+    "heading": "east",
+    "v": 0,
+    "goal": "((6, 93), east)",
+    "agent_color": "blue"
+  }
+}
