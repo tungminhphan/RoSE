@@ -2,7 +2,7 @@
   "0": {
     "error_type": "sensor",
     "error_category": "velocity",
-    "certainty_level": 90
+    "certainty_level": 80
   },
   "1": {
     "error_type": "perception",

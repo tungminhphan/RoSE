@@ -1,14 +1,14 @@
 {
   "0": {
     "heading": "auto",
-    "v": 1,
-    "goals": "auto",
-    "agent_color": "red"
+    "v": 3,
+    "goals": "((18, 60), east)",
+    "agent_color": "blue"
   },
   "1": {
     "heading": "auto",
-    "v": 2,
-    "goals": "auto",
-    "agent_color": "green"
+    "v": 1,
+    "goals": "((18, 60), east)",
+    "agent_color": "red"
   }
 }

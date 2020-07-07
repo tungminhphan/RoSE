@@ -171,7 +171,7 @@ class Oracle():
     def __init__(self, name):
         self.name = name
         pass
-    def evaluate(self, ctrl_action, plant, game, error_flag):
+    def evaluate(self, ctrl_action, plant, game):
         raise NotImplementedError
 
 class StaticObstacleOracle(Oracle):
@@ -325,7 +325,7 @@ class TrafficLightOracle(Oracle):
         # check whether the right-turn action is okay
         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
             traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
-            light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
+            light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0 #HERE
             if light_is_red:
                 # check if right turn is valid
                 return plant.check_right_turn_is_clear(ctrl_action)
@@ -335,8 +335,9 @@ class TrafficLightOracle(Oracle):
             return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
 class UnprotectedLeftTurnOracle(Oracle):
-    def __init__(self):
+    def __init__(self,error_flag):
         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
+        self.error = error_flag
 
     def get_conservative_gap(self, lead_agent, N):
         """
@@ -344,7 +345,9 @@ class UnprotectedLeftTurnOracle(Oracle):
         time steps assuming maximum acceleration at each time step
         """
         gap = 0
-        v_init = lead_agent.state.v
+        v_init = lead_agent.state.v - self.error
+        if v_init < lead_agent.v_min:
+            v_init = lead_agent.v_min + self.error
         for idx in range(N):
             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
             gap += v_init
@@ -616,8 +619,9 @@ class LegalOrientationOracle(Oracle):
             return False # if node is an obstacle or out of bounds
 
 class BackupPlanSafetyOracle(Oracle):
-    def __init__(self):
+    def __init__(self,error_flag):
         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
+        self.error = error_flag
     def evaluate(self, ctrl_action, plant, game):
         # check if collision occurs by taking that action
         collision_chk = plant.check_collision_in_bubble(ctrl_action)
@@ -631,8 +635,17 @@ class BackupPlanSafetyOracle(Oracle):
             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
             lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
 
+
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+
+                e = v_a - self.error
+                if e < lead_agent.v_min:
+                    v_a = v_a + self.error
+                else:
+                    v_a = e
+                #print(v_a,'/n')
+                #lead_agent.state.v = v_a
 
                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
                 # record lead agent
