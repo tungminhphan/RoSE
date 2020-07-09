@@ -46,9 +46,9 @@ def traces_to_animation(filename, output_dir, start=0, end=-1):
         plot_map(the_map)
         agents = traces[t]['agents']
         lights = traces[t]['lights']
-        plot_cars(agents, draw_bubble=False,
-                special_heading_tiles=special_heading_tiles)
-        plot_traffic_lights(lights)
+        plot_cars(agents, draw_bubble=False, special_heading_tiles=special_heading_tiles)
+        if len(lights) != 0:
+            plot_traffic_lights(lights)
         plot_name = str(t).zfill(5)
         img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)

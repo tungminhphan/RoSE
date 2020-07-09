@@ -267,6 +267,7 @@ class Car(Agent):
         self.token_count_before = 0
         self.left_turn_gap_arr = []
         self.clearance_straight_info = None
+        self.no_deadlock_sv = od()
 
         self.conflict_winner_sv = None
         self.received_sv = []
@@ -454,10 +455,21 @@ class Car(Agent):
     def get_length_along_bundle(self):
         assert self.supervisor, 'Supervisory controller required!'
         x, y = self.state.x, self.state.y
+
+        # need to check whether agent is on a special tile
+        # TODO: fix this bandage code
+        heading = self.state.heading
+        if ((self.state.x, self.state.y), self.state.heading) in self.supervisor.game.map.special_goal_tiles:
+            heading = Car.convert_orientation(Car.convert_orientation(self.state.heading) + 90)
+
         current_bundles = self.supervisor.game.map.tile_to_bundle_map[x,y]
+
         for bundle in current_bundles:
-            if bundle.direction == self.state.heading:
+            if bundle.direction == heading:
                 return bundle.tile_to_relative_length((x,y)), bundle
+
+        print("bundle in direction not found")
+        return None, None
 
     # TODO: REDUNDANT use directed_tile_to_get_relative_width
     def get_width_along_bundle(self):
@@ -818,6 +830,7 @@ class Car(Agent):
         # which agents checking to send
         agents_checked_for_conflict = []
 
+
         # check whether agent is in conflict with other agents in its bubble
         for agent in agents_in_bubble:
             if agent.get_id() != self.get_id():
@@ -825,11 +838,13 @@ class Car(Agent):
                 try:
                     lon1 = self.get_length_along_bundle()[0]
                 except:
+                    print('long 1 not found')
                     lon1 = None
                 try:
                     lon2 = agent.get_length_along_bundle()[0]
                 except:
                     lon2 = None
+                    print('long 2 not found')
                 agents_checked_for_conflict.append((agent, lon1, lon2, self.state.heading==agent.state.heading))
                 # first check if agent is longitudinally equal or ahead of other agent
                 try:
@@ -837,6 +852,7 @@ class Car(Agent):
                     chk_lon = chk>=0
                     #if chk == 0:
                 except:
+                    print("breaking")
                     break
                 if chk_lon and self.state.heading == agent.state.heading:
                     # one last check to see whether agents are in the same lane and the agent behind doesn't also want to switch lanes
@@ -852,7 +868,8 @@ class Car(Agent):
                             self.agent_max_braking_not_enough = agent
                             # save this info
                             self.agent_max_braking_not_enough_sv = (agent.state.__tuple__(), flag_a, flag_b)
-                            return []
+                            #print("returning early, not saving data")
+                            send_requests_list = []
         if self.supervisor.game.save_debug_info: 
             self.agents_checked_for_conflict_sv = [(ag[0].state.__tuple__(), ag[0].intention, ag[0].token_count_before, ag[0].get_id(), ag[1], ag[2], ag[3]) for ag in agents_checked_for_conflict]
         return send_requests_list
@@ -1624,6 +1641,7 @@ class TrafficGame(Simulation):
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
         self.save_debug_info = save_debug_info
+        #self.no_deadlock_sv = od()
         # save interesting numbers
         self.car_count = 0
         self.agents_reached_goal_count = 0 
@@ -1715,7 +1733,8 @@ class TrafficGame(Simulation):
                                 'lead_agent':agent.lead_agent,
                                 'checked_for_conflict':agent.agents_checked_for_conflict_sv,
                                 'agents_in_bubble_before': agent.agents_in_bubble_before_sv,
-                                'clearance_straight_info': agent.clearance_straight_info}
+                                'clearance_straight_info': agent.clearance_straight_info,
+                                'no_deadlock_info': agent.no_deadlock_sv}
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
         self.traces_debug[self.time] = all_agent_info_at_time_t_dict
@@ -3273,7 +3292,7 @@ def get_default_car_ss():
                   traffic_intersection_oracle,
                   intersection_clearance_oracle, 
                   no_deadlock_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 5, 5, 1, 1, 2, 2, 4])
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 4, 5, 5, 1, 1, 2, 2, 3])
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
@@ -3282,6 +3301,7 @@ def create_default_car(source, sink, game, car_count):
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start_xy, start_heading = source.node
     end = sink.node
+    #print(end)
     car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
@@ -3300,7 +3320,10 @@ def create_specified_car(attributes, game):
         set_seed(game.map.seed)
         attributes['goal'] = np.random.choice(game.map.IO_map.sinks).node
     else:
-        attributes['goal'] = parse_goal_string_to_goal_tuple(attributes['goal'])
+        a = parse_goal_string_to_goal_tuple(attributes['goal'])
+        a = ((a[0], a[1]), a[2])
+        attributes['goal'] = a
+        
     if 'controller' not in attributes:
         ss = get_default_car_ss()
         # default to SpecificationStructureController
@@ -3430,8 +3453,13 @@ class QuasiSimultaneousGame(TrafficGame):
                 if agent.conflict_winner is not None:
                     agent.conflict_winner_sv = agent.conflict_winner.state.__tuple__()
 
+    def reset_debug_info(self):
+        for agent in self.agent_set:
+            agent.no_deadlock_sv = od()
+
     def sys_step(self):
         # set all agent intentions
+        self.reset_debug_info()
         self.set_agent_intentions()
         self.set_agent_bubbles()
         # call resolve_conflicts
@@ -3538,12 +3566,12 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 123
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.30, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.3, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map)
-    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    #game = QuasiSimultaneousGame(game_map=the_map)
+    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
     game.play(outfile=output_filename, t_end=400)

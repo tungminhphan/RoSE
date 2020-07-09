@@ -541,11 +541,15 @@ class NoDeadlockOracle(Oracle):
     def __init__(self):
         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
 
-    def evaluate(self, ctrl_action, plant, game):
+    def evaluate(self, ctrl_action, plant, game, save_debug=False):
         ''' action evaluates to True only if action will maintain one-or-two gaps
         depending on whether agent is at an intersection and direction agent wants to turn, i.e.
         internal or external loop more specific version of the traffic clearance intersection
         currently only works for 4x4 intersections'''
+        # want to record control action, case, clearance computed
+
+        #no_deadlock_oracle_info_sv = od()
+
         # count agents in the intersection ahead 
         def count_agents_ahead(gap):
             cnt = 0
@@ -561,9 +565,13 @@ class NoDeadlockOracle(Oracle):
         
         # find the lead agent in the lane agent will turn left into and number of 
         # agents in intersection that are also making left turn
-        def find_left_turn_lead_agent(plant):
+        def find_left_turn_lead_agent(plant, state=None):
+            if state == None: 
+                state = plant.state
+
             agent_cnt = 0
-            current_heading = plant.state.heading
+            x_curr, y_curr = state.x, state.y
+            current_heading = state.heading
             heading_degrees = convert_car_orientation(current_heading)
             left_heading_degrees = (heading_degrees + 90) % 360
             left_heading = convert_car_orientation(left_heading_degrees)
@@ -578,12 +586,22 @@ class NoDeadlockOracle(Oracle):
                 
                 next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
             # reference state is that last subgoal of the left turn
-            reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
+            reference_state = plant.hack_state(state, x=next_tile[0], y=next_tile[1], heading=left_heading)
             lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
             return lead_agent, agent_cnt, reference_state
         
+        # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
         # returns the appropriate tiles
-        def get_adjacent_tiles(plant, left_or_right):
+        def get_rel_adjacent_tiles(plant):
+            rel_tiles = od()
+            # TODO: generalize this so field-of-view depends on agent bubble!!!!
+            # default heading is north
+            rel_tiles['left'] = [[-2,-1], [-1, -1], [0, -1], [1, -1], [2, -1]]
+            rel_tiles['right'] = [[-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1]]
+            return rel_tiles
+        
+        # returns true if the first tile is open and either second or third tile are unoccupied
+        def check_clearance_gap_for_lane_change(plant, ctrl_action):
             # rotate the vector from 
             def relativize_displacement(plant, abs_dis): 
                 rel_dis = []
@@ -593,27 +611,38 @@ class NoDeadlockOracle(Oracle):
                     arr=(offset + rotate_vector(tuple(displacement), heading))
                     rel_dis.append((arr[0], arr[1]))
                 return rel_dis
-
-            # default heading is north
-            left_tiles_default = [[-1, -1], [0, -1], [1, -1]]
-            right_tiles_default = [[-1, 1], [0, 1], [1, 1]]
-            # rotate according to the agent heading
-            if left_or_right == 'left':
-                tiles =  relativize_displacement(plant, left_tiles_default)
-            elif left_or_right == 'right':
-                tiles = relativize_displacement(plant, right_tiles_default)
+            
+            rel_tiles = get_rel_adjacent_tiles(plant)
+            
+            # convert the tiles to absolute coordinates 
+            if ctrl_action['steer'] == 'left-lane':
+                tiles = relativize_displacement(plant, rel_tiles['left'])
+            elif ctrl_action['steer'] == 'right-lane':
+                tiles = relativize_displacement(plant, rel_tiles['right'])
             else:
-                tiles = None
+                print("ERROR, not a lane change action")
+            
+            # loop through all tiles and count how many gaps 
+            cnt = 0 
+            for tile in tiles: 
+                if tile not in plant.supervisor.game.occupancy_dict: 
+                    cnt = cnt + 1
+            
+            # check if agent subgoal is a left-turn tile, then look for clearance gaps
+            # in lane where agent will left turn into 
+            current_subgoal = plant.supervisor.subgoals[0]
+            if current_subgoal in plant.supervisor.game.map.all_left_turns:
+                # if at least one gap is available, then add to count by one
+                # from state where you would start left-turn...
+                st_f = plant.query_car_occupancy(ctrl_action)[-1]
+                lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant, state=None)
+                gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
+                clearance_gaps = gap_total-agent_ahead_cnt
+                if clearance_gaps >= 1: 
+                    cnt = cnt+1
 
-            return tiles
-
-        # TODO: need to generalize this AND check whether this is right?!
-        # returns true if the first tile is open and either second or third tile are unoccupied
-        def check_clearance_gap_for_lane_change(plant, tiles):
-            first_tile_unocc = tiles[0] not in plant.supervisor.game.occupancy_dict
-            second_tile_unocc = tiles[1] not in plant.supervisor.game.occupancy_dict
-            third_tile_unocc = tiles[2] not in plant.supervisor.game.occupancy_dict
-            return first_tile_unocc and (second_tile_unocc or third_tile_unocc)
+            # need clearance of two 
+            return cnt>=2, cnt
 
         # printing to debug what's happening
         #print(plant.state)
@@ -627,6 +656,7 @@ class NoDeadlockOracle(Oracle):
         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
         x_next_bp, y_next_bp = bp_state.x, bp_state.y
         current_heading = plant.state.heading
+        ctrl_action_str = ctrl_action['steer'] + ' ' + str(ctrl_action['acceleration'])
 
         # When agent is NOT CROSSING INTO INTERSECTION
         try:
@@ -641,19 +671,19 @@ class NoDeadlockOracle(Oracle):
             # CASE E: when agents want to do lane-change AND not go through an intersection
             # should check whether there are 2 gaps of clearance in loop agent wants to change lanes into
             #====================================================================================================#
-            if ctrl_action['steer'] == 'left-lane':
-                adj_tiles = get_adjacent_tiles(plant, 'left')
-                return check_clearance_gap_for_lane_change(plant, adj_tiles)
-
-            elif ctrl_action['steer'] == 'right-lane':
-                adj_tiles = get_adjacent_tiles(plant, 'right')
-                return check_clearance_gap_for_lane_change(plant, adj_tiles)
+            if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):
+                gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)
+                if save_debug: 
+                    plant.no_deadlock_sv[ctrl_action] = ['E', gap_cnt, gap_is_enough]
+                return gap_is_enough
 
             #====================================================================================================#
             # CASE F: when agents not doing lane change AND not go through an intersection
             # oracle should be satisfied vacuously in this case
             #====================================================================================================#
             else: 
+                if save_debug:
+                    plant.no_deadlock_sv[ctrl_action] = ['F', None, None]
                 return True
 
         # When the action will take the agent into the intersection
@@ -665,6 +695,7 @@ class NoDeadlockOracle(Oracle):
 
             # get traffic light information
             current_subgoal = plant.supervisor.subgoals[0]
+            #print(current_subgoal)
             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]
             light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
             
@@ -678,6 +709,8 @@ class NoDeadlockOracle(Oracle):
                 # CASE A: when agents wants to do left turn 
                 #====================================================================================================#
                 if light_color == 'red':
+                    if save_debug:
+                        plant.no_deadlock_sv[ctrl_action] = ['A', 'red']
                     return True
                 else:
                     # need to check 
@@ -690,11 +723,17 @@ class NoDeadlockOracle(Oracle):
                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
                         clearance_gaps = gap_total-agent_ahead_cnt
                         if clearance_gaps > 0: 
+                            if save_debug: 
+                                plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, True]
                             return True
                         else:
+                            if save_debug: 
+                                plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, False]
                             return False
-                    # lead agent is not found
+                    # lead agent is not found, lots of spaces so OK
                     else:
+                        if save_debug: 
+                            plant.no_deadlock_sv[ctrl_action] = ['A', 10000, True]
                         return True 
                     
 
@@ -711,6 +750,8 @@ class NoDeadlockOracle(Oracle):
                     # if green light, need at least two gaps of clearance
                     # find lead agent
                 if light_color == 'red':
+                    if save_debug: 
+                        plant.no_deadlock_sv[ctrl_action] = ['B/C', 'red']
                     return True
                 else: 
                     lead_agent_forward = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
@@ -725,17 +766,25 @@ class NoDeadlockOracle(Oracle):
                             #pass
                             agents_ahead = agents_ahead + 1
                             # compute gaps of clearance
-                            clearance_gaps = gap_between_agents-agents_ahead
-                            if clearance_gaps > 1: 
-                                return True
-                            else:
-                                return False
+
+                        clearance_gaps = gap_between_agents-agents_ahead
+                        if clearance_gaps > 1: 
+                            if save_debug: 
+                                plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, True]
+                            return True
+                        else:
+                            if save_debug: 
+                                plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, False]
+                            return False
 
                         # TODO: if in the right-most lane, then need to figure out how many agents might turn right into
                         # its lane
-                        return False
+                        #no_deadlock_sv[ctrl_action] = ['C', clearance_gaps, False]
+                        #return False
                     # no lead agent
                     else:
+                        if save_debug: 
+                            plant.no_deadlock_sv = ['C', 'nolead']
                         return True
 
             #====================================================================================================#
@@ -747,11 +796,15 @@ class NoDeadlockOracle(Oracle):
                 right_turn_tile = (right_turn_state.x, right_turn_state.y)
                 # if agent is in tile, return false
                 if right_turn_tile in plant.supervisor.game.occupancy_dict:
+                    if save_debug:
+                        plant.no_deadlock_sv[ctrl_action] = ['D', 'agent in tile']
                     return False
                 # if agent is not in tile
                 else:
                     # when light color is red, other cars might go first
                     if light_color == 'red':
+                        if save_debug: 
+                            plant.no_deadlock_sv[ctrl_action] = ['D', False]
                         # TODO: WRITE FUNCTION TO CHECK WHETHER CAR HAS PRECEDENCE
                         #agent_ahead = check_whether_car_has_precedence()
                         # there is a car that can go ahead of agent
@@ -762,6 +815,8 @@ class NoDeadlockOracle(Oracle):
                         return False
                     # otherwise, no other cars will have precedence over right turn agent
                     else:
+                        if save_debug: 
+                            plant.no_deadlock_sv[ctrl_action] = ['D', True]
                         return True
 
             # not left turn, straight across intersection OR right turn
@@ -914,14 +969,20 @@ class TrafficIntersectionOracle(Oracle):
                 if bundle.direction == heading:
                     return True
             return False
+        
+        # When agent is NOT CROSSING INTO INTERSECTION
+        currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((plant.state.x,plant.state.y))
+        next_state = plant.query_next_state(ctrl_action)
+        x_next, y_next = next_state.x, next_state.y
+        will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
+            #bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
+            #x_next_bp, y_next_bp = bp_state.x, bp_state.y
+            #bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
+        #except:
+        #   return True
 
-        # if agent isn't in intersection return true
-        if game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
-            return True
-        elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:
-            return True
-        # else check if action is a lane change move (which isn't allowed)
-        else:
+        # if agent is currently in intersection or action will take agent into intersection
+        if currently_in_intersection or will_be_in_intersection:
             ego_tile = plant.state.x, plant.state.y
             ego_heading = plant.state.heading
             bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
@@ -937,6 +998,14 @@ class TrafficIntersectionOracle(Oracle):
                     return False
                 else:
                     return True
+
+        elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
+            return True
+        elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:
+            return True
+        else:
+            print('unknown case')
+            return False
 
 class LegalOrientationOracle(Oracle):
     """
