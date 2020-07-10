@@ -47,6 +47,7 @@ def write_info(out_file, t, trace):
         out_file.write(str(ctrl)+'\n')
 
         for key, value in oracle_scores.items():
+            #print('oracle')
             out_file.write(key + ' ' + str(value)+'\n')
 
     out_file.write('\n')
@@ -77,7 +78,7 @@ def write_info(out_file, t, trace):
     out_file.write('\n')
 
     # print out which agents it checked conflict with
-    out_file.write('checked for agent conflict with:\n')
+    out_file.write('checked for agent conflicts with:\n')
     for agent in trace['checked_for_conflict']:
         out_file.write(str(agent)+'\n')
 
@@ -136,7 +137,7 @@ def print_one_agent_trace(filename, x, y, heading, time, outfile):
 
     t_end = int(max(traces.keys()))
     #print(t_end)
-    for t in range(0,t_end):
+    for t in range(1,t_end):
         agents_dict = traces[t]
         # search through all agents at time t
         for ag_id, agent_trace in agents_dict.items():
@@ -215,7 +216,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
     #print_one_agent_trace(traces_file, 24, 65, 'west', 67, outfile)
-    print_one_agent_trace(traces_file, 8, 90, 'east', 76, outfile)
+    print_one_agent_trace(traces_file, 31, 46, 'west', 32, outfile)
 
-    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    print_all_agents_at_time_t(traces_file, outfile_cc, 76)
+    #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    #print_all_agents_at_time_t(traces_file, outfile_cc, 108)
