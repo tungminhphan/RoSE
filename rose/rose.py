@@ -1663,14 +1663,8 @@ class TrafficGame(Simulation):
                 #print(len(self.map.IO_map.map[source]))
                 sink = self.map.IO_map.map[source][sinks[i]]
                 # check if new car satisfies spawning safety contract
-                #print('sources and sinks')
-                #print(source.node, sink.node)
                 new_car = create_default_car(source, sink, self, self.car_count)
                 spawning_contract = SpawningContract(self, new_car)
-                #print('state')
-                #print(new_car.state)
-                #print(spawning_contract.okay_to_spawn_flag)
-
                 if spawning_contract.okay_to_spawn_flag:
                     #print(new_car.supervisor.goals)
                     self.agent_set.append(new_car)
@@ -2206,7 +2200,7 @@ class Map(Field):
             if tile in self.IO_map.sources:
             # add in tiles between source and next tile
                 turn_type = 'source'
-                tile_nxt = self.get_next_special_tile_in_lane(tile)
+                tile_nxt = self.get_next_special_tile_in_lane(tile.node)
                 loop_tiles.append(get_tiles_in_between(tile, tile_nxt))
             elif tile in self.left_turn_tiles:
                 turn_type = 'left'
