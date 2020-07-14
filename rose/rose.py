@@ -1912,6 +1912,13 @@ class Bundle:
         width = self.tile_to_relative_width(tile)
         length = self.tile_to_relative_length(tile)
         return width, length
+    
+    # returns the tile at the end of the bundle in same lane as tile, 
+    # note, these tiles should coincide with the sink tiles 
+    def return_end_tiles(self, tile): 
+        rel_width = self.tile_to_relative_width(tile)
+        end_tile = self.relative_coordinates_to_tile(rel_width, self.length)
+        return end_tile
 
     # returns true if tile is in left most lane of bundle
     def is_leftmost_lane(self, tile):
@@ -1920,6 +1927,7 @@ class Bundle:
     # returns true if tile is in right most lane of bundle
     def is_rightmost_lane(self, tile):
         return self.tile_to_relative_width(tile) == 0
+
 
 # stand alone comparator function
 def get_comparator(cond):
@@ -1952,6 +1960,15 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key].append(item)
     else:
         dictionary[key] = [item]
+
+class MapLoop: 
+    def __init__(self, direction, tiles):
+        self.direction = direction
+        self.tiles = tiles
+    
+    def add_tiles(self, new_tiles):
+        self.tiles = self.tiles.append(new_tiles)
+        pass
 
 class Field:
     def __init__(self, csv_filename):
@@ -2016,6 +2033,10 @@ class Map(Field):
         self.bundle_plan_cache = self.get_bundle_plan_cache()
         self.IO_map = self.get_IO_map()
 
+        # map decomposition into loops 
+        self.loops = self.parse_map_into_loops()
+        self.tiles_to_loops_dict = self.get_tiles_to_loops_dict()
+
 
     def tile_is_in_intersection(self, xy):
         """
@@ -2054,6 +2075,214 @@ class Map(Field):
         for bundle in current_bundles:
             if bundle.direction == heading:
                 return bundle.tile_to_relative_width((x,y)), bundle
+    
+    # use bundle width and length to check whether tile is in same lane 
+    # and whether or not it is ahead, also returns distance between tiles if true
+    def check_same_lane_and_ahead(self, tile_to_chk_ahead, tile):
+        # width 1, length 1 correspond to the 
+        try:
+            width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(tile_to_chk_ahead)
+        except:
+            return False, None
+        try:
+            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(tile)
+        except:
+            return False, None
+        try:
+            length_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(tile_to_chk_ahead)
+        except:
+            return False, None
+        try:
+            length_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_length(tile)
+        except:
+            return False, None
+
+        # all checks that must be satisfied
+        same_bundle = (bundle_1.get_id() == bundle_2.get_id())
+        same_width = (width_1 == width_2)
+        tile_is_ahead = (length_1 > length_2)
+        all_chks = same_bundle and same_width and tile_is_ahead
+
+        if all_chks:
+            return True, length_2-length_1
+
+        return all_chks, None
+    
+    def get_next_special_tile_in_lane(self, directed_tile):
+        '''
+        get the next special tile in lane (for the next turn in
+        the loop), inverse flips direction of directed tile;
+        this function is used to decompose the map into loops 
+        function
+        '''
+
+        # TODO: make this function more efficient (avoid looping through all tiles in bundle)
+        def find_tile_ahead(tile_curr, tile_list, heading):
+            '''
+            find the next tile ahead
+            '''
+            # loop through the list to find the next tile ahead
+            min_dist = np.infinity
+            tile_nxt = None 
+            for tile in tile_list: 
+                # check if tile in same lane and same heading and ahead of tile_curr
+                check, dist = self.check_same_lane_and_ahead(tile, tile_curr)
+                if check: 
+                # if satisfies all checks, udate if dist is less than max_dist
+                    if dist < min_dist: 
+                        min_dist = dist
+                        tile_next = tile
+            return tile_nxt
+
+        # actual function body
+        x, y = directed_tile[0]
+        heading = directed_tile[1]
+        #if inverse: 
+        #    heading = Car.convert_orientation(Car.convert_orientation(heading) + 180)
+        # figure out which special tile is ahead
+        bundle = directed_tile_to_bundle(directed_tile)
+        
+        # look through left turn tiles in the same lane 
+        for left_turn in self.left_turn_tiles[bundle]:
+            # find tile ahead 
+            tile_nxt = find_tile_ahead(directed_tile, self.left_turn_tiles[bundle], heading)
+            # if left turn tile found, then return 
+            if tile_nxt:
+                return tile_nxt
+        
+        # look through right turn tiles
+        for right_turn in self.right_turn_tiles[bundle]:
+            tile_nxt = find_tile_ahead(directed_tile, self.right_turn_tiles[bundle], heading)
+        
+        # will return None if tile not found!!
+        return tile_nxt
+
+    
+    def parse_map_into_loops(self):
+        ''' 
+        parse the map into these internal right-turn and left-turn atoms
+        ''' 
+        
+        # get all tiles in between the two directed tiles
+        def get_tiles_in_between(from_tile, to_tile):
+            # TODO: add in assertions that from tile to to tile is in the same heading
+            x_from, y_from = from_tile[0]
+            heading_from = from_tile[1]
+            x_to, y_to = to_tile[0]
+            heading_to = to_tile[1]
+            dist = max(abs(x_from-x_to), abs(y_from-y_to))
+            # default dir = east
+            arr = np.arange(0, dist)
+            arr_def = np.array([np.zeros(len(arr)), arr])
+            
+            rangle = Car.convert_orientation('east')-Car.convert_orientation(heading_from)
+            rangle = rangle*np.pi/180
+
+            # rotate and then add translation
+            tiles = (x_from, y_from) + rotate_vector(tuple(arr_def), rangle)
+            return tiles
+
+
+        # loop that terminates when all left-turn tiles have been found
+        # or when sink is reached 
+        def find_loop(tile, visited):
+            def find_sink_node_in_lane(directed_tile):
+                # check all sink tiles in bundle and return one
+                # that is in the same lane as car
+                bundle = self.directed_tile_to_bundle(directed_tile)
+                # find the tile at the end of the bundle
+                bundle.length
+                # pass the 
+                return sink_node
+
+
+            # find the end of the left turn tile 
+            # TODO: need to catch when to tile isn't in map 
+            loop_tiles = []
+            local_tiles_visited = []
+            tile_nxt = tile
+
+            # check whether turn tile is left turn tile, right turn tile or source
+            if tile in self.IO_map.sources:
+            # add in tiles between source and next tile
+                turn_type = 'source'
+                tile_nxt = self.get_next_special_tile_in_lane(tile)
+                loop_tiles.append(get_tiles_in_between(tile, tile_nxt))
+            elif tile in self.left_turn_tiles:
+                turn_type = 'left'
+            else:
+                turn_type = 'right'
+            
+            # keep looping until next tile is not found OR the next tile is
+            # one of the ones that have already been checked 
+            while ((tile_nxt in self.IO_map.sinks) and (tile_nxt not in local_tiles_visited)): 
+                local_tiles_visited.append(tile_nxt)
+                if turn_type == 'left':
+                    to_tile = self.left_turn_tiles[bundle][tile_nxt][-1]
+                else:
+                    to_tile = self.right_turn_tiles[bundle][tile_nxt][-1]
+                tile_nxt = self.get_next_special_tile_in_lane(to_tile)
+
+                # add in tiles between to_tile and tile_nxt 
+                if not tile_nxt:
+                    tile_nxt = find_sink_node_in_lane(to_tile)
+
+                # add in tiles in between to_tile and tile_nxt
+                loop_tiles.append(get_tiles_in_between(to_tile, tile_nxt))
+
+                # if tile_nxt is already part of a loop, add original tiles to old loop
+                if tile_nxt in visited.keys(): 
+                    # get loop that the tile is a part of
+                    map_loop = visited[tile_nxt]
+                    map_loop.add_tiles(loop_tiles)
+                    for tile in local_tiles_visited:
+                        visited[tile] = map_loop
+                    return map_loop, visited
+
+            # create a new loop with all the tiles (add into dictionary)
+            map_loop = MapLoop(turn_type, local_tiles_visited)
+            for tile in local_tiles_visited:
+                visited[tile] = map_loop
+
+            return map_loop, visited
+
+
+        # use dictionary to keep track of which tiles have already been checked
+        visited = od()
+        loops = []
+
+        # loop through all of the source nodes!! (they are part of the loops too)
+        for node in self.IO_map.sources: 
+            loop, visited = find_loop(node, visited)
+            loops.append(loop)
+
+        # loop through all bundles 
+        for bundle in bundles: 
+            # loop through all left-turn tiles
+            left_turn_tiles = self.left_turn_tiles[bundle]
+            for left_turn_tile in left_turn_tiles:
+                # only find loop if it's not part of a loop already
+                if left_turn_tile not in visited.keys():
+                    loop, visited = find_loop(left_turn_tile, visited)
+                    loops.append(loop)
+
+            # loop through all right-turn tiles
+            right_turn_tiles = self.right_turn_tiles[bundle]
+            for right_turn_tile in self.right_turn_tiles[bundle]:
+                # only find loop if it's not part of a loop already
+                if right_turn_tile not in visited.keys():
+                    loop, visited = find_loop(right_turn_tile, visited)
+                    loops.append(loop)
+
+        return loops
+
+    # create a tiles to loops dictionary
+    def get_tile_to_loop_dict(self):
+        tile_to_loop_dict = od()
+        for loop in self.loops:
+            for tile in loop.tiles:
+                tile_to_loop_dict[tile] = loop
+        return tile_to_loop_dict
 
     def directed_tile_to_relative_length(self, directed_tile):
         x, y = directed_tile[0]
