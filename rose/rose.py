@@ -1805,7 +1805,6 @@ class TrafficGame(Simulation):
                 if self.save_debug_info:
                     self.write_agents_to_traces()
 
-
         if write_bool:
             output_dir = os.getcwd()+'/saved_traces/'
             if not os.path.exists(output_dir):
@@ -1909,10 +1908,11 @@ class Bundle:
     
     # returns the tile at the end of the bundle in same lane as tile, 
     # note, these tiles should coincide with the sink tiles 
-    def return_end_tiles(self, tile): 
-        rel_width = self.tile_to_relative_width(tile)
-        end_tile = self.relative_coordinates_to_tile(rel_width, self.length)
-        return end_tile
+    def return_end_tile(self, tile): 
+        rel_width = self.tile_to_relative_width(tile[0])
+        end_tile = self.relative_coordinates_to_tile((rel_width, self.length-1))
+        directed_end_tile = ((end_tile[0], end_tile[1]), tile[1])
+        return directed_end_tile
 
     # returns true if tile is in left most lane of bundle
     def is_leftmost_lane(self, tile):
@@ -1921,7 +1921,6 @@ class Bundle:
     # returns true if tile is in right most lane of bundle
     def is_rightmost_lane(self, tile):
         return self.tile_to_relative_width(tile) == 0
-
 
 # stand alone comparator function
 def get_comparator(cond):
@@ -1956,13 +1955,16 @@ def append_or_create_new_list(dictionary, key, item):
         dictionary[key] = [item]
 
 class MapLoop: 
-    def __init__(self, direction, tiles):
+    def __init__(self, direction, tiles, critical_tiles):
         self.direction = direction
         self.tiles = tiles
+        self.critical_tiles = critical_tiles
     
     def add_tiles(self, new_tiles):
         self.tiles = self.tiles.append(new_tiles)
-        pass
+
+    def add_critical_tiles(self, new_tiles):
+        self.critical_tiles = self.critical_tiles.append(new_tiles)
 
 class Field:
     def __init__(self, csv_filename):
@@ -2026,11 +2028,15 @@ class Map(Field):
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
         self.IO_map = self.get_IO_map()
+        self.sources, self.sinks = self.get_sources_sinks_node_list()
 
         # map decomposition into loops 
         self.loops = self.parse_map_into_loops()
-        self.tiles_to_loops_dict = self.get_tiles_to_loops_dict()
-
+        self.tiles_to_loops_dict = self.get_tile_to_loop_dict()
+        # printing map loops
+        #for loop in self.loops:
+        #    print(loop.direction)
+        #    print(loop.critical_tiles)
 
     def tile_is_in_intersection(self, xy):
         """
@@ -2064,7 +2070,6 @@ class Map(Field):
         #__import__('ipdb').set_trace(context=21)
         x, y = directed_tile[0]
         heading = directed_tile[1]
-
         current_bundles = self.tile_to_bundle_map[x,y]
         for bundle in current_bundles:
             if bundle.direction == heading:
@@ -2075,20 +2080,24 @@ class Map(Field):
     def check_same_lane_and_ahead(self, tile_to_chk_ahead, tile):
         # width 1, length 1 correspond to the 
         try:
-            width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(tile_to_chk_ahead)
+            width_1, bundle_1 = self.directed_tile_to_relative_width(tile_to_chk_ahead)
         except:
+            print('a')
             return False, None
         try:
-            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(tile)
+            width_2, bundle_2 = self.directed_tile_to_relative_width(tile)
         except:
+            print('b')
             return False, None
         try:
-            length_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(tile_to_chk_ahead)
+            length_1, bundle_1 = self.directed_tile_to_relative_length(tile_to_chk_ahead)
         except:
+            print('c')
             return False, None
         try:
-            length_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_length(tile)
+            length_2, bundle_2 = self.directed_tile_to_relative_length(tile)
         except:
+            print('d')
             return False, None
 
         # all checks that must be satisfied
@@ -2098,7 +2107,7 @@ class Map(Field):
         all_chks = same_bundle and same_width and tile_is_ahead
 
         if all_chks:
-            return True, length_2-length_1
+            return True, length_1-length_2
 
         return all_chks, None
     
@@ -2109,47 +2118,45 @@ class Map(Field):
         this function is used to decompose the map into loops 
         function
         '''
-
-        # TODO: make this function more efficient (avoid looping through all tiles in bundle)
-        def find_tile_ahead(tile_curr, tile_list, heading):
-            '''
-            find the next tile ahead
-            '''
-            # loop through the list to find the next tile ahead
-            min_dist = np.infinity
-            tile_nxt = None 
-            for tile in tile_list: 
-                # check if tile in same lane and same heading and ahead of tile_curr
-                check, dist = self.check_same_lane_and_ahead(tile, tile_curr)
-                if check: 
-                # if satisfies all checks, udate if dist is less than max_dist
-                    if dist < min_dist: 
-                        min_dist = dist
-                        tile_next = tile
-            return tile_nxt
-
         # actual function body
         x, y = directed_tile[0]
         heading = directed_tile[1]
-        #if inverse: 
-        #    heading = Car.convert_orientation(Car.convert_orientation(heading) + 180)
         # figure out which special tile is ahead
-        bundle = directed_tile_to_bundle(directed_tile)
+        bundle = self.directed_tile_to_bundle(directed_tile)
         
+        min_dist = np.Inf
+        tile_next = None
         # look through left turn tiles in the same lane 
+        #print('left turn loop')
         for left_turn in self.left_turn_tiles[bundle]:
-            # find tile ahead 
-            tile_nxt = find_tile_ahead(directed_tile, self.left_turn_tiles[bundle], heading)
-            # if left turn tile found, then return 
-            if tile_nxt:
-                return tile_nxt
+            #print(left_turn)
+            check, dist = self.check_same_lane_and_ahead(left_turn, directed_tile)
+            # if satisfies all checks, update if dist is less than max_dist
+            if check: 
+                if dist < min_dist: 
+                    min_dist = dist
+                    tile_next = left_turn
+
+        # if a left turn tile is found
+        if tile_next:
+            return tile_next, 'left'
         
+        #print('right turn loop')
         # look through right turn tiles
+        min_dist = np.Inf
         for right_turn in self.right_turn_tiles[bundle]:
-            tile_nxt = find_tile_ahead(directed_tile, self.right_turn_tiles[bundle], heading)
+            #print('checking right turn tile')
+            #print(right_turn)
+            check, dist = self.check_same_lane_and_ahead(right_turn, directed_tile)
+            #print(check, dist)
+            # if satisfies all checks, update if dist is less than max_dist
+            if check: 
+                if dist < min_dist: 
+                    min_dist = dist
+                    tile_next = right_turn
         
         # will return None if tile not found!!
-        return tile_nxt
+        return tile_next, 'right'
 
     
     def parse_map_into_loops(self):
@@ -2169,12 +2176,13 @@ class Map(Field):
             arr = np.arange(0, dist)
             arr_def = np.array([np.zeros(len(arr)), arr])
             
-            rangle = Car.convert_orientation('east')-Car.convert_orientation(heading_from)
+            rangle = Car.convert_orientation(heading_from)-Car.convert_orientation('east')
             rangle = rangle*np.pi/180
 
             # rotate and then add translation
-            tiles = (x_from, y_from) + rotate_vector(tuple(arr_def), rangle)
-            return tiles
+            tiles = [[x_from],[y_from]] + rotate_matrix(np.array(arr_def), rangle)
+            directed_tiles = [((round(tiles[0,i]).astype(int), round(tiles[1,i]).astype(int)), heading_to) for i in range(tiles.shape[1])]
+            return directed_tiles
 
 
         # loop that terminates when all left-turn tiles have been found
@@ -2184,42 +2192,44 @@ class Map(Field):
                 # check all sink tiles in bundle and return one
                 # that is in the same lane as car
                 bundle = self.directed_tile_to_bundle(directed_tile)
-                # find the tile at the end of the bundle
-                bundle.length
-                # pass the 
-                return sink_node
-
+                return bundle.return_end_tile(directed_tile)
 
             # find the end of the left turn tile 
             # TODO: need to catch when to tile isn't in map 
+
             loop_tiles = []
             local_tiles_visited = []
             tile_nxt = tile
+            bundle = self.directed_tile_to_bundle(tile)
 
             # check whether turn tile is left turn tile, right turn tile or source
-            if tile in self.IO_map.sources:
             # add in tiles between source and next tile
+            if tile in self.sources:
                 turn_type = 'source'
-                tile_nxt = self.get_next_special_tile_in_lane(tile.node)
+                tile_nxt, turn_type = self.get_next_special_tile_in_lane(tile)
+                local_tiles_visited.append(tile)
                 loop_tiles.append(get_tiles_in_between(tile, tile_nxt))
-            elif tile in self.left_turn_tiles:
+            
+            elif tile in self.left_turn_tiles[bundle]:
                 turn_type = 'left'
             else:
                 turn_type = 'right'
             
             # keep looping until next tile is not found OR the next tile is
             # one of the ones that have already been checked 
-            while ((tile_nxt in self.IO_map.sinks) and (tile_nxt not in local_tiles_visited)): 
+            while ((tile_nxt not in self.sinks) and (tile_nxt not in local_tiles_visited)): 
                 local_tiles_visited.append(tile_nxt)
+                bundle = self.directed_tile_to_bundle(tile_nxt)
                 if turn_type == 'left':
                     to_tile = self.left_turn_tiles[bundle][tile_nxt][-1]
                 else:
                     to_tile = self.right_turn_tiles[bundle][tile_nxt][-1]
-                tile_nxt = self.get_next_special_tile_in_lane(to_tile)
+                tile_nxt, _ = self.get_next_special_tile_in_lane(to_tile)
 
                 # add in tiles between to_tile and tile_nxt 
                 if not tile_nxt:
                     tile_nxt = find_sink_node_in_lane(to_tile)
+                    local_tiles_visited.append(tile_nxt)
 
                 # add in tiles in between to_tile and tile_nxt
                 loop_tiles.append(get_tiles_in_between(to_tile, tile_nxt))
@@ -2228,13 +2238,14 @@ class Map(Field):
                 if tile_nxt in visited.keys(): 
                     # get loop that the tile is a part of
                     map_loop = visited[tile_nxt]
+                    map_loop.add_critical_tiles(local_tiles_visited)
                     map_loop.add_tiles(loop_tiles)
                     for tile in local_tiles_visited:
                         visited[tile] = map_loop
                     return map_loop, visited
 
             # create a new loop with all the tiles (add into dictionary)
-            map_loop = MapLoop(turn_type, local_tiles_visited)
+            map_loop = MapLoop(turn_type, loop_tiles, local_tiles_visited)
             for tile in local_tiles_visited:
                 visited[tile] = map_loop
 
@@ -2246,12 +2257,12 @@ class Map(Field):
         loops = []
 
         # loop through all of the source nodes!! (they are part of the loops too)
-        for node in self.IO_map.sources: 
+        for node in self.sources: 
             loop, visited = find_loop(node, visited)
             loops.append(loop)
 
         # loop through all bundles 
-        for bundle in bundles: 
+        for bundle in self.bundles: 
             # loop through all left-turn tiles
             left_turn_tiles = self.left_turn_tiles[bundle]
             for left_turn_tile in left_turn_tiles:
@@ -2274,7 +2285,7 @@ class Map(Field):
     def get_tile_to_loop_dict(self):
         tile_to_loop_dict = od()
         for loop in self.loops:
-            for tile in loop.tiles:
+            for tile in loop.tiles[0]:
                 tile_to_loop_dict[tile] = loop
         return tile_to_loop_dict
 
@@ -2767,6 +2778,12 @@ class Map(Field):
                     source = Source(inp, spawn_probability=self.default_spawn_probability)
                     presources.append(source)
         return presources, presinks
+    
+    def get_sources_sinks_node_list(self):
+        sources, sinks = self.get_sources_sinks()
+        sources_lst = [source.node for source in sources]
+        sinks_lst = [sink.node for sink in sinks]
+        return sources_lst, sinks_lst
 
     # search for the traffic lights along the edges of the intersections, 
     # traffic light objects are defined by cnt, id, htiles, vtiles, random init, seed
@@ -3797,7 +3814,7 @@ if __name__ == '__main__':
     game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=400)
+    game.play(outfile=output_filename, t_end=1)
     #game.animate(frequency=0.01)
 
     # print debug info

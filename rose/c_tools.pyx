@@ -47,6 +47,15 @@ def rotate_vector(vec, theta):
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     return np.array([int(round(x)) for x in np.matmul(rot_mat, vec)])
 
+def rotate_matrix(mat, theta):
+    """
+    take in a 2D matrix and an angle in radians and outputs the same vector
+    rotated by the amount specified by the input angle in a CCW fashion.
+    """
+    # create rotation matrix
+    rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    return np.matmul(rot_mat, mat)
+
 def ctrl_dict_to_tuple(ctrl):
     return (ctrl['steer'], ctrl['acceleration'])
 
