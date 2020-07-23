@@ -1,0 +1,12 @@
+{
+  "0": {
+    "error_type": "sensor",
+    "error_category": "velocity",
+    "certainty_level": 100
+  },
+  "1": {
+    "error_type": "deliberate",
+    "error_category": "traffic_light",
+    "certainty_level": 90
+  }
+}

@@ -168,6 +168,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("AGENT SUBGOALS IS:\n")
         out_file.write(str((agent_trace['subgoals']))+'\n')
 
+        out_file.write("AGENT BACKUP PLAN WAS: \n")
+        out_file.write(str((agent_trace['backup_plan_safety'])) + '\n')
+
         out_file.write("agent intention is:\n")
         out_file.write(str(agent_trace['intention'])+'\n')
 
@@ -216,7 +219,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
     #print_one_agent_trace(traces_file, 24, 65, 'west', 67, outfile)
-    print_one_agent_trace(traces_file, 31, 46, 'west', 32, outfile)
+    #print_one_agent_trace(traces_file, 31, 46, 'west', 32, outfile)
 
-    #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
-    #print_all_agents_at_time_t(traces_file, outfile_cc, 108)
+    outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
+    print_all_agents_at_time_t(traces_file, outfile_cc, 12)

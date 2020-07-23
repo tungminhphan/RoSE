@@ -168,6 +168,14 @@ def convert_car_orientation(inp):
     else:
         raise TypeError('Check your input!')
 
+def add_perception_error(v_true, v_min, error):
+    z = v_true - error
+    if z < v_min:
+        v_est = v_min
+    else:
+        v_est = z
+    return v_est
+
 class Oracle():
     def __init__(self, name):
         self.name = name
@@ -261,8 +269,9 @@ class BackUpPlanBundleProgressOracle(Oracle):
                 return False
 
 class TrafficLightOracle(Oracle):
-    def __init__(self):
+    def __init__(self,flag):
         super(TrafficLightOracle, self).__init__(name='traffic_light')
+        self.flag = flag
 
     def tile_sequence_not_running_a_red_light_on_N_turn(self, tile_sequence, game, N):
         light_checks = []
@@ -278,7 +287,8 @@ class TrafficLightOracle(Oracle):
             # get traffic light
             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
-            if will_be_crossing and red_light_on:
+            if will_be_crossing and red_light_on and self.flag is 0:
+                print('Haha')
                 return False
         return True
 
@@ -1027,8 +1037,9 @@ class LegalOrientationOracle(Oracle):
             return False # if node is an obstacle or out of bounds
 
 class BackupPlanSafetyOracle(Oracle):
-    def __init__(self):
+    def __init__(self,flag):
         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
+        self.flag = flag
     def evaluate(self, ctrl_action, plant, game):
         # check if collision occurs by taking that action
         collision_chk = plant.check_collision_in_bubble(ctrl_action)
@@ -1044,6 +1055,7 @@ class BackupPlanSafetyOracle(Oracle):
 
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
                 # record lead agent
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
