@@ -1753,7 +1753,7 @@ class TrafficGame(Simulation):
         if new_entry is not None:
             traces.update(new_entry)
         with open(filename, 'wb+') as pckl_file:
-            pickle.dump(traces, pckl_file)
+            pickle.dump(traces, pckl_file, protocol=2)
 
 
     def sys_step(self):
@@ -2023,6 +2023,7 @@ class Map(Field):
         self.special_heading_tiles = []
         self.right_turn_tiles = self.find_right_turn_tiles() 
         self.left_turn_tiles = self.find_left_turn_tiles()
+        #print(self.special_goal_tiles)
         self.all_left_turns = self.get_all_left_turns()
         self.bundle_graph = self.get_bundle_graph() 
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
@@ -2031,8 +2032,8 @@ class Map(Field):
         self.sources, self.sinks = self.get_sources_sinks_node_list()
 
         # map decomposition into loops 
-        self.loops = self.parse_map_into_loops()
-        self.tiles_to_loops_dict = self.get_tile_to_loop_dict()
+        #self.loops = self.parse_map_into_loops()
+        #self.tiles_to_loops_dict = self.get_tile_to_loop_dict()
         # printing map loops
         #for loop in self.loops:
         #    print(loop.direction)
@@ -3366,12 +3367,16 @@ class SpecificationStructure():
         def num(tier):
             return np.sum(np.array(oracle_tier) == tier)
         all_tiers = np.sort(list(set(oracle_tier)))[::-1]
+        #print(all_tiers)
+        #print(oracle_tier)
         tier_weights = od()
         tier_weights[all_tiers[0]] = 1
         for idx in range(1, len(all_tiers)):
             tier = all_tiers[idx]
             next_lower_tier = all_tiers[idx-1]
             tier_weights[tier] = (num(next_lower_tier)+1)*tier_weights[next_lower_tier]
+            #print(idx, tier, num(next_lower_tier)+1, next_lower_tier)
+        #print(tier_weights)
         return tier_weights
 
 class TrafficLight:
@@ -3516,23 +3521,32 @@ def get_default_car_ss():
     legal_orientation_oracle = LegalOrientationOracle()
     backup_plan_progress_oracle = BackUpPlanBundleProgressOracle()
     maintenance_progress_oracle = MaintenanceBundleProgressOracle()
-    improvement_progress_oracle = ImprovementBundleProgressOracle()
+    improvement_progress_oracle_one = ImprovementBundleProgressOracleOne()
+    improvement_progress_oracle_two = ImprovementBundleProgressOracleTwo()
+    improvement_progress_oracle_three = ImprovementBundleProgressOracleThree()
     traffic_intersection_oracle = TrafficIntersectionOracle()
     unprotected_left_turn_oracle = UnprotectedLeftTurnOracle()
     intersection_clearance_oracle = IntersectionClearanceOracle()
-    no_deadlock_oracle = NoDeadlockOracle()
+    #no_deadlock_oracle = NoDeadlockOracle()
     oracle_set = [static_obstacle_oracle,
                   traffic_light_oracle,
                   legal_orientation_oracle,
                   backup_plan_progress_oracle,
-                  maintenance_progress_oracle,
-                  improvement_progress_oracle,
+                  maintenance_progress_oracle, 
+                  improvement_progress_oracle_one,
                   backup_plan_safety_oracle,
                   unprotected_left_turn_oracle,
                   traffic_intersection_oracle,
                   intersection_clearance_oracle, 
-                  no_deadlock_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 4, 5, 5, 1, 1, 2, 2, 3])
+                  improvement_progress_oracle_two,
+                  improvement_progress_oracle_three] # type: List[Oracle]
+    
+    # trying to put forward progress oracle before lawfulness
+    #specification_structure = SpecificationStructure(oracle_set, [1, 3, 3, 2, 5, 5, 1, 1, 3, 3, 4])
+
+    #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 4, 5, 5, 1, 1, 2, 2, 3, 5, 5])
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2, 2, 4, 4])
+
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
@@ -3678,7 +3692,7 @@ class QuasiSimultaneousGame(TrafficGame):
 
     def set_agent_intentions(self):
         for agent in self.agent_set:
-            agent.set_intention()
+            agent.set_intention_slow()
 
     def resolve_precedence(self):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
@@ -3729,6 +3743,25 @@ class QuasiSimultaneousGame(TrafficGame):
                     all_occupancy_gridpts.extend(gridpts)
                     self.done_simulating_agent(agent)
         self.done_simulating_everyone()
+
+        # check the safety backup plan of every agent in the game
+        #print("checking all agent safety backup plans")
+        for agent in self.agent_set: 
+            # find lead agent
+            x, y, v = agent.state.x, agent.state.y, agent.state.v
+            lead_agent = agent.find_lead_agent(inside_bubble=True, same_heading_required=False)
+
+            if lead_agent:
+                x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
+                if compute_gap_req_fast(lead_agent.a_min, v_a, agent.a_min, v) > gap_curr:
+                    print(x, y, v)
+                    print(x_a, y_a, v_a)
+                    print("WARNING: safety backup plan action not valid")
+                #else:
+                #    print("pass")
+
+
 
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
@@ -3804,17 +3837,17 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 123
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.3, seed=seed)
+    seed = 99
+    map_name = 'city_blocks_med'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.25, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    #game = QuasiSimultaneousGame(game_map=the_map)
-    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    game = QuasiSimultaneousGame(game_map=the_map)
+    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=1)
+    game.play(outfile=output_filename, t_end=300)
     #game.animate(frequency=0.01)
 
     # print debug info

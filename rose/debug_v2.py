@@ -216,7 +216,7 @@ if __name__ == '__main__':
     traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
     #print_one_agent_trace(traces_file, 24, 65, 'west', 67, outfile)
-    print_one_agent_trace(traces_file, 31, 46, 'west', 32, outfile)
+    print_one_agent_trace(traces_file, 3, 5, 'east', 1, outfile)
 
     #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     #print_all_agents_at_time_t(traces_file, outfile_cc, 108)

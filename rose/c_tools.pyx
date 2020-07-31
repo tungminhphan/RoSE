@@ -464,7 +464,7 @@ class UnprotectedLeftTurnOracle(Oracle):
         for idx in range(N):
             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
             gap += v_init
-        return gap
+        return gap+1
 
     def evaluate(self, ctrl_action, plant, game):
         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
@@ -836,10 +836,10 @@ class NoDeadlockOracle(Oracle):
         pass
 
 
-class ImprovementBundleProgressOracle(Oracle):
+class ImprovementBundleProgressOracleOne(Oracle):
     # requires a supervisor controller
     def __init__(self):
-        super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
+        super(ImprovementBundleProgressOracleOne, self).__init__(name="improve_progress_one")
     def evaluate(self, ctrl_action, plant, game):
 
         # get current state
@@ -892,15 +892,165 @@ class ImprovementBundleProgressOracle(Oracle):
                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])
                 dlatt_next = abs(rel_next[0]-rel_goal[0])
 
+                # 
+
                 # check if strictly improving longitudinal/lateral distance
-                latt_improves = dlatt_next < dlatt_curr
-                long_improves = dlong_next < dlong_curr
-                improves = latt_improves or long_improves
+                latt_improves = (dlatt_next < dlatt_curr)
+                long_improves = (dlong_next < dlong_curr)
+
+                dlatt = dlatt_curr-dlatt_next
+                dlong = dlong_curr-dlong_next
+                improves = (dlatt + dlong) > 0
 
                 # only need to check reachability for braking backup plan because this implies reachability for current action
                 return improves
             else:
                 return False
+
+class ImprovementBundleProgressOracleTwo(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(ImprovementBundleProgressOracleTwo, self).__init__(name="improve_progress_two")
+    def evaluate(self, ctrl_action, plant, game):
+
+        # get current state
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        current_directed_tile = (current_xy, current_dir)
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+        queried_directed_tile = (queried_xy, queried_dir)
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # if current subgoal is special, namely, attempting to move toward special tile
+        # for now, we are assuming default car dynamics; TODO: generalize this
+        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if moving away from special tile
+        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if current subgoal isn't special
+        else:
+            # get bundle corresponding to the current subgoal
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+            # get bundle corresponding to the current state
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+            try:
+                # get bundle for the queried state, if bundle doesn't exist, return False
+                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+            except:
+                return False
+
+            if current_bundle != subgoal_bundle:
+                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                    return True
+                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                    return False
+                else:
+                    return False
+            elif queried_bundle == subgoal_bundle:
+                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+                dlong_curr = rel_goal[1]-rel_curr[1]
+                dlong_next = rel_goal[1]-rel_next[1]
+
+                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+                dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+                # 
+
+                # check if strictly improving longitudinal/lateral distance
+                latt_improves = dlatt_next < dlatt_curr
+                long_improves = dlong_next < dlong_curr
+                improves = latt_improves or long_improves
+
+                dlatt = dlatt_curr-dlatt_next
+                dlong = dlong_curr-dlong_next
+                improves = (dlatt + dlong) > 1
+
+                # only need to check reachability for braking backup plan because this implies reachability for current action
+                return improves
+            else:
+                return False
+
+class ImprovementBundleProgressOracleThree(Oracle):
+    # requires a supervisor controller
+    def __init__(self):
+        super(ImprovementBundleProgressOracleThree, self).__init__(name="improve_progress_three")
+    def evaluate(self, ctrl_action, plant, game):
+
+        # get current state
+        current_xy = plant.state.x, plant.state.y
+        current_dir = plant.state.heading
+        current_directed_tile = (current_xy, current_dir)
+
+        # query next state
+        queried_state = plant.query_occupancy(ctrl_action)[-1]
+        queried_xy = queried_state.x, queried_state.y
+        queried_dir = queried_state.heading
+        queried_directed_tile = (queried_xy, queried_dir)
+        # get current subgoal
+        current_subgoal = plant.supervisor.subgoals[0]
+        # if current subgoal is special, namely, attempting to move toward special tile
+        # for now, we are assuming default car dynamics; TODO: generalize this
+        if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if moving away from special tile
+        elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
+            return (queried_directed_tile == current_subgoal)
+        # if current subgoal isn't special
+        else:
+            # get bundle corresponding to the current subgoal
+            subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
+            # get bundle corresponding to the current state
+            current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
+
+            try:
+                # get bundle for the queried state, if bundle doesn't exist, return False
+                queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
+            except:
+                return False
+
+            if current_bundle != subgoal_bundle:
+                if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
+                    return True
+                elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
+                    return False
+                else:
+                    return False
+            elif queried_bundle == subgoal_bundle:
+                rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
+                rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
+                rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
+
+                dlong_curr = rel_goal[1]-rel_curr[1]
+                dlong_next = rel_goal[1]-rel_next[1]
+
+                dlatt_curr = abs(rel_curr[0]-rel_goal[0])
+                dlatt_next = abs(rel_next[0]-rel_goal[0])
+
+                # 
+
+                # check if strictly improving longitudinal/lateral distance
+                latt_improves = dlatt_next < dlatt_curr
+                long_improves = dlong_next < dlong_curr
+                improves = latt_improves or long_improves
+
+                dlatt = dlatt_curr-dlatt_next
+                dlong = dlong_curr-dlong_next
+                improves = (dlatt + dlong) > 2
+
+                # only need to check reachability for braking backup plan because this implies reachability for current action
+                return improves
+            else:
+                return False
+
 
 class MaintenanceBundleProgressOracle(Oracle):
     # requires a supervisor controller
@@ -921,6 +1071,7 @@ class MaintenanceBundleProgressOracle(Oracle):
         current_subgoal = plant.supervisor.subgoals[0]
         # if current subgoal is special, namely, attempting to move toward special tile
         # for now, we are assuming default car dynamics; TODO: generalize this
+        #print(plant.supervisor.game.map.special_goal_tiles)
         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
         # if moving away from special tile
