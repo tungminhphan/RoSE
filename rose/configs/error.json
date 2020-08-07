@@ -2,11 +2,16 @@
   "0": {
     "error_type": "sensor",
     "error_category": "velocity",
-    "certainty_level": 100
+    "certainty_level": 0
   },
   "1": {
     "error_type": "deliberate",
     "error_category": "traffic_light",
-    "certainty_level": 90
+    "certainty_level": 100
+  },
+  "2": {
+    "error_type": "perception",
+    "error_category": "acceleration",
+    "certainty_level": 50
   }
 }

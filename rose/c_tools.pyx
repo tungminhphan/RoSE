@@ -287,8 +287,7 @@ class TrafficLightOracle(Oracle):
             # get traffic light
             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
-            if will_be_crossing and red_light_on and self.flag is 0:
-                print('Haha')
+            if will_be_crossing and red_light_on: #and self.flag is 0:
                 return False
         return True
 

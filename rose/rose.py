@@ -27,6 +27,7 @@ from c_tools import *
 from global_constants import *
 
 
+
 def set_seed(seed, other_param=0):
     #other_param = 0
     if seed is not None:
@@ -253,6 +254,7 @@ class Car(Agent):
         self.turn_signal = None
         self.is_winner = None
         self.id = self.set_id()
+        self.backup_plan_status = None
 
         if 'agent_color' in kwargs:
             self.agent_color = kwargs.get('agent_color')
@@ -283,7 +285,7 @@ class Car(Agent):
         self.lead_agent = None
         self.prior_state = None
 
-        self.backup_plan_safety = None
+
 
     def apply(self, ctrl):
         self.prior_state = self.state
@@ -614,9 +616,6 @@ class Car(Agent):
         if lead_agent is None:
             ctrl = Car.get_ctrl_od(self.a_max, 'straight')
             return ctrl
-        x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-
-        v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
 
         # try all acceleration values
         ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
@@ -959,12 +958,11 @@ class Car(Agent):
             x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
             gap_curr = ((x_a - x) ** 2 + (y_a - y) ** 2) ** 0.5
             # not safe if gap is not large enough for any one of the agents
-            if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) >= gap_curr):
-                #print('Unsafe!')
-                self.backup_plan_safety = 'VIOLATED'
-                return False
-        self.backup_plan_safety = 'MAINTAINED'
-        return True
+
+            if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                print('Unsafe!');
+                return 'VIOLATED'
+        return 'MAINTAINED'
 
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
@@ -988,13 +986,13 @@ class Car(Agent):
             agents_no_bp = []
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-
-                v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
+                v_a_err = cp.deepcopy(v_a)
+                v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
 
 
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a_err, self.a_min, v) > gap_curr):
                     is_safe = False
                     agents_no_bp.append(agent.state.__tuple__())
 
@@ -1106,28 +1104,30 @@ class Car(Agent):
             try:
                 l_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_length(((st_1.x, st_1.y), st_1.heading))
             except:
-                return None, None, None, None
+                return None, None, None, None, None
             try:
                 l_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_length(((st_2.x, st_2.y), st_2.heading))
             except:
-                return None, None, None, None
+                return None, None, None, None, None
             if l_1 > l_2:
-                return ag_1, ag_2, st_1, st_2
+                return ag_1, ag_2, st_1, st_2,0
             elif l_2 > l_1:
-                return ag_2, ag_1, st_2, st_1
+                return ag_2, ag_1, st_2, st_1,1
             else:
-                return None, None, None, None
+                return None, None, None, None, None
 
         if st_1 is None:
             st_1 = ag_1.state
         if st_2 is None:
             st_2 = ag_2.state
 
-        st_2.v = add_perception_error(st_2.v, ag_2.v_min, self.flag)
+        st_2ch = cp.deepcopy(st_2)
+        st_2ch.v = add_perception_error(st_2.v, ag_2.v_min, self.flag)
+
         #print("safe config check")
         #print(ag_1.state, ag_2.state, st_1, st_2)
         # first check same lane
-        same_lane_chk = self.check_same_lane(st_1, st_2)
+        same_lane_chk = self.check_same_lane(st_1, st_2ch)
         #print('same lane check')
         #print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
@@ -1135,15 +1135,19 @@ class Car(Agent):
             #print("not same lane check")
             return True
         # then check which agent is lead and which one is behind
-        ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2)
+        ag_lead, ag_behind, st_lead, st_behind, flag_switch = sort_agents(st_1, st_2ch)
+
+
         # if None, agents are on top of each other
         if ag_lead is None:
             #print("agents on top of each other ")
             #print()
             return False
 
+
         gap_req = compute_gap_req_fast(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
-        gap_curr = math.sqrt((st_lead.x-st_behind.x)**2+(st_lead.y-st_behind.y)**2)
+        gap_curr = math.sqrt((st_lead.x - st_behind.x) ** 2 + (st_lead.y - st_behind.y) ** 2)
+
 
         return gap_curr >= gap_req
 
@@ -1184,7 +1188,12 @@ class Car(Agent):
         # TODO: see whether end state after these actions still have a back-up plan
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
-                chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
+                #deep copy here
+                agent_err = cp.deepcopy(agent)
+                #print('1: ', agent_err.intention['acceleration'])
+                #agent_err.intention['acceleration']  = add_perception_error(agent_err.intention['acceleration'], agent_err.a_min, 1)
+                #print('2: ', agent_err.intention['acceleration'])
+                chk_valid_actions = self.check_valid_actions(self, self.intention, agent_err, agent_err.intention) #Here - add error change accel or steer
                 #if not chk_valid_actions:
                     #if agent.state.heading == 'east':
                         #print(self.state)
@@ -1675,6 +1684,7 @@ class TrafficGame(Simulation):
         self.agents_reached_goal_count = 0
         self.cert_vel = errors[0].certainty_level/100
         self.cert_tf = errors[1].certainty_level/ 100
+        self.cert_perc = errors[2].certainty_level/100
 
 
 
@@ -1698,9 +1708,12 @@ class TrafficGame(Simulation):
                 #print('sources and sinks')
                 #print(source.node, sink.node)
                 flag_vel = error_bool(self.cert_vel)
-                print('vel:',flag_vel)
+                #print('vel:',flag_vel)
                 flag_tf = error_bool(self.cert_tf)
                 #print('tf:', flag_tf)
+                flag_perc = error_bool(self.cert_perc)
+                #print('perc:', flag_perc)
+
 
 
                 new_car = create_default_car(source, sink, self, self.car_count,flag_vel,flag_tf)
@@ -1741,6 +1754,7 @@ class TrafficGame(Simulation):
 
     def write_agents_to_traces(self):
         all_agent_info_at_time_t_dict = od()
+        violation_dict = od()
         for agent in self.agent_set:
             # if prior state is not none
             prior_state = agent.prior_state
@@ -1763,12 +1777,12 @@ class TrafficGame(Simulation):
                                 'max_braking_not_enough': agent.agent_max_braking_not_enough_sv,
                                 'straight_action_eval': agent.straight_action_eval,
                                 'action_selection_flags': agent.action_selection_flags,
+                                'backup_plan_status':agent.backup_plan_status,
                                 'intention': agent.intention,
                                 'conflict_winner': agent.conflict_winner_sv,
                                 'token_count_before': agent.token_count_before,
                                 'agent_id':agent.get_id(),
                                 'left_turn_gap_arr':agent.left_turn_gap_arr,
-                                'backup_plan_safety':agent.backup_plan_safety,
                                 'lead_agent':agent.lead_agent,
                                 'checked_for_conflict':agent.agents_checked_for_conflict_sv,
                                 'agents_in_bubble_before': agent.agents_in_bubble_before_sv,
@@ -1777,7 +1791,6 @@ class TrafficGame(Simulation):
             all_agent_info_at_time_t_dict[agent.get_id()] = agent_trace_dict
 
         self.traces_debug[self.time] = all_agent_info_at_time_t_dict
-
 
     # write the game information to traces
     def write_game_info_to_traces(self, t_end):
@@ -1792,6 +1805,7 @@ class TrafficGame(Simulation):
         self.traces['total_agent_count'] = self.car_count
         self.traces['agents_reached_goal_count'] = self.agents_reached_goal_count
         self.traces['agents_in_map'] = len(self.agent_set)
+
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         filename = filename + '.p'
@@ -1815,10 +1829,11 @@ class TrafficGame(Simulation):
             lead_agent = plant.find_lead_agent(inside_bubble=True)
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
-                v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
+                v_a_err = cp.deepcopy(v_a)
+                v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a_err, plant.a_min, v) >= gap_curr):
                     return False
         # all agents have backup plan
         return True
@@ -3406,6 +3421,7 @@ class QuasiSimultaneousGame(TrafficGame):
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         #self.bundle_to_agent_precedence = None
         self.simulated_agents = []
+        self.backup_plan_status = []
 
 
     def done_simulating_agent(self, agent):
@@ -3500,6 +3516,7 @@ class QuasiSimultaneousGame(TrafficGame):
     def reset_debug_info(self):
         for agent in self.agent_set:
             agent.no_deadlock_sv = od()
+        self.backup_plan_status.clear()
 
     def sys_step(self):
         # set all agent intentions
@@ -3535,12 +3552,9 @@ class QuasiSimultaneousGame(TrafficGame):
         self.done_simulating_everyone()
 
         # Here - Ask Karena
-        for bundle in self.map.bundles:
-            precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
-            precedence_list.sort(reverse=True)
-            for precedence in precedence_list:
-                for agent in self.bundle_to_agent_precedence[bundle][precedence]:
-                    agent.check_backup_violation()
+        for agent in self.agent_set:
+            agent.backup_plan_status = agent.check_backup_violation()#reset_debug_info
+            self.backup_plan_status.append(agent.backup_plan_status)
 
 def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
@@ -3682,8 +3696,8 @@ def create_qs_with_errors(error_config_path,game_map,config_path):
 
 if __name__ == '__main__':
     seed = 123
-    map_name = 'straight_simple'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.1, seed=seed)
+    map_name = 'straight_simple' #'city_blocks_small'#
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0, seed=seed)
     output_filename = 'game'
     error_config_path = './configs/error.json'
 
@@ -3693,7 +3707,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name, errors = [])
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=25)
+    game.play(outfile=output_filename, t_end=5)
     #game.animate(frequency=0.01)
 
     # print debug info

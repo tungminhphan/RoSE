@@ -848,7 +848,7 @@ struct __pyx_obj_7c_tools___pyx_scope_struct_1_evaluate {
 };
 
 
-/* "c_tools.pyx":354
+/* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -862,7 +862,7 @@ struct __pyx_obj_7c_tools___pyx_scope_struct_2_evaluate {
 };
 
 
-/* "c_tools.pyx":554
+/* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
@@ -1559,7 +1559,6 @@ static const char __pyx_k_vec[] = "vec";
 static const char __pyx_k_vel[] = "vel";
 static const char __pyx_k_x_a[] = "x_a";
 static const char __pyx_k_y_a[] = "y_a";
-static const char __pyx_k_Haha[] = "Haha";
 static const char __pyx_k_args[] = "args";
 static const char __pyx_k_call[] = "__call__";
 static const char __pyx_k_ceil[] = "ceil";
@@ -1939,7 +1938,6 @@ static PyObject *__pyx_n_s_E;
 static PyObject *__pyx_kp_s_ERROR;
 static PyObject *__pyx_kp_s_ERROR_not_a_lane_change_action;
 static PyObject *__pyx_n_s_F;
-static PyObject *__pyx_n_s_Haha;
 static PyObject *__pyx_n_s_ImprovementBundleProgressOracle;
 static PyObject *__pyx_n_s_ImprovementBundleProgressOracle_2;
 static PyObject *__pyx_n_s_ImprovementBundleProgressOracle_3;
@@ -9416,7 +9414,6 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
   PyObject *(*__pyx_t_10)(PyObject *);
   int __pyx_t_11;
   PyObject *__pyx_t_12 = NULL;
-  int __pyx_t_13;
   __Pyx_RefNannySetupContext("tile_sequence_not_running_a_red_light_on_N_turn", 0);
 
   /* "c_tools.pyx":277
@@ -9695,7 +9692,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
  *             # get traffic light
  *             traffic_light = game.map.tile_to_traffic_light_map[light_tile]             # <<<<<<<<<<<<<<
  *             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
- *             if will_be_crossing and red_light_on and self.flag is 0:
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:
  */
     __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
@@ -9712,8 +9709,8 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
  *             # get traffic light
  *             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
  *             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)             # <<<<<<<<<<<<<<
- *             if will_be_crossing and red_light_on and self.flag is 0:
- *                 print('Haha')
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:
+ *                 return False
  */
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_check_if_light_red_in_N_turns); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 289, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -9771,9 +9768,9 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
     /* "c_tools.pyx":290
  *             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
  *             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
- *             if will_be_crossing and red_light_on and self.flag is 0:             # <<<<<<<<<<<<<<
- *                 print('Haha')
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:             # <<<<<<<<<<<<<<
  *                 return False
+ *         return True
  */
     __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_crossing); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 290, __pyx_L1_error)
     if (__pyx_t_6) {
@@ -9782,32 +9779,13 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
       goto __pyx_L11_bool_binop_done;
     }
     __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_red_light_on); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 290, __pyx_L1_error)
-    if (__pyx_t_6) {
-    } else {
-      __pyx_t_7 = __pyx_t_6;
-      goto __pyx_L11_bool_binop_done;
-    }
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_flag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = (__pyx_t_5 == __pyx_int_0);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_13 = (__pyx_t_6 != 0);
-    __pyx_t_7 = __pyx_t_13;
+    __pyx_t_7 = __pyx_t_6;
     __pyx_L11_bool_binop_done:;
     if (__pyx_t_7) {
 
       /* "c_tools.pyx":291
  *             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
- *             if will_be_crossing and red_light_on and self.flag is 0:
- *                 print('Haha')             # <<<<<<<<<<<<<<
- *                 return False
- *         return True
- */
-      if (__Pyx_PrintOne(0, __pyx_n_s_Haha) < 0) __PYX_ERR(0, 291, __pyx_L1_error)
-
-      /* "c_tools.pyx":292
- *             if will_be_crossing and red_light_on and self.flag is 0:
- *                 print('Haha')
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:
  *                 return False             # <<<<<<<<<<<<<<
  *         return True
  * 
@@ -9821,9 +9799,9 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
       /* "c_tools.pyx":290
  *             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
  *             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
- *             if will_be_crossing and red_light_on and self.flag is 0:             # <<<<<<<<<<<<<<
- *                 print('Haha')
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:             # <<<<<<<<<<<<<<
  *                 return False
+ *         return True
  */
     }
 
@@ -9837,8 +9815,8 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":293
- *                 print('Haha')
+  /* "c_tools.pyx":292
+ *             if will_be_crossing and red_light_on: #and self.flag is 0:
  *                 return False
  *         return True             # <<<<<<<<<<<<<<
  * 
@@ -9880,7 +9858,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_2tile_sequence_not_runni
   return __pyx_r;
 }
 
-/* "c_tools.pyx":295
+/* "c_tools.pyx":294
  *         return True
  * 
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):             # <<<<<<<<<<<<<<
@@ -9926,23 +9904,23 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_5check_if_light_red_in_N
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_traffic_light)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 1); __PYX_ERR(0, 295, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 1); __PYX_ERR(0, 294, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_direction)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 2); __PYX_ERR(0, 295, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 2); __PYX_ERR(0, 294, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 3); __PYX_ERR(0, 295, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, 3); __PYX_ERR(0, 294, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_if_light_red_in_N_turns") < 0)) __PYX_ERR(0, 295, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_if_light_red_in_N_turns") < 0)) __PYX_ERR(0, 294, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -9959,7 +9937,7 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_5check_if_light_red_in_N
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 295, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("check_if_light_red_in_N_turns", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 294, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficLightOracle.check_if_light_red_in_N_turns", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9983,14 +9961,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("check_if_light_red_in_N_turns", 0);
 
-  /* "c_tools.pyx":296
+  /* "c_tools.pyx":295
  * 
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
  *         color = traffic_light.check_directed_light_in_N_turns(direction, N)             # <<<<<<<<<<<<<<
  *         return color == 'red'
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -10007,7 +9985,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_direction, __pyx_v_N};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -10015,13 +9993,13 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_v_direction, __pyx_v_N};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -10032,7 +10010,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
     __Pyx_INCREF(__pyx_v_N);
     __Pyx_GIVEREF(__pyx_v_N);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_N);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -10040,7 +10018,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
   __pyx_v_color = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":297
+  /* "c_tools.pyx":296
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
  *         color = traffic_light.check_directed_light_in_N_turns(direction, N)
  *         return color == 'red'             # <<<<<<<<<<<<<<
@@ -10048,12 +10026,12 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_color, __pyx_n_s_red, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_color, __pyx_n_s_red, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":295
+  /* "c_tools.pyx":294
  *         return True
  * 
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):             # <<<<<<<<<<<<<<
@@ -10076,7 +10054,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_4check_if_light_red_in_N
   return __pyx_r;
 }
 
-/* "c_tools.pyx":299
+/* "c_tools.pyx":298
  *         return color == 'red'
  * 
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -10122,23 +10100,23 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_7action_not_running_a_re
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 1); __PYX_ERR(0, 299, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 1); __PYX_ERR(0, 298, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 2); __PYX_ERR(0, 299, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 2); __PYX_ERR(0, 298, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 3); __PYX_ERR(0, 299, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, 3); __PYX_ERR(0, 298, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "action_not_running_a_red_light") < 0)) __PYX_ERR(0, 299, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "action_not_running_a_red_light") < 0)) __PYX_ERR(0, 298, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -10155,7 +10133,7 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_7action_not_running_a_re
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 299, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("action_not_running_a_red_light", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 298, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficLightOracle.action_not_running_a_red_light", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10183,14 +10161,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("action_not_running_a_red_light", 0);
 
-  /* "c_tools.pyx":300
+  /* "c_tools.pyx":299
  * 
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):
  *         occ_states = plant.query_occupancy(ctrl_action)             # <<<<<<<<<<<<<<
  *         occ_tiles = [(state.x, state.y) for state in occ_states]
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -10204,45 +10182,45 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_occ_states = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":301
+  /* "c_tools.pyx":300
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):
  *         occ_states = plant.query_occupancy(ctrl_action)
  *         occ_tiles = [(state.x, state.y) for state in occ_states]             # <<<<<<<<<<<<<<
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  * 
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (likely(PyList_CheckExact(__pyx_v_occ_states)) || PyTuple_CheckExact(__pyx_v_occ_states)) {
     __pyx_t_2 = __pyx_v_occ_states; __Pyx_INCREF(__pyx_t_2); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_occ_states); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_occ_states); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_5)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 301, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 301, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -10252,7 +10230,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 301, __pyx_L1_error)
+          else __PYX_ERR(0, 300, __pyx_L1_error)
         }
         break;
       }
@@ -10260,11 +10238,11 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
     }
     __Pyx_XDECREF_SET(__pyx_v_state, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 300, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 300, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_3);
@@ -10272,14 +10250,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
     PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_6);
     __pyx_t_3 = 0;
     __pyx_t_6 = 0;
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 301, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 300, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_occ_tiles = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":302
+  /* "c_tools.pyx":301
  *         occ_states = plant.query_occupancy(ctrl_action)
  *         occ_tiles = [(state.x, state.y) for state in occ_states]
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)             # <<<<<<<<<<<<<<
@@ -10287,9 +10265,9 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
  *     def check_if_crossing(self, light_tile, tiles, direction):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tile_sequence_not_running_a_red); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tile_sequence_not_running_a_red); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_occ_tiles);
   __Pyx_GIVEREF(__pyx_v_occ_tiles);
@@ -10297,10 +10275,10 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
   __Pyx_INCREF(__pyx_v_game);
   __Pyx_GIVEREF(__pyx_v_game);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_game);
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_N, __pyx_int_1) < 0) __PYX_ERR(0, 302, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 302, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_N, __pyx_int_1) < 0) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10309,7 +10287,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
   __pyx_t_6 = 0;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":299
+  /* "c_tools.pyx":298
  *         return color == 'red'
  * 
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -10335,7 +10313,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_6action_not_running_a_re
   return __pyx_r;
 }
 
-/* "c_tools.pyx":304
+/* "c_tools.pyx":303
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):             # <<<<<<<<<<<<<<
@@ -10381,23 +10359,23 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_9check_if_crossing(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_light_tile)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 1); __PYX_ERR(0, 304, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 1); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_tiles)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 2); __PYX_ERR(0, 304, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 2); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_direction)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 3); __PYX_ERR(0, 304, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, 3); __PYX_ERR(0, 303, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_if_crossing") < 0)) __PYX_ERR(0, 304, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_if_crossing") < 0)) __PYX_ERR(0, 303, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -10414,7 +10392,7 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_9check_if_crossing(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 304, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("check_if_crossing", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 303, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficLightOracle.check_if_crossing", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10443,7 +10421,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("check_if_crossing", 0);
 
-  /* "c_tools.pyx":305
+  /* "c_tools.pyx":304
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):
  *         if direction in ['west', 'east']:             # <<<<<<<<<<<<<<
@@ -10452,20 +10430,20 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   __Pyx_INCREF(__pyx_v_direction);
   __pyx_t_1 = __pyx_v_direction;
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   if (!__pyx_t_3) {
   } else {
     __pyx_t_2 = __pyx_t_3;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 305, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "c_tools.pyx":306
+    /* "c_tools.pyx":305
  *     def check_if_crossing(self, light_tile, tiles, direction):
  *         if direction in ['west', 'east']:
  *             k = 1             # <<<<<<<<<<<<<<
@@ -10474,7 +10452,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
     __pyx_v_k = 1;
 
-    /* "c_tools.pyx":305
+    /* "c_tools.pyx":304
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):
  *         if direction in ['west', 'east']:             # <<<<<<<<<<<<<<
@@ -10484,7 +10462,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
     goto __pyx_L3;
   }
 
-  /* "c_tools.pyx":307
+  /* "c_tools.pyx":306
  *         if direction in ['west', 'east']:
  *             k = 1
  *         elif direction in ['north', 'south']:             # <<<<<<<<<<<<<<
@@ -10493,20 +10471,20 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   __Pyx_INCREF(__pyx_v_direction);
   __pyx_t_1 = __pyx_v_direction;
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_north, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_north, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 306, __pyx_L1_error)
   if (!__pyx_t_2) {
   } else {
     __pyx_t_3 = __pyx_t_2;
     goto __pyx_L6_bool_binop_done;
   }
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_south, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 307, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_south, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 306, __pyx_L1_error)
   __pyx_t_3 = __pyx_t_2;
   __pyx_L6_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_2 = (__pyx_t_3 != 0);
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":308
+    /* "c_tools.pyx":307
  *             k = 1
  *         elif direction in ['north', 'south']:
  *             k = 0             # <<<<<<<<<<<<<<
@@ -10515,7 +10493,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
     __pyx_v_k = 0;
 
-    /* "c_tools.pyx":307
+    /* "c_tools.pyx":306
  *         if direction in ['west', 'east']:
  *             k = 1
  *         elif direction in ['north', 'south']:             # <<<<<<<<<<<<<<
@@ -10525,51 +10503,51 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
   }
   __pyx_L3:;
 
-  /* "c_tools.pyx":309
+  /* "c_tools.pyx":308
  *         elif direction in ['north', 'south']:
  *             k = 0
  *         light_tile_projection = light_tile[k]             # <<<<<<<<<<<<<<
  *         tile_projections = [tile[k] for tile in tiles]
  *         if direction in ['east', 'south']:
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_light_tile, __pyx_v_k, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_light_tile, __pyx_v_k, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 308, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_light_tile_projection = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":310
+  /* "c_tools.pyx":309
  *             k = 0
  *         light_tile_projection = light_tile[k]
  *         tile_projections = [tile[k] for tile in tiles]             # <<<<<<<<<<<<<<
  *         if direction in ['east', 'south']:
  *             return min(tile_projections) <= light_tile_projection and max(tile_projections) > light_tile_projection
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (likely(PyList_CheckExact(__pyx_v_tiles)) || PyTuple_CheckExact(__pyx_v_tiles)) {
     __pyx_t_4 = __pyx_v_tiles; __Pyx_INCREF(__pyx_t_4); __pyx_t_5 = 0;
     __pyx_t_6 = NULL;
   } else {
-    __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_tiles); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 310, __pyx_L1_error)
+    __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_tiles); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 310, __pyx_L1_error)
+    __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 309, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_6)) {
       if (likely(PyList_CheckExact(__pyx_t_4))) {
         if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
+        __pyx_t_7 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 309, __pyx_L1_error)
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 310, __pyx_L1_error)
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 309, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       } else {
         if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_7); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 309, __pyx_L1_error)
         #else
-        __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 310, __pyx_L1_error)
+        __pyx_t_7 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 309, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         #endif
       }
@@ -10579,7 +10557,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 310, __pyx_L1_error)
+          else __PYX_ERR(0, 309, __pyx_L1_error)
         }
         break;
       }
@@ -10587,16 +10565,16 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
     }
     __Pyx_XDECREF_SET(__pyx_v_tile, __pyx_t_7);
     __pyx_t_7 = 0;
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_tile, __pyx_v_k, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 310, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_tile, __pyx_v_k, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 309, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 310, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 309, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_tile_projections = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":311
+  /* "c_tools.pyx":310
  *         light_tile_projection = light_tile[k]
  *         tile_projections = [tile[k] for tile in tiles]
  *         if direction in ['east', 'south']:             # <<<<<<<<<<<<<<
@@ -10605,20 +10583,20 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   __Pyx_INCREF(__pyx_v_direction);
   __pyx_t_1 = __pyx_v_direction;
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
   if (!__pyx_t_3) {
   } else {
     __pyx_t_2 = __pyx_t_3;
     goto __pyx_L11_bool_binop_done;
   }
-  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_south, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_south, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_3;
   __pyx_L11_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "c_tools.pyx":312
+    /* "c_tools.pyx":311
  *         tile_projections = [tile[k] for tile in tiles]
  *         if direction in ['east', 'south']:
  *             return min(tile_projections) <= light_tile_projection and max(tile_projections) > light_tile_projection             # <<<<<<<<<<<<<<
@@ -10626,11 +10604,11 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_tile_projections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_tile_projections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_v_light_tile_projection, Py_LE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_v_light_tile_projection, Py_LE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
     if (__pyx_t_3) {
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else {
@@ -10639,9 +10617,9 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L13_bool_binop_done;
     }
-    __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_tile_projections); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_tile_projections); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_v_light_tile_projection, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 312, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_v_light_tile_projection, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_t_1 = __pyx_t_4;
@@ -10651,7 +10629,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":311
+    /* "c_tools.pyx":310
  *         light_tile_projection = light_tile[k]
  *         tile_projections = [tile[k] for tile in tiles]
  *         if direction in ['east', 'south']:             # <<<<<<<<<<<<<<
@@ -10660,7 +10638,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   }
 
-  /* "c_tools.pyx":313
+  /* "c_tools.pyx":312
  *         if direction in ['east', 'south']:
  *             return min(tile_projections) <= light_tile_projection and max(tile_projections) > light_tile_projection
  *         elif direction in ['west', 'north']:             # <<<<<<<<<<<<<<
@@ -10669,20 +10647,20 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   __Pyx_INCREF(__pyx_v_direction);
   __pyx_t_1 = __pyx_v_direction;
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
   if (!__pyx_t_2) {
   } else {
     __pyx_t_3 = __pyx_t_2;
     goto __pyx_L15_bool_binop_done;
   }
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_north, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_north, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
   __pyx_t_3 = __pyx_t_2;
   __pyx_L15_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_2 = (__pyx_t_3 != 0);
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":314
+    /* "c_tools.pyx":313
  *             return min(tile_projections) <= light_tile_projection and max(tile_projections) > light_tile_projection
  *         elif direction in ['west', 'north']:
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection             # <<<<<<<<<<<<<<
@@ -10690,11 +10668,11 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_tile_projections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_tile_projections); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_v_light_tile_projection, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_4, __pyx_v_light_tile_projection, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 313, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 313, __pyx_L1_error)
     if (__pyx_t_2) {
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else {
@@ -10703,9 +10681,9 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L17_bool_binop_done;
     }
-    __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_tile_projections); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_tile_projections); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 313, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_v_light_tile_projection, Py_GE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_7, __pyx_v_light_tile_projection, Py_GE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 313, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_t_1 = __pyx_t_4;
@@ -10715,7 +10693,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":313
+    /* "c_tools.pyx":312
  *         if direction in ['east', 'south']:
  *             return min(tile_projections) <= light_tile_projection and max(tile_projections) > light_tile_projection
  *         elif direction in ['west', 'north']:             # <<<<<<<<<<<<<<
@@ -10724,7 +10702,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
  */
   }
 
-  /* "c_tools.pyx":304
+  /* "c_tools.pyx":303
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):             # <<<<<<<<<<<<<<
@@ -10750,7 +10728,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_8check_if_crossing(CYTHO
   return __pyx_r;
 }
 
-/* "c_tools.pyx":316
+/* "c_tools.pyx":315
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
  * 
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -10796,23 +10774,23 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_11backup_plant_will_stil
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 1); __PYX_ERR(0, 316, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 1); __PYX_ERR(0, 315, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 2); __PYX_ERR(0, 316, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 2); __PYX_ERR(0, 315, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 3); __PYX_ERR(0, 316, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, 3); __PYX_ERR(0, 315, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backup_plant_will_still_be_ok") < 0)) __PYX_ERR(0, 316, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "backup_plant_will_still_be_ok") < 0)) __PYX_ERR(0, 315, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -10829,7 +10807,7 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_11backup_plant_will_stil
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 316, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("backup_plant_will_still_be_ok", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 315, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficLightOracle.backup_plant_will_still_be_ok", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10861,14 +10839,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
   int __pyx_t_9;
   __Pyx_RefNannySetupContext("backup_plant_will_still_be_ok", 0);
 
-  /* "c_tools.pyx":317
+  /* "c_tools.pyx":316
  * 
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
  *         next_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  *         for tile_sequence in tile_sequence_chain:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -10882,35 +10860,35 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 317, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_next_state = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":318
+  /* "c_tools.pyx":317
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
  *         next_state = plant.query_occupancy(ctrl_action)[-1]
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)             # <<<<<<<<<<<<<<
  *         for tile_sequence in tile_sequence_chain:
  *             N, required_tiles = tile_sequence
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_backup_plan); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_backup_plan); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 318, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_tile_sequence_chain = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":319
+  /* "c_tools.pyx":318
  *         next_state = plant.query_occupancy(ctrl_action)[-1]
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  *         for tile_sequence in tile_sequence_chain:             # <<<<<<<<<<<<<<
@@ -10921,26 +10899,26 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
     __pyx_t_3 = __pyx_v_tile_sequence_chain; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_tile_sequence_chain); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_tile_sequence_chain); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 319, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 318, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_5)) {
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 318, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_1); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 318, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 318, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -10950,7 +10928,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 319, __pyx_L1_error)
+          else __PYX_ERR(0, 318, __pyx_L1_error)
         }
         break;
       }
@@ -10959,7 +10937,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
     __Pyx_XDECREF_SET(__pyx_v_tile_sequence, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":320
+    /* "c_tools.pyx":319
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  *         for tile_sequence in tile_sequence_chain:
  *             N, required_tiles = tile_sequence             # <<<<<<<<<<<<<<
@@ -10972,7 +10950,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 320, __pyx_L1_error)
+        __PYX_ERR(0, 319, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -10985,21 +10963,21 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
       __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_t_2);
       #else
-      __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 320, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_6 = PyObject_GetIter(__pyx_v_tile_sequence); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 320, __pyx_L1_error)
+      __pyx_t_6 = PyObject_GetIter(__pyx_v_tile_sequence); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 319, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
       index = 0; __pyx_t_1 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_1)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_1);
       index = 1; __pyx_t_2 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_2)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 320, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 319, __pyx_L1_error)
       __pyx_t_7 = NULL;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       goto __pyx_L6_unpacking_done;
@@ -11007,7 +10985,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 320, __pyx_L1_error)
+      __PYX_ERR(0, 319, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_N, __pyx_t_1);
@@ -11015,16 +10993,16 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
     __Pyx_XDECREF_SET(__pyx_v_required_tiles, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":321
+    /* "c_tools.pyx":320
  *         for tile_sequence in tile_sequence_chain:
  *             N, required_tiles = tile_sequence
  *             if self.tile_sequence_not_running_a_red_light_on_N_turn(required_tiles, game, N=N):             # <<<<<<<<<<<<<<
  *                 pass
  *             else:
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tile_sequence_not_running_a_red); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tile_sequence_not_running_a_red); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_required_tiles);
     __Pyx_GIVEREF(__pyx_v_required_tiles);
@@ -11032,21 +11010,21 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
     __Pyx_INCREF(__pyx_v_game);
     __Pyx_GIVEREF(__pyx_v_game);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_game);
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 321, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_N, __pyx_v_N) < 0) __PYX_ERR(0, 321, __pyx_L1_error)
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 321, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_N, __pyx_v_N) < 0) __PYX_ERR(0, 320, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 320, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_9) {
       goto __pyx_L7;
     }
 
-    /* "c_tools.pyx":324
+    /* "c_tools.pyx":323
  *                 pass
  *             else:
  *                 return False             # <<<<<<<<<<<<<<
@@ -11062,7 +11040,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
     }
     __pyx_L7:;
 
-    /* "c_tools.pyx":319
+    /* "c_tools.pyx":318
  *         next_state = plant.query_occupancy(ctrl_action)[-1]
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  *         for tile_sequence in tile_sequence_chain:             # <<<<<<<<<<<<<<
@@ -11072,7 +11050,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":325
+  /* "c_tools.pyx":324
  *             else:
  *                 return False
  *         return True             # <<<<<<<<<<<<<<
@@ -11084,7 +11062,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":316
+  /* "c_tools.pyx":315
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
  * 
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -11112,7 +11090,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_10backup_plant_will_stil
   return __pyx_r;
 }
 
-/* "c_tools.pyx":327
+/* "c_tools.pyx":326
  *         return True
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -11158,23 +11136,23 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_13evaluate(PyObject *__p
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 327, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 326, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 327, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 326, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 327, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 326, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 327, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 326, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -11191,7 +11169,7 @@ static PyObject *__pyx_pw_7c_tools_18TrafficLightOracle_13evaluate(PyObject *__p
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 327, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 326, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficLightOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -11226,14 +11204,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   PyObject *__pyx_t_12 = NULL;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":328
+  /* "c_tools.pyx":327
  * 
  *     def evaluate(self, ctrl_action, plant, game):
  *         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)             # <<<<<<<<<<<<<<
  *         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
  *         # if you're at the critical right-turn tile and red light
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_action_not_running_a_red_light); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 328, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_action_not_running_a_red_light); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -11250,7 +11228,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_3, __pyx_v_ctrl_action, __pyx_v_plant, __pyx_v_game};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -11258,13 +11236,13 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_3, __pyx_v_ctrl_action, __pyx_v_plant, __pyx_v_game};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -11278,7 +11256,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_v_game);
     __Pyx_GIVEREF(__pyx_v_game);
     PyTuple_SET_ITEM(__pyx_t_5, 2+__pyx_t_4, __pyx_v_game);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -11286,14 +11264,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   __pyx_v_action_not_running_a_red_light = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":329
+  /* "c_tools.pyx":328
  *     def evaluate(self, ctrl_action, plant, game):
  *         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
  *         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)             # <<<<<<<<<<<<<<
  *         # if you're at the critical right-turn tile and red light
  *         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_backup_plant_will_still_be_ok); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 329, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_backup_plant_will_still_be_ok); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 328, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   __pyx_t_4 = 0;
@@ -11310,7 +11288,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_5, __pyx_v_ctrl_action, __pyx_v_plant, __pyx_v_game};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -11318,13 +11296,13 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_5, __pyx_v_ctrl_action, __pyx_v_plant, __pyx_v_game};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_3 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -11338,7 +11316,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
     __Pyx_INCREF(__pyx_v_game);
     __Pyx_GIVEREF(__pyx_v_game);
     PyTuple_SET_ITEM(__pyx_t_3, 2+__pyx_t_4, __pyx_v_game);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
@@ -11346,29 +11324,29 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   __pyx_v_backup_plant_will_still_be_ok = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":331
+  /* "c_tools.pyx":330
  *         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
  *         # if you're at the critical right-turn tile and red light
  *         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))             # <<<<<<<<<<<<<<
  *         # special left turn lane bandage
  *         if bundle is None:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5);
@@ -11376,12 +11354,12 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_6);
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 331, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_2);
@@ -11402,13 +11380,13 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 331, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 330, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_bundle = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":333
+  /* "c_tools.pyx":332
  *         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
  *         # special left turn lane bandage
  *         if bundle is None:             # <<<<<<<<<<<<<<
@@ -11419,7 +11397,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   __pyx_t_8 = (__pyx_t_7 != 0);
   if (__pyx_t_8) {
 
-    /* "c_tools.pyx":335
+    /* "c_tools.pyx":334
  *         if bundle is None:
  *             #print(plant.state.x, plant.state.y, plant.state.heading)
  *             return False             # <<<<<<<<<<<<<<
@@ -11431,7 +11409,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
     __pyx_r = Py_False;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":333
+    /* "c_tools.pyx":332
  *         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
  *         # special left turn lane bandage
  *         if bundle is None:             # <<<<<<<<<<<<<<
@@ -11440,24 +11418,24 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
   }
 
-  /* "c_tools.pyx":337
+  /* "c_tools.pyx":336
  *             return False
  *         # check whether the right-turn action is okay
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':             # <<<<<<<<<<<<<<
  *             try:
  *                 traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -11465,12 +11443,12 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_6);
   __pyx_t_3 = 0;
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -11478,15 +11456,15 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_3);
   __pyx_t_1 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_right_turn_tiles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_right_turn_tiles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_t_6, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_t_6, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_9 = (__pyx_t_7 != 0);
@@ -11495,15 +11473,15 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
     __pyx_t_8 = __pyx_t_9;
     goto __pyx_L5_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_turn, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_turn, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 336, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_8 = __pyx_t_9;
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_8) {
 
-    /* "c_tools.pyx":338
+    /* "c_tools.pyx":337
  *         # check whether the right-turn action is okay
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
  *             try:             # <<<<<<<<<<<<<<
@@ -11519,29 +11497,29 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       __Pyx_XGOTREF(__pyx_t_12);
       /*try:*/ {
 
-        /* "c_tools.pyx":339
+        /* "c_tools.pyx":338
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
  *             try:
  *                 traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]             # <<<<<<<<<<<<<<
  *                 light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
  *             except:
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_to_traffic_light_map); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_to_traffic_light_map); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -11549,25 +11527,25 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
         PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_5);
         __pyx_t_1 = 0;
         __pyx_t_5 = 0;
-        __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L7_error)
+        __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 338, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_traffic_light = __pyx_t_5;
         __pyx_t_5 = 0;
 
-        /* "c_tools.pyx":340
+        /* "c_tools.pyx":339
  *             try:
  *                 traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
  *                 light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0             # <<<<<<<<<<<<<<
  *             except:
  *                 light_is_red = True # if no traffic light, assume it's red
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_check_if_light_red_in_N_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 340, __pyx_L7_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_check_if_light_red_in_N_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 340, __pyx_L7_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 339, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 340, __pyx_L7_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 339, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __pyx_t_6 = NULL;
@@ -11585,7 +11563,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_traffic_light, __pyx_t_1, __pyx_int_0};
-          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L7_error)
+          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L7_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -11594,14 +11572,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_traffic_light, __pyx_t_1, __pyx_int_0};
-          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L7_error)
+          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 3+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L7_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         } else
         #endif
         {
-          __pyx_t_2 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 340, __pyx_L7_error)
+          __pyx_t_2 = PyTuple_New(3+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 339, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_2);
           if (__pyx_t_6) {
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -11615,7 +11593,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
           __Pyx_GIVEREF(__pyx_int_0);
           PyTuple_SET_ITEM(__pyx_t_2, 2+__pyx_t_4, __pyx_int_0);
           __pyx_t_1 = 0;
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L7_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         }
@@ -11623,7 +11601,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
         __pyx_v_light_is_red = __pyx_t_5;
         __pyx_t_5 = 0;
 
-        /* "c_tools.pyx":338
+        /* "c_tools.pyx":337
  *         # check whether the right-turn action is okay
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
  *             try:             # <<<<<<<<<<<<<<
@@ -11642,7 +11620,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "c_tools.pyx":341
+      /* "c_tools.pyx":340
  *                 traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
  *                 light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
  *             except:             # <<<<<<<<<<<<<<
@@ -11651,12 +11629,12 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
       /*except:*/ {
         __Pyx_AddTraceback("c_tools.TrafficLightOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_2) < 0) __PYX_ERR(0, 341, __pyx_L9_except_error)
+        if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_2) < 0) __PYX_ERR(0, 340, __pyx_L9_except_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GOTREF(__pyx_t_2);
 
-        /* "c_tools.pyx":342
+        /* "c_tools.pyx":341
  *                 light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
  *             except:
  *                 light_is_red = True # if no traffic light, assume it's red             # <<<<<<<<<<<<<<
@@ -11672,7 +11650,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       }
       __pyx_L9_except_error:;
 
-      /* "c_tools.pyx":338
+      /* "c_tools.pyx":337
  *         # check whether the right-turn action is okay
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
  *             try:             # <<<<<<<<<<<<<<
@@ -11692,17 +11670,17 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       __pyx_L12_try_end:;
     }
 
-    /* "c_tools.pyx":343
+    /* "c_tools.pyx":342
  *             except:
  *                 light_is_red = True # if no traffic light, assume it's red
  *             if light_is_red:             # <<<<<<<<<<<<<<
  *                 # check if right turn is valid
  *                 return plant.check_right_turn_is_clear(ctrl_action)
  */
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_light_is_red); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 343, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_light_is_red); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 342, __pyx_L1_error)
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":345
+      /* "c_tools.pyx":344
  *             if light_is_red:
  *                 # check if right turn is valid
  *                 return plant.check_right_turn_is_clear(ctrl_action)             # <<<<<<<<<<<<<<
@@ -11710,7 +11688,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  *                 return action_not_running_a_red_light and backup_plant_will_still_be_ok
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_check_right_turn_is_clear); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 345, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_check_right_turn_is_clear); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 344, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_5 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -11724,14 +11702,14 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       }
       __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ctrl_action);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 345, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 344, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":343
+      /* "c_tools.pyx":342
  *             except:
  *                 light_is_red = True # if no traffic light, assume it's red
  *             if light_is_red:             # <<<<<<<<<<<<<<
@@ -11740,7 +11718,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
     }
 
-    /* "c_tools.pyx":347
+    /* "c_tools.pyx":346
  *                 return plant.check_right_turn_is_clear(ctrl_action)
  *             else:
  *                 return action_not_running_a_red_light and backup_plant_will_still_be_ok             # <<<<<<<<<<<<<<
@@ -11749,7 +11727,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
     /*else*/ {
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_action_not_running_a_red_light); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 347, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_action_not_running_a_red_light); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 346, __pyx_L1_error)
       if (__pyx_t_8) {
       } else {
         __Pyx_INCREF(__pyx_v_action_not_running_a_red_light);
@@ -11764,7 +11742,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
       goto __pyx_L0;
     }
 
-    /* "c_tools.pyx":337
+    /* "c_tools.pyx":336
  *             return False
  *         # check whether the right-turn action is okay
  *         if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':             # <<<<<<<<<<<<<<
@@ -11773,7 +11751,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
   }
 
-  /* "c_tools.pyx":349
+  /* "c_tools.pyx":348
  *                 return action_not_running_a_red_light and backup_plant_will_still_be_ok
  *         else:
  *             return action_not_running_a_red_light and backup_plant_will_still_be_ok             # <<<<<<<<<<<<<<
@@ -11782,7 +11760,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_action_not_running_a_red_light); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 349, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_action_not_running_a_red_light); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 348, __pyx_L1_error)
     if (__pyx_t_8) {
     } else {
       __Pyx_INCREF(__pyx_v_action_not_running_a_red_light);
@@ -11797,7 +11775,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
     goto __pyx_L0;
   }
 
-  /* "c_tools.pyx":327
+  /* "c_tools.pyx":326
  *         return True
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -11825,7 +11803,7 @@ static PyObject *__pyx_pf_7c_tools_18TrafficLightOracle_12evaluate(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "c_tools.pyx":352
+/* "c_tools.pyx":351
  * 
  * class IntersectionClearanceOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -11855,16 +11833,16 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle___init__(CYTHON
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":353
+  /* "c_tools.pyx":352
  * class IntersectionClearanceOracle(Oracle):
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  *         # return count of number of agents ahead of it in interesection
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_IntersectionClearanceOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_IntersectionClearanceOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -11872,22 +11850,22 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle___init__(CYTHON
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_intersection_clearance) < 0) __PYX_ERR(0, 353, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 353, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_intersection_clearance) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":352
+  /* "c_tools.pyx":351
  * 
  * class IntersectionClearanceOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -11910,7 +11888,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle___init__(CYTHON
   return __pyx_r;
 }
 
-/* "c_tools.pyx":354
+/* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -11956,23 +11934,23 @@ static PyObject *__pyx_pw_7c_tools_27IntersectionClearanceOracle_3evaluate(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 354, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 353, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 354, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 353, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 354, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 353, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 354, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 353, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -11989,7 +11967,7 @@ static PyObject *__pyx_pw_7c_tools_27IntersectionClearanceOracle_3evaluate(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 354, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 353, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.IntersectionClearanceOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -12002,7 +11980,7 @@ static PyObject *__pyx_pw_7c_tools_27IntersectionClearanceOracle_3evaluate(PyObj
   return __pyx_r;
 }
 
-/* "c_tools.pyx":356
+/* "c_tools.pyx":355
  *     def evaluate(self, ctrl_action, plant, game):
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):             # <<<<<<<<<<<<<<
@@ -12047,7 +12025,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   __pyx_outer_scope = (struct __pyx_obj_7c_tools___pyx_scope_struct_2_evaluate *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "c_tools.pyx":357
+  /* "c_tools.pyx":356
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):
  *             cnt = 0             # <<<<<<<<<<<<<<
@@ -12057,53 +12035,53 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_cnt = __pyx_int_0;
 
-  /* "c_tools.pyx":359
+  /* "c_tools.pyx":358
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]             # <<<<<<<<<<<<<<
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, intersection_gap):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 359, __pyx_L1_error) }
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 358, __pyx_L1_error) }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_forward = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":360
+  /* "c_tools.pyx":359
  *             # check for number of agents ahead in intersection
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])             # <<<<<<<<<<<<<<
  *             for i in range(1, intersection_gap):
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 360, __pyx_L1_error) }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 359, __pyx_L1_error) }
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 360, __pyx_L1_error) }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 359, __pyx_L1_error) }
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
@@ -12124,20 +12102,20 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_curr_st = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":361
+  /* "c_tools.pyx":360
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, intersection_gap):             # <<<<<<<<<<<<<<
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -12145,16 +12123,16 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   __Pyx_INCREF(__pyx_v_intersection_gap);
   __Pyx_GIVEREF(__pyx_v_intersection_gap);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_intersection_gap);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 361, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 360, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -12162,17 +12140,17 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 361, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 360, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 361, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 360, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -12182,7 +12160,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 361, __pyx_L1_error)
+          else __PYX_ERR(0, 360, __pyx_L1_error)
         }
         break;
       }
@@ -12191,16 +12169,16 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":362
+    /* "c_tools.pyx":361
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, intersection_gap):
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))             # <<<<<<<<<<<<<<
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -12215,49 +12193,49 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
     }
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_forward);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Multiply(__pyx_v_i, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Multiply(__pyx_v_i, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Add(__pyx_v_curr_st, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_v_curr_st, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 362, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 361, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_next_tile_tuple, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":364
+    /* "c_tools.pyx":363
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:             # <<<<<<<<<<<<<<
  *                     cnt = cnt + 1
  *             return cnt
  */
-    if (unlikely(!__pyx_cur_scope->__pyx_v_game)) { __Pyx_RaiseClosureNameError("game"); __PYX_ERR(0, 364, __pyx_L1_error) }
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 364, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_v_game)) { __Pyx_RaiseClosureNameError("game"); __PYX_ERR(0, 363, __pyx_L1_error) }
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile_tuple, __pyx_t_5, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile_tuple, __pyx_t_5, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 363, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_9 = (__pyx_t_8 != 0);
     if (__pyx_t_9) {
 
-      /* "c_tools.pyx":365
+      /* "c_tools.pyx":364
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:
  *                     cnt = cnt + 1             # <<<<<<<<<<<<<<
  *             return cnt
  * 
  */
-      __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 365, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 364, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF_SET(__pyx_v_cnt, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "c_tools.pyx":364
+      /* "c_tools.pyx":363
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:             # <<<<<<<<<<<<<<
@@ -12266,7 +12244,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
  */
     }
 
-    /* "c_tools.pyx":361
+    /* "c_tools.pyx":360
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, intersection_gap):             # <<<<<<<<<<<<<<
@@ -12276,7 +12254,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":366
+  /* "c_tools.pyx":365
  *                 if next_tile_tuple in game.occupancy_dict:
  *                     cnt = cnt + 1
  *             return cnt             # <<<<<<<<<<<<<<
@@ -12288,7 +12266,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   __pyx_r = __pyx_v_cnt;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":356
+  /* "c_tools.pyx":355
  *     def evaluate(self, ctrl_action, plant, game):
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):             # <<<<<<<<<<<<<<
@@ -12316,7 +12294,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count
   return __pyx_r;
 }
 
-/* "c_tools.pyx":354
+/* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -12379,7 +12357,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_7c_tools___pyx_scope_struct_2_evaluate *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 354, __pyx_L1_error)
+    __PYX_ERR(0, 353, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -12390,45 +12368,45 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_game);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_game);
 
-  /* "c_tools.pyx":356
+  /* "c_tools.pyx":355
  *     def evaluate(self, ctrl_action, plant, game):
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):             # <<<<<<<<<<<<<<
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_8evaluate_1count_agents_in_intersection_ahead, 0, __pyx_n_s_IntersectionClearanceOracle_eval, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_8evaluate_1count_agents_in_intersection_ahead, 0, __pyx_n_s_IntersectionClearanceOracle_eval, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_count_agents_in_intersection_ahead = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":368
+  /* "c_tools.pyx":367
  *             return cnt
  * 
  *         self.clearance_straight_info = None             # <<<<<<<<<<<<<<
  *         current_state = plant.state.x, plant.state.y
  *         x_curr, y_curr = current_state
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_clearance_straight_info, Py_None) < 0) __PYX_ERR(0, 368, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_clearance_straight_info, Py_None) < 0) __PYX_ERR(0, 367, __pyx_L1_error)
 
-  /* "c_tools.pyx":369
+  /* "c_tools.pyx":368
  * 
  *         self.clearance_straight_info = None
  *         current_state = plant.state.x, plant.state.y             # <<<<<<<<<<<<<<
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -12439,7 +12417,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   __pyx_v_current_state = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":370
+  /* "c_tools.pyx":369
  *         self.clearance_straight_info = None
  *         current_state = plant.state.x, plant.state.y
  *         x_curr, y_curr = current_state             # <<<<<<<<<<<<<<
@@ -12452,7 +12430,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 370, __pyx_L1_error)
+      __PYX_ERR(0, 369, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
@@ -12460,9 +12438,9 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __Pyx_INCREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 369, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
   }
@@ -12471,14 +12449,14 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   __pyx_v_y_curr = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":371
+  /* "c_tools.pyx":370
  *         current_state = plant.state.x, plant.state.y
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)             # <<<<<<<<<<<<<<
  *         x_next, y_next = next_state.x, next_state.y
  *         # need to check whether agent backup plan at next state will be in intersection
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -12492,38 +12470,38 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_next_state = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":372
+  /* "c_tools.pyx":371
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y             # <<<<<<<<<<<<<<
  *         # need to check whether agent backup plan at next state will be in intersection
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_x_next = __pyx_t_3;
   __pyx_t_3 = 0;
   __pyx_v_y_next = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":374
+  /* "c_tools.pyx":373
  *         x_next, y_next = next_state.x, next_state.y
  *         # need to check whether agent backup plan at next state will be in intersection
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]             # <<<<<<<<<<<<<<
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_backup_plan_ctrl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_backup_plan_ctrl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -12537,45 +12515,45 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   }
   __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 374, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 374, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_bp_state = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":375
+  /* "c_tools.pyx":374
  *         # need to check whether agent backup plan at next state will be in intersection
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y             # <<<<<<<<<<<<<<
  * 
  *         # check if not crossing into an intersection
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_x_next_bp = __pyx_t_3;
   __pyx_t_3 = 0;
   __pyx_v_y_next_bp = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":378
+  /* "c_tools.pyx":377
  * 
  *         # check if not crossing into an intersection
  *         try:             # <<<<<<<<<<<<<<
@@ -12591,25 +12569,25 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __Pyx_XGOTREF(__pyx_t_7);
     /*try:*/ {
 
-      /* "c_tools.pyx":379
+      /* "c_tools.pyx":378
  *         # check if not crossing into an intersection
  *         try:
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))             # <<<<<<<<<<<<<<
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L3_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_x_curr);
       __Pyx_GIVEREF(__pyx_v_x_curr);
@@ -12630,31 +12608,31 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 379, __pyx_L3_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 378, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_currently_in_intersection = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":380
+      /* "c_tools.pyx":379
  *         try:
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))             # <<<<<<<<<<<<<<
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L3_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_x_next);
       __Pyx_GIVEREF(__pyx_v_x_next);
@@ -12675,31 +12653,31 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L3_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 379, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_will_be_in_intersection = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":381
+      /* "c_tools.pyx":380
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))             # <<<<<<<<<<<<<<
  *         except:
  *             return True
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L3_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 381, __pyx_L3_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_x_next_bp);
       __Pyx_GIVEREF(__pyx_v_x_next_bp);
@@ -12720,13 +12698,13 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 381, __pyx_L3_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 380, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_bp_will_be_in_intersection = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":378
+      /* "c_tools.pyx":377
  * 
  *         # check if not crossing into an intersection
  *         try:             # <<<<<<<<<<<<<<
@@ -12744,7 +12722,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":382
+    /* "c_tools.pyx":381
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:             # <<<<<<<<<<<<<<
@@ -12753,12 +12731,12 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
     /*except:*/ {
       __Pyx_AddTraceback("c_tools.IntersectionClearanceOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_3) < 0) __PYX_ERR(0, 382, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_3) < 0) __PYX_ERR(0, 381, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_3);
 
-      /* "c_tools.pyx":383
+      /* "c_tools.pyx":382
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:
  *             return True             # <<<<<<<<<<<<<<
@@ -12775,7 +12753,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     }
     __pyx_L5_except_error:;
 
-    /* "c_tools.pyx":378
+    /* "c_tools.pyx":377
  * 
  *         # check if not crossing into an intersection
  *         try:             # <<<<<<<<<<<<<<
@@ -12796,33 +12774,33 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __pyx_L8_try_end:;
   }
 
-  /* "c_tools.pyx":384
+  /* "c_tools.pyx":383
  *         except:
  *             return True
  *         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:             # <<<<<<<<<<<<<<
  *             return True
  *         else:
  */
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
   if (!__pyx_t_9) {
   } else {
     __pyx_t_8 = __pyx_t_9;
     goto __pyx_L12_bool_binop_done;
   }
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
   __pyx_t_10 = ((!__pyx_t_9) != 0);
   if (!__pyx_t_10) {
   } else {
     __pyx_t_8 = __pyx_t_10;
     goto __pyx_L12_bool_binop_done;
   }
-  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_bp_will_be_in_intersection); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_bp_will_be_in_intersection); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
   __pyx_t_9 = ((!__pyx_t_10) != 0);
   __pyx_t_8 = __pyx_t_9;
   __pyx_L12_bool_binop_done:;
   if (__pyx_t_8) {
 
-    /* "c_tools.pyx":385
+    /* "c_tools.pyx":384
  *             return True
  *         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:
  *             return True             # <<<<<<<<<<<<<<
@@ -12834,7 +12812,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":384
+    /* "c_tools.pyx":383
  *         except:
  *             return True
  *         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:             # <<<<<<<<<<<<<<
@@ -12843,7 +12821,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
   }
 
-  /* "c_tools.pyx":389
+  /* "c_tools.pyx":388
  *             # if indeed crossing into an intersection
  *             # check if attempting to perform a left turn
  *             current_subgoal = plant.supervisor.subgoals[0]             # <<<<<<<<<<<<<<
@@ -12851,30 +12829,30 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_current_subgoal = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":391
+    /* "c_tools.pyx":390
  *             current_subgoal = plant.supervisor.subgoals[0]
  *             # figure out what intersection is being entered
  *             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]             # <<<<<<<<<<<<<<
  *             current_heading = plant.state.heading
  *             # confirm intention to perform left turn; TODO: generalize this check
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 390, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 390, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 390, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_x_next);
     __Pyx_GIVEREF(__pyx_v_x_next);
@@ -12882,57 +12860,57 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __Pyx_INCREF(__pyx_v_y_next);
     __Pyx_GIVEREF(__pyx_v_y_next);
     PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_y_next);
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 391, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 390, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_next_intersection = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":392
+    /* "c_tools.pyx":391
  *             # figure out what intersection is being entered
  *             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]
  *             current_heading = plant.state.heading             # <<<<<<<<<<<<<<
  *             # confirm intention to perform left turn; TODO: generalize this check
  *             if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_current_heading = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":394
+    /* "c_tools.pyx":393
  *             current_heading = plant.state.heading
  *             # confirm intention to perform left turn; TODO: generalize this check
  *             if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):             # <<<<<<<<<<<<<<
  *                 # left turn is confirmed
  *                 heading_degrees = convert_car_orientation(current_heading)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
@@ -12953,21 +12931,21 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
     __pyx_t_3 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_11, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 394, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 394, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 393, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":396
+      /* "c_tools.pyx":395
  *             if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):
  *                 # left turn is confirmed
  *                 heading_degrees = convert_car_orientation(current_heading)             # <<<<<<<<<<<<<<
  *                 left_heading_degrees = (heading_degrees + 90) % 360
  *                 left_heading = convert_car_orientation(left_heading_degrees)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 396, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -12981,35 +12959,35 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_v_current_heading) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_current_heading);
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_heading_degrees = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":397
+      /* "c_tools.pyx":396
  *                 # left turn is confirmed
  *                 heading_degrees = convert_car_orientation(current_heading)
  *                 left_heading_degrees = (heading_degrees + 90) % 360             # <<<<<<<<<<<<<<
  *                 left_heading = convert_car_orientation(left_heading_degrees)
  *                 forward = DIRECTION_TO_VECTOR[current_heading]
  */
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_heading_degrees, __pyx_int_90, 90, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 397, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_heading_degrees, __pyx_int_90, 90, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 396, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_3, __pyx_int_360, 0x168, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 397, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_RemainderObjC(__pyx_t_3, __pyx_int_360, 0x168, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 396, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_left_heading_degrees = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":398
+      /* "c_tools.pyx":397
  *                 heading_degrees = convert_car_orientation(current_heading)
  *                 left_heading_degrees = (heading_degrees + 90) % 360
  *                 left_heading = convert_car_orientation(left_heading_degrees)             # <<<<<<<<<<<<<<
  *                 forward = DIRECTION_TO_VECTOR[current_heading]
  *                 next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 398, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 397, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -13023,37 +13001,37 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_left_heading_degrees) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_left_heading_degrees);
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 398, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 397, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_left_heading = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":399
+      /* "c_tools.pyx":398
  *                 left_heading_degrees = (heading_degrees + 90) % 360
  *                 left_heading = convert_car_orientation(left_heading_degrees)
  *                 forward = DIRECTION_TO_VECTOR[current_heading]             # <<<<<<<<<<<<<<
  *                 next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  *                 # need to iterate through to the last node of the left turn
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 398, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 399, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 398, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_forward = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":400
+      /* "c_tools.pyx":399
  *                 left_heading = convert_car_orientation(left_heading_degrees)
  *                 forward = DIRECTION_TO_VECTOR[current_heading]
  *                 next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))             # <<<<<<<<<<<<<<
  *                 # need to iterate through to the last node of the left turn
  *                 while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_2 = NULL;
@@ -13068,15 +13046,15 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_2, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_forward);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 400, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_x_curr);
       __Pyx_GIVEREF(__pyx_v_x_curr);
@@ -13097,20 +13075,20 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_t_4 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_2);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 400, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_11 = PyNumber_Add(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_11 = PyNumber_Add(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_11); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_11); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __pyx_v_next_tile = ((PyObject*)__pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":402
+      /* "c_tools.pyx":401
  *                 next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  *                 # need to iterate through to the last node of the left turn
  *                 while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:             # <<<<<<<<<<<<<<
@@ -13118,35 +13096,35 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *                 # reference state is that last subgoal of the left turn
  */
       while (1) {
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_next_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_next_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_left_heading, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 402, __pyx_L1_error)
+        __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_left_heading, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 401, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_9 = (__pyx_t_8 != 0);
         if (!__pyx_t_9) break;
 
-        /* "c_tools.pyx":403
+        /* "c_tools.pyx":402
  *                 # need to iterate through to the last node of the left turn
  *                 while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
  *                     next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))             # <<<<<<<<<<<<<<
  *                 # reference state is that last subgoal of the left turn
  *                 reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_t_11 = NULL;
@@ -13161,19 +13139,19 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         }
         __pyx_t_4 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_11, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_forward);
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 403, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        __pyx_t_11 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_12 = PyList_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_12 = PyList_New(2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_GIVEREF(__pyx_t_11);
         PyList_SET_ITEM(__pyx_t_12, 0, __pyx_t_11);
@@ -13194,48 +13172,48 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_12) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_12);
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_2 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 403, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 402, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF_SET(__pyx_v_next_tile, ((PyObject*)__pyx_t_3));
         __pyx_t_3 = 0;
       }
 
-      /* "c_tools.pyx":405
+      /* "c_tools.pyx":404
  *                     next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
  *                 # reference state is that last subgoal of the left turn
  *                 reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)             # <<<<<<<<<<<<<<
  *                 # intersection gap depends on agent heading
  *                 if current_heading in ['east', 'west']:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_hack_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_hack_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
       __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_12 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_x, __pyx_t_12) < 0) __PYX_ERR(0, 405, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_x, __pyx_t_12) < 0) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_12 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 405, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_y, __pyx_t_12) < 0) __PYX_ERR(0, 405, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_y, __pyx_t_12) < 0) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_heading, __pyx_v_left_heading) < 0) __PYX_ERR(0, 405, __pyx_L1_error)
-      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 405, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_heading, __pyx_v_left_heading) < 0) __PYX_ERR(0, 404, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -13243,7 +13221,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_v_reference_state = __pyx_t_12;
       __pyx_t_12 = 0;
 
-      /* "c_tools.pyx":407
+      /* "c_tools.pyx":406
  *                 reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  *                 # intersection gap depends on agent heading
  *                 if current_heading in ['east', 'west']:             # <<<<<<<<<<<<<<
@@ -13252,32 +13230,32 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
       __Pyx_INCREF(__pyx_v_current_heading);
       __pyx_t_12 = __pyx_v_current_heading;
-      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_t_12, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_t_12, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 406, __pyx_L1_error)
       if (!__pyx_t_8) {
       } else {
         __pyx_t_9 = __pyx_t_8;
         goto __pyx_L19_bool_binop_done;
       }
-      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_t_12, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 407, __pyx_L1_error)
+      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_t_12, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 406, __pyx_L1_error)
       __pyx_t_9 = __pyx_t_8;
       __pyx_L19_bool_binop_done:;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_8 = (__pyx_t_9 != 0);
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":408
+        /* "c_tools.pyx":407
  *                 # intersection gap depends on agent heading
  *                 if current_heading in ['east', 'west']:
  *                     intersection_gap = next_intersection.height             # <<<<<<<<<<<<<<
  *                 else:
  *                     intersection_gap = next_intersection.width
  */
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 408, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 407, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_v_intersection_gap = __pyx_t_12;
         __pyx_t_12 = 0;
 
-        /* "c_tools.pyx":407
+        /* "c_tools.pyx":406
  *                 reference_state = plant.hack_state(plant.state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  *                 # intersection gap depends on agent heading
  *                 if current_heading in ['east', 'west']:             # <<<<<<<<<<<<<<
@@ -13287,7 +13265,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         goto __pyx_L18;
       }
 
-      /* "c_tools.pyx":410
+      /* "c_tools.pyx":409
  *                     intersection_gap = next_intersection.height
  *                 else:
  *                     intersection_gap = next_intersection.width             # <<<<<<<<<<<<<<
@@ -13295,32 +13273,32 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  */
       /*else*/ {
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_width); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 410, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_width); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 409, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_v_intersection_gap = __pyx_t_12;
         __pyx_t_12 = 0;
       }
       __pyx_L18:;
 
-      /* "c_tools.pyx":412
+      /* "c_tools.pyx":411
  *                     intersection_gap = next_intersection.width
  *                 # find the first agent in the bundle that the agent will turn into
  *                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)             # <<<<<<<<<<<<<<
  *                 if lead_agent:
  *                     width, _= plant.get_width_along_bundle()
  */
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_reference_state);
       __Pyx_GIVEREF(__pyx_v_reference_state);
       PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_reference_state);
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 412, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 412, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 412, __pyx_L1_error)
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 412, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 411, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 411, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -13328,24 +13306,24 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_v_lead_agent = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":413
+      /* "c_tools.pyx":412
  *                 # find the first agent in the bundle that the agent will turn into
  *                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:             # <<<<<<<<<<<<<<
  *                     width, _= plant.get_width_along_bundle()
  *                     reference_state_bundle_width = width + 1
  */
-      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 413, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 412, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":414
+        /* "c_tools.pyx":413
  *                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:
  *                     width, _= plant.get_width_along_bundle()             # <<<<<<<<<<<<<<
  *                     reference_state_bundle_width = width + 1
  *                     # defines the number of tiles in the intersection the agent has to cross-over to complete left turn
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_width_along_bundle); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 414, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_width_along_bundle); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 413, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_2 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -13359,7 +13337,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         }
         __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 414, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 413, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -13368,7 +13346,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
           if (unlikely(size != 2)) {
             if (size > 2) __Pyx_RaiseTooManyValuesError(2);
             else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-            __PYX_ERR(0, 414, __pyx_L1_error)
+            __PYX_ERR(0, 413, __pyx_L1_error)
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
           if (likely(PyTuple_CheckExact(sequence))) {
@@ -13381,15 +13359,15 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
           __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(__pyx_t_2);
           #else
-          __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 413, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 413, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else {
           Py_ssize_t index = -1;
-          __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 414, __pyx_L1_error)
+          __pyx_t_12 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 413, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_13 = Py_TYPE(__pyx_t_12)->tp_iternext;
@@ -13397,7 +13375,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
           __Pyx_GOTREF(__pyx_t_4);
           index = 1; __pyx_t_2 = __pyx_t_13(__pyx_t_12); if (unlikely(!__pyx_t_2)) goto __pyx_L22_unpacking_failed;
           __Pyx_GOTREF(__pyx_t_2);
-          if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_12), 2) < 0) __PYX_ERR(0, 414, __pyx_L1_error)
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_12), 2) < 0) __PYX_ERR(0, 413, __pyx_L1_error)
           __pyx_t_13 = NULL;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           goto __pyx_L23_unpacking_done;
@@ -13405,7 +13383,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __pyx_t_13 = NULL;
           if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-          __PYX_ERR(0, 414, __pyx_L1_error)
+          __PYX_ERR(0, 413, __pyx_L1_error)
           __pyx_L23_unpacking_done:;
         }
         __pyx_v_width = __pyx_t_4;
@@ -13413,67 +13391,67 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         __pyx_v__ = __pyx_t_2;
         __pyx_t_2 = 0;
 
-        /* "c_tools.pyx":415
+        /* "c_tools.pyx":414
  *                 if lead_agent:
  *                     width, _= plant.get_width_along_bundle()
  *                     reference_state_bundle_width = width + 1             # <<<<<<<<<<<<<<
  *                     # defines the number of tiles in the intersection the agent has to cross-over to complete left turn
  *                     num_residual_tiles = intersection_gap - reference_state_bundle_width
  */
-        __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_width, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 415, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_width, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 414, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_reference_state_bundle_width = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":417
+        /* "c_tools.pyx":416
  *                     reference_state_bundle_width = width + 1
  *                     # defines the number of tiles in the intersection the agent has to cross-over to complete left turn
  *                     num_residual_tiles = intersection_gap - reference_state_bundle_width             # <<<<<<<<<<<<<<
  *                     # whichever one is bigger (one of them should be zero depending on agent heading)
  *                     clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))
  */
-        __pyx_t_3 = PyNumber_Subtract(__pyx_v_intersection_gap, __pyx_v_reference_state_bundle_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 417, __pyx_L1_error)
+        __pyx_t_3 = PyNumber_Subtract(__pyx_v_intersection_gap, __pyx_v_reference_state_bundle_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 416, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_num_residual_tiles = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":419
+        /* "c_tools.pyx":418
  *                     num_residual_tiles = intersection_gap - reference_state_bundle_width
  *                     # whichever one is bigger (one of them should be zero depending on agent heading)
  *                     clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))             # <<<<<<<<<<<<<<
  *                 else:
  *                     clearance = np.inf
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_reference_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_reference_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_4 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyNumber_Absolute(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyNumber_Absolute(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_reference_state, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_reference_state, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_12 = PyNumber_Subtract(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_12 = PyNumber_Subtract(__pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 419, __pyx_L1_error)
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 419, __pyx_L1_error)
+        __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 418, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_8) {
           __Pyx_INCREF(__pyx_t_3);
@@ -13490,7 +13468,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         __pyx_v_clearance = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":413
+        /* "c_tools.pyx":412
  *                 # find the first agent in the bundle that the agent will turn into
  *                 lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:             # <<<<<<<<<<<<<<
@@ -13500,7 +13478,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         goto __pyx_L21;
       }
 
-      /* "c_tools.pyx":421
+      /* "c_tools.pyx":420
  *                     clearance = max(abs(lead_agent.state.x-reference_state.x), abs(lead_agent.state.y-reference_state.y))
  *                 else:
  *                     clearance = np.inf             # <<<<<<<<<<<<<<
@@ -13508,9 +13486,9 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  * 
  */
       /*else*/ {
-        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 421, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 420, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_inf); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 421, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_inf); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 420, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_clearance = __pyx_t_12;
@@ -13518,7 +13496,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_L21:;
 
-      /* "c_tools.pyx":422
+      /* "c_tools.pyx":421
  *                 else:
  *                     clearance = np.inf
  *                 return clearance > intersection_gap #TODO: find a better bound             # <<<<<<<<<<<<<<
@@ -13526,12 +13504,12 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *             else: # going straight
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_12 = PyObject_RichCompare(__pyx_v_clearance, __pyx_v_intersection_gap, Py_GT); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 422, __pyx_L1_error)
+      __pyx_t_12 = PyObject_RichCompare(__pyx_v_clearance, __pyx_v_intersection_gap, Py_GT); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 421, __pyx_L1_error)
       __pyx_r = __pyx_t_12;
       __pyx_t_12 = 0;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":394
+      /* "c_tools.pyx":393
  *             current_heading = plant.state.heading
  *             # confirm intention to perform left turn; TODO: generalize this check
  *             if plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1])):             # <<<<<<<<<<<<<<
@@ -13540,7 +13518,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
     }
 
-    /* "c_tools.pyx":425
+    /* "c_tools.pyx":424
  * 
  *             else: # going straight
  *                 lead_agent_in_intersection = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)             # <<<<<<<<<<<<<<
@@ -13548,20 +13526,20 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *                     # if there's an agent in the intersection with a
  */
     /*else*/ {
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 425, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 424, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 425, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 424, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 425, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 424, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 425, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 424, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_must_not_be_in_intersection, Py_False) < 0) __PYX_ERR(0, 425, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 425, __pyx_L1_error)
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 425, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_must_not_be_in_intersection, Py_False) < 0) __PYX_ERR(0, 424, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 424, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 424, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -13569,41 +13547,41 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_v_lead_agent_in_intersection = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":426
+      /* "c_tools.pyx":425
  *             else: # going straight
  *                 lead_agent_in_intersection = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
  *                 if lead_agent_in_intersection:             # <<<<<<<<<<<<<<
  *                     # if there's an agent in the intersection with a
  *                     # different heading ahead, don't enter
  */
-      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent_in_intersection); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 426, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent_in_intersection); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 425, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":429
+        /* "c_tools.pyx":428
  *                     # if there's an agent in the intersection with a
  *                     # different heading ahead, don't enter
  *                     if lead_agent_in_intersection.state.heading != plant.state.heading:             # <<<<<<<<<<<<<<
  *                         return False
  *                 # save intersection gap,
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_in_intersection, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_in_intersection, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_2 = PyObject_RichCompare(__pyx_t_3, __pyx_t_4, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 429, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 428, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":430
+          /* "c_tools.pyx":429
  *                     # different heading ahead, don't enter
  *                     if lead_agent_in_intersection.state.heading != plant.state.heading:
  *                         return False             # <<<<<<<<<<<<<<
@@ -13615,7 +13593,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
           __pyx_r = Py_False;
           goto __pyx_L0;
 
-          /* "c_tools.pyx":429
+          /* "c_tools.pyx":428
  *                     # if there's an agent in the intersection with a
  *                     # different heading ahead, don't enter
  *                     if lead_agent_in_intersection.state.heading != plant.state.heading:             # <<<<<<<<<<<<<<
@@ -13624,7 +13602,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
         }
 
-        /* "c_tools.pyx":426
+        /* "c_tools.pyx":425
  *             else: # going straight
  *                 lead_agent_in_intersection = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
  *                 if lead_agent_in_intersection:             # <<<<<<<<<<<<<<
@@ -13633,7 +13611,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
       }
 
-      /* "c_tools.pyx":432
+      /* "c_tools.pyx":431
  *                         return False
  *                 # save intersection gap,
  *                 if current_heading in ['east', 'west']:             # <<<<<<<<<<<<<<
@@ -13642,32 +13620,32 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  */
       __Pyx_INCREF(__pyx_v_current_heading);
       __pyx_t_2 = __pyx_v_current_heading;
-      __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 432, __pyx_L1_error)
+      __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_east, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 431, __pyx_L1_error)
       if (!__pyx_t_9) {
       } else {
         __pyx_t_8 = __pyx_t_9;
         goto __pyx_L27_bool_binop_done;
       }
-      __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 432, __pyx_L1_error)
+      __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_west, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 431, __pyx_L1_error)
       __pyx_t_8 = __pyx_t_9;
       __pyx_L27_bool_binop_done:;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_9 = (__pyx_t_8 != 0);
       if (__pyx_t_9) {
 
-        /* "c_tools.pyx":433
+        /* "c_tools.pyx":432
  *                 # save intersection gap,
  *                 if current_heading in ['east', 'west']:
  *                     intersection_gap = next_intersection.width             # <<<<<<<<<<<<<<
  *                 else:
  *                     intersection_gap = next_intersection.height
  */
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 433, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_width); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_v_intersection_gap = __pyx_t_2;
         __pyx_t_2 = 0;
 
-        /* "c_tools.pyx":432
+        /* "c_tools.pyx":431
  *                         return False
  *                 # save intersection gap,
  *                 if current_heading in ['east', 'west']:             # <<<<<<<<<<<<<<
@@ -13677,7 +13655,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         goto __pyx_L26;
       }
 
-      /* "c_tools.pyx":435
+      /* "c_tools.pyx":434
  *                     intersection_gap = next_intersection.width
  *                 else:
  *                     intersection_gap = next_intersection.height             # <<<<<<<<<<<<<<
@@ -13685,46 +13663,46 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *                 agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
  */
       /*else*/ {
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 435, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_intersection, __pyx_n_s_height); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 434, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_v_intersection_gap = __pyx_t_2;
         __pyx_t_2 = 0;
       }
       __pyx_L26:;
 
-      /* "c_tools.pyx":437
+      /* "c_tools.pyx":436
  *                     intersection_gap = next_intersection.height
  *                 # count the number of agents in intersection ahead of it
  *                 agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)             # <<<<<<<<<<<<<<
  *                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:
  */
-      __pyx_t_2 = __pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count_agents_in_intersection_ahead(__pyx_v_count_agents_in_intersection_ahead, __pyx_v_intersection_gap); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 437, __pyx_L1_error)
+      __pyx_t_2 = __pyx_pf_7c_tools_27IntersectionClearanceOracle_8evaluate_count_agents_in_intersection_ahead(__pyx_v_count_agents_in_intersection_ahead, __pyx_v_intersection_gap); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_v_agent_cnt_in_intersection = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":438
+      /* "c_tools.pyx":437
  *                 # count the number of agents in intersection ahead of it
  *                 agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
  *                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)             # <<<<<<<<<<<<<<
  *                 if lead_agent:
  *                     clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 438, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 438, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 438, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 438, __pyx_L1_error)
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 438, __pyx_L1_error)
-      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 438, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 437, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 437, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 437, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13732,47 +13710,47 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_v_lead_agent = __pyx_t_12;
       __pyx_t_12 = 0;
 
-      /* "c_tools.pyx":439
+      /* "c_tools.pyx":438
  *                 agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
  *                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:             # <<<<<<<<<<<<<<
  *                     clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
  *                 else:
  */
-      __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 438, __pyx_L1_error)
       if (__pyx_t_9) {
 
-        /* "c_tools.pyx":440
+        /* "c_tools.pyx":439
  *                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:
  *                     clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection             # <<<<<<<<<<<<<<
  *                 else:
  *                     clearance = np.inf
  */
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = PyNumber_Subtract(__pyx_t_4, __pyx_v_y_curr); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_12 = PyNumber_Subtract(__pyx_t_4, __pyx_v_y_curr); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = PyNumber_Subtract(__pyx_t_3, __pyx_v_x_curr); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_12 = PyNumber_Subtract(__pyx_t_3, __pyx_v_x_curr); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyNumber_Absolute(__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_t_3, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 440, __pyx_L1_error)
-        __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_2 = PyObject_RichCompare(__pyx_t_4, __pyx_t_3, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_9) {
           __Pyx_INCREF(__pyx_t_4);
@@ -13783,16 +13761,16 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = PyNumber_Subtract(__pyx_t_12, __pyx_v_intersection_gap); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_4 = PyNumber_Subtract(__pyx_t_12, __pyx_v_intersection_gap); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = PyNumber_Subtract(__pyx_t_4, __pyx_v_agent_cnt_in_intersection); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 440, __pyx_L1_error)
+        __pyx_t_12 = PyNumber_Subtract(__pyx_t_4, __pyx_v_agent_cnt_in_intersection); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 439, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_clearance = __pyx_t_12;
         __pyx_t_12 = 0;
 
-        /* "c_tools.pyx":439
+        /* "c_tools.pyx":438
  *                 agent_cnt_in_intersection = count_agents_in_intersection_ahead(intersection_gap)
  *                 lead_agent = plant.find_lead_agent(plant.state, must_not_be_in_intersection=True, same_heading_required=False)
  *                 if lead_agent:             # <<<<<<<<<<<<<<
@@ -13802,7 +13780,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         goto __pyx_L29;
       }
 
-      /* "c_tools.pyx":442
+      /* "c_tools.pyx":441
  *                     clearance = max(abs(lead_agent.state.x-x_curr), abs(lead_agent.state.y-y_curr)) - intersection_gap - agent_cnt_in_intersection
  *                 else:
  *                     clearance = np.inf             # <<<<<<<<<<<<<<
@@ -13810,9 +13788,9 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  *                 if lead_agent is None:
  */
       /*else*/ {
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 441, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_inf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 442, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_inf); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 441, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_v_clearance = __pyx_t_4;
@@ -13820,7 +13798,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_L29:;
 
-      /* "c_tools.pyx":444
+      /* "c_tools.pyx":443
  *                     clearance = np.inf
  * 
  *                 if lead_agent is None:             # <<<<<<<<<<<<<<
@@ -13831,7 +13809,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __pyx_t_8 = (__pyx_t_9 != 0);
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":445
+        /* "c_tools.pyx":444
  * 
  *                 if lead_agent is None:
  *                     x_sv = None             # <<<<<<<<<<<<<<
@@ -13841,7 +13819,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         __Pyx_INCREF(Py_None);
         __pyx_v_x_sv = Py_None;
 
-        /* "c_tools.pyx":446
+        /* "c_tools.pyx":445
  *                 if lead_agent is None:
  *                     x_sv = None
  *                     y_sv = None             # <<<<<<<<<<<<<<
@@ -13851,7 +13829,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         __Pyx_INCREF(Py_None);
         __pyx_v_y_sv = Py_None;
 
-        /* "c_tools.pyx":444
+        /* "c_tools.pyx":443
  *                     clearance = np.inf
  * 
  *                 if lead_agent is None:             # <<<<<<<<<<<<<<
@@ -13861,7 +13839,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
         goto __pyx_L30;
       }
 
-      /* "c_tools.pyx":448
+      /* "c_tools.pyx":447
  *                     y_sv = None
  *                 else:
  *                     x_sv = lead_agent.state.x             # <<<<<<<<<<<<<<
@@ -13869,24 +13847,24 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  * 
  */
       /*else*/ {
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 447, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 447, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_x_sv = __pyx_t_12;
         __pyx_t_12 = 0;
 
-        /* "c_tools.pyx":449
+        /* "c_tools.pyx":448
  *                 else:
  *                     x_sv = lead_agent.state.x
  *                     y_sv = lead_agent.state.y             # <<<<<<<<<<<<<<
  * 
  *                 self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
  */
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 449, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 448, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 449, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 448, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_v_y_sv = __pyx_t_4;
@@ -13894,14 +13872,14 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       }
       __pyx_L30:;
 
-      /* "c_tools.pyx":451
+      /* "c_tools.pyx":450
  *                     y_sv = lead_agent.state.y
  * 
  *                 self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)             # <<<<<<<<<<<<<<
  *                 return clearance > intersection_gap #TODO: find a better bound
  * 
  */
-      __pyx_t_4 = PyTuple_New(7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 451, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 450, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_x_curr);
       __Pyx_GIVEREF(__pyx_v_x_curr);
@@ -13924,10 +13902,10 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
       __Pyx_INCREF(__pyx_v_clearance);
       __Pyx_GIVEREF(__pyx_v_clearance);
       PyTuple_SET_ITEM(__pyx_t_4, 6, __pyx_v_clearance);
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_clearance_straight_info, __pyx_t_4) < 0) __PYX_ERR(0, 451, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_clearance_straight_info, __pyx_t_4) < 0) __PYX_ERR(0, 450, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":452
+      /* "c_tools.pyx":451
  * 
  *                 self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
  *                 return clearance > intersection_gap #TODO: find a better bound             # <<<<<<<<<<<<<<
@@ -13935,14 +13913,14 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
  * class UnprotectedLeftTurnOracle(Oracle):
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_4 = PyObject_RichCompare(__pyx_v_clearance, __pyx_v_intersection_gap, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 452, __pyx_L1_error)
+      __pyx_t_4 = PyObject_RichCompare(__pyx_v_clearance, __pyx_v_intersection_gap, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 451, __pyx_L1_error)
       __pyx_r = __pyx_t_4;
       __pyx_t_4 = 0;
       goto __pyx_L0;
     }
   }
 
-  /* "c_tools.pyx":354
+  /* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -14000,7 +13978,7 @@ static PyObject *__pyx_pf_7c_tools_27IntersectionClearanceOracle_2evaluate(CYTHO
   return __pyx_r;
 }
 
-/* "c_tools.pyx":455
+/* "c_tools.pyx":454
  * 
  * class UnprotectedLeftTurnOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -14030,16 +14008,16 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle___init__(CYTHON_U
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":456
+  /* "c_tools.pyx":455
  * class UnprotectedLeftTurnOracle(Oracle):
  *     def __init__(self):
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')             # <<<<<<<<<<<<<<
  * 
  *     def get_conservative_gap(self, lead_agent, N):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_UnprotectedLeftTurnOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 456, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_UnprotectedLeftTurnOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 456, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -14047,22 +14025,22 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle___init__(CYTHON_U
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 456, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 456, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 456, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_unprotected_left_turn) < 0) __PYX_ERR(0, 456, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 456, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_unprotected_left_turn) < 0) __PYX_ERR(0, 455, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 455, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":455
+  /* "c_tools.pyx":454
  * 
  * class UnprotectedLeftTurnOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -14085,7 +14063,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle___init__(CYTHON_U
   return __pyx_r;
 }
 
-/* "c_tools.pyx":458
+/* "c_tools.pyx":457
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  *     def get_conservative_gap(self, lead_agent, N):             # <<<<<<<<<<<<<<
@@ -14129,17 +14107,17 @@ static PyObject *__pyx_pw_7c_tools_25UnprotectedLeftTurnOracle_3get_conservative
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lead_agent)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, 1); __PYX_ERR(0, 458, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, 1); __PYX_ERR(0, 457, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_N)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, 2); __PYX_ERR(0, 458, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, 2); __PYX_ERR(0, 457, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_conservative_gap") < 0)) __PYX_ERR(0, 458, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_conservative_gap") < 0)) __PYX_ERR(0, 457, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -14154,7 +14132,7 @@ static PyObject *__pyx_pw_7c_tools_25UnprotectedLeftTurnOracle_3get_conservative
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 458, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_conservative_gap", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 457, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.UnprotectedLeftTurnOracle.get_conservative_gap", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -14183,7 +14161,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("get_conservative_gap", 0);
 
-  /* "c_tools.pyx":463
+  /* "c_tools.pyx":462
  *         time steps assuming maximum acceleration at each time step
  *         """
  *         gap = 0             # <<<<<<<<<<<<<<
@@ -14193,37 +14171,37 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_gap = __pyx_int_0;
 
-  /* "c_tools.pyx":464
+  /* "c_tools.pyx":463
  *         """
  *         gap = 0
  *         v_init = lead_agent.state.v             # <<<<<<<<<<<<<<
  *         for idx in range(N):
  *             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_v_init = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":465
+  /* "c_tools.pyx":464
  *         gap = 0
  *         v_init = lead_agent.state.v
  *         for idx in range(N):             # <<<<<<<<<<<<<<
  *             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
  *             gap += v_init
  */
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_v_N); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 465, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_v_N); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
     __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 465, __pyx_L1_error)
+    __pyx_t_3 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 464, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 465, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 464, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -14231,17 +14209,17 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_3 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 465, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 464, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 465, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_3 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 465, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_3); __Pyx_INCREF(__pyx_t_2); __pyx_t_3++; if (unlikely(0 < 0)) __PYX_ERR(0, 464, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 465, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_3); __pyx_t_3++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 464, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -14251,7 +14229,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 465, __pyx_L1_error)
+          else __PYX_ERR(0, 464, __pyx_L1_error)
         }
         break;
       }
@@ -14260,22 +14238,22 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
     __Pyx_XDECREF_SET(__pyx_v_idx, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":466
+    /* "c_tools.pyx":465
  *         v_init = lead_agent.state.v
  *         for idx in range(N):
  *             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)             # <<<<<<<<<<<<<<
  *             gap += v_init
  *         return gap
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_max); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 466, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_max); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 465, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyNumber_Add(__pyx_v_v_init, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 466, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_v_v_init, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 465, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_v_max); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 466, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_v_max); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 465, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 466, __pyx_L1_error)
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 466, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_2, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 465, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 465, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (__pyx_t_8) {
       __Pyx_INCREF(__pyx_t_5);
@@ -14292,19 +14270,19 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
     __Pyx_DECREF_SET(__pyx_v_v_init, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":467
+    /* "c_tools.pyx":466
  *         for idx in range(N):
  *             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
  *             gap += v_init             # <<<<<<<<<<<<<<
  *         return gap
  * 
  */
-    __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_v_gap, __pyx_v_v_init); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 467, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_v_gap, __pyx_v_v_init); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 466, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF_SET(__pyx_v_gap, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":465
+    /* "c_tools.pyx":464
  *         gap = 0
  *         v_init = lead_agent.state.v
  *         for idx in range(N):             # <<<<<<<<<<<<<<
@@ -14314,7 +14292,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":468
+  /* "c_tools.pyx":467
  *             v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
  *             gap += v_init
  *         return gap             # <<<<<<<<<<<<<<
@@ -14326,7 +14304,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
   __pyx_r = __pyx_v_gap;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":458
+  /* "c_tools.pyx":457
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  *     def get_conservative_gap(self, lead_agent, N):             # <<<<<<<<<<<<<<
@@ -14352,7 +14330,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_2get_conservative
   return __pyx_r;
 }
 
-/* "c_tools.pyx":470
+/* "c_tools.pyx":469
  *         return gap
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -14398,23 +14376,23 @@ static PyObject *__pyx_pw_7c_tools_25UnprotectedLeftTurnOracle_5evaluate(PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 470, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 469, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 470, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 469, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 470, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 469, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 470, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 469, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -14431,7 +14409,7 @@ static PyObject *__pyx_pw_7c_tools_25UnprotectedLeftTurnOracle_5evaluate(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 470, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 469, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.UnprotectedLeftTurnOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -14487,24 +14465,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   PyObject *__pyx_t_15 = NULL;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":471
+  /* "c_tools.pyx":470
  * 
  *     def evaluate(self, ctrl_action, plant, game):
  *         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading             # <<<<<<<<<<<<<<
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -14512,12 +14490,12 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 471, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 470, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -14528,14 +14506,14 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   __pyx_v_current_directed_tile = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":472
+  /* "c_tools.pyx":471
  *     def evaluate(self, ctrl_action, plant, game):
  *         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 472, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -14549,27 +14527,27 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 472, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 472, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 471, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_queried_state = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":473
+  /* "c_tools.pyx":472
  *         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y             # <<<<<<<<<<<<<<
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 473, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 473, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 473, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -14580,26 +14558,26 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   __pyx_v_queried_xy = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":474
+  /* "c_tools.pyx":473
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading             # <<<<<<<<<<<<<<
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # check if agent needs to reason about making an unprotected left turn
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 474, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_queried_dir = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":475
+  /* "c_tools.pyx":474
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)             # <<<<<<<<<<<<<<
  *         # check if agent needs to reason about making an unprotected left turn
  *         if current_directed_tile in game.map.all_left_turns:
  */
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_queried_xy);
   __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -14610,33 +14588,33 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   __pyx_v_queried_directed_tile = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":477
+  /* "c_tools.pyx":476
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # check if agent needs to reason about making an unprotected left turn
  *         if current_directed_tile in game.map.all_left_turns:             # <<<<<<<<<<<<<<
  *             current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)
  *             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 477, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_all_left_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_all_left_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 477, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "c_tools.pyx":478
+    /* "c_tools.pyx":477
  *         # check if agent needs to reason about making an unprotected left turn
  *         if current_directed_tile in game.map.all_left_turns:
  *             current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)             # <<<<<<<<<<<<<<
  *             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
  *                 return True
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 478, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -14651,36 +14629,36 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
     }
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_v_current_directed_tile) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_current_directed_tile);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 478, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_current_bundle = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":479
+    /* "c_tools.pyx":478
  *         if current_directed_tile in game.map.all_left_turns:
  *             current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)
  *             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left             # <<<<<<<<<<<<<<
  *                 return True
  *             else: # if commit to turning
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 479, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_left_turn_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 479, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_left_turn_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 479, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 479, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_queried_directed_tile, __pyx_t_2, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 479, __pyx_L1_error)
+    __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_queried_directed_tile, __pyx_t_2, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_4 = (__pyx_t_5 != 0);
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":480
+      /* "c_tools.pyx":479
  *             current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)
  *             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left
  *                 return True             # <<<<<<<<<<<<<<
@@ -14692,7 +14670,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":479
+      /* "c_tools.pyx":478
  *         if current_directed_tile in game.map.all_left_turns:
  *             current_bundle = game.map.directed_tile_to_bundle(current_directed_tile)
  *             if queried_directed_tile not in game.map.left_turn_tiles[current_bundle][current_directed_tile]: # if not turning left             # <<<<<<<<<<<<<<
@@ -14701,7 +14679,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  */
     }
 
-    /* "c_tools.pyx":482
+    /* "c_tools.pyx":481
  *                 return True
  *             else: # if commit to turning
  *                 opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]             # <<<<<<<<<<<<<<
@@ -14709,12 +14687,12 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  *                 # (bigger means closer to left-most lane)
  */
     /*else*/ {
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 482, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_left_turn_to_opposing_traffic_bu); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 482, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_left_turn_to_opposing_traffic_bu); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 482, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -14723,7 +14701,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         if (unlikely(size != 2)) {
           if (size > 2) __Pyx_RaiseTooManyValuesError(2);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 482, __pyx_L1_error)
+          __PYX_ERR(0, 481, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -14736,15 +14714,15 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_INCREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         #else
-        __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
@@ -14752,7 +14730,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_GOTREF(__pyx_t_3);
         index = 1; __pyx_t_1 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_1)) goto __pyx_L5_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_1);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 482, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 481, __pyx_L1_error)
         __pyx_t_7 = NULL;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         goto __pyx_L6_unpacking_done;
@@ -14760,7 +14738,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __pyx_t_7 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 482, __pyx_L1_error)
+        __PYX_ERR(0, 481, __pyx_L1_error)
         __pyx_L6_unpacking_done:;
       }
       __pyx_v_opposing_bundle = __pyx_t_3;
@@ -14768,24 +14746,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       __pyx_v_relative_occupancy = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "c_tools.pyx":485
+      /* "c_tools.pyx":484
  *                 # idx indicates the lane number on the opposing traffic bundle
  *                 # (bigger means closer to left-most lane)
  *                 relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]             # <<<<<<<<<<<<<<
  *                 relative_tiles.reverse()
  *                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
  */
-      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 485, __pyx_L1_error)
+      __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 484, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_8 = PyObject_Length(__pyx_v_relative_occupancy); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 485, __pyx_L1_error)
+      __pyx_t_8 = PyObject_Length(__pyx_v_relative_occupancy); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 484, __pyx_L1_error)
       __pyx_t_9 = __pyx_t_8;
       for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
         __pyx_v_idx = __pyx_t_10;
-        __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_idx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_idx); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 484, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_relative_occupancy, __pyx_v_idx, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_relative_occupancy, __pyx_v_idx, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 484, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 484, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_1);
         PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -14793,72 +14771,72 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_t_3);
         __pyx_t_1 = 0;
         __pyx_t_3 = 0;
-        if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_6))) __PYX_ERR(0, 485, __pyx_L1_error)
+        if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_6))) __PYX_ERR(0, 484, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __pyx_v_relative_tiles = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":486
+      /* "c_tools.pyx":485
  *                 # (bigger means closer to left-most lane)
  *                 relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
  *                 relative_tiles.reverse()             # <<<<<<<<<<<<<<
  *                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
  *                 # get traffic light
  */
-      __pyx_t_11 = PyList_Reverse(__pyx_v_relative_tiles); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 486, __pyx_L1_error)
+      __pyx_t_11 = PyList_Reverse(__pyx_v_relative_tiles); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 485, __pyx_L1_error)
 
-      /* "c_tools.pyx":487
+      /* "c_tools.pyx":486
  *                 relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
  *                 relative_tiles.reverse()
  *                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]             # <<<<<<<<<<<<<<
  *                 # get traffic light
  *                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 487, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 486, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 487, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 486, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_current_directed_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 487, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_current_directed_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 486, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 487, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 486, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_current_intersection = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":489
+      /* "c_tools.pyx":488
  *                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
  *                 # get traffic light
  *                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]             # <<<<<<<<<<<<<<
  *                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
  *                 if light_color == 'red':
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 489, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 488, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_intersection_to_traffic_light_ma); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 489, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_intersection_to_traffic_light_ma); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 488, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 489, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 488, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_traffic_light = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":490
+      /* "c_tools.pyx":489
  *                 # get traffic light
  *                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
  *                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)             # <<<<<<<<<<<<<<
  *                 if light_color == 'red':
  *                     # find agents in intersection to check if collision might occur during red light
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 490, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 489, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 490, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 489, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 490, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 489, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_6 = NULL;
@@ -14876,7 +14854,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_2)) {
         PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_1, __pyx_int_0};
-        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 490, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 489, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -14885,14 +14863,14 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
         PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_1, __pyx_int_0};
-        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 490, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 489, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       } else
       #endif
       {
-        __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 490, __pyx_L1_error)
+        __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 489, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_13);
         if (__pyx_t_6) {
           __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -14903,7 +14881,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_GIVEREF(__pyx_int_0);
         PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_12, __pyx_int_0);
         __pyx_t_1 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 490, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 489, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       }
@@ -14911,17 +14889,17 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       __pyx_v_light_color = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":491
+      /* "c_tools.pyx":490
  *                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
  *                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
  *                     # find agents in intersection to check if collision might occur during red light
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  */
-      __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 491, __pyx_L1_error)
+      __pyx_t_4 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 490, __pyx_L1_error)
       if (__pyx_t_4) {
 
-        /* "c_tools.pyx":493
+        /* "c_tools.pyx":492
  *                 if light_color == 'red':
  *                     # find agents in intersection to check if collision might occur during red light
  *                     for N, occupancy_tile in enumerate(relative_tiles):             # <<<<<<<<<<<<<<
@@ -14934,29 +14912,29 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         for (;;) {
           if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_2)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_13 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_13); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 493, __pyx_L1_error)
+          __pyx_t_13 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_13); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 492, __pyx_L1_error)
           #else
-          __pyx_t_13 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 493, __pyx_L1_error)
+          __pyx_t_13 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 492, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           #endif
           __Pyx_XDECREF_SET(__pyx_v_occupancy_tile, __pyx_t_13);
           __pyx_t_13 = 0;
           __Pyx_INCREF(__pyx_t_3);
           __Pyx_XDECREF_SET(__pyx_v_N, __pyx_t_3);
-          __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 493, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 492, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_3);
           __pyx_t_3 = __pyx_t_13;
           __pyx_t_13 = 0;
 
-          /* "c_tools.pyx":494
+          /* "c_tools.pyx":493
  *                     # find agents in intersection to check if collision might occur during red light
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)             # <<<<<<<<<<<<<<
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  */
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_opposing_bundle, __pyx_n_s_relative_coordinates_to_tile); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 494, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_opposing_bundle, __pyx_n_s_relative_coordinates_to_tile); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 493, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_6 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -14970,7 +14948,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           }
           __pyx_t_13 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_v_occupancy_tile) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_occupancy_tile);
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 494, __pyx_L1_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 493, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           if ((likely(PyTuple_CheckExact(__pyx_t_13))) || (PyList_CheckExact(__pyx_t_13))) {
@@ -14979,7 +14957,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             if (unlikely(size != 2)) {
               if (size > 2) __Pyx_RaiseTooManyValuesError(2);
               else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-              __PYX_ERR(0, 494, __pyx_L1_error)
+              __PYX_ERR(0, 493, __pyx_L1_error)
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
             if (likely(PyTuple_CheckExact(sequence))) {
@@ -14992,15 +14970,15 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_INCREF(__pyx_t_1);
             __Pyx_INCREF(__pyx_t_6);
             #else
-            __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 494, __pyx_L1_error)
+            __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 493, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
-            __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 494, __pyx_L1_error)
+            __pyx_t_6 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 493, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             #endif
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           } else {
             Py_ssize_t index = -1;
-            __pyx_t_14 = PyObject_GetIter(__pyx_t_13); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 494, __pyx_L1_error)
+            __pyx_t_14 = PyObject_GetIter(__pyx_t_13); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 493, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __pyx_t_7 = Py_TYPE(__pyx_t_14)->tp_iternext;
@@ -15008,7 +14986,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_GOTREF(__pyx_t_1);
             index = 1; __pyx_t_6 = __pyx_t_7(__pyx_t_14); if (unlikely(!__pyx_t_6)) goto __pyx_L12_unpacking_failed;
             __Pyx_GOTREF(__pyx_t_6);
-            if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_14), 2) < 0) __PYX_ERR(0, 494, __pyx_L1_error)
+            if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_14), 2) < 0) __PYX_ERR(0, 493, __pyx_L1_error)
             __pyx_t_7 = NULL;
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
             goto __pyx_L13_unpacking_done;
@@ -15016,7 +14994,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
             __pyx_t_7 = NULL;
             if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-            __PYX_ERR(0, 494, __pyx_L1_error)
+            __PYX_ERR(0, 493, __pyx_L1_error)
             __pyx_L13_unpacking_done:;
           }
           __Pyx_XDECREF_SET(__pyx_v_abs_x, __pyx_t_1);
@@ -15024,34 +15002,34 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_abs_y, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "c_tools.pyx":495
+          /* "c_tools.pyx":494
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)             # <<<<<<<<<<<<<<
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  *                         if lead_agent is not None:
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_hack_car_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_hack_car_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_GIVEREF(__pyx_t_6);
           PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
           __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_x, __pyx_v_abs_x) < 0) __PYX_ERR(0, 495, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_y, __pyx_v_abs_y) < 0) __PYX_ERR(0, 495, __pyx_L1_error)
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 495, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_x, __pyx_v_abs_x) < 0) __PYX_ERR(0, 494, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_y, __pyx_v_abs_y) < 0) __PYX_ERR(0, 494, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_heading); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_heading); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_15);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_heading, __pyx_t_15) < 0) __PYX_ERR(0, 495, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_heading, __pyx_t_15) < 0) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-          __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 494, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_15);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -15059,24 +15037,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_fake_state, __pyx_t_15);
           __pyx_t_15 = 0;
 
-          /* "c_tools.pyx":496
+          /* "c_tools.pyx":495
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)             # <<<<<<<<<<<<<<
  *                         if lead_agent is not None:
  *                             # if agent is in intersection
  */
-          __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 496, __pyx_L1_error)
+          __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 495, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_15);
-          __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 496, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 495, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_INCREF(__pyx_v_fake_state);
           __Pyx_GIVEREF(__pyx_v_fake_state);
           PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_fake_state);
-          __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 496, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 495, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 496, __pyx_L1_error)
-          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 496, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 495, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_6, __pyx_t_1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 495, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -15084,7 +15062,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_lead_agent, __pyx_t_13);
           __pyx_t_13 = 0;
 
-          /* "c_tools.pyx":497
+          /* "c_tools.pyx":496
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  *                         if lead_agent is not None:             # <<<<<<<<<<<<<<
@@ -15095,29 +15073,29 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __pyx_t_5 = (__pyx_t_4 != 0);
           if (__pyx_t_5) {
 
-            /* "c_tools.pyx":499
+            /* "c_tools.pyx":498
  *                         if lead_agent is not None:
  *                             # if agent is in intersection
  *                             if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:             # <<<<<<<<<<<<<<
  *                                 # get other agent intention
  *                                 if lead_agent.turn_signal == 'left':
  */
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_x); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_x); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_y); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_y); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_15);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
             __Pyx_GIVEREF(__pyx_t_6);
             PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_6);
@@ -15125,31 +15103,31 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_t_15);
             __pyx_t_6 = 0;
             __pyx_t_15 = 0;
-            __pyx_t_15 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_15 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_15);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_9 = PyObject_Length(__pyx_t_15); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 499, __pyx_L1_error)
+            __pyx_t_9 = PyObject_Length(__pyx_t_15); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 498, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
             __pyx_t_5 = ((__pyx_t_9 > 1) != 0);
             if (__pyx_t_5) {
 
-              /* "c_tools.pyx":501
+              /* "c_tools.pyx":500
  *                             if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:
  *                                 # get other agent intention
  *                                 if lead_agent.turn_signal == 'left':             # <<<<<<<<<<<<<<
  *                                     pass
  *                                 else:
  */
-              __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_turn_signal); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 501, __pyx_L1_error)
+              __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_turn_signal); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 500, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_15);
-              __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_15, __pyx_n_s_left, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 501, __pyx_L1_error)
+              __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_15, __pyx_n_s_left, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 500, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
               if (__pyx_t_5) {
                 goto __pyx_L16;
               }
 
-              /* "c_tools.pyx":505
+              /* "c_tools.pyx":504
  *                                 else:
  *                                     # check collision, make conservative and assume other agent bundle hasn't gone
  *                                     gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))             # <<<<<<<<<<<<<<
@@ -15157,30 +15135,30 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  *                                     if gap > gap_requirement:
  */
               /*else*/ {
-                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_15);
-                __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_13);
                 __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-                __pyx_t_15 = PyNumber_Subtract(__pyx_v_abs_y, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_15 = PyNumber_Subtract(__pyx_v_abs_y, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_15);
                 __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-                __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_15); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_13);
                 __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_15);
-                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-                __pyx_t_15 = PyNumber_Subtract(__pyx_v_abs_x, __pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_15 = PyNumber_Subtract(__pyx_v_abs_x, __pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_15);
                 __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-                __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-                __pyx_t_6 = PyObject_RichCompare(__pyx_t_13, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 505, __pyx_L1_error)
-                __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 505, __pyx_L1_error)
+                __pyx_t_6 = PyObject_RichCompare(__pyx_t_13, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 504, __pyx_L1_error)
+                __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 504, __pyx_L1_error)
                 __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
                 if (__pyx_t_5) {
                   __Pyx_INCREF(__pyx_t_13);
@@ -15197,16 +15175,16 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
                 __Pyx_XDECREF_SET(__pyx_v_gap, __pyx_t_13);
                 __pyx_t_13 = 0;
 
-                /* "c_tools.pyx":506
+                /* "c_tools.pyx":505
  *                                     # check collision, make conservative and assume other agent bundle hasn't gone
  *                                     gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))
  *                                     gap_requirement = self.get_conservative_gap(lead_agent, N+1)             # <<<<<<<<<<<<<<
  *                                     if gap > gap_requirement:
  *                                         pass
  */
-                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_get_conservative_gap); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 506, __pyx_L1_error)
+                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_get_conservative_gap); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 505, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_15);
-                __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 506, __pyx_L1_error)
+                __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 505, __pyx_L1_error)
                 __Pyx_GOTREF(__pyx_t_1);
                 __pyx_t_6 = NULL;
                 __pyx_t_12 = 0;
@@ -15223,7 +15201,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
                 #if CYTHON_FAST_PYCALL
                 if (PyFunction_Check(__pyx_t_15)) {
                   PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_lead_agent, __pyx_t_1};
-                  __pyx_t_13 = __Pyx_PyFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 506, __pyx_L1_error)
+                  __pyx_t_13 = __Pyx_PyFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 505, __pyx_L1_error)
                   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
                   __Pyx_GOTREF(__pyx_t_13);
                   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -15232,14 +15210,14 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
                 #if CYTHON_FAST_PYCCALL
                 if (__Pyx_PyFastCFunction_Check(__pyx_t_15)) {
                   PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_lead_agent, __pyx_t_1};
-                  __pyx_t_13 = __Pyx_PyCFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 506, __pyx_L1_error)
+                  __pyx_t_13 = __Pyx_PyCFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 505, __pyx_L1_error)
                   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
                   __Pyx_GOTREF(__pyx_t_13);
                   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
                 } else
                 #endif
                 {
-                  __pyx_t_14 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 506, __pyx_L1_error)
+                  __pyx_t_14 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 505, __pyx_L1_error)
                   __Pyx_GOTREF(__pyx_t_14);
                   if (__pyx_t_6) {
                     __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -15250,7 +15228,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
                   __Pyx_GIVEREF(__pyx_t_1);
                   PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_12, __pyx_t_1);
                   __pyx_t_1 = 0;
-                  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_14, NULL); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 506, __pyx_L1_error)
+                  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_14, NULL); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 505, __pyx_L1_error)
                   __Pyx_GOTREF(__pyx_t_13);
                   __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
                 }
@@ -15258,21 +15236,21 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
                 __Pyx_XDECREF_SET(__pyx_v_gap_requirement, __pyx_t_13);
                 __pyx_t_13 = 0;
 
-                /* "c_tools.pyx":507
+                /* "c_tools.pyx":506
  *                                     gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))
  *                                     gap_requirement = self.get_conservative_gap(lead_agent, N+1)
  *                                     if gap > gap_requirement:             # <<<<<<<<<<<<<<
  *                                         pass
  *                                     else:
  */
-                __pyx_t_13 = PyObject_RichCompare(__pyx_v_gap, __pyx_v_gap_requirement, Py_GT); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 507, __pyx_L1_error)
-                __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 507, __pyx_L1_error)
+                __pyx_t_13 = PyObject_RichCompare(__pyx_v_gap, __pyx_v_gap_requirement, Py_GT); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 506, __pyx_L1_error)
+                __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 506, __pyx_L1_error)
                 __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
                 if (__pyx_t_5) {
                   goto __pyx_L17;
                 }
 
-                /* "c_tools.pyx":510
+                /* "c_tools.pyx":509
  *                                         pass
  *                                     else:
  *                                         return False             # <<<<<<<<<<<<<<
@@ -15291,7 +15269,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
               }
               __pyx_L16:;
 
-              /* "c_tools.pyx":499
+              /* "c_tools.pyx":498
  *                         if lead_agent is not None:
  *                             # if agent is in intersection
  *                             if len(game.map.legal_orientations[(lead_agent.state.x, lead_agent.state.y)]) > 1:             # <<<<<<<<<<<<<<
@@ -15301,7 +15279,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
               goto __pyx_L15;
             }
 
-            /* "c_tools.pyx":513
+            /* "c_tools.pyx":512
  *                             # other agent is not in intersection, don't need to check
  *                             else:
  *                                 pass             # <<<<<<<<<<<<<<
@@ -15312,7 +15290,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             }
             __pyx_L15:;
 
-            /* "c_tools.pyx":497
+            /* "c_tools.pyx":496
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  *                         if lead_agent is not None:             # <<<<<<<<<<<<<<
@@ -15322,7 +15300,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             goto __pyx_L14;
           }
 
-          /* "c_tools.pyx":515
+          /* "c_tools.pyx":514
  *                                 pass
  *                         else:
  *                             pass             # <<<<<<<<<<<<<<
@@ -15333,7 +15311,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           }
           __pyx_L14:;
 
-          /* "c_tools.pyx":493
+          /* "c_tools.pyx":492
  *                 if light_color == 'red':
  *                     # find agents in intersection to check if collision might occur during red light
  *                     for N, occupancy_tile in enumerate(relative_tiles):             # <<<<<<<<<<<<<<
@@ -15344,7 +15322,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":516
+        /* "c_tools.pyx":515
  *                         else:
  *                             pass
  *                     return True             # <<<<<<<<<<<<<<
@@ -15356,7 +15334,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":491
+        /* "c_tools.pyx":490
  *                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
  *                 light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
@@ -15365,7 +15343,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  */
       }
 
-      /* "c_tools.pyx":519
+      /* "c_tools.pyx":518
  *                 else:
  *                     #print("checking for gap")
  *                     opposing_bundle, relative_occupancy = game.map.left_turn_to_opposing_traffic_bundles[current_directed_tile]             # <<<<<<<<<<<<<<
@@ -15373,12 +15351,12 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  *                     # (bigger means closer to left-most lane)
  */
       /*else*/ {
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 518, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_left_turn_to_opposing_traffic_bu); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 519, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_left_turn_to_opposing_traffic_bu); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 518, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 519, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_current_directed_tile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 518, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -15387,7 +15365,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           if (unlikely(size != 2)) {
             if (size > 2) __Pyx_RaiseTooManyValuesError(2);
             else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-            __PYX_ERR(0, 519, __pyx_L1_error)
+            __PYX_ERR(0, 518, __pyx_L1_error)
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
           if (likely(PyTuple_CheckExact(sequence))) {
@@ -15400,15 +15378,15 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_INCREF(__pyx_t_2);
           __Pyx_INCREF(__pyx_t_13);
           #else
-          __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 519, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 518, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_13 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 519, __pyx_L1_error)
+          __pyx_t_13 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 518, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           #endif
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else {
           Py_ssize_t index = -1;
-          __pyx_t_15 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 519, __pyx_L1_error)
+          __pyx_t_15 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 518, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_15);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __pyx_t_7 = Py_TYPE(__pyx_t_15)->tp_iternext;
@@ -15416,7 +15394,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_GOTREF(__pyx_t_2);
           index = 1; __pyx_t_13 = __pyx_t_7(__pyx_t_15); if (unlikely(!__pyx_t_13)) goto __pyx_L18_unpacking_failed;
           __Pyx_GOTREF(__pyx_t_13);
-          if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_15), 2) < 0) __PYX_ERR(0, 519, __pyx_L1_error)
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_15), 2) < 0) __PYX_ERR(0, 518, __pyx_L1_error)
           __pyx_t_7 = NULL;
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           goto __pyx_L19_unpacking_done;
@@ -15424,7 +15402,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
           __pyx_t_7 = NULL;
           if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-          __PYX_ERR(0, 519, __pyx_L1_error)
+          __PYX_ERR(0, 518, __pyx_L1_error)
           __pyx_L19_unpacking_done:;
         }
         __Pyx_DECREF_SET(__pyx_v_opposing_bundle, __pyx_t_2);
@@ -15432,24 +15410,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_DECREF_SET(__pyx_v_relative_occupancy, __pyx_t_13);
         __pyx_t_13 = 0;
 
-        /* "c_tools.pyx":522
+        /* "c_tools.pyx":521
  *                     # idx indicates the lane number on the opposing traffic bundle
  *                     # (bigger means closer to left-most lane)
  *                     relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]             # <<<<<<<<<<<<<<
  *                     relative_tiles.reverse() # sort so temporal order is achieved
  *                     gaps = []
  */
-        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 522, __pyx_L1_error)
+        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 521, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = PyObject_Length(__pyx_v_relative_occupancy); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 522, __pyx_L1_error)
+        __pyx_t_8 = PyObject_Length(__pyx_v_relative_occupancy); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 521, __pyx_L1_error)
         __pyx_t_9 = __pyx_t_8;
         for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
           __pyx_v_idx = __pyx_t_10;
-          __pyx_t_13 = PyInt_FromSsize_t(__pyx_v_idx); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 522, __pyx_L1_error)
+          __pyx_t_13 = PyInt_FromSsize_t(__pyx_v_idx); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 521, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_relative_occupancy, __pyx_v_idx, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 522, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_relative_occupancy, __pyx_v_idx, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 521, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_15 = PyTuple_New(2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 522, __pyx_L1_error)
+          __pyx_t_15 = PyTuple_New(2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 521, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_15);
           __Pyx_GIVEREF(__pyx_t_13);
           PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_13);
@@ -15457,46 +15435,46 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_t_2);
           __pyx_t_13 = 0;
           __pyx_t_2 = 0;
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_3, (PyObject*)__pyx_t_15))) __PYX_ERR(0, 522, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_3, (PyObject*)__pyx_t_15))) __PYX_ERR(0, 521, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         }
         __Pyx_DECREF_SET(__pyx_v_relative_tiles, ((PyObject*)__pyx_t_3));
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":523
+        /* "c_tools.pyx":522
  *                     # (bigger means closer to left-most lane)
  *                     relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
  *                     relative_tiles.reverse() # sort so temporal order is achieved             # <<<<<<<<<<<<<<
  *                     gaps = []
  *                     #fake_heading = opposing_bundle.direction
  */
-        __pyx_t_11 = PyList_Reverse(__pyx_v_relative_tiles); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 523, __pyx_L1_error)
+        __pyx_t_11 = PyList_Reverse(__pyx_v_relative_tiles); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 522, __pyx_L1_error)
 
-        /* "c_tools.pyx":524
+        /* "c_tools.pyx":523
  *                     relative_tiles = [(idx, relative_occupancy[idx]) for idx in range(len(relative_occupancy))]
  *                     relative_tiles.reverse() # sort so temporal order is achieved
  *                     gaps = []             # <<<<<<<<<<<<<<
  *                     #fake_heading = opposing_bundle.direction
  *                     left_turn_gap_arr = []
  */
-        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
+        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 523, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_gaps = ((PyObject*)__pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":526
+        /* "c_tools.pyx":525
  *                     gaps = []
  *                     #fake_heading = opposing_bundle.direction
  *                     left_turn_gap_arr = []             # <<<<<<<<<<<<<<
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
  */
-        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 526, __pyx_L1_error)
+        __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 525, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_left_turn_gap_arr = ((PyObject*)__pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":527
+        /* "c_tools.pyx":526
  *                     #fake_heading = opposing_bundle.direction
  *                     left_turn_gap_arr = []
  *                     for N, occupancy_tile in enumerate(relative_tiles):             # <<<<<<<<<<<<<<
@@ -15509,29 +15487,29 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         for (;;) {
           if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_15)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_15, __pyx_t_8); __Pyx_INCREF(__pyx_t_2); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 527, __pyx_L1_error)
+          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_15, __pyx_t_8); __Pyx_INCREF(__pyx_t_2); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 526, __pyx_L1_error)
           #else
-          __pyx_t_2 = PySequence_ITEM(__pyx_t_15, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_15, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
           __Pyx_XDECREF_SET(__pyx_v_occupancy_tile, __pyx_t_2);
           __pyx_t_2 = 0;
           __Pyx_INCREF(__pyx_t_3);
           __Pyx_XDECREF_SET(__pyx_v_N, __pyx_t_3);
-          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3);
           __pyx_t_3 = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":528
+          /* "c_tools.pyx":527
  *                     left_turn_gap_arr = []
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)             # <<<<<<<<<<<<<<
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  */
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_opposing_bundle, __pyx_n_s_relative_coordinates_to_tile); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 528, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_opposing_bundle, __pyx_n_s_relative_coordinates_to_tile); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 527, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_t_14 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_13))) {
@@ -15545,7 +15523,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           }
           __pyx_t_2 = (__pyx_t_14) ? __Pyx_PyObject_Call2Args(__pyx_t_13, __pyx_t_14, __pyx_v_occupancy_tile) : __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_v_occupancy_tile);
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -15554,7 +15532,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             if (unlikely(size != 2)) {
               if (size > 2) __Pyx_RaiseTooManyValuesError(2);
               else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-              __PYX_ERR(0, 528, __pyx_L1_error)
+              __PYX_ERR(0, 527, __pyx_L1_error)
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
             if (likely(PyTuple_CheckExact(sequence))) {
@@ -15567,15 +15545,15 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_INCREF(__pyx_t_13);
             __Pyx_INCREF(__pyx_t_14);
             #else
-            __pyx_t_13 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 528, __pyx_L1_error)
+            __pyx_t_13 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 527, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_14 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 528, __pyx_L1_error)
+            __pyx_t_14 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 527, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             #endif
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           } else {
             Py_ssize_t index = -1;
-            __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 528, __pyx_L1_error)
+            __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 527, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -15583,7 +15561,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_GOTREF(__pyx_t_13);
             index = 1; __pyx_t_14 = __pyx_t_7(__pyx_t_1); if (unlikely(!__pyx_t_14)) goto __pyx_L24_unpacking_failed;
             __Pyx_GOTREF(__pyx_t_14);
-            if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_1), 2) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
+            if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_1), 2) < 0) __PYX_ERR(0, 527, __pyx_L1_error)
             __pyx_t_7 = NULL;
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             goto __pyx_L25_unpacking_done;
@@ -15591,7 +15569,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             __pyx_t_7 = NULL;
             if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-            __PYX_ERR(0, 528, __pyx_L1_error)
+            __PYX_ERR(0, 527, __pyx_L1_error)
             __pyx_L25_unpacking_done:;
           }
           __Pyx_XDECREF_SET(__pyx_v_abs_x, __pyx_t_13);
@@ -15599,34 +15577,34 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_abs_y, __pyx_t_14);
           __pyx_t_14 = 0;
 
-          /* "c_tools.pyx":529
+          /* "c_tools.pyx":528
  *                     for N, occupancy_tile in enumerate(relative_tiles):
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)             # <<<<<<<<<<<<<<
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_hack_car_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_hack_car_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_13 = PyTuple_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_13 = PyTuple_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_GIVEREF(__pyx_t_14);
           PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_14);
           __pyx_t_14 = 0;
-          __pyx_t_14 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_x, __pyx_v_abs_x) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_y, __pyx_v_abs_y) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 529, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_x, __pyx_v_abs_x) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_y, __pyx_v_abs_y) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_heading, __pyx_t_6) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_heading, __pyx_t_6) < 0) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, __pyx_t_14); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, __pyx_t_14); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -15634,24 +15612,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_fake_state, __pyx_t_6);
           __pyx_t_6 = 0;
 
-          /* "c_tools.pyx":530
+          /* "c_tools.pyx":529
  *                         abs_x, abs_y = opposing_bundle.relative_coordinates_to_tile(occupancy_tile)
  *                         fake_state = hack_car_state(plant.state, x=abs_x, y=abs_y, heading=plant.state.heading)
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)             # <<<<<<<<<<<<<<
  * 
  *                         if lead_agent is None:
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 530, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_14 = PyTuple_New(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 530, __pyx_L1_error)
+          __pyx_t_14 = PyTuple_New(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __Pyx_INCREF(__pyx_v_fake_state);
           __Pyx_GIVEREF(__pyx_v_fake_state);
           PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_v_fake_state);
-          __pyx_t_13 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 530, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 530, __pyx_L1_error)
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_14, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 530, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_14, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
@@ -15659,7 +15637,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           __Pyx_XDECREF_SET(__pyx_v_lead_agent, __pyx_t_2);
           __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":532
+          /* "c_tools.pyx":531
  *                         lead_agent = plant.find_lead_agent(fake_state, same_heading_required=False)
  * 
  *                         if lead_agent is None:             # <<<<<<<<<<<<<<
@@ -15672,7 +15650,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             goto __pyx_L26;
           }
 
-          /* "c_tools.pyx":536
+          /* "c_tools.pyx":535
  *                             pass
  *                         else:
  *                             gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))             # <<<<<<<<<<<<<<
@@ -15680,30 +15658,30 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  *                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)
  */
           /*else*/ {
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = PyNumber_Subtract(__pyx_v_abs_y, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_2 = PyNumber_Subtract(__pyx_v_abs_y, __pyx_t_13); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = PyNumber_Subtract(__pyx_v_abs_x, __pyx_t_14); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_2 = PyNumber_Subtract(__pyx_v_abs_x, __pyx_t_14); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-            __pyx_t_14 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_14 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_6 = PyObject_RichCompare(__pyx_t_13, __pyx_t_14, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 536, __pyx_L1_error)
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 536, __pyx_L1_error)
+            __pyx_t_6 = PyObject_RichCompare(__pyx_t_13, __pyx_t_14, Py_GT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 535, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 535, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             if (__pyx_t_4) {
               __Pyx_INCREF(__pyx_t_13);
@@ -15720,16 +15698,16 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_XDECREF_SET(__pyx_v_gap, __pyx_t_13);
             __pyx_t_13 = 0;
 
-            /* "c_tools.pyx":538
+            /* "c_tools.pyx":537
  *                             gap = max(abs(abs_x-lead_agent.state.x), abs(abs_y-lead_agent.state.y))
  *                             # TODO: complete gap conditions
  *                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)             # <<<<<<<<<<<<<<
  *                             left_turn_gap_arr.append((gap_requirement, gap, N+1, lead_agent.state.x, lead_agent.state.y, abs_x, abs_y))
  *                             if gap > gap_requirement:
  */
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_get_conservative_gap); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_get_conservative_gap); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 537, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_14 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 538, __pyx_L1_error)
+            __pyx_t_14 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 537, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __pyx_t_6 = NULL;
             __pyx_t_12 = 0;
@@ -15746,7 +15724,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_2)) {
               PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_lead_agent, __pyx_t_14};
-              __pyx_t_13 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 538, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 537, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
               __Pyx_GOTREF(__pyx_t_13);
               __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
@@ -15755,14 +15733,14 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
               PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_v_lead_agent, __pyx_t_14};
-              __pyx_t_13 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 538, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 537, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
               __Pyx_GOTREF(__pyx_t_13);
               __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
             } else
             #endif
             {
-              __pyx_t_1 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
+              __pyx_t_1 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 537, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_1);
               if (__pyx_t_6) {
                 __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -15773,7 +15751,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
               __Pyx_GIVEREF(__pyx_t_14);
               PyTuple_SET_ITEM(__pyx_t_1, 1+__pyx_t_12, __pyx_t_14);
               __pyx_t_14 = 0;
-              __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 538, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, NULL); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 537, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_13);
               __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             }
@@ -15781,26 +15759,26 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __Pyx_XDECREF_SET(__pyx_v_gap_requirement, __pyx_t_13);
             __pyx_t_13 = 0;
 
-            /* "c_tools.pyx":539
+            /* "c_tools.pyx":538
  *                             # TODO: complete gap conditions
  *                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)
  *                             left_turn_gap_arr.append((gap_requirement, gap, N+1, lead_agent.state.x, lead_agent.state.y, abs_x, abs_y))             # <<<<<<<<<<<<<<
  *                             if gap > gap_requirement:
  *                                 pass
  */
-            __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_v_N, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = PyTuple_New(7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_2 = PyTuple_New(7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_INCREF(__pyx_v_gap_requirement);
             __Pyx_GIVEREF(__pyx_v_gap_requirement);
@@ -15823,24 +15801,24 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
             __pyx_t_13 = 0;
             __pyx_t_1 = 0;
             __pyx_t_14 = 0;
-            __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_left_turn_gap_arr, __pyx_t_2); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_left_turn_gap_arr, __pyx_t_2); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 538, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-            /* "c_tools.pyx":540
+            /* "c_tools.pyx":539
  *                             gap_requirement = self.get_conservative_gap(lead_agent, N+1)
  *                             left_turn_gap_arr.append((gap_requirement, gap, N+1, lead_agent.state.x, lead_agent.state.y, abs_x, abs_y))
  *                             if gap > gap_requirement:             # <<<<<<<<<<<<<<
  *                                 pass
  *                             else:
  */
-            __pyx_t_2 = PyObject_RichCompare(__pyx_v_gap, __pyx_v_gap_requirement, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 540, __pyx_L1_error)
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 540, __pyx_L1_error)
+            __pyx_t_2 = PyObject_RichCompare(__pyx_v_gap, __pyx_v_gap_requirement, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 539, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 539, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             if (__pyx_t_4) {
               goto __pyx_L27;
             }
 
-            /* "c_tools.pyx":543
+            /* "c_tools.pyx":542
  *                                 pass
  *                             else:
  *                                 plant.left_turn_gap_arr = left_turn_gap_arr             # <<<<<<<<<<<<<<
@@ -15848,9 +15826,9 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  *                     plant.left_turn_gap_arr = left_turn_gap_arr
  */
             /*else*/ {
-              if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_left_turn_gap_arr, __pyx_v_left_turn_gap_arr) < 0) __PYX_ERR(0, 543, __pyx_L1_error)
+              if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_left_turn_gap_arr, __pyx_v_left_turn_gap_arr) < 0) __PYX_ERR(0, 542, __pyx_L1_error)
 
-              /* "c_tools.pyx":544
+              /* "c_tools.pyx":543
  *                             else:
  *                                 plant.left_turn_gap_arr = left_turn_gap_arr
  *                                 return False             # <<<<<<<<<<<<<<
@@ -15868,7 +15846,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
           }
           __pyx_L26:;
 
-          /* "c_tools.pyx":527
+          /* "c_tools.pyx":526
  *                     #fake_heading = opposing_bundle.direction
  *                     left_turn_gap_arr = []
  *                     for N, occupancy_tile in enumerate(relative_tiles):             # <<<<<<<<<<<<<<
@@ -15879,16 +15857,16 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":545
+        /* "c_tools.pyx":544
  *                                 plant.left_turn_gap_arr = left_turn_gap_arr
  *                                 return False
  *                     plant.left_turn_gap_arr = left_turn_gap_arr             # <<<<<<<<<<<<<<
  *                     return True
  *         else: # if the agent is not trying to perform a left turn
  */
-        if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_left_turn_gap_arr, __pyx_v_left_turn_gap_arr) < 0) __PYX_ERR(0, 545, __pyx_L1_error)
+        if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_left_turn_gap_arr, __pyx_v_left_turn_gap_arr) < 0) __PYX_ERR(0, 544, __pyx_L1_error)
 
-        /* "c_tools.pyx":546
+        /* "c_tools.pyx":545
  *                                 return False
  *                     plant.left_turn_gap_arr = left_turn_gap_arr
  *                     return True             # <<<<<<<<<<<<<<
@@ -15902,7 +15880,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
       }
     }
 
-    /* "c_tools.pyx":477
+    /* "c_tools.pyx":476
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # check if agent needs to reason about making an unprotected left turn
  *         if current_directed_tile in game.map.all_left_turns:             # <<<<<<<<<<<<<<
@@ -15911,7 +15889,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
  */
   }
 
-  /* "c_tools.pyx":548
+  /* "c_tools.pyx":547
  *                     return True
  *         else: # if the agent is not trying to perform a left turn
  *             return True             # <<<<<<<<<<<<<<
@@ -15925,7 +15903,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
     goto __pyx_L0;
   }
 
-  /* "c_tools.pyx":470
+  /* "c_tools.pyx":469
  *         return gap
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -15972,7 +15950,7 @@ static PyObject *__pyx_pf_7c_tools_25UnprotectedLeftTurnOracle_4evaluate(CYTHON_
   return __pyx_r;
 }
 
-/* "c_tools.pyx":551
+/* "c_tools.pyx":550
  * 
  * class NoDeadlockOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -16002,16 +15980,16 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle___init__(CYTHON_UNUSED PyO
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":552
+  /* "c_tools.pyx":551
  * class NoDeadlockOracle(Oracle):
  *     def __init__(self):
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")             # <<<<<<<<<<<<<<
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_NoDeadlockOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_NoDeadlockOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -16019,22 +15997,22 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle___init__(CYTHON_UNUSED PyO
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 552, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_no_deadlock) < 0) __PYX_ERR(0, 552, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 552, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_no_deadlock) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 551, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":551
+  /* "c_tools.pyx":550
  * 
  * class NoDeadlockOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -16057,7 +16035,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle___init__(CYTHON_UNUSED PyO
   return __pyx_r;
 }
 
-/* "c_tools.pyx":554
+/* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
@@ -16108,19 +16086,19 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_3evaluate(PyObject *__pyx_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 1); __PYX_ERR(0, 554, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 1); __PYX_ERR(0, 553, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 2); __PYX_ERR(0, 554, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 2); __PYX_ERR(0, 553, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 3); __PYX_ERR(0, 554, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, 3); __PYX_ERR(0, 553, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -16130,7 +16108,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_3evaluate(PyObject *__pyx_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 554, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 553, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -16152,7 +16130,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_3evaluate(PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 554, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 553, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.NoDeadlockOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -16165,7 +16143,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_3evaluate(PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "c_tools.pyx":564
+/* "c_tools.pyx":563
  * 
  *         # count agents in the intersection ahead
  *         def count_agents_ahead(gap):             # <<<<<<<<<<<<<<
@@ -16210,7 +16188,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   __pyx_outer_scope = (struct __pyx_obj_7c_tools___pyx_scope_struct_3_evaluate *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "c_tools.pyx":565
+  /* "c_tools.pyx":564
  *         # count agents in the intersection ahead
  *         def count_agents_ahead(gap):
  *             cnt = 0             # <<<<<<<<<<<<<<
@@ -16220,53 +16198,53 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_cnt = __pyx_int_0;
 
-  /* "c_tools.pyx":567
+  /* "c_tools.pyx":566
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]             # <<<<<<<<<<<<<<
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, gap):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 567, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 567, __pyx_L1_error) }
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 567, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 566, __pyx_L1_error) }
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 567, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 567, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_forward = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":568
+  /* "c_tools.pyx":567
  *             # check for number of agents ahead in intersection
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])             # <<<<<<<<<<<<<<
  *             for i in range(1, gap):
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 568, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 568, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 568, __pyx_L1_error) }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 568, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 567, __pyx_L1_error) }
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 568, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 568, __pyx_L1_error) }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 568, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_plant)) { __Pyx_RaiseClosureNameError("plant"); __PYX_ERR(0, 567, __pyx_L1_error) }
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 568, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 568, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
@@ -16287,20 +16265,20 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 568, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 567, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_curr_st = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":569
+  /* "c_tools.pyx":568
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, gap):             # <<<<<<<<<<<<<<
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 568, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -16308,16 +16286,16 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   __Pyx_INCREF(__pyx_v_gap);
   __Pyx_GIVEREF(__pyx_v_gap);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_gap);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 568, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 568, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 569, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 568, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -16325,17 +16303,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 568, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 568, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 568, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 568, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -16345,7 +16323,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 569, __pyx_L1_error)
+          else __PYX_ERR(0, 568, __pyx_L1_error)
         }
         break;
       }
@@ -16354,16 +16332,16 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":570
+    /* "c_tools.pyx":569
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, gap):
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))             # <<<<<<<<<<<<<<
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 570, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 570, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -16378,49 +16356,49 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
     }
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_forward);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Multiply(__pyx_v_i, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 570, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Multiply(__pyx_v_i, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Add(__pyx_v_curr_st, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_v_curr_st, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 570, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF_SET(__pyx_v_next_tile_tuple, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":572
+    /* "c_tools.pyx":571
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:             # <<<<<<<<<<<<<<
  *                     cnt = cnt + 1
  *             return cnt
  */
-    if (unlikely(!__pyx_cur_scope->__pyx_v_game)) { __Pyx_RaiseClosureNameError("game"); __PYX_ERR(0, 572, __pyx_L1_error) }
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 572, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_v_game)) { __Pyx_RaiseClosureNameError("game"); __PYX_ERR(0, 571, __pyx_L1_error) }
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 571, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile_tuple, __pyx_t_5, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 572, __pyx_L1_error)
+    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile_tuple, __pyx_t_5, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 571, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_9 = (__pyx_t_8 != 0);
     if (__pyx_t_9) {
 
-      /* "c_tools.pyx":573
+      /* "c_tools.pyx":572
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:
  *                     cnt = cnt + 1             # <<<<<<<<<<<<<<
  *             return cnt
  * 
  */
-      __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 573, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 572, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF_SET(__pyx_v_cnt, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "c_tools.pyx":572
+      /* "c_tools.pyx":571
  *                 next_tile_tuple = tuple(curr_st + i*np.array(forward))
  *                 # if there is an agent there, then count it
  *                 if next_tile_tuple in game.occupancy_dict:             # <<<<<<<<<<<<<<
@@ -16429,7 +16407,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
  */
     }
 
-    /* "c_tools.pyx":569
+    /* "c_tools.pyx":568
  *             forward = DIRECTION_TO_VECTOR[plant.state.heading]
  *             curr_st = np.array([plant.state.x, plant.state.y])
  *             for i in range(1, gap):             # <<<<<<<<<<<<<<
@@ -16439,7 +16417,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":574
+  /* "c_tools.pyx":573
  *                 if next_tile_tuple in game.occupancy_dict:
  *                     cnt = cnt + 1
  *             return cnt             # <<<<<<<<<<<<<<
@@ -16451,7 +16429,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   __pyx_r = __pyx_v_cnt;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":564
+  /* "c_tools.pyx":563
  * 
  *         # count agents in the intersection ahead
  *         def count_agents_ahead(gap):             # <<<<<<<<<<<<<<
@@ -16479,7 +16457,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahe
   return __pyx_r;
 }
 
-/* "c_tools.pyx":578
+/* "c_tools.pyx":577
  *         # find the lead agent in the lane agent will turn left into and number of
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):             # <<<<<<<<<<<<<<
@@ -16524,7 +16502,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_3find_left_turn_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_left_turn_lead_agent") < 0)) __PYX_ERR(0, 578, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_left_turn_lead_agent") < 0)) __PYX_ERR(0, 577, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -16540,7 +16518,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_3find_left_turn_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find_left_turn_lead_agent", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 578, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find_left_turn_lead_agent", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 577, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.NoDeadlockOracle.evaluate.find_left_turn_lead_agent", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -16579,31 +16557,31 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __Pyx_RefNannySetupContext("find_left_turn_lead_agent", 0);
   __Pyx_INCREF(__pyx_v_state);
 
-  /* "c_tools.pyx":579
+  /* "c_tools.pyx":578
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):
  *             if state == None:             # <<<<<<<<<<<<<<
  *                 state = plant.state
  * 
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_state, Py_None, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 579, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 579, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_state, Py_None, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 578, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":580
+    /* "c_tools.pyx":579
  *         def find_left_turn_lead_agent(plant, state=None):
  *             if state == None:
  *                 state = plant.state             # <<<<<<<<<<<<<<
  * 
  *             agent_cnt = 0
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 579, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_state, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":579
+    /* "c_tools.pyx":578
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):
  *             if state == None:             # <<<<<<<<<<<<<<
@@ -16612,7 +16590,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
  */
   }
 
-  /* "c_tools.pyx":582
+  /* "c_tools.pyx":581
  *                 state = plant.state
  * 
  *             agent_cnt = 0             # <<<<<<<<<<<<<<
@@ -16622,42 +16600,42 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_agent_cnt = __pyx_int_0;
 
-  /* "c_tools.pyx":583
+  /* "c_tools.pyx":582
  * 
  *             agent_cnt = 0
  *             x_curr, y_curr = state.x, state.y             # <<<<<<<<<<<<<<
  *             current_heading = state.heading
  *             heading_degrees = convert_car_orientation(current_heading)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 582, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 582, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_x_curr = __pyx_t_1;
   __pyx_t_1 = 0;
   __pyx_v_y_curr = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":584
+  /* "c_tools.pyx":583
  *             agent_cnt = 0
  *             x_curr, y_curr = state.x, state.y
  *             current_heading = state.heading             # <<<<<<<<<<<<<<
  *             heading_degrees = convert_car_orientation(current_heading)
  *             left_heading_degrees = (heading_degrees + 90) % 360
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 584, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 583, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_current_heading = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":585
+  /* "c_tools.pyx":584
  *             x_curr, y_curr = state.x, state.y
  *             current_heading = state.heading
  *             heading_degrees = convert_car_orientation(current_heading)             # <<<<<<<<<<<<<<
  *             left_heading_degrees = (heading_degrees + 90) % 360
  *             left_heading = convert_car_orientation(left_heading_degrees)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 585, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -16671,35 +16649,35 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   }
   __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_v_current_heading) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_current_heading);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 585, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_heading_degrees = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":586
+  /* "c_tools.pyx":585
  *             current_heading = state.heading
  *             heading_degrees = convert_car_orientation(current_heading)
  *             left_heading_degrees = (heading_degrees + 90) % 360             # <<<<<<<<<<<<<<
  *             left_heading = convert_car_orientation(left_heading_degrees)
  *             forward = DIRECTION_TO_VECTOR[current_heading]
  */
-  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_heading_degrees, __pyx_int_90, 90, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 586, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_heading_degrees, __pyx_int_90, 90, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 585, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_3, __pyx_int_360, 0x168, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 586, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_RemainderObjC(__pyx_t_3, __pyx_int_360, 0x168, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 585, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_left_heading_degrees = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":587
+  /* "c_tools.pyx":586
  *             heading_degrees = convert_car_orientation(current_heading)
  *             left_heading_degrees = (heading_degrees + 90) % 360
  *             left_heading = convert_car_orientation(left_heading_degrees)             # <<<<<<<<<<<<<<
  *             forward = DIRECTION_TO_VECTOR[current_heading]
  *             next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 587, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 586, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -16713,37 +16691,37 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   }
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_left_heading_degrees) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_left_heading_degrees);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 586, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_left_heading = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":588
+  /* "c_tools.pyx":587
  *             left_heading_degrees = (heading_degrees + 90) % 360
  *             left_heading = convert_car_orientation(left_heading_degrees)
  *             forward = DIRECTION_TO_VECTOR[current_heading]             # <<<<<<<<<<<<<<
  *             next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  *             # need to iterate through to the last node of the left turn
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_DIRECTION_TO_VECTOR); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_current_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 588, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_v_current_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_forward = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":589
+  /* "c_tools.pyx":588
  *             left_heading = convert_car_orientation(left_heading_degrees)
  *             forward = DIRECTION_TO_VECTOR[current_heading]
  *             next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))             # <<<<<<<<<<<<<<
  *             # need to iterate through to the last node of the left turn
  *             while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -16758,15 +16736,15 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_forward);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 589, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_x_curr);
   __Pyx_GIVEREF(__pyx_v_x_curr);
@@ -16787,20 +16765,20 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __pyx_t_4 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 589, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Add(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PySequence_Tuple(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_next_tile = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":591
+  /* "c_tools.pyx":590
  *             next_tile = tuple(np.array(forward) + np.array([x_curr, y_curr]))
  *             # need to iterate through to the last node of the left turn
  *             while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:             # <<<<<<<<<<<<<<
@@ -16808,70 +16786,70 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
  *                 agent_in_tile = next_tile in plant.supervisor.game.occupancy_dict
  */
   while (1) {
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_next_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_v_next_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_left_heading, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_left_heading, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 590, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_7 = (__pyx_t_2 != 0);
     if (!__pyx_t_7) break;
 
-    /* "c_tools.pyx":593
+    /* "c_tools.pyx":592
  *             while left_heading not in plant.supervisor.game.map.legal_orientations[next_tile]:
  *                 # check whether the agent is in the next tile and if it is, add it to the count
  *                 agent_in_tile = next_tile in plant.supervisor.game.occupancy_dict             # <<<<<<<<<<<<<<
  *                 if agent_in_tile:
  *                     agent_cnt = agent_cnt + 1
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile, __pyx_t_4, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_v_next_tile, __pyx_t_4, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_t_7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_agent_in_tile, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":594
+    /* "c_tools.pyx":593
  *                 # check whether the agent is in the next tile and if it is, add it to the count
  *                 agent_in_tile = next_tile in plant.supervisor.game.occupancy_dict
  *                 if agent_in_tile:             # <<<<<<<<<<<<<<
  *                     agent_cnt = agent_cnt + 1
  * 
  */
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_agent_in_tile); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 594, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_agent_in_tile); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 593, __pyx_L1_error)
     if (__pyx_t_7) {
 
-      /* "c_tools.pyx":595
+      /* "c_tools.pyx":594
  *                 agent_in_tile = next_tile in plant.supervisor.game.occupancy_dict
  *                 if agent_in_tile:
  *                     agent_cnt = agent_cnt + 1             # <<<<<<<<<<<<<<
  * 
  *                 next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
  */
-      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_agent_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 595, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_agent_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 594, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_agent_cnt, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "c_tools.pyx":594
+      /* "c_tools.pyx":593
  *                 # check whether the agent is in the next tile and if it is, add it to the count
  *                 agent_in_tile = next_tile in plant.supervisor.game.occupancy_dict
  *                 if agent_in_tile:             # <<<<<<<<<<<<<<
@@ -16880,16 +16858,16 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
  */
     }
 
-    /* "c_tools.pyx":597
+    /* "c_tools.pyx":596
  *                     agent_cnt = agent_cnt + 1
  * 
  *                 next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))             # <<<<<<<<<<<<<<
  *             # reference state is that last subgoal of the left turn
  *             reference_state = plant.hack_state(state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -16904,19 +16882,19 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
     }
     __pyx_t_4 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_v_forward) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_forward);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 597, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = PyList_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_8 = PyList_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_GIVEREF(__pyx_t_5);
     PyList_SET_ITEM(__pyx_t_8, 0, __pyx_t_5);
@@ -16937,46 +16915,46 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
     __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_8) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_8);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 597, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF_SET(__pyx_v_next_tile, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
   }
 
-  /* "c_tools.pyx":599
+  /* "c_tools.pyx":598
  *                 next_tile = tuple(np.array(forward) + np.array([next_tile[0], next_tile[1]]))
  *             # reference state is that last subgoal of the left turn
  *             reference_state = plant.hack_state(state, x=next_tile[0], y=next_tile[1], heading=left_heading)             # <<<<<<<<<<<<<<
  *             lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  *             return lead_agent, agent_cnt, reference_state
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_hack_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_hack_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_state);
   __Pyx_GIVEREF(__pyx_v_state);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_state);
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_x, __pyx_t_8) < 0) __PYX_ERR(0, 599, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_x, __pyx_t_8) < 0) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt_Tuple(__pyx_v_next_tile, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_y, __pyx_t_8) < 0) __PYX_ERR(0, 599, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_y, __pyx_t_8) < 0) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_heading, __pyx_v_left_heading) < 0) __PYX_ERR(0, 599, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 599, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_heading, __pyx_v_left_heading) < 0) __PYX_ERR(0, 598, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 598, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -16984,25 +16962,25 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __pyx_v_reference_state = __pyx_t_8;
   __pyx_t_8 = 0;
 
-  /* "c_tools.pyx":600
+  /* "c_tools.pyx":599
  *             # reference state is that last subgoal of the left turn
  *             reference_state = plant.hack_state(state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  *             lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)             # <<<<<<<<<<<<<<
  *             return lead_agent, agent_cnt, reference_state
  * 
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 599, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 599, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_reference_state);
   __Pyx_GIVEREF(__pyx_v_reference_state);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_reference_state);
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 600, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 599, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 600, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 600, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 600, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_must_not_be_in_intersection, Py_True) < 0) __PYX_ERR(0, 599, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 599, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 599, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -17010,7 +16988,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __pyx_v_lead_agent = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":601
+  /* "c_tools.pyx":600
  *             reference_state = plant.hack_state(state, x=next_tile[0], y=next_tile[1], heading=left_heading)
  *             lead_agent = plant.find_lead_agent(reference_state, must_not_be_in_intersection=True, same_heading_required=False)
  *             return lead_agent, agent_cnt, reference_state             # <<<<<<<<<<<<<<
@@ -17018,7 +16996,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
  *         # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 601, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 600, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_lead_agent);
   __Pyx_GIVEREF(__pyx_v_lead_agent);
@@ -17033,7 +17011,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":578
+  /* "c_tools.pyx":577
  *         # find the lead agent in the lane agent will turn left into and number of
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):             # <<<<<<<<<<<<<<
@@ -17070,7 +17048,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_2find_left_turn_
   return __pyx_r;
 }
 
-/* "c_tools.pyx":605
+/* "c_tools.pyx":604
  *         # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
  *         # returns the appropriate tiles
  *         def get_rel_adjacent_tiles(plant):             # <<<<<<<<<<<<<<
@@ -17104,14 +17082,14 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("get_rel_adjacent_tiles", 0);
 
-  /* "c_tools.pyx":606
+  /* "c_tools.pyx":605
  *         # returns the appropriate tiles
  *         def get_rel_adjacent_tiles(plant):
  *             rel_tiles = od()             # <<<<<<<<<<<<<<
  *             # TODO: generalize this so field-of-view depends on agent bubble!!!!
  *             # default heading is north
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_od); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 606, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_od); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 605, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -17125,20 +17103,20 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 606, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 605, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_rel_tiles = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":609
+  /* "c_tools.pyx":608
  *             # TODO: generalize this so field-of-view depends on agent bubble!!!!
  *             # default heading is north
  *             rel_tiles['left'] = [[-2,-1], [-1, -1], [0, -1], [1, -1], [2, -1]]             # <<<<<<<<<<<<<<
  *             rel_tiles['right'] = [[-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1]]
  *             return rel_tiles
  */
-  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_int_neg_2);
   __Pyx_GIVEREF(__pyx_int_neg_2);
@@ -17146,7 +17124,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
   PyList_SET_ITEM(__pyx_t_1, 1, __pyx_int_neg_1);
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
@@ -17154,7 +17132,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_int_neg_1);
-  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
@@ -17162,7 +17140,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
   PyList_SET_ITEM(__pyx_t_3, 1, __pyx_int_neg_1);
-  __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -17170,7 +17148,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
   PyList_SET_ITEM(__pyx_t_4, 1, __pyx_int_neg_1);
-  __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_int_2);
   __Pyx_GIVEREF(__pyx_int_2);
@@ -17178,7 +17156,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
   PyList_SET_ITEM(__pyx_t_5, 1, __pyx_int_neg_1);
-  __pyx_t_6 = PyList_New(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_t_6 = PyList_New(5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_1);
   PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_1);
@@ -17195,17 +17173,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_v_rel_tiles, __pyx_n_s_left, __pyx_t_6) < 0)) __PYX_ERR(0, 609, __pyx_L1_error)
+  if (unlikely(PyObject_SetItem(__pyx_v_rel_tiles, __pyx_n_s_left, __pyx_t_6) < 0)) __PYX_ERR(0, 608, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "c_tools.pyx":610
+  /* "c_tools.pyx":609
  *             # default heading is north
  *             rel_tiles['left'] = [[-2,-1], [-1, -1], [0, -1], [1, -1], [2, -1]]
  *             rel_tiles['right'] = [[-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1]]             # <<<<<<<<<<<<<<
  *             return rel_tiles
  * 
  */
-  __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_6 = PyList_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_int_neg_2);
   __Pyx_GIVEREF(__pyx_int_neg_2);
@@ -17213,7 +17191,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
   PyList_SET_ITEM(__pyx_t_6, 1, __pyx_int_1);
-  __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
@@ -17221,7 +17199,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
   PyList_SET_ITEM(__pyx_t_5, 1, __pyx_int_1);
-  __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
@@ -17229,7 +17207,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
   PyList_SET_ITEM(__pyx_t_4, 1, __pyx_int_1);
-  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -17237,7 +17215,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
   PyList_SET_ITEM(__pyx_t_3, 1, __pyx_int_1);
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_int_2);
   __Pyx_GIVEREF(__pyx_int_2);
@@ -17245,7 +17223,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_int_1);
-  __pyx_t_1 = PyList_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 610, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_6);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
@@ -17262,10 +17240,10 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __pyx_t_4 = 0;
   __pyx_t_3 = 0;
   __pyx_t_2 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_v_rel_tiles, __pyx_n_s_right, __pyx_t_1) < 0)) __PYX_ERR(0, 610, __pyx_L1_error)
+  if (unlikely(PyObject_SetItem(__pyx_v_rel_tiles, __pyx_n_s_right, __pyx_t_1) < 0)) __PYX_ERR(0, 609, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":611
+  /* "c_tools.pyx":610
  *             rel_tiles['left'] = [[-2,-1], [-1, -1], [0, -1], [1, -1], [2, -1]]
  *             rel_tiles['right'] = [[-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1]]
  *             return rel_tiles             # <<<<<<<<<<<<<<
@@ -17277,7 +17255,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   __pyx_r = __pyx_v_rel_tiles;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":605
+  /* "c_tools.pyx":604
  *         # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
  *         # returns the appropriate tiles
  *         def get_rel_adjacent_tiles(plant):             # <<<<<<<<<<<<<<
@@ -17302,7 +17280,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacen
   return __pyx_r;
 }
 
-/* "c_tools.pyx":614
+/* "c_tools.pyx":613
  * 
  *         # returns true if the first tile is open and either second or third tile are unoccupied
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):             # <<<<<<<<<<<<<<
@@ -17342,11 +17320,11 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_7check_clearance
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_clearance_gap_for_lane_change", 1, 2, 2, 1); __PYX_ERR(0, 614, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_clearance_gap_for_lane_change", 1, 2, 2, 1); __PYX_ERR(0, 613, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_clearance_gap_for_lane_change") < 0)) __PYX_ERR(0, 614, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_clearance_gap_for_lane_change") < 0)) __PYX_ERR(0, 613, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -17359,7 +17337,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_7check_clearance
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("check_clearance_gap_for_lane_change", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 614, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("check_clearance_gap_for_lane_change", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 613, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.NoDeadlockOracle.evaluate.check_clearance_gap_for_lane_change", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -17372,7 +17350,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_7check_clearance
   return __pyx_r;
 }
 
-/* "c_tools.pyx":616
+/* "c_tools.pyx":615
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):             # <<<<<<<<<<<<<<
@@ -17412,11 +17390,11 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_abs_dis)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("relativize_displacement", 1, 2, 2, 1); __PYX_ERR(0, 616, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("relativize_displacement", 1, 2, 2, 1); __PYX_ERR(0, 615, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "relativize_displacement") < 0)) __PYX_ERR(0, 616, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "relativize_displacement") < 0)) __PYX_ERR(0, 615, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -17429,7 +17407,7 @@ static PyObject *__pyx_pw_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("relativize_displacement", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 616, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("relativize_displacement", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 615, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.NoDeadlockOracle.evaluate.check_clearance_gap_for_lane_change.relativize_displacement", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -17462,41 +17440,41 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   int __pyx_t_10;
   __Pyx_RefNannySetupContext("relativize_displacement", 0);
 
-  /* "c_tools.pyx":617
+  /* "c_tools.pyx":616
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):
  *                 rel_dis = []             # <<<<<<<<<<<<<<
  *                 offset = np.array([plant.state.x, plant.state.y])
  *                 for displacement in abs_dis:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 617, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_rel_dis = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":618
+  /* "c_tools.pyx":617
  *             def relativize_displacement(plant, abs_dis):
  *                 rel_dis = []
  *                 offset = np.array([plant.state.x, plant.state.y])             # <<<<<<<<<<<<<<
  *                 for displacement in abs_dis:
  *                     heading = convert_car_orientation(plant.state.heading) * np.pi/180
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 618, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
@@ -17517,13 +17495,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 617, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_offset = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":619
+  /* "c_tools.pyx":618
  *                 rel_dis = []
  *                 offset = np.array([plant.state.x, plant.state.y])
  *                 for displacement in abs_dis:             # <<<<<<<<<<<<<<
@@ -17534,26 +17512,26 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     __pyx_t_1 = __pyx_v_abs_dis; __Pyx_INCREF(__pyx_t_1); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_abs_dis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 619, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_abs_dis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 618, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 619, __pyx_L1_error)
+    __pyx_t_7 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 618, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_7)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 619, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 618, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 619, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 618, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 619, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_6); __Pyx_INCREF(__pyx_t_3); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 618, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 619, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 618, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -17563,7 +17541,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 619, __pyx_L1_error)
+          else __PYX_ERR(0, 618, __pyx_L1_error)
         }
         break;
       }
@@ -17572,18 +17550,18 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     __Pyx_XDECREF_SET(__pyx_v_displacement, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":620
+    /* "c_tools.pyx":619
  *                 offset = np.array([plant.state.x, plant.state.y])
  *                 for displacement in abs_dis:
  *                     heading = convert_car_orientation(plant.state.heading) * np.pi/180             # <<<<<<<<<<<<<<
  *                     arr=(offset + rotate_vector(tuple(displacement), heading))
  *                     rel_dis.append((arr[0], arr[1]))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_convert_car_orientation); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_heading); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_heading); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -17599,34 +17577,34 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 620, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_pi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_pi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_int_180); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_int_180); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_heading, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":621
+    /* "c_tools.pyx":620
  *                 for displacement in abs_dis:
  *                     heading = convert_car_orientation(plant.state.heading) * np.pi/180
  *                     arr=(offset + rotate_vector(tuple(displacement), heading))             # <<<<<<<<<<<<<<
  *                     rel_dis.append((arr[0], arr[1]))
  *                 return rel_dis
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rotate_vector); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 621, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_rotate_vector); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 620, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_v_displacement); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 621, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_Tuple(__pyx_v_displacement); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 620, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_5 = NULL;
     __pyx_t_8 = 0;
@@ -17643,7 +17621,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_v_heading};
-      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 621, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -17652,14 +17630,14 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_v_heading};
-      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 621, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 621, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 620, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -17670,29 +17648,29 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
       __Pyx_GIVEREF(__pyx_v_heading);
       PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_v_heading);
       __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 621, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 620, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Add(__pyx_v_offset, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 621, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Add(__pyx_v_offset, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 620, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_arr, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":622
+    /* "c_tools.pyx":621
  *                     heading = convert_car_orientation(plant.state.heading) * np.pi/180
  *                     arr=(offset + rotate_vector(tuple(displacement), heading))
  *                     rel_dis.append((arr[0], arr[1]))             # <<<<<<<<<<<<<<
  *                 return rel_dis
  * 
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_arr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 622, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_arr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 621, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_arr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 622, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_arr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 621, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 622, __pyx_L1_error)
+    __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 621, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2);
@@ -17700,10 +17678,10 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
     PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_4);
     __pyx_t_2 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_rel_dis, __pyx_t_9); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 622, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_rel_dis, __pyx_t_9); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 621, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "c_tools.pyx":619
+    /* "c_tools.pyx":618
  *                 rel_dis = []
  *                 offset = np.array([plant.state.x, plant.state.y])
  *                 for displacement in abs_dis:             # <<<<<<<<<<<<<<
@@ -17713,7 +17691,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":623
+  /* "c_tools.pyx":622
  *                     arr=(offset + rotate_vector(tuple(displacement), heading))
  *                     rel_dis.append((arr[0], arr[1]))
  *                 return rel_dis             # <<<<<<<<<<<<<<
@@ -17725,7 +17703,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   __pyx_r = __pyx_v_rel_dis;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":616
+  /* "c_tools.pyx":615
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):             # <<<<<<<<<<<<<<
@@ -17754,7 +17732,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearanc
   return __pyx_r;
 }
 
-/* "c_tools.pyx":614
+/* "c_tools.pyx":613
  * 
  *         # returns true if the first tile is open and either second or third tile are unoccupied
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):             # <<<<<<<<<<<<<<
@@ -17793,60 +17771,60 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
   __pyx_outer_scope = (struct __pyx_obj_7c_tools___pyx_scope_struct_3_evaluate *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "c_tools.pyx":616
+  /* "c_tools.pyx":615
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):             # <<<<<<<<<<<<<<
  *                 rel_dis = []
  *                 offset = np.array([plant.state.x, plant.state.y])
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_1relativize_displacement, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 616, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_1relativize_displacement, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__12)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 615, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_relativize_displacement = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":625
+  /* "c_tools.pyx":624
  *                 return rel_dis
  * 
  *             rel_tiles = get_rel_adjacent_tiles(plant)             # <<<<<<<<<<<<<<
  * 
  *             # convert the tiles to absolute coordinates
  */
-  if (unlikely(!__pyx_cur_scope->__pyx_v_get_rel_adjacent_tiles)) { __Pyx_RaiseClosureNameError("get_rel_adjacent_tiles"); __PYX_ERR(0, 625, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacent_tiles(__pyx_cur_scope->__pyx_v_get_rel_adjacent_tiles, __pyx_v_plant); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 625, __pyx_L1_error)
+  if (unlikely(!__pyx_cur_scope->__pyx_v_get_rel_adjacent_tiles)) { __Pyx_RaiseClosureNameError("get_rel_adjacent_tiles"); __PYX_ERR(0, 624, __pyx_L1_error) }
+  __pyx_t_1 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_4get_rel_adjacent_tiles(__pyx_cur_scope->__pyx_v_get_rel_adjacent_tiles, __pyx_v_plant); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 624, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_rel_tiles = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":628
+  /* "c_tools.pyx":627
  * 
  *             # convert the tiles to absolute coordinates
  *             if ctrl_action['steer'] == 'left-lane':             # <<<<<<<<<<<<<<
  *                 tiles = relativize_displacement(plant, rel_tiles['left'])
  *             elif ctrl_action['steer'] == 'right-lane':
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 627, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 627, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":629
+    /* "c_tools.pyx":628
  *             # convert the tiles to absolute coordinates
  *             if ctrl_action['steer'] == 'left-lane':
  *                 tiles = relativize_displacement(plant, rel_tiles['left'])             # <<<<<<<<<<<<<<
  *             elif ctrl_action['steer'] == 'right-lane':
  *                 tiles = relativize_displacement(plant, rel_tiles['right'])
  */
-    __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_rel_tiles, __pyx_n_s_left); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_rel_tiles, __pyx_n_s_left); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 628, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_relativize_displacement(__pyx_v_relativize_displacement, __pyx_v_plant, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_3 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_relativize_displacement(__pyx_v_relativize_displacement, __pyx_v_plant, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 628, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_tiles = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":628
+    /* "c_tools.pyx":627
  * 
  *             # convert the tiles to absolute coordinates
  *             if ctrl_action['steer'] == 'left-lane':             # <<<<<<<<<<<<<<
@@ -17856,35 +17834,35 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     goto __pyx_L3;
   }
 
-  /* "c_tools.pyx":630
+  /* "c_tools.pyx":629
  *             if ctrl_action['steer'] == 'left-lane':
  *                 tiles = relativize_displacement(plant, rel_tiles['left'])
  *             elif ctrl_action['steer'] == 'right-lane':             # <<<<<<<<<<<<<<
  *                 tiles = relativize_displacement(plant, rel_tiles['right'])
  *             else:
  */
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 630, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 629, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 630, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 629, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":631
+    /* "c_tools.pyx":630
  *                 tiles = relativize_displacement(plant, rel_tiles['left'])
  *             elif ctrl_action['steer'] == 'right-lane':
  *                 tiles = relativize_displacement(plant, rel_tiles['right'])             # <<<<<<<<<<<<<<
  *             else:
  *                 print("ERROR, not a lane change action")
  */
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_rel_tiles, __pyx_n_s_right); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_rel_tiles, __pyx_n_s_right); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 630, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_relativize_displacement(__pyx_v_relativize_displacement, __pyx_v_plant, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_1 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_35check_clearance_gap_for_lane_change_relativize_displacement(__pyx_v_relativize_displacement, __pyx_v_plant, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 630, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_tiles = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":630
+    /* "c_tools.pyx":629
  *             if ctrl_action['steer'] == 'left-lane':
  *                 tiles = relativize_displacement(plant, rel_tiles['left'])
  *             elif ctrl_action['steer'] == 'right-lane':             # <<<<<<<<<<<<<<
@@ -17894,7 +17872,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     goto __pyx_L3;
   }
 
-  /* "c_tools.pyx":633
+  /* "c_tools.pyx":632
  *                 tiles = relativize_displacement(plant, rel_tiles['right'])
  *             else:
  *                 print("ERROR, not a lane change action")             # <<<<<<<<<<<<<<
@@ -17902,11 +17880,11 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
  *             # loop through all tiles and count how many gaps
  */
   /*else*/ {
-    if (__Pyx_PrintOne(0, __pyx_kp_s_ERROR_not_a_lane_change_action) < 0) __PYX_ERR(0, 633, __pyx_L1_error)
+    if (__Pyx_PrintOne(0, __pyx_kp_s_ERROR_not_a_lane_change_action) < 0) __PYX_ERR(0, 632, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "c_tools.pyx":636
+  /* "c_tools.pyx":635
  * 
  *             # loop through all tiles and count how many gaps
  *             cnt = 0             # <<<<<<<<<<<<<<
@@ -17916,38 +17894,38 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_cnt = __pyx_int_0;
 
-  /* "c_tools.pyx":637
+  /* "c_tools.pyx":636
  *             # loop through all tiles and count how many gaps
  *             cnt = 0
  *             for tile in tiles:             # <<<<<<<<<<<<<<
  *                 if tile not in plant.supervisor.game.occupancy_dict:
  *                     cnt = cnt + 1
  */
-  if (unlikely(!__pyx_v_tiles)) { __Pyx_RaiseUnboundLocalError("tiles"); __PYX_ERR(0, 637, __pyx_L1_error) }
+  if (unlikely(!__pyx_v_tiles)) { __Pyx_RaiseUnboundLocalError("tiles"); __PYX_ERR(0, 636, __pyx_L1_error) }
   if (likely(PyList_CheckExact(__pyx_v_tiles)) || PyTuple_CheckExact(__pyx_v_tiles)) {
     __pyx_t_1 = __pyx_v_tiles; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
   } else {
-    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_tiles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 637, __pyx_L1_error)
+    __pyx_t_4 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_tiles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 636, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 637, __pyx_L1_error)
+    __pyx_t_5 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 636, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_5)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 637, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 636, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 636, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 637, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 636, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 636, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -17957,7 +17935,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 637, __pyx_L1_error)
+          else __PYX_ERR(0, 636, __pyx_L1_error)
         }
         break;
       }
@@ -17966,39 +17944,39 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     __Pyx_XDECREF_SET(__pyx_v_tile, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":638
+    /* "c_tools.pyx":637
  *             cnt = 0
  *             for tile in tiles:
  *                 if tile not in plant.supervisor.game.occupancy_dict:             # <<<<<<<<<<<<<<
  *                     cnt = cnt + 1
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 638, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_tile, __pyx_t_3, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 638, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_v_tile, __pyx_t_3, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 637, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_7 = (__pyx_t_2 != 0);
     if (__pyx_t_7) {
 
-      /* "c_tools.pyx":639
+      /* "c_tools.pyx":638
  *             for tile in tiles:
  *                 if tile not in plant.supervisor.game.occupancy_dict:
  *                     cnt = cnt + 1             # <<<<<<<<<<<<<<
  * 
  *             # check if agent subgoal is a left-turn tile, then look for clearance gaps
  */
-      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 639, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 638, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF_SET(__pyx_v_cnt, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":638
+      /* "c_tools.pyx":637
  *             cnt = 0
  *             for tile in tiles:
  *                 if tile not in plant.supervisor.game.occupancy_dict:             # <<<<<<<<<<<<<<
@@ -18007,7 +17985,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
  */
     }
 
-    /* "c_tools.pyx":637
+    /* "c_tools.pyx":636
  *             # loop through all tiles and count how many gaps
  *             cnt = 0
  *             for tile in tiles:             # <<<<<<<<<<<<<<
@@ -18017,55 +17995,55 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":643
+  /* "c_tools.pyx":642
  *             # check if agent subgoal is a left-turn tile, then look for clearance gaps
  *             # in lane where agent will left turn into
  *             current_subgoal = plant.supervisor.subgoals[0]             # <<<<<<<<<<<<<<
  *             if current_subgoal in plant.supervisor.game.map.all_left_turns:
  *                 # if at least one gap is available, then add to count by one
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 643, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 642, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 643, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 642, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 643, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 642, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_current_subgoal = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":644
+  /* "c_tools.pyx":643
  *             # in lane where agent will left turn into
  *             current_subgoal = plant.supervisor.subgoals[0]
  *             if current_subgoal in plant.supervisor.game.map.all_left_turns:             # <<<<<<<<<<<<<<
  *                 # if at least one gap is available, then add to count by one
  *                 # from state where you would start left-turn...
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_all_left_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_all_left_turns); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 644, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 643, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = (__pyx_t_7 != 0);
   if (__pyx_t_2) {
 
-    /* "c_tools.pyx":647
+    /* "c_tools.pyx":646
  *                 # if at least one gap is available, then add to count by one
  *                 # from state where you would start left-turn...
  *                 st_f = plant.query_car_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *                 lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant, state=None)
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_car_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_car_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 646, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -18079,32 +18057,32 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     }
     __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_ctrl_action);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 646, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 646, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_st_f = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":648
+    /* "c_tools.pyx":647
  *                 # from state where you would start left-turn...
  *                 st_f = plant.query_car_occupancy(ctrl_action)[-1]
  *                 lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant, state=None)             # <<<<<<<<<<<<<<
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                 clearance_gaps = gap_total-agent_ahead_cnt
  */
-    if (unlikely(!__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent)) { __Pyx_RaiseClosureNameError("find_left_turn_lead_agent"); __PYX_ERR(0, 648, __pyx_L1_error) }
-    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent)) { __Pyx_RaiseClosureNameError("find_left_turn_lead_agent"); __PYX_ERR(0, 647, __pyx_L1_error) }
+    __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_plant);
     __Pyx_GIVEREF(__pyx_v_plant);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_plant);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 648, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, Py_None) < 0) __PYX_ERR(0, 648, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 648, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, Py_None) < 0) __PYX_ERR(0, 647, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -18114,7 +18092,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
       if (unlikely(size != 3)) {
         if (size > 3) __Pyx_RaiseTooManyValuesError(3);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 648, __pyx_L1_error)
+        __PYX_ERR(0, 647, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -18130,17 +18108,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
       __Pyx_INCREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 648, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 647, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 648, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 647, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 648, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 647, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -18150,7 +18128,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
       __Pyx_GOTREF(__pyx_t_1);
       index = 2; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 3) < 0) __PYX_ERR(0, 648, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 3) < 0) __PYX_ERR(0, 647, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L9_unpacking_done;
@@ -18158,7 +18136,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 648, __pyx_L1_error)
+      __PYX_ERR(0, 647, __pyx_L1_error)
       __pyx_L9_unpacking_done:;
     }
     __pyx_v_lead_agent_left = __pyx_t_3;
@@ -18168,43 +18146,43 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     __pyx_v_ref_state = __pyx_t_8;
     __pyx_t_8 = 0;
 
-    /* "c_tools.pyx":649
+    /* "c_tools.pyx":648
  *                 st_f = plant.query_car_occupancy(ctrl_action)[-1]
  *                 lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant, state=None)
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))             # <<<<<<<<<<<<<<
  *                 clearance_gaps = gap_total-agent_ahead_cnt
  *                 if clearance_gaps >= 1:
  */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_y); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_y); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_1 = PyNumber_Subtract(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Subtract(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyNumber_Absolute(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyNumber_Absolute(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyNumber_Subtract(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 649, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 649, __pyx_L1_error)
+    __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_1, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 648, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 648, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_2) {
       __Pyx_INCREF(__pyx_t_6);
@@ -18221,43 +18199,43 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
     __pyx_v_gap_total = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "c_tools.pyx":650
+    /* "c_tools.pyx":649
  *                 lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant, state=None)
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                 clearance_gaps = gap_total-agent_ahead_cnt             # <<<<<<<<<<<<<<
  *                 if clearance_gaps >= 1:
  *                     cnt = cnt+1
  */
-    __pyx_t_6 = PyNumber_Subtract(__pyx_v_gap_total, __pyx_v_agent_ahead_cnt); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 650, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Subtract(__pyx_v_gap_total, __pyx_v_agent_ahead_cnt); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 649, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_v_clearance_gaps = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "c_tools.pyx":651
+    /* "c_tools.pyx":650
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                 clearance_gaps = gap_total-agent_ahead_cnt
  *                 if clearance_gaps >= 1:             # <<<<<<<<<<<<<<
  *                     cnt = cnt+1
  * 
  */
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 651, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 651, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 650, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 650, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     if (__pyx_t_2) {
 
-      /* "c_tools.pyx":652
+      /* "c_tools.pyx":651
  *                 clearance_gaps = gap_total-agent_ahead_cnt
  *                 if clearance_gaps >= 1:
  *                     cnt = cnt+1             # <<<<<<<<<<<<<<
  * 
  *             # need clearance of two
  */
-      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 652, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_AddObjC(__pyx_v_cnt, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 651, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF_SET(__pyx_v_cnt, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "c_tools.pyx":651
+      /* "c_tools.pyx":650
  *                 gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                 clearance_gaps = gap_total-agent_ahead_cnt
  *                 if clearance_gaps >= 1:             # <<<<<<<<<<<<<<
@@ -18266,7 +18244,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
  */
     }
 
-    /* "c_tools.pyx":644
+    /* "c_tools.pyx":643
  *             # in lane where agent will left turn into
  *             current_subgoal = plant.supervisor.subgoals[0]
  *             if current_subgoal in plant.supervisor.game.map.all_left_turns:             # <<<<<<<<<<<<<<
@@ -18275,7 +18253,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
  */
   }
 
-  /* "c_tools.pyx":655
+  /* "c_tools.pyx":654
  * 
  *             # need clearance of two
  *             return cnt>=2, cnt             # <<<<<<<<<<<<<<
@@ -18283,8 +18261,8 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
  *         # printing to debug what's happening
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = PyObject_RichCompare(__pyx_v_cnt, __pyx_int_2, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 655, __pyx_L1_error)
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 655, __pyx_L1_error)
+  __pyx_t_6 = PyObject_RichCompare(__pyx_v_cnt, __pyx_int_2, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 654, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 654, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
@@ -18296,7 +18274,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":614
+  /* "c_tools.pyx":613
  * 
  *         # returns true if the first tile is open and either second or third tile are unoccupied
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):             # <<<<<<<<<<<<<<
@@ -18331,7 +18309,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance
   return __pyx_r;
 }
 
-/* "c_tools.pyx":554
+/* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
@@ -18396,7 +18374,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_7c_tools___pyx_scope_struct_3_evaluate *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 554, __pyx_L1_error)
+    __PYX_ERR(0, 553, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
@@ -18407,75 +18385,75 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_game);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_game);
 
-  /* "c_tools.pyx":564
+  /* "c_tools.pyx":563
  * 
  *         # count agents in the intersection ahead
  *         def count_agents_ahead(gap):             # <<<<<<<<<<<<<<
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_1count_agents_ahead, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_2, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 564, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_1count_agents_ahead, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_2, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 563, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_count_agents_ahead = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":578
+  /* "c_tools.pyx":577
  *         # find the lead agent in the lane agent will turn left into and number of
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):             # <<<<<<<<<<<<<<
  *             if state == None:
  *                 state = plant.state
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_3find_left_turn_lead_agent, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_3find_left_turn_lead_agent, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 577, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_1, __pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_find_left_turn_lead_agent = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":605
+  /* "c_tools.pyx":604
  *         # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
  *         # returns the appropriate tiles
  *         def get_rel_adjacent_tiles(plant):             # <<<<<<<<<<<<<<
  *             rel_tiles = od()
  *             # TODO: generalize this so field-of-view depends on agent bubble!!!!
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_5get_rel_adjacent_tiles, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_4, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 605, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_5get_rel_adjacent_tiles, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_4, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__19)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 604, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_get_rel_adjacent_tiles = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":614
+  /* "c_tools.pyx":613
  * 
  *         # returns true if the first tile is open and either second or third tile are unoccupied
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):             # <<<<<<<<<<<<<<
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_7check_clearance_gap_for_lane_change, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_5, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 614, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_8evaluate_7check_clearance_gap_for_lane_change, 0, __pyx_n_s_NoDeadlockOracle_evaluate_locals_5, ((PyObject*)__pyx_cur_scope), __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__21)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 613, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_check_clearance_gap_for_lane_change = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":662
+  /* "c_tools.pyx":661
  * 
  *         # collect all relevant state info and compute intersection gap
  *         current_state = plant.state.x, plant.state.y             # <<<<<<<<<<<<<<
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 661, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 661, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 661, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -18486,7 +18464,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   __pyx_v_current_state = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":663
+  /* "c_tools.pyx":662
  *         # collect all relevant state info and compute intersection gap
  *         current_state = plant.state.x, plant.state.y
  *         x_curr, y_curr = current_state             # <<<<<<<<<<<<<<
@@ -18499,7 +18477,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 663, __pyx_L1_error)
+      __PYX_ERR(0, 662, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
@@ -18507,9 +18485,9 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __Pyx_INCREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 663, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
   }
@@ -18518,14 +18496,14 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   __pyx_v_y_curr = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":664
+  /* "c_tools.pyx":663
  *         current_state = plant.state.x, plant.state.y
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)             # <<<<<<<<<<<<<<
  *         x_next, y_next = next_state.x, next_state.y
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 664, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 663, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -18539,38 +18517,38 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 663, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_next_state = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":665
+  /* "c_tools.pyx":664
  *         x_curr, y_curr = current_state
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y             # <<<<<<<<<<<<<<
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 665, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 665, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 664, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_x_next = __pyx_t_3;
   __pyx_t_3 = 0;
   __pyx_v_y_next = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":666
+  /* "c_tools.pyx":665
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]             # <<<<<<<<<<<<<<
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y
  *         current_heading = plant.state.heading
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 666, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_backup_plan_ctrl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 666, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_get_backup_plan_ctrl); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -18584,84 +18562,84 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   }
   __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 666, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 666, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 666, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 666, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 666, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 665, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 666, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 665, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_bp_state = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":667
+  /* "c_tools.pyx":666
  *         x_next, y_next = next_state.x, next_state.y
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y             # <<<<<<<<<<<<<<
  *         current_heading = plant.state.heading
  *         ctrl_action_str = ctrl_action['steer'] + ' ' + str(ctrl_action['acceleration'])
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 667, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 667, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bp_state, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 666, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_x_next_bp = __pyx_t_3;
   __pyx_t_3 = 0;
   __pyx_v_y_next_bp = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":668
+  /* "c_tools.pyx":667
  *         bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y
  *         current_heading = plant.state.heading             # <<<<<<<<<<<<<<
  *         ctrl_action_str = ctrl_action['steer'] + ' ' + str(ctrl_action['acceleration'])
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 668, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 668, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 667, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_current_heading = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":669
+  /* "c_tools.pyx":668
  *         x_next_bp, y_next_bp = bp_state.x, bp_state.y
  *         current_heading = plant.state.heading
  *         ctrl_action_str = ctrl_action['steer'] + ' ' + str(ctrl_action['acceleration'])             # <<<<<<<<<<<<<<
  * 
  *         # When agent is NOT CROSSING INTO INTERSECTION
  */
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 669, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_kp_s__22); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 669, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_kp_s__22); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_acceleration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 669, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_acceleration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 669, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 668, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_ctrl_action_str = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":672
+  /* "c_tools.pyx":671
  * 
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         try:             # <<<<<<<<<<<<<<
@@ -18677,25 +18655,25 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __Pyx_XGOTREF(__pyx_t_7);
     /*try:*/ {
 
-      /* "c_tools.pyx":673
+      /* "c_tools.pyx":672
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         try:
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))             # <<<<<<<<<<<<<<
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 673, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 673, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L3_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_x_curr);
       __Pyx_GIVEREF(__pyx_v_x_curr);
@@ -18716,31 +18694,31 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 673, __pyx_L3_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 672, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_v_currently_in_intersection = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":674
+      /* "c_tools.pyx":673
  *         try:
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))             # <<<<<<<<<<<<<<
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 674, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 674, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L3_error)
+      __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_v_x_next);
       __Pyx_GIVEREF(__pyx_v_x_next);
@@ -18761,31 +18739,31 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 674, __pyx_L3_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 673, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_will_be_in_intersection = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":675
+      /* "c_tools.pyx":674
  *             currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_curr,y_curr))
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))             # <<<<<<<<<<<<<<
  *         except:
  *             return True
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 675, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 675, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 675, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 675, __pyx_L3_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 675, __pyx_L3_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_x_next_bp);
       __Pyx_GIVEREF(__pyx_v_x_next_bp);
@@ -18806,13 +18784,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L3_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 674, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_v_bp_will_be_in_intersection = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":672
+      /* "c_tools.pyx":671
  * 
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         try:             # <<<<<<<<<<<<<<
@@ -18830,7 +18808,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":676
+    /* "c_tools.pyx":675
  *             will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:             # <<<<<<<<<<<<<<
@@ -18839,12 +18817,12 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     /*except:*/ {
       __Pyx_AddTraceback("c_tools.NoDeadlockOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 676, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 675, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GOTREF(__pyx_t_2);
 
-      /* "c_tools.pyx":677
+      /* "c_tools.pyx":676
  *             bp_will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next_bp,y_next_bp))
  *         except:
  *             return True             # <<<<<<<<<<<<<<
@@ -18861,7 +18839,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     }
     __pyx_L5_except_error:;
 
-    /* "c_tools.pyx":672
+    /* "c_tools.pyx":671
  * 
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         try:             # <<<<<<<<<<<<<<
@@ -18882,57 +18860,57 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __pyx_L8_try_end:;
   }
 
-  /* "c_tools.pyx":679
+  /* "c_tools.pyx":678
  *             return True
  * 
  *         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:             # <<<<<<<<<<<<<<
  *             #====================================================================================================#
  *             # CASE E: when agents want to do lane-change AND not go through an intersection
  */
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 679, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 678, __pyx_L1_error)
   if (!__pyx_t_9) {
   } else {
     __pyx_t_8 = __pyx_t_9;
     goto __pyx_L12_bool_binop_done;
   }
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 679, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 678, __pyx_L1_error)
   __pyx_t_10 = ((!__pyx_t_9) != 0);
   if (!__pyx_t_10) {
   } else {
     __pyx_t_8 = __pyx_t_10;
     goto __pyx_L12_bool_binop_done;
   }
-  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_bp_will_be_in_intersection); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 679, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_bp_will_be_in_intersection); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 678, __pyx_L1_error)
   __pyx_t_9 = ((!__pyx_t_10) != 0);
   __pyx_t_8 = __pyx_t_9;
   __pyx_L12_bool_binop_done:;
   if (__pyx_t_8) {
 
-    /* "c_tools.pyx":684
+    /* "c_tools.pyx":683
  *             # should check whether there are 2 gaps of clearance in loop agent wants to change lanes into
  *             #====================================================================================================#
  *             if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):             # <<<<<<<<<<<<<<
  *                 gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)
  *                 if save_debug:
  */
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 684, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 684, __pyx_L1_error)
+    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (!__pyx_t_9) {
     } else {
       __pyx_t_8 = __pyx_t_9;
       goto __pyx_L16_bool_binop_done;
     }
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 684, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 684, __pyx_L1_error)
+    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = __pyx_t_9;
     __pyx_L16_bool_binop_done:;
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":685
+      /* "c_tools.pyx":684
  *             #====================================================================================================#
  *             if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):
  *                 gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)             # <<<<<<<<<<<<<<
@@ -18941,7 +18919,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       __pyx_t_2 = __pyx_cur_scope->__pyx_v_plant;
       __Pyx_INCREF(__pyx_t_2);
-      __pyx_t_4 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance_gap_for_lane_change(__pyx_v_check_clearance_gap_for_lane_change, __pyx_t_2, __pyx_v_ctrl_action); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 685, __pyx_L1_error)
+      __pyx_t_4 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_6check_clearance_gap_for_lane_change(__pyx_v_check_clearance_gap_for_lane_change, __pyx_t_2, __pyx_v_ctrl_action); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 684, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -18950,7 +18928,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         if (unlikely(size != 2)) {
           if (size > 2) __Pyx_RaiseTooManyValuesError(2);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 685, __pyx_L1_error)
+          __PYX_ERR(0, 684, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -18963,15 +18941,15 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __Pyx_INCREF(__pyx_t_2);
         __Pyx_INCREF(__pyx_t_3);
         #else
-        __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 685, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 684, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 685, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 684, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 685, __pyx_L1_error)
+        __pyx_t_1 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 684, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -18979,7 +18957,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __Pyx_GOTREF(__pyx_t_2);
         index = 1; __pyx_t_3 = __pyx_t_11(__pyx_t_1); if (unlikely(!__pyx_t_3)) goto __pyx_L18_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_3);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_1), 2) < 0) __PYX_ERR(0, 685, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_1), 2) < 0) __PYX_ERR(0, 684, __pyx_L1_error)
         __pyx_t_11 = NULL;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         goto __pyx_L19_unpacking_done;
@@ -18987,7 +18965,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_t_11 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 685, __pyx_L1_error)
+        __PYX_ERR(0, 684, __pyx_L1_error)
         __pyx_L19_unpacking_done:;
       }
       __pyx_v_gap_is_enough = __pyx_t_2;
@@ -18995,24 +18973,24 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_v_gap_cnt = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":686
+      /* "c_tools.pyx":685
  *             if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):
  *                 gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)
  *                 if save_debug:             # <<<<<<<<<<<<<<
  *                     plant.no_deadlock_sv[ctrl_action] = ['E', gap_cnt, gap_is_enough]
  *                 return gap_is_enough
  */
-      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 686, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 685, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":687
+        /* "c_tools.pyx":686
  *                 gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)
  *                 if save_debug:
  *                     plant.no_deadlock_sv[ctrl_action] = ['E', gap_cnt, gap_is_enough]             # <<<<<<<<<<<<<<
  *                 return gap_is_enough
  * 
  */
-        __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 687, __pyx_L1_error)
+        __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 686, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_n_s_E);
         __Pyx_GIVEREF(__pyx_n_s_E);
@@ -19023,13 +19001,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __Pyx_INCREF(__pyx_v_gap_is_enough);
         __Pyx_GIVEREF(__pyx_v_gap_is_enough);
         PyList_SET_ITEM(__pyx_t_4, 2, __pyx_v_gap_is_enough);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 687, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 686, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_4) < 0)) __PYX_ERR(0, 687, __pyx_L1_error)
+        if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_4) < 0)) __PYX_ERR(0, 686, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "c_tools.pyx":686
+        /* "c_tools.pyx":685
  *             if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):
  *                 gap_is_enough, gap_cnt = check_clearance_gap_for_lane_change(plant, ctrl_action)
  *                 if save_debug:             # <<<<<<<<<<<<<<
@@ -19038,7 +19016,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       }
 
-      /* "c_tools.pyx":688
+      /* "c_tools.pyx":687
  *                 if save_debug:
  *                     plant.no_deadlock_sv[ctrl_action] = ['E', gap_cnt, gap_is_enough]
  *                 return gap_is_enough             # <<<<<<<<<<<<<<
@@ -19050,7 +19028,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_r = __pyx_v_gap_is_enough;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":684
+      /* "c_tools.pyx":683
  *             # should check whether there are 2 gaps of clearance in loop agent wants to change lanes into
  *             #====================================================================================================#
  *             if ((ctrl_action['steer'] == 'left-lane') or (ctrl_action['steer'] == 'right-lane')):             # <<<<<<<<<<<<<<
@@ -19059,7 +19037,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     }
 
-    /* "c_tools.pyx":695
+    /* "c_tools.pyx":694
  *             #====================================================================================================#
  *             else:
  *                 if save_debug:             # <<<<<<<<<<<<<<
@@ -19067,17 +19045,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                 return True
  */
     /*else*/ {
-      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 695, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 694, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":696
+        /* "c_tools.pyx":695
  *             else:
  *                 if save_debug:
  *                     plant.no_deadlock_sv[ctrl_action] = ['F', None, None]             # <<<<<<<<<<<<<<
  *                 return True
  * 
  */
-        __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_4 = PyList_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 695, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_n_s_F);
         __Pyx_GIVEREF(__pyx_n_s_F);
@@ -19088,13 +19066,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __Pyx_INCREF(Py_None);
         __Pyx_GIVEREF(Py_None);
         PyList_SET_ITEM(__pyx_t_4, 2, Py_None);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 695, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_4) < 0)) __PYX_ERR(0, 696, __pyx_L1_error)
+        if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_4) < 0)) __PYX_ERR(0, 695, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-        /* "c_tools.pyx":695
+        /* "c_tools.pyx":694
  *             #====================================================================================================#
  *             else:
  *                 if save_debug:             # <<<<<<<<<<<<<<
@@ -19103,7 +19081,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       }
 
-      /* "c_tools.pyx":697
+      /* "c_tools.pyx":696
  *                 if save_debug:
  *                     plant.no_deadlock_sv[ctrl_action] = ['F', None, None]
  *                 return True             # <<<<<<<<<<<<<<
@@ -19116,7 +19094,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       goto __pyx_L0;
     }
 
-    /* "c_tools.pyx":679
+    /* "c_tools.pyx":678
  *             return True
  * 
  *         if currently_in_intersection or not will_be_in_intersection or not bp_will_be_in_intersection:             # <<<<<<<<<<<<<<
@@ -19125,7 +19103,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
   }
 
-  /* "c_tools.pyx":701
+  /* "c_tools.pyx":700
  *         # When the action will take the agent into the intersection
  *         else:
  *             if (ctrl_action['steer'] == 'right-lane') or (ctrl_action['steer'] == 'left-lane'):             # <<<<<<<<<<<<<<
@@ -19133,24 +19111,24 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  * 
  */
   /*else*/ {
-    __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 701, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 701, __pyx_L1_error)
+    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (!__pyx_t_9) {
     } else {
       __pyx_t_8 = __pyx_t_9;
       goto __pyx_L23_bool_binop_done;
     }
-    __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 701, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 701, __pyx_L1_error)
+    __pyx_t_9 = (__Pyx_PyString_Equals(__pyx_t_4, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_8 = __pyx_t_9;
     __pyx_L23_bool_binop_done:;
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":702
+      /* "c_tools.pyx":701
  *         else:
  *             if (ctrl_action['steer'] == 'right-lane') or (ctrl_action['steer'] == 'left-lane'):
  *                 return True             # <<<<<<<<<<<<<<
@@ -19162,7 +19140,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":701
+      /* "c_tools.pyx":700
  *         # When the action will take the agent into the intersection
  *         else:
  *             if (ctrl_action['steer'] == 'right-lane') or (ctrl_action['steer'] == 'left-lane'):             # <<<<<<<<<<<<<<
@@ -19171,19 +19149,19 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     }
 
-    /* "c_tools.pyx":704
+    /* "c_tools.pyx":703
  *                 return True
  * 
  *             next_intersection = game.map.tile_to_intersection_map[(x_next, y_next)]             # <<<<<<<<<<<<<<
  * 
  *             # get traffic light information
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 704, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 703, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 704, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_to_intersection_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 703, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 704, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 703, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_x_next);
     __Pyx_GIVEREF(__pyx_v_x_next);
@@ -19191,61 +19169,61 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __Pyx_INCREF(__pyx_v_y_next);
     __Pyx_GIVEREF(__pyx_v_y_next);
     PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_y_next);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 704, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 703, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_next_intersection = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":707
+    /* "c_tools.pyx":706
  * 
  *             # get traffic light information
  *             current_subgoal = plant.supervisor.subgoals[0]             # <<<<<<<<<<<<<<
  *             #print(current_subgoal)
  *             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 707, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 706, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 707, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 706, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 707, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 706, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_current_subgoal = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":709
+    /* "c_tools.pyx":708
  *             current_subgoal = plant.supervisor.subgoals[0]
  *             #print(current_subgoal)
  *             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]             # <<<<<<<<<<<<<<
  *             light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 708, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_intersection_to_traffic_light_ma); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 709, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_intersection_to_traffic_light_ma); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 708, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_next_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_v_next_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 708, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_traffic_light = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":710
+    /* "c_tools.pyx":709
  *             #print(current_subgoal)
  *             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]
  *             light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)             # <<<<<<<<<<<<<<
  * 
  *             # TODO: need to generalize to more types of intersections
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 710, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_traffic_light, __pyx_n_s_check_directed_light_in_N_turns); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 710, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 710, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -19263,7 +19241,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_1, __pyx_int_0};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 710, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -19272,14 +19250,14 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_t_1, __pyx_int_0};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 710, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else
     #endif
     {
-      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 710, __pyx_L1_error)
+      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       if (__pyx_t_3) {
         __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -19290,7 +19268,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __Pyx_GIVEREF(__pyx_int_0);
       PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_12, __pyx_int_0);
       __pyx_t_1 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 710, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
@@ -19298,35 +19276,35 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __pyx_v_light_color = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":714
+    /* "c_tools.pyx":713
  *             # TODO: need to generalize to more types of intersections
  *             # specific left turn check, need to generalize
  *             left_turn_chk = plant.supervisor.game.map.tile_is_in_intersection((current_subgoal[0][0], current_subgoal[0][1]))             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_game); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_map); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 714, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
@@ -19347,50 +19325,50 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_13, __pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 714, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __pyx_v_left_turn_chk = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":717
+    /* "c_tools.pyx":716
  * 
  * 
  *             if left_turn_chk:             # <<<<<<<<<<<<<<
  *                 #====================================================================================================#
  *                 # CASE A: when agents wants to do left turn
  */
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_left_turn_chk); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 717, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_left_turn_chk); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 716, __pyx_L1_error)
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":721
+      /* "c_tools.pyx":720
  *                 # CASE A: when agents wants to do left turn
  *                 #====================================================================================================#
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['A', 'red']
  */
-      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 721, __pyx_L1_error)
+      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 720, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":722
+        /* "c_tools.pyx":721
  *                 #====================================================================================================#
  *                 if light_color == 'red':
  *                     if save_debug:             # <<<<<<<<<<<<<<
  *                         plant.no_deadlock_sv[ctrl_action] = ['A', 'red']
  *                     return True
  */
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 722, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 721, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":723
+          /* "c_tools.pyx":722
  *                 if light_color == 'red':
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['A', 'red']             # <<<<<<<<<<<<<<
  *                     return True
  *                 else:
  */
-          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 723, __pyx_L1_error)
+          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 722, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_INCREF(__pyx_n_s_A);
           __Pyx_GIVEREF(__pyx_n_s_A);
@@ -19398,13 +19376,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_INCREF(__pyx_n_s_red);
           __Pyx_GIVEREF(__pyx_n_s_red);
           PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_red);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 723, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 722, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 723, __pyx_L1_error)
+          if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 722, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":722
+          /* "c_tools.pyx":721
  *                 #====================================================================================================#
  *                 if light_color == 'red':
  *                     if save_debug:             # <<<<<<<<<<<<<<
@@ -19413,7 +19391,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":724
+        /* "c_tools.pyx":723
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['A', 'red']
  *                     return True             # <<<<<<<<<<<<<<
@@ -19425,7 +19403,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":721
+        /* "c_tools.pyx":720
  *                 # CASE A: when agents wants to do left turn
  *                 #====================================================================================================#
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
@@ -19434,7 +19412,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       }
 
-      /* "c_tools.pyx":728
+      /* "c_tools.pyx":727
  *                     # need to check
  *                     # find lead agent in road that agent will left-turn into
  *                     lead_agent_left, agent_ahead_cnt, ref_state = find_left_turn_lead_agent(plant)             # <<<<<<<<<<<<<<
@@ -19442,7 +19420,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                     # compute the clearance gap
  */
       /*else*/ {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent, __pyx_cur_scope->__pyx_v_plant); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 728, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_cur_scope->__pyx_v_find_left_turn_lead_agent, __pyx_cur_scope->__pyx_v_plant); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 727, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
           PyObject* sequence = __pyx_t_2;
@@ -19450,7 +19428,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           if (unlikely(size != 3)) {
             if (size > 3) __Pyx_RaiseTooManyValuesError(3);
             else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-            __PYX_ERR(0, 728, __pyx_L1_error)
+            __PYX_ERR(0, 727, __pyx_L1_error)
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
           if (likely(PyTuple_CheckExact(sequence))) {
@@ -19466,17 +19444,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(__pyx_t_3);
           #else
-          __pyx_t_13 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 728, __pyx_L1_error)
+          __pyx_t_13 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 727, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 728, __pyx_L1_error)
+          __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 727, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_3 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 728, __pyx_L1_error)
+          __pyx_t_3 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 727, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           #endif
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         } else {
           Py_ssize_t index = -1;
-          __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 728, __pyx_L1_error)
+          __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 727, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext;
@@ -19486,7 +19464,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_GOTREF(__pyx_t_4);
           index = 2; __pyx_t_3 = __pyx_t_11(__pyx_t_1); if (unlikely(!__pyx_t_3)) goto __pyx_L28_unpacking_failed;
           __Pyx_GOTREF(__pyx_t_3);
-          if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_1), 3) < 0) __PYX_ERR(0, 728, __pyx_L1_error)
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_1), 3) < 0) __PYX_ERR(0, 727, __pyx_L1_error)
           __pyx_t_11 = NULL;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           goto __pyx_L29_unpacking_done;
@@ -19494,7 +19472,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __pyx_t_11 = NULL;
           if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-          __PYX_ERR(0, 728, __pyx_L1_error)
+          __PYX_ERR(0, 727, __pyx_L1_error)
           __pyx_L29_unpacking_done:;
         }
         __pyx_v_lead_agent_left = __pyx_t_13;
@@ -19504,53 +19482,53 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_v_ref_state = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":731
+        /* "c_tools.pyx":730
  * 
  *                     # compute the clearance gap
  *                     if lead_agent_left:             # <<<<<<<<<<<<<<
  *                         # compute the distance between agents
  *                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  */
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent_left); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 731, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent_left); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 730, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":733
+          /* "c_tools.pyx":732
  *                     if lead_agent_left:
  *                         # compute the distance between agents
  *                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))             # <<<<<<<<<<<<<<
  *                         clearance_gaps = gap_total-agent_ahead_cnt
  *                         if clearance_gaps > 0:
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyNumber_Absolute(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyNumber_Absolute(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_left, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ref_state, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_13 = PyNumber_Subtract(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_13 = PyNumber_Subtract(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_13); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_13); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 733, __pyx_L1_error)
-          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 733, __pyx_L1_error)
+          __pyx_t_3 = PyObject_RichCompare(__pyx_t_2, __pyx_t_4, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 732, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           if (__pyx_t_8) {
             __Pyx_INCREF(__pyx_t_2);
@@ -19567,48 +19545,48 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __pyx_v_gap_total = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":734
+          /* "c_tools.pyx":733
  *                         # compute the distance between agents
  *                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                         clearance_gaps = gap_total-agent_ahead_cnt             # <<<<<<<<<<<<<<
  *                         if clearance_gaps > 0:
  *                             if save_debug:
  */
-          __pyx_t_2 = PyNumber_Subtract(__pyx_v_gap_total, __pyx_v_agent_ahead_cnt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 734, __pyx_L1_error)
+          __pyx_t_2 = PyNumber_Subtract(__pyx_v_gap_total, __pyx_v_agent_ahead_cnt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 733, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __pyx_v_clearance_gaps = __pyx_t_2;
           __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":735
+          /* "c_tools.pyx":734
  *                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                         clearance_gaps = gap_total-agent_ahead_cnt
  *                         if clearance_gaps > 0:             # <<<<<<<<<<<<<<
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, True]
  */
-          __pyx_t_2 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 735, __pyx_L1_error)
-          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 735, __pyx_L1_error)
+          __pyx_t_2 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 734, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 734, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           if (__pyx_t_8) {
 
-            /* "c_tools.pyx":736
+            /* "c_tools.pyx":735
  *                         clearance_gaps = gap_total-agent_ahead_cnt
  *                         if clearance_gaps > 0:
  *                             if save_debug:             # <<<<<<<<<<<<<<
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, True]
  *                             return True
  */
-            __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 736, __pyx_L1_error)
+            __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 735, __pyx_L1_error)
             if (__pyx_t_8) {
 
-              /* "c_tools.pyx":737
+              /* "c_tools.pyx":736
  *                         if clearance_gaps > 0:
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, True]             # <<<<<<<<<<<<<<
  *                             return True
  *                         else:
  */
-              __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 737, __pyx_L1_error)
+              __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 736, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_INCREF(__pyx_n_s_A);
               __Pyx_GIVEREF(__pyx_n_s_A);
@@ -19619,13 +19597,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
               __Pyx_INCREF(Py_True);
               __Pyx_GIVEREF(Py_True);
               PyList_SET_ITEM(__pyx_t_2, 2, Py_True);
-              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 737, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 736, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_13);
-              if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 737, __pyx_L1_error)
+              if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 736, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-              /* "c_tools.pyx":736
+              /* "c_tools.pyx":735
  *                         clearance_gaps = gap_total-agent_ahead_cnt
  *                         if clearance_gaps > 0:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -19634,7 +19612,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
             }
 
-            /* "c_tools.pyx":738
+            /* "c_tools.pyx":737
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, True]
  *                             return True             # <<<<<<<<<<<<<<
@@ -19646,7 +19624,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __pyx_r = Py_True;
             goto __pyx_L0;
 
-            /* "c_tools.pyx":735
+            /* "c_tools.pyx":734
  *                         gap_total = max(abs(lead_agent_left.state.x-ref_state.x), abs(lead_agent_left.state.y-ref_state.y))
  *                         clearance_gaps = gap_total-agent_ahead_cnt
  *                         if clearance_gaps > 0:             # <<<<<<<<<<<<<<
@@ -19655,7 +19633,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":740
+          /* "c_tools.pyx":739
  *                             return True
  *                         else:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -19663,17 +19641,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                             return False
  */
           /*else*/ {
-            __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 740, __pyx_L1_error)
+            __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 739, __pyx_L1_error)
             if (__pyx_t_8) {
 
-              /* "c_tools.pyx":741
+              /* "c_tools.pyx":740
  *                         else:
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, False]             # <<<<<<<<<<<<<<
  *                             return False
  *                     # lead agent is not found, lots of spaces so OK
  */
-              __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 741, __pyx_L1_error)
+              __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 740, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_INCREF(__pyx_n_s_A);
               __Pyx_GIVEREF(__pyx_n_s_A);
@@ -19684,13 +19662,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
               __Pyx_INCREF(Py_False);
               __Pyx_GIVEREF(Py_False);
               PyList_SET_ITEM(__pyx_t_2, 2, Py_False);
-              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 741, __pyx_L1_error)
+              __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 740, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_13);
-              if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 741, __pyx_L1_error)
+              if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 740, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-              /* "c_tools.pyx":740
+              /* "c_tools.pyx":739
  *                             return True
  *                         else:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -19699,7 +19677,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
             }
 
-            /* "c_tools.pyx":742
+            /* "c_tools.pyx":741
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['A', clearance_gaps, False]
  *                             return False             # <<<<<<<<<<<<<<
@@ -19712,7 +19690,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             goto __pyx_L0;
           }
 
-          /* "c_tools.pyx":731
+          /* "c_tools.pyx":730
  * 
  *                     # compute the clearance gap
  *                     if lead_agent_left:             # <<<<<<<<<<<<<<
@@ -19721,7 +19699,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":745
+        /* "c_tools.pyx":744
  *                     # lead agent is not found, lots of spaces so OK
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -19729,17 +19707,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                         return True
  */
         /*else*/ {
-          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 745, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 744, __pyx_L1_error)
           if (__pyx_t_8) {
 
-            /* "c_tools.pyx":746
+            /* "c_tools.pyx":745
  *                     else:
  *                         if save_debug:
  *                             plant.no_deadlock_sv[ctrl_action] = ['A', 10000, True]             # <<<<<<<<<<<<<<
  *                         return True
  * 
  */
-            __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 746, __pyx_L1_error)
+            __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 745, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_INCREF(__pyx_n_s_A);
             __Pyx_GIVEREF(__pyx_n_s_A);
@@ -19750,13 +19728,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __Pyx_INCREF(Py_True);
             __Pyx_GIVEREF(Py_True);
             PyList_SET_ITEM(__pyx_t_2, 2, Py_True);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 746, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 745, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 746, __pyx_L1_error)
+            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 745, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-            /* "c_tools.pyx":745
+            /* "c_tools.pyx":744
  *                     # lead agent is not found, lots of spaces so OK
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -19765,7 +19743,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":747
+          /* "c_tools.pyx":746
  *                         if save_debug:
  *                             plant.no_deadlock_sv[ctrl_action] = ['A', 10000, True]
  *                         return True             # <<<<<<<<<<<<<<
@@ -19779,7 +19757,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         }
       }
 
-      /* "c_tools.pyx":717
+      /* "c_tools.pyx":716
  * 
  * 
  *             if left_turn_chk:             # <<<<<<<<<<<<<<
@@ -19788,41 +19766,41 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     }
 
-    /* "c_tools.pyx":751
+    /* "c_tools.pyx":750
  * 
  *             # if action is to go straight in intersection
  *             elif ((not left_turn_chk) and ctrl_action['steer'] == 'straight'):             # <<<<<<<<<<<<<<
  *                 #====================================================================================================#
  *                 # CASE B: going straight ahead into intersection (not in right-most lane)
  */
-    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_left_turn_chk); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 751, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_v_left_turn_chk); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 750, __pyx_L1_error)
     __pyx_t_10 = ((!__pyx_t_9) != 0);
     if (__pyx_t_10) {
     } else {
       __pyx_t_8 = __pyx_t_10;
       goto __pyx_L35_bool_binop_done;
     }
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 751, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 750, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_10 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_straight, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 751, __pyx_L1_error)
+    __pyx_t_10 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_straight, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 750, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = __pyx_t_10;
     __pyx_L35_bool_binop_done:;
     if (__pyx_t_8) {
 
-      /* "c_tools.pyx":756
+      /* "c_tools.pyx":755
  *                 # CASE C: going straight ahead into intersection (in right-most lane), just add into the agent count
  *                 #====================================================================================================#
  *                 directed_tile = (current_state, plant.state.heading)             # <<<<<<<<<<<<<<
  *                 in_rightmost_lane = plant.supervisor.game.map.check_if_right_turn_tile(directed_tile)
  *                 #if not in_rightmost_lane:
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 756, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 755, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 756, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_heading); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 755, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 756, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 755, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_v_current_state);
       __Pyx_GIVEREF(__pyx_v_current_state);
@@ -19833,22 +19811,22 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_v_directed_tile = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":757
+      /* "c_tools.pyx":756
  *                 #====================================================================================================#
  *                 directed_tile = (current_state, plant.state.heading)
  *                 in_rightmost_lane = plant.supervisor.game.map.check_if_right_turn_tile(directed_tile)             # <<<<<<<<<<<<<<
  *                 #if not in_rightmost_lane:
  *                     # if red light, satisfied vacuously (shouldn't be going)???
  */
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 757, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 756, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 757, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_game); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 756, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 757, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_map); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 756, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_check_if_right_turn_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 757, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_check_if_right_turn_tile); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 756, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __pyx_t_13 = NULL;
@@ -19863,40 +19841,40 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       }
       __pyx_t_2 = (__pyx_t_13) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_13, __pyx_v_directed_tile) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_directed_tile);
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 757, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 756, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_v_in_rightmost_lane = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":762
+      /* "c_tools.pyx":761
  *                     # if green light, need at least two gaps of clearance
  *                     # find lead agent
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['B/C', 'red']
  */
-      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 762, __pyx_L1_error)
+      __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 761, __pyx_L1_error)
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":763
+        /* "c_tools.pyx":762
  *                     # find lead agent
  *                 if light_color == 'red':
  *                     if save_debug:             # <<<<<<<<<<<<<<
  *                         plant.no_deadlock_sv[ctrl_action] = ['B/C', 'red']
  *                     return True
  */
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 763, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 762, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":764
+          /* "c_tools.pyx":763
  *                 if light_color == 'red':
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['B/C', 'red']             # <<<<<<<<<<<<<<
  *                     return True
  *                 else:
  */
-          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 764, __pyx_L1_error)
+          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 763, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_INCREF(__pyx_kp_s_B_C);
           __Pyx_GIVEREF(__pyx_kp_s_B_C);
@@ -19904,13 +19882,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_INCREF(__pyx_n_s_red);
           __Pyx_GIVEREF(__pyx_n_s_red);
           PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_red);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 764, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 763, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 764, __pyx_L1_error)
+          if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 763, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":763
+          /* "c_tools.pyx":762
  *                     # find lead agent
  *                 if light_color == 'red':
  *                     if save_debug:             # <<<<<<<<<<<<<<
@@ -19919,7 +19897,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":765
+        /* "c_tools.pyx":764
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['B/C', 'red']
  *                     return True             # <<<<<<<<<<<<<<
@@ -19931,7 +19909,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":762
+        /* "c_tools.pyx":761
  *                     # if green light, need at least two gaps of clearance
  *                     # find lead agent
  *                 if light_color == 'red':             # <<<<<<<<<<<<<<
@@ -19940,7 +19918,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       }
 
-      /* "c_tools.pyx":767
+      /* "c_tools.pyx":766
  *                     return True
  *                 else:
  *                     lead_agent_forward = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)             # <<<<<<<<<<<<<<
@@ -19948,20 +19926,20 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                     # count how many agents between lead agent and current agent when there is a lead agent
  */
       /*else*/ {
-        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 767, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 766, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 767, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 766, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_13 = PyTuple_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 767, __pyx_L1_error)
+        __pyx_t_13 = PyTuple_New(1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 766, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_13);
         __Pyx_GIVEREF(__pyx_t_4);
         PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_4);
         __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 767, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 766, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_False) < 0) __PYX_ERR(0, 767, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 767, __pyx_L1_error)
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 767, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_must_not_be_in_intersection, Py_False) < 0) __PYX_ERR(0, 766, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 766, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 766, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -19969,7 +19947,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_v_lead_agent_forward = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "c_tools.pyx":770
+        /* "c_tools.pyx":769
  * 
  *                     # count how many agents between lead agent and current agent when there is a lead agent
  *                     if lead_agent_forward is not None:             # <<<<<<<<<<<<<<
@@ -19980,49 +19958,49 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_t_10 = (__pyx_t_8 != 0);
         if (__pyx_t_10) {
 
-          /* "c_tools.pyx":771
+          /* "c_tools.pyx":770
  *                     # count how many agents between lead agent and current agent when there is a lead agent
  *                     if lead_agent_forward is not None:
  *                         gap_between_agents = max(abs(lead_agent_forward.state.x-plant.state.x), abs(lead_agent_forward.state.y-plant.state.y))             # <<<<<<<<<<<<<<
  *                         agents_ahead = count_agents_ahead(gap_between_agents)
  *                         # compute how many agents in right-turn lane can fill in gaps
  */
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_forward, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_forward, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_13); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_13); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_forward, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent_forward, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_3 = PyNumber_Subtract(__pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_4 = PyObject_RichCompare(__pyx_t_13, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 771, __pyx_L1_error)
-          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 771, __pyx_L1_error)
+          __pyx_t_4 = PyObject_RichCompare(__pyx_t_13, __pyx_t_2, Py_GT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 770, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 770, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (__pyx_t_10) {
             __Pyx_INCREF(__pyx_t_13);
@@ -20039,41 +20017,41 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __pyx_v_gap_between_agents = __pyx_t_13;
           __pyx_t_13 = 0;
 
-          /* "c_tools.pyx":772
+          /* "c_tools.pyx":771
  *                     if lead_agent_forward is not None:
  *                         gap_between_agents = max(abs(lead_agent_forward.state.x-plant.state.x), abs(lead_agent_forward.state.y-plant.state.y))
  *                         agents_ahead = count_agents_ahead(gap_between_agents)             # <<<<<<<<<<<<<<
  *                         # compute how many agents in right-turn lane can fill in gaps
  *                         if in_rightmost_lane:
  */
-          __pyx_t_13 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahead(__pyx_v_count_agents_ahead, __pyx_v_gap_between_agents); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 772, __pyx_L1_error)
+          __pyx_t_13 = __pyx_pf_7c_tools_16NoDeadlockOracle_8evaluate_count_agents_ahead(__pyx_v_count_agents_ahead, __pyx_v_gap_between_agents); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 771, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_v_agents_ahead = __pyx_t_13;
           __pyx_t_13 = 0;
 
-          /* "c_tools.pyx":774
+          /* "c_tools.pyx":773
  *                         agents_ahead = count_agents_ahead(gap_between_agents)
  *                         # compute how many agents in right-turn lane can fill in gaps
  *                         if in_rightmost_lane:             # <<<<<<<<<<<<<<
  *                             # TODO: ADD IN COUNT, GENERALIZE LATER
  *                             #pass
  */
-          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_in_rightmost_lane); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 774, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_in_rightmost_lane); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 773, __pyx_L1_error)
           if (__pyx_t_10) {
 
-            /* "c_tools.pyx":777
+            /* "c_tools.pyx":776
  *                             # TODO: ADD IN COUNT, GENERALIZE LATER
  *                             #pass
  *                             agents_ahead = agents_ahead + 1             # <<<<<<<<<<<<<<
  *                             # compute gaps of clearance
  * 
  */
-            __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_v_agents_ahead, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 777, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_v_agents_ahead, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 776, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
             __Pyx_DECREF_SET(__pyx_v_agents_ahead, __pyx_t_13);
             __pyx_t_13 = 0;
 
-            /* "c_tools.pyx":774
+            /* "c_tools.pyx":773
  *                         agents_ahead = count_agents_ahead(gap_between_agents)
  *                         # compute how many agents in right-turn lane can fill in gaps
  *                         if in_rightmost_lane:             # <<<<<<<<<<<<<<
@@ -20082,48 +20060,48 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":780
+          /* "c_tools.pyx":779
  *                             # compute gaps of clearance
  * 
  *                         clearance_gaps = gap_between_agents-agents_ahead             # <<<<<<<<<<<<<<
  *                         if clearance_gaps > 1:
  *                             if save_debug:
  */
-          __pyx_t_13 = PyNumber_Subtract(__pyx_v_gap_between_agents, __pyx_v_agents_ahead); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 780, __pyx_L1_error)
+          __pyx_t_13 = PyNumber_Subtract(__pyx_v_gap_between_agents, __pyx_v_agents_ahead); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 779, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __pyx_v_clearance_gaps = __pyx_t_13;
           __pyx_t_13 = 0;
 
-          /* "c_tools.pyx":781
+          /* "c_tools.pyx":780
  * 
  *                         clearance_gaps = gap_between_agents-agents_ahead
  *                         if clearance_gaps > 1:             # <<<<<<<<<<<<<<
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, True]
  */
-          __pyx_t_13 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_1, Py_GT); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 781, __pyx_L1_error)
-          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 781, __pyx_L1_error)
+          __pyx_t_13 = PyObject_RichCompare(__pyx_v_clearance_gaps, __pyx_int_1, Py_GT); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 780, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 780, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           if (__pyx_t_10) {
 
-            /* "c_tools.pyx":782
+            /* "c_tools.pyx":781
  *                         clearance_gaps = gap_between_agents-agents_ahead
  *                         if clearance_gaps > 1:
  *                             if save_debug:             # <<<<<<<<<<<<<<
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, True]
  *                             return True
  */
-            __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 782, __pyx_L1_error)
+            __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 781, __pyx_L1_error)
             if (__pyx_t_10) {
 
-              /* "c_tools.pyx":783
+              /* "c_tools.pyx":782
  *                         if clearance_gaps > 1:
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, True]             # <<<<<<<<<<<<<<
  *                             return True
  *                         else:
  */
-              __pyx_t_13 = PyList_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 783, __pyx_L1_error)
+              __pyx_t_13 = PyList_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 782, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_13);
               __Pyx_INCREF(__pyx_kp_s_B_C);
               __Pyx_GIVEREF(__pyx_kp_s_B_C);
@@ -20134,13 +20112,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
               __Pyx_INCREF(Py_True);
               __Pyx_GIVEREF(Py_True);
               PyList_SET_ITEM(__pyx_t_13, 2, Py_True);
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 783, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 782, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_3);
-              if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_13) < 0)) __PYX_ERR(0, 783, __pyx_L1_error)
+              if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_13) < 0)) __PYX_ERR(0, 782, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-              /* "c_tools.pyx":782
+              /* "c_tools.pyx":781
  *                         clearance_gaps = gap_between_agents-agents_ahead
  *                         if clearance_gaps > 1:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -20149,7 +20127,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
             }
 
-            /* "c_tools.pyx":784
+            /* "c_tools.pyx":783
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, True]
  *                             return True             # <<<<<<<<<<<<<<
@@ -20161,7 +20139,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __pyx_r = Py_True;
             goto __pyx_L0;
 
-            /* "c_tools.pyx":781
+            /* "c_tools.pyx":780
  * 
  *                         clearance_gaps = gap_between_agents-agents_ahead
  *                         if clearance_gaps > 1:             # <<<<<<<<<<<<<<
@@ -20170,7 +20148,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":786
+          /* "c_tools.pyx":785
  *                             return True
  *                         else:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -20178,17 +20156,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                             return False
  */
           /*else*/ {
-            __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 786, __pyx_L1_error)
+            __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 785, __pyx_L1_error)
             if (__pyx_t_10) {
 
-              /* "c_tools.pyx":787
+              /* "c_tools.pyx":786
  *                         else:
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, False]             # <<<<<<<<<<<<<<
  *                             return False
  * 
  */
-              __pyx_t_13 = PyList_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 787, __pyx_L1_error)
+              __pyx_t_13 = PyList_New(3); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 786, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_13);
               __Pyx_INCREF(__pyx_kp_s_B_C);
               __Pyx_GIVEREF(__pyx_kp_s_B_C);
@@ -20199,13 +20177,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
               __Pyx_INCREF(Py_False);
               __Pyx_GIVEREF(Py_False);
               PyList_SET_ITEM(__pyx_t_13, 2, Py_False);
-              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 787, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 786, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_3);
-              if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_13) < 0)) __PYX_ERR(0, 787, __pyx_L1_error)
+              if (unlikely(PyObject_SetItem(__pyx_t_3, __pyx_v_ctrl_action, __pyx_t_13) < 0)) __PYX_ERR(0, 786, __pyx_L1_error)
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-              /* "c_tools.pyx":786
+              /* "c_tools.pyx":785
  *                             return True
  *                         else:
  *                             if save_debug:             # <<<<<<<<<<<<<<
@@ -20214,7 +20192,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
             }
 
-            /* "c_tools.pyx":788
+            /* "c_tools.pyx":787
  *                             if save_debug:
  *                                 plant.no_deadlock_sv[ctrl_action] = ['B/C', clearance_gaps, False]
  *                             return False             # <<<<<<<<<<<<<<
@@ -20227,7 +20205,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             goto __pyx_L0;
           }
 
-          /* "c_tools.pyx":770
+          /* "c_tools.pyx":769
  * 
  *                     # count how many agents between lead agent and current agent when there is a lead agent
  *                     if lead_agent_forward is not None:             # <<<<<<<<<<<<<<
@@ -20236,7 +20214,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":796
+        /* "c_tools.pyx":795
  *                     # no lead agent
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -20244,17 +20222,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                         return True
  */
         /*else*/ {
-          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 796, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 795, __pyx_L1_error)
           if (__pyx_t_10) {
 
-            /* "c_tools.pyx":797
+            /* "c_tools.pyx":796
  *                     else:
  *                         if save_debug:
  *                             plant.no_deadlock_sv = ['C', 'nolead']             # <<<<<<<<<<<<<<
  *                         return True
  * 
  */
-            __pyx_t_13 = PyList_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 797, __pyx_L1_error)
+            __pyx_t_13 = PyList_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 796, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
             __Pyx_INCREF(__pyx_n_s_C);
             __Pyx_GIVEREF(__pyx_n_s_C);
@@ -20262,10 +20240,10 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __Pyx_INCREF(__pyx_n_s_nolead);
             __Pyx_GIVEREF(__pyx_n_s_nolead);
             PyList_SET_ITEM(__pyx_t_13, 1, __pyx_n_s_nolead);
-            if (__Pyx_PyObject_SetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv, __pyx_t_13) < 0) __PYX_ERR(0, 797, __pyx_L1_error)
+            if (__Pyx_PyObject_SetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv, __pyx_t_13) < 0) __PYX_ERR(0, 796, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-            /* "c_tools.pyx":796
+            /* "c_tools.pyx":795
  *                     # no lead agent
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -20274,7 +20252,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":798
+          /* "c_tools.pyx":797
  *                         if save_debug:
  *                             plant.no_deadlock_sv = ['C', 'nolead']
  *                         return True             # <<<<<<<<<<<<<<
@@ -20288,7 +20266,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         }
       }
 
-      /* "c_tools.pyx":751
+      /* "c_tools.pyx":750
  * 
  *             # if action is to go straight in intersection
  *             elif ((not left_turn_chk) and ctrl_action['steer'] == 'straight'):             # <<<<<<<<<<<<<<
@@ -20297,27 +20275,27 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     }
 
-    /* "c_tools.pyx":804
+    /* "c_tools.pyx":803
  *             #====================================================================================================#
  *             # if action is to turn right across intersection
  *             elif ctrl_action['steer'] == 'right-turn':             # <<<<<<<<<<<<<<
  *                 right_turn_state = plant.query_occupancy(ctrl_action)[-1]
  *                 right_turn_tile = (right_turn_state.x, right_turn_state.y)
  */
-    __pyx_t_13 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_10 = (__Pyx_PyString_Equals(__pyx_t_13, __pyx_kp_s_right_turn, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_10 = (__Pyx_PyString_Equals(__pyx_t_13, __pyx_kp_s_right_turn, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 803, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     if (__pyx_t_10) {
 
-      /* "c_tools.pyx":805
+      /* "c_tools.pyx":804
  *             # if action is to turn right across intersection
  *             elif ctrl_action['steer'] == 'right-turn':
  *                 right_turn_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *                 right_turn_tile = (right_turn_state.x, right_turn_state.y)
  *                 # if agent is in tile, return false
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 805, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_2 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -20331,27 +20309,27 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       }
       __pyx_t_13 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ctrl_action);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 805, __pyx_L1_error)
+      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_13, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 805, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_13, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __pyx_v_right_turn_state = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":806
+      /* "c_tools.pyx":805
  *             elif ctrl_action['steer'] == 'right-turn':
  *                 right_turn_state = plant.query_occupancy(ctrl_action)[-1]
  *                 right_turn_tile = (right_turn_state.x, right_turn_state.y)             # <<<<<<<<<<<<<<
  *                 # if agent is in tile, return false
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_turn_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 806, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_turn_state, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 805, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_turn_state, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 806, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_right_turn_state, __pyx_n_s_y); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 805, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 806, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 805, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
@@ -20362,44 +20340,44 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
       __pyx_v_right_turn_tile = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":808
+      /* "c_tools.pyx":807
  *                 right_turn_tile = (right_turn_state.x, right_turn_state.y)
  *                 # if agent is in tile, return false
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:             # <<<<<<<<<<<<<<
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['D', 'agent in tile']
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 808, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 807, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 808, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 807, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 808, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_occupancy_dict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 807, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-      __pyx_t_10 = (__Pyx_PySequence_ContainsTF(__pyx_v_right_turn_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 808, __pyx_L1_error)
+      __pyx_t_10 = (__Pyx_PySequence_ContainsTF(__pyx_v_right_turn_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 807, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_8 = (__pyx_t_10 != 0);
       if (__pyx_t_8) {
 
-        /* "c_tools.pyx":809
+        /* "c_tools.pyx":808
  *                 # if agent is in tile, return false
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:
  *                     if save_debug:             # <<<<<<<<<<<<<<
  *                         plant.no_deadlock_sv[ctrl_action] = ['D', 'agent in tile']
  *                     return False
  */
-        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 809, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 808, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":810
+          /* "c_tools.pyx":809
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['D', 'agent in tile']             # <<<<<<<<<<<<<<
  *                     return False
  *                 # if agent is not in tile
  */
-          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 810, __pyx_L1_error)
+          __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 809, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_INCREF(__pyx_n_s_D);
           __Pyx_GIVEREF(__pyx_n_s_D);
@@ -20407,13 +20385,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __Pyx_INCREF(__pyx_kp_s_agent_in_tile_2);
           __Pyx_GIVEREF(__pyx_kp_s_agent_in_tile_2);
           PyList_SET_ITEM(__pyx_t_2, 1, __pyx_kp_s_agent_in_tile_2);
-          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 810, __pyx_L1_error)
+          __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 809, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 810, __pyx_L1_error)
+          if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 809, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "c_tools.pyx":809
+          /* "c_tools.pyx":808
  *                 # if agent is in tile, return false
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:
  *                     if save_debug:             # <<<<<<<<<<<<<<
@@ -20422,7 +20400,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":811
+        /* "c_tools.pyx":810
  *                     if save_debug:
  *                         plant.no_deadlock_sv[ctrl_action] = ['D', 'agent in tile']
  *                     return False             # <<<<<<<<<<<<<<
@@ -20434,7 +20412,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         __pyx_r = Py_False;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":808
+        /* "c_tools.pyx":807
  *                 right_turn_tile = (right_turn_state.x, right_turn_state.y)
  *                 # if agent is in tile, return false
  *                 if right_turn_tile in plant.supervisor.game.occupancy_dict:             # <<<<<<<<<<<<<<
@@ -20443,7 +20421,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
       }
 
-      /* "c_tools.pyx":815
+      /* "c_tools.pyx":814
  *                 else:
  *                     # when light color is red, other cars might go first
  *                     if light_color == 'red':             # <<<<<<<<<<<<<<
@@ -20451,27 +20429,27 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                             plant.no_deadlock_sv[ctrl_action] = ['D', False]
  */
       /*else*/ {
-        __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 815, __pyx_L1_error)
+        __pyx_t_8 = (__Pyx_PyString_Equals(__pyx_v_light_color, __pyx_n_s_red, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 814, __pyx_L1_error)
         if (__pyx_t_8) {
 
-          /* "c_tools.pyx":816
+          /* "c_tools.pyx":815
  *                     # when light color is red, other cars might go first
  *                     if light_color == 'red':
  *                         if save_debug:             # <<<<<<<<<<<<<<
  *                             plant.no_deadlock_sv[ctrl_action] = ['D', False]
  *                         # TODO: WRITE FUNCTION TO CHECK WHETHER CAR HAS PRECEDENCE
  */
-          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 816, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 815, __pyx_L1_error)
           if (__pyx_t_8) {
 
-            /* "c_tools.pyx":817
+            /* "c_tools.pyx":816
  *                     if light_color == 'red':
  *                         if save_debug:
  *                             plant.no_deadlock_sv[ctrl_action] = ['D', False]             # <<<<<<<<<<<<<<
  *                         # TODO: WRITE FUNCTION TO CHECK WHETHER CAR HAS PRECEDENCE
  *                         #agent_ahead = check_whether_car_has_precedence()
  */
-            __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 817, __pyx_L1_error)
+            __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 816, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_INCREF(__pyx_n_s_D);
             __Pyx_GIVEREF(__pyx_n_s_D);
@@ -20479,13 +20457,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __Pyx_INCREF(Py_False);
             __Pyx_GIVEREF(Py_False);
             PyList_SET_ITEM(__pyx_t_2, 1, Py_False);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 817, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 816, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 817, __pyx_L1_error)
+            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 816, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-            /* "c_tools.pyx":816
+            /* "c_tools.pyx":815
  *                     # when light color is red, other cars might go first
  *                     if light_color == 'red':
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -20494,7 +20472,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":825
+          /* "c_tools.pyx":824
  *                         #else:
  *                         #    return True
  *                         return False             # <<<<<<<<<<<<<<
@@ -20506,7 +20484,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
           __pyx_r = Py_False;
           goto __pyx_L0;
 
-          /* "c_tools.pyx":815
+          /* "c_tools.pyx":814
  *                 else:
  *                     # when light color is red, other cars might go first
  *                     if light_color == 'red':             # <<<<<<<<<<<<<<
@@ -20515,7 +20493,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
         }
 
-        /* "c_tools.pyx":828
+        /* "c_tools.pyx":827
  *                     # otherwise, no other cars will have precedence over right turn agent
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -20523,17 +20501,17 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                         return True
  */
         /*else*/ {
-          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 828, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_save_debug); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 827, __pyx_L1_error)
           if (__pyx_t_8) {
 
-            /* "c_tools.pyx":829
+            /* "c_tools.pyx":828
  *                     else:
  *                         if save_debug:
  *                             plant.no_deadlock_sv[ctrl_action] = ['D', True]             # <<<<<<<<<<<<<<
  *                         return True
  * 
  */
-            __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 829, __pyx_L1_error)
+            __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 828, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_INCREF(__pyx_n_s_D);
             __Pyx_GIVEREF(__pyx_n_s_D);
@@ -20541,13 +20519,13 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
             __Pyx_INCREF(Py_True);
             __Pyx_GIVEREF(Py_True);
             PyList_SET_ITEM(__pyx_t_2, 1, Py_True);
-            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 829, __pyx_L1_error)
+            __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_no_deadlock_sv); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 828, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
-            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 829, __pyx_L1_error)
+            if (unlikely(PyObject_SetItem(__pyx_t_13, __pyx_v_ctrl_action, __pyx_t_2) < 0)) __PYX_ERR(0, 828, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-            /* "c_tools.pyx":828
+            /* "c_tools.pyx":827
  *                     # otherwise, no other cars will have precedence over right turn agent
  *                     else:
  *                         if save_debug:             # <<<<<<<<<<<<<<
@@ -20556,7 +20534,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
           }
 
-          /* "c_tools.pyx":830
+          /* "c_tools.pyx":829
  *                         if save_debug:
  *                             plant.no_deadlock_sv[ctrl_action] = ['D', True]
  *                         return True             # <<<<<<<<<<<<<<
@@ -20570,7 +20548,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
         }
       }
 
-      /* "c_tools.pyx":804
+      /* "c_tools.pyx":803
  *             #====================================================================================================#
  *             # if action is to turn right across intersection
  *             elif ctrl_action['steer'] == 'right-turn':             # <<<<<<<<<<<<<<
@@ -20579,7 +20557,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  */
     }
 
-    /* "c_tools.pyx":834
+    /* "c_tools.pyx":833
  *             # not left turn, straight across intersection OR right turn
  *             else:
  *                 print(ctrl_action)             # <<<<<<<<<<<<<<
@@ -20587,32 +20565,32 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
  *                 print("ERROR!!")
  */
     /*else*/ {
-      if (__Pyx_PrintOne(0, __pyx_v_ctrl_action) < 0) __PYX_ERR(0, 834, __pyx_L1_error)
+      if (__Pyx_PrintOne(0, __pyx_v_ctrl_action) < 0) __PYX_ERR(0, 833, __pyx_L1_error)
 
-      /* "c_tools.pyx":835
+      /* "c_tools.pyx":834
  *             else:
  *                 print(ctrl_action)
  *                 print(plant.state)             # <<<<<<<<<<<<<<
  *                 print("ERROR!!")
  *         pass
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 835, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 834, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 835, __pyx_L1_error)
+      if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 834, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":836
+      /* "c_tools.pyx":835
  *                 print(ctrl_action)
  *                 print(plant.state)
  *                 print("ERROR!!")             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
-      if (__Pyx_PrintOne(0, __pyx_kp_s_ERROR) < 0) __PYX_ERR(0, 836, __pyx_L1_error)
+      if (__Pyx_PrintOne(0, __pyx_kp_s_ERROR) < 0) __PYX_ERR(0, 835, __pyx_L1_error)
     }
   }
 
-  /* "c_tools.pyx":554
+  /* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
@@ -20673,7 +20651,7 @@ static PyObject *__pyx_pf_7c_tools_16NoDeadlockOracle_2evaluate(CYTHON_UNUSED Py
   return __pyx_r;
 }
 
-/* "c_tools.pyx":842
+/* "c_tools.pyx":841
  * class ImprovementBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -20703,16 +20681,16 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle___init__(CY
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":843
+  /* "c_tools.pyx":842
  *     # requires a supervisor controller
  *     def __init__(self):
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_ImprovementBundleProgressOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_ImprovementBundleProgressOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -20720,22 +20698,22 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle___init__(CY
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_improve_progress) < 0) __PYX_ERR(0, 843, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 843, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_improve_progress) < 0) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 842, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":842
+  /* "c_tools.pyx":841
  * class ImprovementBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -20758,7 +20736,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle___init__(CY
   return __pyx_r;
 }
 
-/* "c_tools.pyx":844
+/* "c_tools.pyx":843
  *     def __init__(self):
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -20804,23 +20782,23 @@ static PyObject *__pyx_pw_7c_tools_31ImprovementBundleProgressOracle_3evaluate(P
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 844, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 843, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 844, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 843, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 844, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 843, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 844, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 843, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -20837,7 +20815,7 @@ static PyObject *__pyx_pw_7c_tools_31ImprovementBundleProgressOracle_3evaluate(P
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 844, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 843, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.ImprovementBundleProgressOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -20886,24 +20864,24 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":847
+  /* "c_tools.pyx":846
  * 
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y             # <<<<<<<<<<<<<<
  *         current_dir = plant.state.heading
  *         current_directed_tile = (current_xy, current_dir)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 846, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 846, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 846, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 846, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 846, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -20914,29 +20892,29 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   __pyx_v_current_xy = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":848
+  /* "c_tools.pyx":847
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y
  *         current_dir = plant.state.heading             # <<<<<<<<<<<<<<
  *         current_directed_tile = (current_xy, current_dir)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 848, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 847, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 848, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 847, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_current_dir = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":849
+  /* "c_tools.pyx":848
  *         current_xy = plant.state.x, plant.state.y
  *         current_dir = plant.state.heading
  *         current_directed_tile = (current_xy, current_dir)             # <<<<<<<<<<<<<<
  * 
  *         # query next state
  */
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 849, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_current_xy);
   __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -20947,14 +20925,14 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   __pyx_v_current_directed_tile = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":852
+  /* "c_tools.pyx":851
  * 
  *         # query next state
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 852, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 851, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -20968,27 +20946,27 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 852, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 851, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 852, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 851, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_queried_state = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":853
+  /* "c_tools.pyx":852
  *         # query next state
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y             # <<<<<<<<<<<<<<
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 853, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 852, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 853, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 852, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 853, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 852, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -20999,26 +20977,26 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   __pyx_v_queried_xy = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":854
+  /* "c_tools.pyx":853
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading             # <<<<<<<<<<<<<<
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # get current subgoal
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 854, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 853, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_queried_dir = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":855
+  /* "c_tools.pyx":854
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)             # <<<<<<<<<<<<<<
  *         # get current subgoal
  *         current_subgoal = plant.supervisor.subgoals[0]
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 855, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 854, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_queried_xy);
   __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -21029,48 +21007,48 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   __pyx_v_queried_directed_tile = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":857
+  /* "c_tools.pyx":856
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # get current subgoal
  *         current_subgoal = plant.supervisor.subgoals[0]             # <<<<<<<<<<<<<<
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 857, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 856, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 857, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 856, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 857, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 856, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_current_subgoal = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":860
+  /* "c_tools.pyx":859
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
  *             return (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 859, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 859, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 859, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 859, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 859, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "c_tools.pyx":861
+    /* "c_tools.pyx":860
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
  *             return (queried_directed_tile == current_subgoal)             # <<<<<<<<<<<<<<
@@ -21078,12 +21056,12 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 861, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 860, __pyx_L1_error)
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":860
+    /* "c_tools.pyx":859
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
@@ -21092,30 +21070,30 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
   }
 
-  /* "c_tools.pyx":863
+  /* "c_tools.pyx":862
  *             return (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
  *             return (queried_directed_tile == current_subgoal)
  *         # if current subgoal isn't special
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 863, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 862, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 863, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 862, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 863, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 862, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 863, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 862, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 863, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 862, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "c_tools.pyx":864
+    /* "c_tools.pyx":863
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
  *             return (queried_directed_tile == current_subgoal)             # <<<<<<<<<<<<<<
@@ -21123,12 +21101,12 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  *         else:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 864, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 863, __pyx_L1_error)
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":863
+    /* "c_tools.pyx":862
  *             return (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
@@ -21137,7 +21115,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
   }
 
-  /* "c_tools.pyx":868
+  /* "c_tools.pyx":867
  *         else:
  *             # get bundle corresponding to the current subgoal
  *             subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)             # <<<<<<<<<<<<<<
@@ -21145,15 +21123,15 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 868, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 867, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 868, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 867, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 868, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 867, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 868, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 867, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -21168,31 +21146,31 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_v_current_subgoal) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_current_subgoal);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 868, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 867, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_subgoal_bundle = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":870
+    /* "c_tools.pyx":869
  *             subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
  *             # get bundle corresponding to the current state
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))             # <<<<<<<<<<<<<<
  * 
  *             try:
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 870, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 870, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 870, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 870, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 870, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_current_xy);
     __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -21213,13 +21191,13 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
     __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 870, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 869, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_current_bundle = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":872
+    /* "c_tools.pyx":871
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -21235,25 +21213,25 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __Pyx_XGOTREF(__pyx_t_9);
       /*try:*/ {
 
-        /* "c_tools.pyx":874
+        /* "c_tools.pyx":873
  *             try:
  *                 # get bundle for the queried state, if bundle doesn't exist, return False
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))             # <<<<<<<<<<<<<<
  *             except:
  *                 return False
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 874, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L4_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 874, __pyx_L4_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L4_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 874, __pyx_L4_error)
+        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_v_queried_xy);
         __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -21274,13 +21252,13 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
         __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 874, __pyx_L4_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 873, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_queried_bundle = __pyx_t_2;
         __pyx_t_2 = 0;
 
-        /* "c_tools.pyx":872
+        /* "c_tools.pyx":871
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -21298,7 +21276,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "c_tools.pyx":875
+      /* "c_tools.pyx":874
  *                 # get bundle for the queried state, if bundle doesn't exist, return False
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
  *             except:             # <<<<<<<<<<<<<<
@@ -21307,12 +21285,12 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
       /*except:*/ {
         __Pyx_AddTraceback("c_tools.ImprovementBundleProgressOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_3) < 0) __PYX_ERR(0, 875, __pyx_L6_except_error)
+        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_3) < 0) __PYX_ERR(0, 874, __pyx_L6_except_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GOTREF(__pyx_t_3);
 
-        /* "c_tools.pyx":876
+        /* "c_tools.pyx":875
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
  *             except:
  *                 return False             # <<<<<<<<<<<<<<
@@ -21329,7 +21307,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       }
       __pyx_L6_except_error:;
 
-      /* "c_tools.pyx":872
+      /* "c_tools.pyx":871
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -21350,26 +21328,26 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_L9_try_end:;
     }
 
-    /* "c_tools.pyx":878
+    /* "c_tools.pyx":877
  *                 return False
  * 
  *             if current_bundle != subgoal_bundle:             # <<<<<<<<<<<<<<
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  */
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_bundle, __pyx_v_subgoal_bundle, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 878, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 878, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_bundle, __pyx_v_subgoal_bundle, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 877, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 877, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":879
+      /* "c_tools.pyx":878
  * 
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics             # <<<<<<<<<<<<<<
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
  */
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 879, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 878, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -21377,13 +21355,13 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_queried_dir);
       __Pyx_GIVEREF(__pyx_v_queried_dir);
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_queried_dir);
-      __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 879, __pyx_L1_error)
+      __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 878, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 879, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 878, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_4) {
 
-        /* "c_tools.pyx":880
+        /* "c_tools.pyx":879
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True             # <<<<<<<<<<<<<<
@@ -21395,7 +21373,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":879
+        /* "c_tools.pyx":878
  * 
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics             # <<<<<<<<<<<<<<
@@ -21404,14 +21382,14 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
       }
 
-      /* "c_tools.pyx":881
+      /* "c_tools.pyx":880
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change             # <<<<<<<<<<<<<<
  *                     return False
  *                 else:
  */
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 880, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -21419,7 +21397,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_queried_dir);
       __Pyx_GIVEREF(__pyx_v_queried_dir);
       PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_queried_dir);
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 880, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_current_xy);
       __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -21427,14 +21405,14 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_current_dir);
       __Pyx_GIVEREF(__pyx_v_current_dir);
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_current_dir);
-      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 880, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 881, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 880, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_4) {
 
-        /* "c_tools.pyx":882
+        /* "c_tools.pyx":881
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
  *                     return False             # <<<<<<<<<<<<<<
@@ -21446,7 +21424,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
         __pyx_r = Py_False;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":881
+        /* "c_tools.pyx":880
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change             # <<<<<<<<<<<<<<
@@ -21455,7 +21433,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
       }
 
-      /* "c_tools.pyx":884
+      /* "c_tools.pyx":883
  *                     return False
  *                 else:
  *                     return False             # <<<<<<<<<<<<<<
@@ -21469,7 +21447,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
         goto __pyx_L0;
       }
 
-      /* "c_tools.pyx":878
+      /* "c_tools.pyx":877
  *                 return False
  * 
  *             if current_bundle != subgoal_bundle:             # <<<<<<<<<<<<<<
@@ -21478,37 +21456,37 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
     }
 
-    /* "c_tools.pyx":885
+    /* "c_tools.pyx":884
  *                 else:
  *                     return False
  *             elif queried_bundle == subgoal_bundle:             # <<<<<<<<<<<<<<
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  */
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_bundle, __pyx_v_subgoal_bundle, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 885, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 885, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_bundle, __pyx_v_subgoal_bundle, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 884, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 884, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":886
+      /* "c_tools.pyx":885
  *                     return False
  *             elif queried_bundle == subgoal_bundle:
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))             # <<<<<<<<<<<<<<
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 886, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_current_xy);
       __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -21529,31 +21507,31 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 886, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 885, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_rel_curr = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":887
+      /* "c_tools.pyx":886
  *             elif queried_bundle == subgoal_bundle:
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))             # <<<<<<<<<<<<<<
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  * 
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -21574,35 +21552,35 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 887, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 886, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_rel_next = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":888
+      /* "c_tools.pyx":887
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))             # <<<<<<<<<<<<<<
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 888, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3);
@@ -21623,120 +21601,120 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_10);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 888, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 887, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_rel_goal = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":890
+      /* "c_tools.pyx":889
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]             # <<<<<<<<<<<<<<
  *                 dlong_next = rel_goal[1]-rel_next[1]
  * 
  */
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 890, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 889, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_curr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 890, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_curr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 889, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 890, __pyx_L1_error)
+      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 889, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_dlong_curr = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":891
+      /* "c_tools.pyx":890
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]
  *                 dlong_next = rel_goal[1]-rel_next[1]             # <<<<<<<<<<<<<<
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])
  */
-      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 890, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 890, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = PyNumber_Subtract(__pyx_t_10, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Subtract(__pyx_t_10, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 890, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_dlong_next = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":893
+      /* "c_tools.pyx":892
  *                 dlong_next = rel_goal[1]-rel_next[1]
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])             # <<<<<<<<<<<<<<
  *                 dlatt_next = abs(rel_next[0]-rel_goal[0])
  * 
  */
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_curr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 893, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_curr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 893, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 893, __pyx_L1_error)
+      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 893, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 892, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_v_dlatt_curr = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "c_tools.pyx":894
+      /* "c_tools.pyx":893
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])
  *                 dlatt_next = abs(rel_next[0]-rel_goal[0])             # <<<<<<<<<<<<<<
  * 
  *                 # check if strictly improving longitudinal/lateral distance
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 894, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 893, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 894, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 893, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 894, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 893, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __pyx_t_10 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 894, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 893, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_dlatt_next = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":897
+      /* "c_tools.pyx":896
  * 
  *                 # check if strictly improving longitudinal/lateral distance
  *                 latt_improves = dlatt_next < dlatt_curr             # <<<<<<<<<<<<<<
  *                 long_improves = dlong_next < dlong_curr
  *                 improves = latt_improves or long_improves
  */
-      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlatt_next, __pyx_v_dlatt_curr, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 897, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlatt_next, __pyx_v_dlatt_curr, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 896, __pyx_L1_error)
       __pyx_v_latt_improves = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":898
+      /* "c_tools.pyx":897
  *                 # check if strictly improving longitudinal/lateral distance
  *                 latt_improves = dlatt_next < dlatt_curr
  *                 long_improves = dlong_next < dlong_curr             # <<<<<<<<<<<<<<
  *                 improves = latt_improves or long_improves
  * 
  */
-      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlong_next, __pyx_v_dlong_curr, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 898, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlong_next, __pyx_v_dlong_curr, Py_LT); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 897, __pyx_L1_error)
       __pyx_v_long_improves = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":899
+      /* "c_tools.pyx":898
  *                 latt_improves = dlatt_next < dlatt_curr
  *                 long_improves = dlong_next < dlong_curr
  *                 improves = latt_improves or long_improves             # <<<<<<<<<<<<<<
  * 
  *                 # only need to check reachability for braking backup plan because this implies reachability for current action
  */
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_latt_improves); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 899, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_latt_improves); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 898, __pyx_L1_error)
       if (!__pyx_t_4) {
       } else {
         __Pyx_INCREF(__pyx_v_latt_improves);
@@ -21749,7 +21727,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_v_improves = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":902
+      /* "c_tools.pyx":901
  * 
  *                 # only need to check reachability for braking backup plan because this implies reachability for current action
  *                 return improves             # <<<<<<<<<<<<<<
@@ -21761,7 +21739,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
       __pyx_r = __pyx_v_improves;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":885
+      /* "c_tools.pyx":884
  *                 else:
  *                     return False
  *             elif queried_bundle == subgoal_bundle:             # <<<<<<<<<<<<<<
@@ -21770,7 +21748,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
  */
     }
 
-    /* "c_tools.pyx":904
+    /* "c_tools.pyx":903
  *                 return improves
  *             else:
  *                 return False             # <<<<<<<<<<<<<<
@@ -21785,7 +21763,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
     }
   }
 
-  /* "c_tools.pyx":844
+  /* "c_tools.pyx":843
  *     def __init__(self):
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -21829,7 +21807,7 @@ static PyObject *__pyx_pf_7c_tools_31ImprovementBundleProgressOracle_2evaluate(C
   return __pyx_r;
 }
 
-/* "c_tools.pyx":908
+/* "c_tools.pyx":907
  * class MaintenanceBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -21859,16 +21837,16 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle___init__(CY
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":909
+  /* "c_tools.pyx":908
  *     # requires a supervisor controller
  *     def __init__(self):
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  *         # get current state
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_MaintenanceBundleProgressOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_MaintenanceBundleProgressOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 909, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -21876,22 +21854,22 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle___init__(CY
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 909, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_maintain_progress) < 0) __PYX_ERR(0, 909, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 909, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_maintain_progress) < 0) __PYX_ERR(0, 908, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 908, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":908
+  /* "c_tools.pyx":907
  * class MaintenanceBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -21914,7 +21892,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle___init__(CY
   return __pyx_r;
 }
 
-/* "c_tools.pyx":910
+/* "c_tools.pyx":909
  *     def __init__(self):
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -21960,23 +21938,23 @@ static PyObject *__pyx_pw_7c_tools_31MaintenanceBundleProgressOracle_3evaluate(P
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 910, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 909, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 910, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 909, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 910, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 909, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 910, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 909, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -21993,7 +21971,7 @@ static PyObject *__pyx_pw_7c_tools_31MaintenanceBundleProgressOracle_3evaluate(P
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 910, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 909, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.MaintenanceBundleProgressOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -22042,24 +22020,24 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":912
+  /* "c_tools.pyx":911
  *     def evaluate(self, ctrl_action, plant, game):
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y             # <<<<<<<<<<<<<<
  *         current_dir = plant.state.heading
  *         current_directed_tile = (current_xy, current_dir)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 912, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 911, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 912, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 911, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 912, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 911, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 912, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 911, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 912, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 911, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -22070,29 +22048,29 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   __pyx_v_current_xy = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":913
+  /* "c_tools.pyx":912
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y
  *         current_dir = plant.state.heading             # <<<<<<<<<<<<<<
  *         current_directed_tile = (current_xy, current_dir)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 913, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 912, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 913, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 912, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_current_dir = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":914
+  /* "c_tools.pyx":913
  *         current_xy = plant.state.x, plant.state.y
  *         current_dir = plant.state.heading
  *         current_directed_tile = (current_xy, current_dir)             # <<<<<<<<<<<<<<
  * 
  *         # query next state
  */
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 914, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 913, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_current_xy);
   __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -22103,14 +22081,14 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   __pyx_v_current_directed_tile = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":917
+  /* "c_tools.pyx":916
  * 
  *         # query next state
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 917, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 916, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_1))) {
@@ -22124,27 +22102,27 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 917, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 916, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 917, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 916, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_queried_state = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":918
+  /* "c_tools.pyx":917
  *         # query next state
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y             # <<<<<<<<<<<<<<
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 918, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 917, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 918, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 917, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 918, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 917, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -22155,26 +22133,26 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   __pyx_v_queried_xy = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":919
+  /* "c_tools.pyx":918
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading             # <<<<<<<<<<<<<<
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # get current subgoal
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 919, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_queried_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 918, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_queried_dir = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":920
+  /* "c_tools.pyx":919
  *         queried_xy = queried_state.x, queried_state.y
  *         queried_dir = queried_state.heading
  *         queried_directed_tile = (queried_xy, queried_dir)             # <<<<<<<<<<<<<<
  *         # get current subgoal
  *         current_subgoal = plant.supervisor.subgoals[0]
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 920, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_queried_xy);
   __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -22185,48 +22163,48 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   __pyx_v_queried_directed_tile = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":922
+  /* "c_tools.pyx":921
  *         queried_directed_tile = (queried_xy, queried_dir)
  *         # get current subgoal
  *         current_subgoal = plant.supervisor.subgoals[0]             # <<<<<<<<<<<<<<
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 922, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 922, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_subgoals); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 922, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_current_subgoal = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":925
+  /* "c_tools.pyx":924
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 925, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 925, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 925, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 925, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 925, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_subgoal, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "c_tools.pyx":926
+    /* "c_tools.pyx":925
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)             # <<<<<<<<<<<<<<
@@ -22234,8 +22212,8 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_current_directed_tile, __pyx_v_queried_directed_tile, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 926, __pyx_L1_error)
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 926, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_current_directed_tile, __pyx_v_queried_directed_tile, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 925, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 925, __pyx_L1_error)
     if (!__pyx_t_5) {
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
@@ -22244,7 +22222,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L4_bool_binop_done;
     }
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 926, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 925, __pyx_L1_error)
     __Pyx_INCREF(__pyx_t_2);
     __pyx_t_3 = __pyx_t_2;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -22253,7 +22231,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":925
+    /* "c_tools.pyx":924
  *         # if current subgoal is special, namely, attempting to move toward special tile
  *         # for now, we are assuming default car dynamics; TODO: generalize this
  *         if current_subgoal in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
@@ -22262,30 +22240,30 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
   }
 
-  /* "c_tools.pyx":928
+  /* "c_tools.pyx":927
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
  *         # if current subgoal isn't special
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 928, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 928, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 928, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 928, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 928, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_current_directed_tile, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "c_tools.pyx":929
+    /* "c_tools.pyx":928
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)             # <<<<<<<<<<<<<<
@@ -22293,8 +22271,8 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  *         else:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_directed_tile, __pyx_v_queried_directed_tile, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 929, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 929, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_directed_tile, __pyx_v_queried_directed_tile, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 928, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 928, __pyx_L1_error)
     if (!__pyx_t_4) {
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
@@ -22303,7 +22281,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       goto __pyx_L6_bool_binop_done;
     }
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 929, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_queried_directed_tile, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 928, __pyx_L1_error)
     __Pyx_INCREF(__pyx_t_3);
     __pyx_t_2 = __pyx_t_3;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -22312,7 +22290,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":928
+    /* "c_tools.pyx":927
  *             return (current_directed_tile == queried_directed_tile) or (queried_directed_tile == current_subgoal)
  *         # if moving away from special tile
  *         elif current_directed_tile in plant.supervisor.game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
@@ -22321,7 +22299,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
   }
 
-  /* "c_tools.pyx":933
+  /* "c_tools.pyx":932
  *         else:
  *             # get bundle corresponding to the current subgoal
  *             subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)             # <<<<<<<<<<<<<<
@@ -22329,15 +22307,15 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  */
   /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 933, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 932, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 933, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 932, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 933, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 932, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 933, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 932, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -22352,31 +22330,31 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_v_current_subgoal) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_current_subgoal);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 933, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 932, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_subgoal_bundle = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":935
+    /* "c_tools.pyx":934
  *             subgoal_bundle = plant.supervisor.game.map.directed_tile_to_bundle(current_subgoal)
  *             # get bundle corresponding to the current state
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))             # <<<<<<<<<<<<<<
  *             try:
  *                 # get bundle for the queried state, if bundle doesn't exist, return False
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_current_xy);
     __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -22397,13 +22375,13 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
     __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 935, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_current_bundle = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":936
+    /* "c_tools.pyx":935
  *             # get bundle corresponding to the current state
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  *             try:             # <<<<<<<<<<<<<<
@@ -22419,25 +22397,25 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_XGOTREF(__pyx_t_9);
       /*try:*/ {
 
-        /* "c_tools.pyx":938
+        /* "c_tools.pyx":937
  *             try:
  *                 # get bundle for the queried state, if bundle doesn't exist, return False
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))             # <<<<<<<<<<<<<<
  *             except:
  *                 return False
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 938, __pyx_L8_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 938, __pyx_L8_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 938, __pyx_L8_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 938, __pyx_L8_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 938, __pyx_L8_error)
+        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_v_queried_xy);
         __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -22458,13 +22436,13 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
         __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 938, __pyx_L8_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 937, __pyx_L8_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_queried_bundle = __pyx_t_2;
         __pyx_t_2 = 0;
 
-        /* "c_tools.pyx":936
+        /* "c_tools.pyx":935
  *             # get bundle corresponding to the current state
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  *             try:             # <<<<<<<<<<<<<<
@@ -22482,7 +22460,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-      /* "c_tools.pyx":939
+      /* "c_tools.pyx":938
  *                 # get bundle for the queried state, if bundle doesn't exist, return False
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
  *             except:             # <<<<<<<<<<<<<<
@@ -22491,12 +22469,12 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
       /*except:*/ {
         __Pyx_AddTraceback("c_tools.MaintenanceBundleProgressOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_3) < 0) __PYX_ERR(0, 939, __pyx_L10_except_error)
+        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_3) < 0) __PYX_ERR(0, 938, __pyx_L10_except_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GOTREF(__pyx_t_3);
 
-        /* "c_tools.pyx":940
+        /* "c_tools.pyx":939
  *                 queried_bundle = plant.supervisor.game.map.directed_tile_to_bundle((queried_xy, queried_dir))
  *             except:
  *                 return False             # <<<<<<<<<<<<<<
@@ -22513,7 +22491,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       }
       __pyx_L10_except_error:;
 
-      /* "c_tools.pyx":936
+      /* "c_tools.pyx":935
  *             # get bundle corresponding to the current state
  *             current_bundle = plant.supervisor.game.map.directed_tile_to_bundle((current_xy, current_dir))
  *             try:             # <<<<<<<<<<<<<<
@@ -22534,26 +22512,26 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_L13_try_end:;
     }
 
-    /* "c_tools.pyx":942
+    /* "c_tools.pyx":941
  *                 return False
  * 
  *             if current_bundle != subgoal_bundle:             # <<<<<<<<<<<<<<
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  */
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_bundle, __pyx_v_subgoal_bundle, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 942, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 942, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_current_bundle, __pyx_v_subgoal_bundle, Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 941, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 941, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":943
+      /* "c_tools.pyx":942
  * 
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics             # <<<<<<<<<<<<<<
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
  */
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 943, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 942, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -22561,13 +22539,13 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_queried_dir);
       __Pyx_GIVEREF(__pyx_v_queried_dir);
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_queried_dir);
-      __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 943, __pyx_L1_error)
+      __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_current_subgoal, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 942, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 943, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 942, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_4) {
 
-        /* "c_tools.pyx":944
+        /* "c_tools.pyx":943
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True             # <<<<<<<<<<<<<<
@@ -22579,7 +22557,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":943
+        /* "c_tools.pyx":942
  * 
  *             if current_bundle != subgoal_bundle:
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics             # <<<<<<<<<<<<<<
@@ -22588,14 +22566,14 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
       }
 
-      /* "c_tools.pyx":945
+      /* "c_tools.pyx":944
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change             # <<<<<<<<<<<<<<
  *                     return True
  *                 else:
  */
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 945, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 944, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -22603,7 +22581,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_queried_dir);
       __Pyx_GIVEREF(__pyx_v_queried_dir);
       PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_queried_dir);
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 945, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_current_xy);
       __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -22611,14 +22589,14 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __Pyx_INCREF(__pyx_v_current_dir);
       __Pyx_GIVEREF(__pyx_v_current_dir);
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_current_dir);
-      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 945, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 945, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 944, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_4) {
 
-        /* "c_tools.pyx":946
+        /* "c_tools.pyx":945
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change
  *                     return True             # <<<<<<<<<<<<<<
@@ -22630,7 +22608,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
         __pyx_r = Py_True;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":945
+        /* "c_tools.pyx":944
  *                 if (queried_xy, queried_dir) == current_subgoal: # bundle change succeeds, assuming default car dynamics
  *                     return True
  *                 elif (queried_xy, queried_dir) == (current_xy, current_dir): # if doesn't make bundle change             # <<<<<<<<<<<<<<
@@ -22639,7 +22617,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
       }
 
-      /* "c_tools.pyx":948
+      /* "c_tools.pyx":947
  *                     return True
  *                 else:
  *                     return False             # <<<<<<<<<<<<<<
@@ -22653,7 +22631,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
         goto __pyx_L0;
       }
 
-      /* "c_tools.pyx":942
+      /* "c_tools.pyx":941
  *                 return False
  * 
  *             if current_bundle != subgoal_bundle:             # <<<<<<<<<<<<<<
@@ -22662,37 +22640,37 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
     }
 
-    /* "c_tools.pyx":949
+    /* "c_tools.pyx":948
  *                 else:
  *                     return False
  *             elif queried_bundle == subgoal_bundle:             # <<<<<<<<<<<<<<
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  */
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_bundle, __pyx_v_subgoal_bundle, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 949, __pyx_L1_error)
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 949, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_queried_bundle, __pyx_v_subgoal_bundle, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 948, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 948, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":950
+      /* "c_tools.pyx":949
  *                     return False
  *             elif queried_bundle == subgoal_bundle:
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))             # <<<<<<<<<<<<<<
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 950, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 950, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_current_xy);
       __Pyx_GIVEREF(__pyx_v_current_xy);
@@ -22713,31 +22691,31 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 950, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 949, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_rel_curr = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":951
+      /* "c_tools.pyx":950
  *             elif queried_bundle == subgoal_bundle:
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))             # <<<<<<<<<<<<<<
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  * 
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_queried_xy);
       __Pyx_GIVEREF(__pyx_v_queried_xy);
@@ -22758,35 +22736,35 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_6, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_1);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 950, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_rel_next = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":952
+      /* "c_tools.pyx":951
  *                 rel_curr = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_xy, current_dir))
  *                 rel_next = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((queried_xy, queried_dir))
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))             # <<<<<<<<<<<<<<
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_game); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_directed_tile_to_relative_bundle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_v_current_subgoal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 952, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3);
@@ -22807,120 +22785,120 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_6, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_10);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 952, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_rel_goal = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":954
+      /* "c_tools.pyx":953
  *                 rel_goal = plant.supervisor.game.map.directed_tile_to_relative_bundle_tile((current_subgoal[0], current_subgoal[1]))
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]             # <<<<<<<<<<<<<<
  *                 dlong_next = rel_goal[1]-rel_next[1]
  * 
  */
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 954, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 953, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_curr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 954, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_curr, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 953, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 954, __pyx_L1_error)
+      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 953, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_dlong_curr = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":955
+      /* "c_tools.pyx":954
  * 
  *                 dlong_curr = rel_goal[1]-rel_curr[1]
  *                 dlong_next = rel_goal[1]-rel_next[1]             # <<<<<<<<<<<<<<
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])
  */
-      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 955, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 955, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = PyNumber_Subtract(__pyx_t_10, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 955, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Subtract(__pyx_t_10, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_dlong_next = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":957
+      /* "c_tools.pyx":956
  *                 dlong_next = rel_goal[1]-rel_next[1]
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])             # <<<<<<<<<<<<<<
  *                 dlatt_next = abs(rel_next[0]-rel_goal[0])
  * 
  */
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_curr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 957, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_rel_curr, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 956, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 957, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 956, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 957, __pyx_L1_error)
+      __pyx_t_10 = PyNumber_Subtract(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 956, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 957, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyNumber_Absolute(__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 956, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_v_dlatt_curr = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "c_tools.pyx":958
+      /* "c_tools.pyx":957
  * 
  *                 dlatt_curr = abs(rel_curr[0]-rel_goal[0])
  *                 dlatt_next = abs(rel_next[0]-rel_goal[0])             # <<<<<<<<<<<<<<
  * 
  *                 # check if at least maintaining longitudinal/lateral distance
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 958, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_rel_next, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 957, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 958, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_GetItemInt(__pyx_v_rel_goal, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 957, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 958, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Subtract(__pyx_t_1, __pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 957, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __pyx_t_10 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 958, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyNumber_Absolute(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 957, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_dlatt_next = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":961
+      /* "c_tools.pyx":960
  * 
  *                 # check if at least maintaining longitudinal/lateral distance
  *                 latt_maintains = dlatt_next <= dlatt_curr             # <<<<<<<<<<<<<<
  *                 long_maintains = dlong_next <= dlong_curr
  *                 maintains = latt_maintains and long_maintains
  */
-      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlatt_next, __pyx_v_dlatt_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 961, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlatt_next, __pyx_v_dlatt_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 960, __pyx_L1_error)
       __pyx_v_latt_maintains = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":962
+      /* "c_tools.pyx":961
  *                 # check if at least maintaining longitudinal/lateral distance
  *                 latt_maintains = dlatt_next <= dlatt_curr
  *                 long_maintains = dlong_next <= dlong_curr             # <<<<<<<<<<<<<<
  *                 maintains = latt_maintains and long_maintains
  * 
  */
-      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlong_next, __pyx_v_dlong_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 962, __pyx_L1_error)
+      __pyx_t_10 = PyObject_RichCompare(__pyx_v_dlong_next, __pyx_v_dlong_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_10); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 961, __pyx_L1_error)
       __pyx_v_long_maintains = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":963
+      /* "c_tools.pyx":962
  *                 latt_maintains = dlatt_next <= dlatt_curr
  *                 long_maintains = dlong_next <= dlong_curr
  *                 maintains = latt_maintains and long_maintains             # <<<<<<<<<<<<<<
  * 
  *                 # TODO: separate into two different oracles to distinguish cases
  */
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_latt_maintains); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 963, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_latt_maintains); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 962, __pyx_L1_error)
       if (__pyx_t_4) {
       } else {
         __Pyx_INCREF(__pyx_v_latt_maintains);
@@ -22933,7 +22911,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_v_maintains = __pyx_t_10;
       __pyx_t_10 = 0;
 
-      /* "c_tools.pyx":967
+      /* "c_tools.pyx":966
  *                 # TODO: separate into two different oracles to distinguish cases
  *                 # only need to check reachability for braking backup plan because this implies reachability for current action
  *                 return maintains             # <<<<<<<<<<<<<<
@@ -22945,7 +22923,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
       __pyx_r = __pyx_v_maintains;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":949
+      /* "c_tools.pyx":948
  *                 else:
  *                     return False
  *             elif queried_bundle == subgoal_bundle:             # <<<<<<<<<<<<<<
@@ -22954,7 +22932,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
  */
     }
 
-    /* "c_tools.pyx":969
+    /* "c_tools.pyx":968
  *                 return maintains
  *             else:
  *                 return False             # <<<<<<<<<<<<<<
@@ -22969,7 +22947,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
     }
   }
 
-  /* "c_tools.pyx":910
+  /* "c_tools.pyx":909
  *     def __init__(self):
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -23013,7 +22991,7 @@ static PyObject *__pyx_pf_7c_tools_31MaintenanceBundleProgressOracle_2evaluate(C
   return __pyx_r;
 }
 
-/* "c_tools.pyx":974
+/* "c_tools.pyx":973
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -23043,16 +23021,16 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle___init__(CYTHON_U
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":975
+  /* "c_tools.pyx":974
  * class TrafficIntersectionOracle(Oracle):
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TrafficIntersectionOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 975, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_TrafficIntersectionOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 975, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -23060,22 +23038,22 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle___init__(CYTHON_U
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 975, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 975, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 975, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_traffic_intersection) < 0) __PYX_ERR(0, 975, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 975, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_traffic_intersection) < 0) __PYX_ERR(0, 974, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 974, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":974
+  /* "c_tools.pyx":973
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -23098,7 +23076,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle___init__(CYTHON_U
   return __pyx_r;
 }
 
-/* "c_tools.pyx":976
+/* "c_tools.pyx":975
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -23144,23 +23122,23 @@ static PyObject *__pyx_pw_7c_tools_25TrafficIntersectionOracle_3evaluate(PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 976, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 975, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 976, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 975, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 976, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 975, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 976, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 975, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -23177,7 +23155,7 @@ static PyObject *__pyx_pw_7c_tools_25TrafficIntersectionOracle_3evaluate(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 976, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 975, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficIntersectionOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -23190,7 +23168,7 @@ static PyObject *__pyx_pw_7c_tools_25TrafficIntersectionOracle_3evaluate(PyObjec
   return __pyx_r;
 }
 
-/* "c_tools.pyx":977
+/* "c_tools.pyx":976
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):             # <<<<<<<<<<<<<<
@@ -23230,11 +23208,11 @@ static PyObject *__pyx_pw_7c_tools_25TrafficIntersectionOracle_8evaluate_1check_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_heading)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("check_heading_matches_bundle_heading", 1, 2, 2, 1); __PYX_ERR(0, 977, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("check_heading_matches_bundle_heading", 1, 2, 2, 1); __PYX_ERR(0, 976, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_heading_matches_bundle_heading") < 0)) __PYX_ERR(0, 977, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "check_heading_matches_bundle_heading") < 0)) __PYX_ERR(0, 976, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -23247,7 +23225,7 @@ static PyObject *__pyx_pw_7c_tools_25TrafficIntersectionOracle_8evaluate_1check_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("check_heading_matches_bundle_heading", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 977, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("check_heading_matches_bundle_heading", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 976, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.TrafficIntersectionOracle.evaluate.check_heading_matches_bundle_heading", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -23272,7 +23250,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("check_heading_matches_bundle_heading", 0);
 
-  /* "c_tools.pyx":978
+  /* "c_tools.pyx":977
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:             # <<<<<<<<<<<<<<
@@ -23283,26 +23261,26 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
     __pyx_t_1 = __pyx_v_bundles; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_bundles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 978, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_bundles); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 977, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 978, __pyx_L1_error)
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 977, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 978, __pyx_L1_error)
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 977, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 978, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 977, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 978, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 977, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 978, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 977, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       }
@@ -23312,7 +23290,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 978, __pyx_L1_error)
+          else __PYX_ERR(0, 977, __pyx_L1_error)
         }
         break;
       }
@@ -23321,22 +23299,22 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
     __Pyx_XDECREF_SET(__pyx_v_bundle, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":979
+    /* "c_tools.pyx":978
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:
  *                 if bundle.direction == heading:             # <<<<<<<<<<<<<<
  *                     return True
  *             return False
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bundle, __pyx_n_s_direction); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 979, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bundle, __pyx_n_s_direction); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 978, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_4, __pyx_v_heading, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 979, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_t_4, __pyx_v_heading, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 978, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 979, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 978, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_6) {
 
-      /* "c_tools.pyx":980
+      /* "c_tools.pyx":979
  *             for bundle in bundles:
  *                 if bundle.direction == heading:
  *                     return True             # <<<<<<<<<<<<<<
@@ -23349,7 +23327,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":979
+      /* "c_tools.pyx":978
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:
  *                 if bundle.direction == heading:             # <<<<<<<<<<<<<<
@@ -23358,7 +23336,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
  */
     }
 
-    /* "c_tools.pyx":978
+    /* "c_tools.pyx":977
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:             # <<<<<<<<<<<<<<
@@ -23368,7 +23346,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":981
+  /* "c_tools.pyx":980
  *                 if bundle.direction == heading:
  *                     return True
  *             return False             # <<<<<<<<<<<<<<
@@ -23380,7 +23358,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "c_tools.pyx":977
+  /* "c_tools.pyx":976
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):             # <<<<<<<<<<<<<<
@@ -23402,7 +23380,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_h
   return __pyx_r;
 }
 
-/* "c_tools.pyx":976
+/* "c_tools.pyx":975
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -23434,47 +23412,47 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   Py_ssize_t __pyx_t_9;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":977
+  /* "c_tools.pyx":976
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):             # <<<<<<<<<<<<<<
  *             for bundle in bundles:
  *                 if bundle.direction == heading:
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_8evaluate_1check_heading_matches_bundle_heading, 0, __pyx_n_s_TrafficIntersectionOracle_evalua, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 977, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_8evaluate_1check_heading_matches_bundle_heading, 0, __pyx_n_s_TrafficIntersectionOracle_evalua, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__24)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 976, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_check_heading_matches_bundle_heading = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":984
+  /* "c_tools.pyx":983
  * 
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((plant.state.x,plant.state.y))             # <<<<<<<<<<<<<<
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_game); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
@@ -23495,20 +23473,20 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 984, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_currently_in_intersection = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":985
+  /* "c_tools.pyx":984
  *         # When agent is NOT CROSSING INTO INTERSECTION
  *         currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((plant.state.x,plant.state.y))
  *         next_state = plant.query_next_state(ctrl_action)             # <<<<<<<<<<<<<<
  *         x_next, y_next = next_state.x, next_state.y
  *         will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 985, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_next_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 984, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -23522,47 +23500,47 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 985, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 984, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_next_state = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":986
+  /* "c_tools.pyx":985
  *         currently_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((plant.state.x,plant.state.y))
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y             # <<<<<<<<<<<<<<
  *         will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))
  *             #bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 986, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 985, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 986, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 985, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_x_next = __pyx_t_1;
   __pyx_t_1 = 0;
   __pyx_v_y_next = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":987
+  /* "c_tools.pyx":986
  *         next_state = plant.query_next_state(ctrl_action)
  *         x_next, y_next = next_state.x, next_state.y
  *         will_be_in_intersection = plant.supervisor.game.map.tile_is_in_intersection((x_next,y_next))             # <<<<<<<<<<<<<<
  *             #bp_state = plant.query_occupancy(plant.get_backup_plan_ctrl(), state=next_state)[-1]
  *             #x_next_bp, y_next_bp = bp_state.x, bp_state.y
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_supervisor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_game); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_tile_is_in_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_x_next);
   __Pyx_GIVEREF(__pyx_v_x_next);
@@ -23583,48 +23561,48 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 987, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 986, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_will_be_in_intersection = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":995
+  /* "c_tools.pyx":994
  * 
  *         # if agent is currently in intersection or action will take agent into intersection
  *         if currently_in_intersection or will_be_in_intersection:             # <<<<<<<<<<<<<<
  *             ego_tile = plant.state.x, plant.state.y
  *             ego_heading = plant.state.heading
  */
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 995, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_currently_in_intersection); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 994, __pyx_L1_error)
   if (!__pyx_t_7) {
   } else {
     __pyx_t_6 = __pyx_t_7;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 995, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_will_be_in_intersection); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 994, __pyx_L1_error)
   __pyx_t_6 = __pyx_t_7;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_6) {
 
-    /* "c_tools.pyx":996
+    /* "c_tools.pyx":995
  *         # if agent is currently in intersection or action will take agent into intersection
  *         if currently_in_intersection or will_be_in_intersection:
  *             ego_tile = plant.state.x, plant.state.y             # <<<<<<<<<<<<<<
  *             ego_heading = plant.state.heading
  *             bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 995, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 995, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 995, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 995, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 995, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -23635,44 +23613,44 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     __pyx_v_ego_tile = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "c_tools.pyx":997
+    /* "c_tools.pyx":996
  *         if currently_in_intersection or will_be_in_intersection:
  *             ego_tile = plant.state.x, plant.state.y
  *             ego_heading = plant.state.heading             # <<<<<<<<<<<<<<
  *             bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
  *             # check if ego_heading aligns with any of bundles at the tile
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 997, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 997, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 996, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_ego_heading = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":998
+    /* "c_tools.pyx":997
  *             ego_tile = plant.state.x, plant.state.y
  *             ego_heading = plant.state.heading
  *             bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]             # <<<<<<<<<<<<<<
  *             # check if ego_heading aligns with any of bundles at the tile
  *             chk_heading_match = check_heading_matches_bundle_heading(bundles, ego_heading)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_tile_to_bundle_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_tile_to_bundle_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -23680,40 +23658,40 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_5);
     __pyx_t_2 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 998, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 997, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_bundles = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":1000
+    /* "c_tools.pyx":999
  *             bundles = game.map.tile_to_bundle_map[plant.state.x,plant.state.y]
  *             # check if ego_heading aligns with any of bundles at the tile
  *             chk_heading_match = check_heading_matches_bundle_heading(bundles, ego_heading)             # <<<<<<<<<<<<<<
  * 
  *             # TODO: change
  */
-    __pyx_t_5 = __pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_heading_matches_bundle_heading(__pyx_v_check_heading_matches_bundle_heading, __pyx_v_bundles, __pyx_v_ego_heading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1000, __pyx_L1_error)
+    __pyx_t_5 = __pyx_pf_7c_tools_25TrafficIntersectionOracle_8evaluate_check_heading_matches_bundle_heading(__pyx_v_check_heading_matches_bundle_heading, __pyx_v_bundles, __pyx_v_ego_heading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 999, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_v_chk_heading_match = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":1003
+    /* "c_tools.pyx":1002
  * 
  *             # TODO: change
  *             if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
  *                 return True
  *             # else don't make a lane change in an intersection
  */
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_chk_heading_match); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_chk_heading_match); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1002, __pyx_L1_error)
     __pyx_t_8 = ((!__pyx_t_7) != 0);
     if (!__pyx_t_8) {
     } else {
       __pyx_t_6 = __pyx_t_8;
       goto __pyx_L7_bool_binop_done;
     }
-    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1002, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_v_ego_tile);
     __Pyx_GIVEREF(__pyx_v_ego_tile);
@@ -23721,12 +23699,12 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     __Pyx_INCREF(__pyx_v_ego_heading);
     __Pyx_GIVEREF(__pyx_v_ego_heading);
     PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_v_ego_heading);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1002, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_special_goal_tiles); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1002, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_5, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_5, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 1002, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_7 = (__pyx_t_8 != 0);
@@ -23734,7 +23712,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     __pyx_L7_bool_binop_done:;
     if (__pyx_t_6) {
 
-      /* "c_tools.pyx":1004
+      /* "c_tools.pyx":1003
  *             # TODO: change
  *             if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:
  *                 return True             # <<<<<<<<<<<<<<
@@ -23746,7 +23724,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":1003
+      /* "c_tools.pyx":1002
  * 
  *             # TODO: change
  *             if not chk_heading_match or (ego_tile, ego_heading) in game.map.special_goal_tiles:             # <<<<<<<<<<<<<<
@@ -23755,7 +23733,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  */
     }
 
-    /* "c_tools.pyx":1007
+    /* "c_tools.pyx":1006
  *             # else don't make a lane change in an intersection
  *             else:
  *                 if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':             # <<<<<<<<<<<<<<
@@ -23763,24 +23741,24 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  *                 else:
  */
     /*else*/ {
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1007, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1006, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_7 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1007, __pyx_L1_error)
+      __pyx_t_7 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_left_lane, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1006, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       if (!__pyx_t_7) {
       } else {
         __pyx_t_6 = __pyx_t_7;
         goto __pyx_L10_bool_binop_done;
       }
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1007, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_ctrl_action, __pyx_n_s_steer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1006, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_7 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1007, __pyx_L1_error)
+      __pyx_t_7 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_kp_s_right_lane, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 1006, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_6 = __pyx_t_7;
       __pyx_L10_bool_binop_done:;
       if (__pyx_t_6) {
 
-        /* "c_tools.pyx":1008
+        /* "c_tools.pyx":1007
  *             else:
  *                 if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':
  *                     return False             # <<<<<<<<<<<<<<
@@ -23792,7 +23770,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
         __pyx_r = Py_False;
         goto __pyx_L0;
 
-        /* "c_tools.pyx":1007
+        /* "c_tools.pyx":1006
  *             # else don't make a lane change in an intersection
  *             else:
  *                 if ctrl_action['steer'] == 'left-lane' or ctrl_action['steer'] == 'right-lane':             # <<<<<<<<<<<<<<
@@ -23801,7 +23779,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  */
       }
 
-      /* "c_tools.pyx":1010
+      /* "c_tools.pyx":1009
  *                     return False
  *                 else:
  *                     return True             # <<<<<<<<<<<<<<
@@ -23816,7 +23794,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
       }
     }
 
-    /* "c_tools.pyx":995
+    /* "c_tools.pyx":994
  * 
  *         # if agent is currently in intersection or action will take agent into intersection
  *         if currently_in_intersection or will_be_in_intersection:             # <<<<<<<<<<<<<<
@@ -23825,29 +23803,29 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  */
   }
 
-  /* "c_tools.pyx":1012
+  /* "c_tools.pyx":1011
  *                     return True
  * 
  *         elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:             # <<<<<<<<<<<<<<
  *             return True
  *         elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_y); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
@@ -23855,7 +23833,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1012, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1011, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -23864,7 +23842,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   __pyx_t_7 = (__pyx_t_6 != 0);
   if (__pyx_t_7) {
 
-    /* "c_tools.pyx":1013
+    /* "c_tools.pyx":1012
  * 
  *         elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
  *             return True             # <<<<<<<<<<<<<<
@@ -23876,7 +23854,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":1012
+    /* "c_tools.pyx":1011
  *                     return True
  * 
  *         elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:             # <<<<<<<<<<<<<<
@@ -23885,29 +23863,29 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  */
   }
 
-  /* "c_tools.pyx":1014
+  /* "c_tools.pyx":1013
  *         elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
  *             return True
  *         elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:             # <<<<<<<<<<<<<<
  *             return True
  *         else:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_state); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5);
@@ -23915,16 +23893,16 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
   __pyx_t_5 = 0;
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_t_9 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1013, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_7 = ((__pyx_t_9 <= 1) != 0);
   if (__pyx_t_7) {
 
-    /* "c_tools.pyx":1015
+    /* "c_tools.pyx":1014
  *             return True
  *         elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:
  *             return True             # <<<<<<<<<<<<<<
@@ -23936,7 +23914,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":1014
+    /* "c_tools.pyx":1013
  *         elif game.map.legal_orientations[(plant.state.x, plant.state.y)] is None:
  *             return True
  *         elif len(game.map.legal_orientations[(plant.state.x, plant.state.y)]) <= 1:             # <<<<<<<<<<<<<<
@@ -23945,7 +23923,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  */
   }
 
-  /* "c_tools.pyx":1017
+  /* "c_tools.pyx":1016
  *             return True
  *         else:
  *             print('unknown case')             # <<<<<<<<<<<<<<
@@ -23953,9 +23931,9 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
  * 
  */
   /*else*/ {
-    if (__Pyx_PrintOne(0, __pyx_kp_s_unknown_case) < 0) __PYX_ERR(0, 1017, __pyx_L1_error)
+    if (__Pyx_PrintOne(0, __pyx_kp_s_unknown_case) < 0) __PYX_ERR(0, 1016, __pyx_L1_error)
 
-    /* "c_tools.pyx":1018
+    /* "c_tools.pyx":1017
  *         else:
  *             print('unknown case')
  *             return False             # <<<<<<<<<<<<<<
@@ -23968,7 +23946,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
     goto __pyx_L0;
   }
 
-  /* "c_tools.pyx":976
+  /* "c_tools.pyx":975
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -24001,7 +23979,7 @@ static PyObject *__pyx_pf_7c_tools_25TrafficIntersectionOracle_2evaluate(CYTHON_
   return __pyx_r;
 }
 
-/* "c_tools.pyx":1025
+/* "c_tools.pyx":1024
  * 
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -24031,16 +24009,16 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle___init__(CYTHON_UNUS
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":1026
+  /* "c_tools.pyx":1025
  *     """
  *     def __init__(self):
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LegalOrientationOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_LegalOrientationOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -24048,22 +24026,22 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle___init__(CYTHON_UNUS
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_legal_orientation) < 0) __PYX_ERR(0, 1026, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1026, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_legal_orientation) < 0) __PYX_ERR(0, 1025, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1025, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":1025
+  /* "c_tools.pyx":1024
  * 
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -24086,7 +24064,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle___init__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "c_tools.pyx":1027
+/* "c_tools.pyx":1026
  *     def __init__(self):
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -24132,23 +24110,23 @@ static PyObject *__pyx_pw_7c_tools_22LegalOrientationOracle_3evaluate(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 1027, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 1026, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 1027, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 1026, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 1027, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 1026, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 1027, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 1026, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -24165,7 +24143,7 @@ static PyObject *__pyx_pw_7c_tools_22LegalOrientationOracle_3evaluate(PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1027, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1026, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.LegalOrientationOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -24191,14 +24169,14 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":1028
+  /* "c_tools.pyx":1027
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):
  *         final_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
  *         final_node = final_state.x, final_state.y
  *         if final_node in game.map.drivable_nodes:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1028, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1027, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24212,27 +24190,27 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1028, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1027, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1028, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1027, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_final_state = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "c_tools.pyx":1029
+  /* "c_tools.pyx":1028
  *     def evaluate(self, ctrl_action, plant, game):
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  *         final_node = final_state.x, final_state.y             # <<<<<<<<<<<<<<
  *         if final_node in game.map.drivable_nodes:
  *             legal_headings = game.map.legal_orientations[final_node]
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1029, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1028, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1029, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1028, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1029, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1028, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -24243,53 +24221,53 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
   __pyx_v_final_node = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":1030
+  /* "c_tools.pyx":1029
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  *         final_node = final_state.x, final_state.y
  *         if final_node in game.map.drivable_nodes:             # <<<<<<<<<<<<<<
  *             legal_headings = game.map.legal_orientations[final_node]
  *             if not legal_headings: # check if node is off road
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1030, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1029, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_drivable_nodes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1030, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_drivable_nodes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1029, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_final_node, __pyx_t_1, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1030, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_v_final_node, __pyx_t_1, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1029, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "c_tools.pyx":1031
+    /* "c_tools.pyx":1030
  *         final_node = final_state.x, final_state.y
  *         if final_node in game.map.drivable_nodes:
  *             legal_headings = game.map.legal_orientations[final_node]             # <<<<<<<<<<<<<<
  *             if not legal_headings: # check if node is off road
  *                 return False
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1031, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_game, __pyx_n_s_map); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1030, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1031, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_legal_orientations); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1030, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_final_node); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1031, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_v_final_node); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1030, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_legal_headings = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":1032
+    /* "c_tools.pyx":1031
  *         if final_node in game.map.drivable_nodes:
  *             legal_headings = game.map.legal_orientations[final_node]
  *             if not legal_headings: # check if node is off road             # <<<<<<<<<<<<<<
  *                 return False
  *             else: # check if next heading is legal
  */
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_legal_headings); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1032, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_legal_headings); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1031, __pyx_L1_error)
     __pyx_t_4 = ((!__pyx_t_5) != 0);
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":1033
+      /* "c_tools.pyx":1032
  *             legal_headings = game.map.legal_orientations[final_node]
  *             if not legal_headings: # check if node is off road
  *                 return False             # <<<<<<<<<<<<<<
@@ -24301,7 +24279,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
       __pyx_r = Py_False;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":1032
+      /* "c_tools.pyx":1031
  *         if final_node in game.map.drivable_nodes:
  *             legal_headings = game.map.legal_orientations[final_node]
  *             if not legal_headings: # check if node is off road             # <<<<<<<<<<<<<<
@@ -24310,7 +24288,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
  */
     }
 
-    /* "c_tools.pyx":1035
+    /* "c_tools.pyx":1034
  *                 return False
  *             else: # check if next heading is legal
  *                 return final_state.heading in legal_headings             # <<<<<<<<<<<<<<
@@ -24319,18 +24297,18 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
  */
     /*else*/ {
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1035, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_final_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1034, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_v_legal_headings, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1035, __pyx_L1_error)
+      __pyx_t_4 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_v_legal_headings, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1034, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1035, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1034, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_r = __pyx_t_1;
       __pyx_t_1 = 0;
       goto __pyx_L0;
     }
 
-    /* "c_tools.pyx":1030
+    /* "c_tools.pyx":1029
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  *         final_node = final_state.x, final_state.y
  *         if final_node in game.map.drivable_nodes:             # <<<<<<<<<<<<<<
@@ -24339,7 +24317,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
  */
   }
 
-  /* "c_tools.pyx":1037
+  /* "c_tools.pyx":1036
  *                 return final_state.heading in legal_headings
  *         else:
  *             return False # if node is an obstacle or out of bounds             # <<<<<<<<<<<<<<
@@ -24353,7 +24331,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
     goto __pyx_L0;
   }
 
-  /* "c_tools.pyx":1027
+  /* "c_tools.pyx":1026
  *     def __init__(self):
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -24377,7 +24355,7 @@ static PyObject *__pyx_pf_7c_tools_22LegalOrientationOracle_2evaluate(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "c_tools.pyx":1040
+/* "c_tools.pyx":1039
  * 
  * class BackupPlanSafetyOracle(Oracle):
  *     def __init__(self,flag):             # <<<<<<<<<<<<<<
@@ -24417,11 +24395,11 @@ static PyObject *__pyx_pw_7c_tools_22BackupPlanSafetyOracle_1__init__(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_flag)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 1040, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 1039, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 1040, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 1039, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -24434,7 +24412,7 @@ static PyObject *__pyx_pw_7c_tools_22BackupPlanSafetyOracle_1__init__(PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1040, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1039, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.BackupPlanSafetyOracle.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -24455,16 +24433,16 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle___init__(CYTHON_UNUS
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "c_tools.pyx":1041
+  /* "c_tools.pyx":1040
  * class BackupPlanSafetyOracle(Oracle):
  *     def __init__(self,flag):
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')             # <<<<<<<<<<<<<<
  *         self.flag = flag
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_BackupPlanSafetyOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_BackupPlanSafetyOracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -24472,31 +24450,31 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle___init__(CYTHON_UNUS
   __Pyx_GIVEREF(__pyx_v_self);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_backup_plan_safety) < 0) __PYX_ERR(0, 1041, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1041, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_name, __pyx_n_s_backup_plan_safety) < 0) __PYX_ERR(0, 1040, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1040, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":1042
+  /* "c_tools.pyx":1041
  *     def __init__(self,flag):
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag             # <<<<<<<<<<<<<<
  *     def evaluate(self, ctrl_action, plant, game):
  *         # check if collision occurs by taking that action
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_flag, __pyx_v_flag) < 0) __PYX_ERR(0, 1042, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_flag, __pyx_v_flag) < 0) __PYX_ERR(0, 1041, __pyx_L1_error)
 
-  /* "c_tools.pyx":1040
+  /* "c_tools.pyx":1039
  * 
  * class BackupPlanSafetyOracle(Oracle):
  *     def __init__(self,flag):             # <<<<<<<<<<<<<<
@@ -24519,7 +24497,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle___init__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "c_tools.pyx":1043
+/* "c_tools.pyx":1042
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -24565,23 +24543,23 @@ static PyObject *__pyx_pw_7c_tools_22BackupPlanSafetyOracle_3evaluate(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_ctrl_action)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 1043, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 1); __PYX_ERR(0, 1042, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_plant)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 1043, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 2); __PYX_ERR(0, 1042, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_game)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 1043, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, 3); __PYX_ERR(0, 1042, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 1043, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "evaluate") < 0)) __PYX_ERR(0, 1042, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -24598,7 +24576,7 @@ static PyObject *__pyx_pw_7c_tools_22BackupPlanSafetyOracle_3evaluate(PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1043, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("evaluate", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1042, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("c_tools.BackupPlanSafetyOracle.evaluate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -24635,14 +24613,14 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("evaluate", 0);
 
-  /* "c_tools.pyx":1045
+  /* "c_tools.pyx":1044
  *     def evaluate(self, ctrl_action, plant, game):
  *         # check if collision occurs by taking that action
  *         collision_chk = plant.check_collision_in_bubble(ctrl_action)             # <<<<<<<<<<<<<<
  *         if collision_chk:
  *             #print('collison occurred, returning false')
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_check_collision_in_bubble); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1045, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_check_collision_in_bubble); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1044, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24656,23 +24634,23 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1045, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1044, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_collision_chk = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":1046
+  /* "c_tools.pyx":1045
  *         # check if collision occurs by taking that action
  *         collision_chk = plant.check_collision_in_bubble(ctrl_action)
  *         if collision_chk:             # <<<<<<<<<<<<<<
  *             #print('collison occurred, returning false')
  *             return False
  */
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_collision_chk); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1046, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_collision_chk); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1045, __pyx_L1_error)
   if (__pyx_t_4) {
 
-    /* "c_tools.pyx":1048
+    /* "c_tools.pyx":1047
  *         if collision_chk:
  *             #print('collison occurred, returning false')
  *             return False             # <<<<<<<<<<<<<<
@@ -24684,7 +24662,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
     __pyx_r = Py_False;
     goto __pyx_L0;
 
-    /* "c_tools.pyx":1046
+    /* "c_tools.pyx":1045
  *         # check if collision occurs by taking that action
  *         collision_chk = plant.check_collision_in_bubble(ctrl_action)
  *         if collision_chk:             # <<<<<<<<<<<<<<
@@ -24693,7 +24671,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  */
   }
 
-  /* "c_tools.pyx":1051
+  /* "c_tools.pyx":1050
  *         else:
  *             # check if makes collision with agent during action
  *             next_state = plant.query_occupancy(ctrl_action)[-1]             # <<<<<<<<<<<<<<
@@ -24701,7 +24679,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  *             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1051, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_query_occupancy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1050, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24715,29 +24693,29 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
     }
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_ctrl_action) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_ctrl_action);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1051, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1050, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1051, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1050, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_next_state = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "c_tools.pyx":1053
+    /* "c_tools.pyx":1052
  *             next_state = plant.query_occupancy(ctrl_action)[-1]
  * 
  *             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v             # <<<<<<<<<<<<<<
  *             lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1052, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_y); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1052, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_heading); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1052, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_next_state, __pyx_n_s_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1052, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_v_x = __pyx_t_2;
     __pyx_t_2 = 0;
@@ -24748,57 +24726,57 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
     __pyx_v_v = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "c_tools.pyx":1054
+    /* "c_tools.pyx":1053
  * 
  *             x, y, heading, v = next_state.x, next_state.y, next_state.heading, next_state.v
  *             lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)             # <<<<<<<<<<<<<<
  * 
  *             if lead_agent:
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_find_lead_agent); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1053, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1053, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 1054, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_inside_bubble, Py_True) < 0) __PYX_ERR(0, 1054, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 1054, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1054, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_state, __pyx_v_next_state) < 0) __PYX_ERR(0, 1053, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_inside_bubble, Py_True) < 0) __PYX_ERR(0, 1053, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_same_heading_required, Py_False) < 0) __PYX_ERR(0, 1053, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1053, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_lead_agent = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "c_tools.pyx":1056
+    /* "c_tools.pyx":1055
  *             lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
  * 
  *             if lead_agent:             # <<<<<<<<<<<<<<
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
  *                 v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
  */
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1056, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_lead_agent); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1055, __pyx_L1_error)
     if (__pyx_t_4) {
 
-      /* "c_tools.pyx":1057
+      /* "c_tools.pyx":1056
  * 
  *             if lead_agent:
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v             # <<<<<<<<<<<<<<
  *                 v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1057, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_x_a = __pyx_t_3;
@@ -24808,18 +24786,18 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_v_v_a = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":1058
+      /* "c_tools.pyx":1057
  *             if lead_agent:
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
  *                 v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)             # <<<<<<<<<<<<<<
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
  *                 # record lead agent
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_add_perception_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1058, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_add_perception_error); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1057, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_v_min); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1058, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_v_min); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1057, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_flag); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1058, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_flag); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1057, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_6 = NULL;
       __pyx_t_7 = 0;
@@ -24836,7 +24814,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_v_a, __pyx_t_3, __pyx_t_1};
-        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1058, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1057, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -24846,7 +24824,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_v_a, __pyx_t_3, __pyx_t_1};
-        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1058, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1057, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -24854,7 +24832,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       } else
       #endif
       {
-        __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1058, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1057, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         if (__pyx_t_6) {
           __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -24868,7 +24846,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
         PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_7, __pyx_t_1);
         __pyx_t_3 = 0;
         __pyx_t_1 = 0;
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1058, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1057, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
@@ -24876,29 +24854,29 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __Pyx_DECREF_SET(__pyx_v_v_a, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":1059
+      /* "c_tools.pyx":1058
  *                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
  *                 v_a = add_perception_error(v_a, lead_agent.v_min, self.flag)
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)             # <<<<<<<<<<<<<<
  *                 # record lead agent
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_math); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_math); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_sqrt); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Subtract(__pyx_v_x_a, __pyx_v_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_v_x_a, __pyx_v_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_1 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Subtract(__pyx_v_y_a, __pyx_v_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_v_y_a, __pyx_v_y); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_3 = PyNumber_Power(__pyx_t_5, __pyx_int_2, Py_None); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -24915,22 +24893,22 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1059, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1058, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_gap_curr = __pyx_t_2;
       __pyx_t_2 = 0;
 
-      /* "c_tools.pyx":1061
+      /* "c_tools.pyx":1060
  *                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
  *                 # record lead agent
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)             # <<<<<<<<<<<<<<
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr
  */
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_state); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_tuple); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_tuple); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_8 = NULL;
@@ -24945,10 +24923,10 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       }
       __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_get_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_get_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_3 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -24962,12 +24940,12 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       }
       __pyx_t_5 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_agent_color); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_agent_color); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_3 = PyTuple_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_2);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -24981,19 +24959,19 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       __pyx_t_2 = 0;
       __pyx_t_5 = 0;
       __pyx_t_8 = 0;
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_lead_agent, __pyx_t_3) < 0) __PYX_ERR(0, 1061, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_lead_agent, __pyx_t_3) < 0) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "c_tools.pyx":1063
+      /* "c_tools.pyx":1062
  *                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr             # <<<<<<<<<<<<<<
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
  *             else:
  */
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_gap_curr, __pyx_v_gap_curr) < 0) __PYX_ERR(0, 1063, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_plant, __pyx_n_s_gap_curr, __pyx_v_gap_curr) < 0) __PYX_ERR(0, 1062, __pyx_L1_error)
 
-      /* "c_tools.pyx":1064
+      /* "c_tools.pyx":1063
  *                 # record computed gap
  *                 plant.gap_curr = gap_curr
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr             # <<<<<<<<<<<<<<
@@ -25001,11 +24979,11 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  *                 return True
  */
       __Pyx_XDECREF(__pyx_r);
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_compute_gap_req_fast); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_compute_gap_req_fast); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1063, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_lead_agent, __pyx_n_s_a_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1063, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_a_min); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_plant, __pyx_n_s_a_min); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1063, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_1 = NULL;
       __pyx_t_7 = 0;
@@ -25022,7 +25000,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_8)) {
         PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_5, __pyx_v_v_a, __pyx_t_2, __pyx_v_v};
-        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1063, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -25032,7 +25010,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
         PyObject *__pyx_temp[5] = {__pyx_t_1, __pyx_t_5, __pyx_v_v_a, __pyx_t_2, __pyx_v_v};
-        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1063, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -25040,7 +25018,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
       } else
       #endif
       {
-        __pyx_t_6 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1064, __pyx_L1_error)
+        __pyx_t_6 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1063, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         if (__pyx_t_1) {
           __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_1); __pyx_t_1 = NULL;
@@ -25057,18 +25035,18 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
         PyTuple_SET_ITEM(__pyx_t_6, 3+__pyx_t_7, __pyx_v_v);
         __pyx_t_5 = 0;
         __pyx_t_2 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1063, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = PyObject_RichCompare(__pyx_t_3, __pyx_v_gap_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      __pyx_t_8 = PyObject_RichCompare(__pyx_t_3, __pyx_v_gap_curr, Py_LE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1063, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_r = __pyx_t_8;
       __pyx_t_8 = 0;
       goto __pyx_L0;
 
-      /* "c_tools.pyx":1056
+      /* "c_tools.pyx":1055
  *             lead_agent = plant.find_lead_agent(state=next_state, inside_bubble=True, same_heading_required=False)
  * 
  *             if lead_agent:             # <<<<<<<<<<<<<<
@@ -25077,7 +25055,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
  */
     }
 
-    /* "c_tools.pyx":1066
+    /* "c_tools.pyx":1065
  *                 return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
  *             else:
  *                 return True             # <<<<<<<<<<<<<<
@@ -25092,7 +25070,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
     }
   }
 
-  /* "c_tools.pyx":1043
+  /* "c_tools.pyx":1042
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
@@ -25127,7 +25105,7 @@ static PyObject *__pyx_pf_7c_tools_22BackupPlanSafetyOracle_2evaluate(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "c_tools.pyx":1068
+/* "c_tools.pyx":1067
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
@@ -25161,7 +25139,7 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("run", 0);
 
-  /* "c_tools.pyx":1069
+  /* "c_tools.pyx":1068
  * 
  * def run(runnable_set):
  *     for runnable in runnable_set:             # <<<<<<<<<<<<<<
@@ -25172,26 +25150,26 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __pyx_t_1 = __pyx_v_runnable_set; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_runnable_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1069, __pyx_L1_error)
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_runnable_set); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1068, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1069, __pyx_L1_error)
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1068, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1069, __pyx_L1_error)
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1068, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1069, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1068, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1069, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1068, __pyx_L1_error)
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1069, __pyx_L1_error)
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1068, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         #endif
       }
@@ -25201,7 +25179,7 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1069, __pyx_L1_error)
+          else __PYX_ERR(0, 1068, __pyx_L1_error)
         }
         break;
       }
@@ -25210,14 +25188,14 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     __Pyx_XDECREF_SET(__pyx_v_runnable, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":1070
+    /* "c_tools.pyx":1069
  * def run(runnable_set):
  *     for runnable in runnable_set:
  *         runnable.run()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_runnable, __pyx_n_s_run); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1070, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_runnable, __pyx_n_s_run); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1069, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -25231,12 +25209,12 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
     }
     __pyx_t_4 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1070, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1069, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "c_tools.pyx":1069
+    /* "c_tools.pyx":1068
  * 
  * def run(runnable_set):
  *     for runnable in runnable_set:             # <<<<<<<<<<<<<<
@@ -25246,7 +25224,7 @@ static PyObject *__pyx_pf_7c_tools_18run(CYTHON_UNUSED PyObject *__pyx_self, PyO
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":1068
+  /* "c_tools.pyx":1067
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
@@ -25956,7 +25934,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_ERROR, __pyx_k_ERROR, sizeof(__pyx_k_ERROR), 0, 0, 1, 0},
   {&__pyx_kp_s_ERROR_not_a_lane_change_action, __pyx_k_ERROR_not_a_lane_change_action, sizeof(__pyx_k_ERROR_not_a_lane_change_action), 0, 0, 1, 0},
   {&__pyx_n_s_F, __pyx_k_F, sizeof(__pyx_k_F), 0, 0, 1, 1},
-  {&__pyx_n_s_Haha, __pyx_k_Haha, sizeof(__pyx_k_Haha), 0, 0, 1, 1},
   {&__pyx_n_s_ImprovementBundleProgressOracle, __pyx_k_ImprovementBundleProgressOracle, sizeof(__pyx_k_ImprovementBundleProgressOracle), 0, 0, 1, 1},
   {&__pyx_n_s_ImprovementBundleProgressOracle_2, __pyx_k_ImprovementBundleProgressOracle_2, sizeof(__pyx_k_ImprovementBundleProgressOracle_2), 0, 0, 1, 1},
   {&__pyx_n_s_ImprovementBundleProgressOracle_3, __pyx_k_ImprovementBundleProgressOracle_3, sizeof(__pyx_k_ImprovementBundleProgressOracle_3), 0, 0, 1, 1},
@@ -26360,8 +26337,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 169, __pyx_L1_error)
   __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 184, __pyx_L1_error)
   __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 188, __pyx_L1_error)
-  __pyx_builtin_min = __Pyx_GetBuiltinName(__pyx_n_s_min); if (!__pyx_builtin_min) __PYX_ERR(0, 312, __pyx_L1_error)
-  __pyx_builtin_max = __Pyx_GetBuiltinName(__pyx_n_s_max); if (!__pyx_builtin_max) __PYX_ERR(0, 312, __pyx_L1_error)
+  __pyx_builtin_min = __Pyx_GetBuiltinName(__pyx_n_s_min); if (!__pyx_builtin_min) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_builtin_max = __Pyx_GetBuiltinName(__pyx_n_s_max); if (!__pyx_builtin_max) __PYX_ERR(0, 311, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -26421,92 +26398,92 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__7);
   __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(2, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_backup_plan_is_ok_from_state, 212, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 212, __pyx_L1_error)
 
-  /* "c_tools.pyx":356
+  /* "c_tools.pyx":355
  *     def evaluate(self, ctrl_action, plant, game):
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):             # <<<<<<<<<<<<<<
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  */
-  __pyx_tuple__9 = PyTuple_Pack(6, __pyx_n_s_intersection_gap, __pyx_n_s_cnt, __pyx_n_s_forward, __pyx_n_s_curr_st, __pyx_n_s_i, __pyx_n_s_next_tile_tuple); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(6, __pyx_n_s_intersection_gap, __pyx_n_s_cnt, __pyx_n_s_forward, __pyx_n_s_curr_st, __pyx_n_s_i, __pyx_n_s_next_tile_tuple); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 355, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
-  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_count_agents_in_intersection_ahe, 356, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 356, __pyx_L1_error)
+  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_count_agents_in_intersection_ahe, 355, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 355, __pyx_L1_error)
 
-  /* "c_tools.pyx":616
+  /* "c_tools.pyx":615
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):             # <<<<<<<<<<<<<<
  *                 rel_dis = []
  *                 offset = np.array([plant.state.x, plant.state.y])
  */
-  __pyx_tuple__11 = PyTuple_Pack(7, __pyx_n_s_plant, __pyx_n_s_abs_dis, __pyx_n_s_rel_dis, __pyx_n_s_offset, __pyx_n_s_displacement, __pyx_n_s_heading, __pyx_n_s_arr); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 616, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(7, __pyx_n_s_plant, __pyx_n_s_abs_dis, __pyx_n_s_rel_dis, __pyx_n_s_offset, __pyx_n_s_displacement, __pyx_n_s_heading, __pyx_n_s_arr); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 615, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_relativize_displacement, 616, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 616, __pyx_L1_error)
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_relativize_displacement, 615, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 615, __pyx_L1_error)
 
-  /* "c_tools.pyx":564
+  /* "c_tools.pyx":563
  * 
  *         # count agents in the intersection ahead
  *         def count_agents_ahead(gap):             # <<<<<<<<<<<<<<
  *             cnt = 0
  *             # check for number of agents ahead in intersection
  */
-  __pyx_tuple__13 = PyTuple_Pack(6, __pyx_n_s_gap, __pyx_n_s_cnt, __pyx_n_s_forward, __pyx_n_s_curr_st, __pyx_n_s_i, __pyx_n_s_next_tile_tuple); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 564, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(6, __pyx_n_s_gap, __pyx_n_s_cnt, __pyx_n_s_forward, __pyx_n_s_curr_st, __pyx_n_s_i, __pyx_n_s_next_tile_tuple); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 563, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_count_agents_ahead, 564, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 564, __pyx_L1_error)
+  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_count_agents_ahead, 563, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 563, __pyx_L1_error)
 
-  /* "c_tools.pyx":578
+  /* "c_tools.pyx":577
  *         # find the lead agent in the lane agent will turn left into and number of
  *         # agents in intersection that are also making left turn
  *         def find_left_turn_lead_agent(plant, state=None):             # <<<<<<<<<<<<<<
  *             if state == None:
  *                 state = plant.state
  */
-  __pyx_tuple__15 = PyTuple_Pack(14, __pyx_n_s_plant, __pyx_n_s_state, __pyx_n_s_agent_cnt, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_current_heading, __pyx_n_s_heading_degrees, __pyx_n_s_left_heading_degrees, __pyx_n_s_left_heading, __pyx_n_s_forward, __pyx_n_s_next_tile, __pyx_n_s_agent_in_tile, __pyx_n_s_reference_state, __pyx_n_s_lead_agent); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(14, __pyx_n_s_plant, __pyx_n_s_state, __pyx_n_s_agent_cnt, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_current_heading, __pyx_n_s_heading_degrees, __pyx_n_s_left_heading_degrees, __pyx_n_s_left_heading, __pyx_n_s_forward, __pyx_n_s_next_tile, __pyx_n_s_agent_in_tile, __pyx_n_s_reference_state, __pyx_n_s_lead_agent); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 577, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(2, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_find_left_turn_lead_agent, 578, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 578, __pyx_L1_error)
-  __pyx_tuple__17 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(2, 0, 14, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_find_left_turn_lead_agent, 577, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 577, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, ((PyObject *)Py_None)); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 577, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
-  /* "c_tools.pyx":605
+  /* "c_tools.pyx":604
  *         # TODO: need to generalize this TO TILES IN AGENT BUBBLE OR FOV
  *         # returns the appropriate tiles
  *         def get_rel_adjacent_tiles(plant):             # <<<<<<<<<<<<<<
  *             rel_tiles = od()
  *             # TODO: generalize this so field-of-view depends on agent bubble!!!!
  */
-  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_n_s_plant, __pyx_n_s_rel_tiles); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 605, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_n_s_plant, __pyx_n_s_rel_tiles); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 604, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
-  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_get_rel_adjacent_tiles, 605, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 605, __pyx_L1_error)
+  __pyx_codeobj__19 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_get_rel_adjacent_tiles, 604, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__19)) __PYX_ERR(0, 604, __pyx_L1_error)
 
-  /* "c_tools.pyx":614
+  /* "c_tools.pyx":613
  * 
  *         # returns true if the first tile is open and either second or third tile are unoccupied
  *         def check_clearance_gap_for_lane_change(plant, ctrl_action):             # <<<<<<<<<<<<<<
  *             # rotate the vector from
  *             def relativize_displacement(plant, abs_dis):
  */
-  __pyx_tuple__20 = PyTuple_Pack(15, __pyx_n_s_plant, __pyx_n_s_ctrl_action, __pyx_n_s_relativize_displacement, __pyx_n_s_relativize_displacement, __pyx_n_s_rel_tiles, __pyx_n_s_tiles, __pyx_n_s_cnt, __pyx_n_s_tile, __pyx_n_s_current_subgoal, __pyx_n_s_st_f, __pyx_n_s_lead_agent_left, __pyx_n_s_agent_ahead_cnt, __pyx_n_s_ref_state, __pyx_n_s_gap_total, __pyx_n_s_clearance_gaps); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 614, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(15, __pyx_n_s_plant, __pyx_n_s_ctrl_action, __pyx_n_s_relativize_displacement, __pyx_n_s_relativize_displacement, __pyx_n_s_rel_tiles, __pyx_n_s_tiles, __pyx_n_s_cnt, __pyx_n_s_tile, __pyx_n_s_current_subgoal, __pyx_n_s_st_f, __pyx_n_s_lead_agent_left, __pyx_n_s_agent_ahead_cnt, __pyx_n_s_ref_state, __pyx_n_s_gap_total, __pyx_n_s_clearance_gaps); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 613, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(2, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_clearance_gap_for_lane_cha, 614, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 614, __pyx_L1_error)
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(2, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_clearance_gap_for_lane_cha, 613, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 613, __pyx_L1_error)
 
-  /* "c_tools.pyx":977
+  /* "c_tools.pyx":976
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  *         def check_heading_matches_bundle_heading(bundles, heading):             # <<<<<<<<<<<<<<
  *             for bundle in bundles:
  *                 if bundle.direction == heading:
  */
-  __pyx_tuple__23 = PyTuple_Pack(3, __pyx_n_s_bundles, __pyx_n_s_heading, __pyx_n_s_bundle); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 977, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(3, __pyx_n_s_bundles, __pyx_n_s_heading, __pyx_n_s_bundle); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 976, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_heading_matches_bundle_hea, 977, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 977, __pyx_L1_error)
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_heading_matches_bundle_hea, 976, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 976, __pyx_L1_error)
 
   /* "c_tools.pyx":12
  *     caching class intended to be used as a decorator
@@ -26736,284 +26713,284 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GIVEREF(__pyx_tuple__62);
   __pyx_codeobj__63 = (PyObject*)__Pyx_PyCode_New(4, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__62, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_tile_sequence_not_running_a_red, 276, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__63)) __PYX_ERR(0, 276, __pyx_L1_error)
 
-  /* "c_tools.pyx":295
+  /* "c_tools.pyx":294
  *         return True
  * 
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):             # <<<<<<<<<<<<<<
  *         color = traffic_light.check_directed_light_in_N_turns(direction, N)
  *         return color == 'red'
  */
-  __pyx_tuple__64 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_traffic_light, __pyx_n_s_direction, __pyx_n_s_N, __pyx_n_s_color); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_tuple__64 = PyTuple_Pack(5, __pyx_n_s_self, __pyx_n_s_traffic_light, __pyx_n_s_direction, __pyx_n_s_N, __pyx_n_s_color); if (unlikely(!__pyx_tuple__64)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__64);
   __Pyx_GIVEREF(__pyx_tuple__64);
-  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(4, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_if_light_red_in_N_turns, 295, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_codeobj__65 = (PyObject*)__Pyx_PyCode_New(4, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__64, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_if_light_red_in_N_turns, 294, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__65)) __PYX_ERR(0, 294, __pyx_L1_error)
 
-  /* "c_tools.pyx":299
+  /* "c_tools.pyx":298
  *         return color == 'red'
  * 
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         occ_states = plant.query_occupancy(ctrl_action)
  *         occ_tiles = [(state.x, state.y) for state in occ_states]
  */
-  __pyx_tuple__66 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_occ_states, __pyx_n_s_occ_tiles, __pyx_n_s_state); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_tuple__66 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_occ_states, __pyx_n_s_occ_tiles, __pyx_n_s_state); if (unlikely(!__pyx_tuple__66)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__66);
   __Pyx_GIVEREF(__pyx_tuple__66);
-  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_action_not_running_a_red_light, 299, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_codeobj__67 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__66, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_action_not_running_a_red_light, 298, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__67)) __PYX_ERR(0, 298, __pyx_L1_error)
 
-  /* "c_tools.pyx":304
+  /* "c_tools.pyx":303
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):             # <<<<<<<<<<<<<<
  *         if direction in ['west', 'east']:
  *             k = 1
  */
-  __pyx_tuple__68 = PyTuple_Pack(8, __pyx_n_s_self, __pyx_n_s_light_tile, __pyx_n_s_tiles, __pyx_n_s_direction, __pyx_n_s_k, __pyx_n_s_light_tile_projection, __pyx_n_s_tile_projections, __pyx_n_s_tile); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_tuple__68 = PyTuple_Pack(8, __pyx_n_s_self, __pyx_n_s_light_tile, __pyx_n_s_tiles, __pyx_n_s_direction, __pyx_n_s_k, __pyx_n_s_light_tile_projection, __pyx_n_s_tile_projections, __pyx_n_s_tile); if (unlikely(!__pyx_tuple__68)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__68);
   __Pyx_GIVEREF(__pyx_tuple__68);
-  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_if_crossing, 304, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_codeobj__69 = (PyObject*)__Pyx_PyCode_New(4, 0, 8, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__68, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_check_if_crossing, 303, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__69)) __PYX_ERR(0, 303, __pyx_L1_error)
 
-  /* "c_tools.pyx":316
+  /* "c_tools.pyx":315
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
  * 
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         next_state = plant.query_occupancy(ctrl_action)[-1]
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  */
-  __pyx_tuple__70 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_next_state, __pyx_n_s_tile_sequence_chain, __pyx_n_s_tile_sequence, __pyx_n_s_N, __pyx_n_s_required_tiles); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_tuple__70 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_next_state, __pyx_n_s_tile_sequence_chain, __pyx_n_s_tile_sequence, __pyx_n_s_N, __pyx_n_s_required_tiles); if (unlikely(!__pyx_tuple__70)) __PYX_ERR(0, 315, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__70);
   __Pyx_GIVEREF(__pyx_tuple__70);
-  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(4, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_backup_plant_will_still_be_ok, 316, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_codeobj__71 = (PyObject*)__Pyx_PyCode_New(4, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__70, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_backup_plant_will_still_be_ok, 315, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__71)) __PYX_ERR(0, 315, __pyx_L1_error)
 
-  /* "c_tools.pyx":327
+  /* "c_tools.pyx":326
  *         return True
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
  *         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
  */
-  __pyx_tuple__72 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_action_not_running_a_red_light, __pyx_n_s_backup_plant_will_still_be_ok, __pyx_n_s_bundle, __pyx_n_s_traffic_light, __pyx_n_s_light_is_red); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_tuple__72 = PyTuple_Pack(9, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_action_not_running_a_red_light, __pyx_n_s_backup_plant_will_still_be_ok, __pyx_n_s_bundle, __pyx_n_s_traffic_light, __pyx_n_s_light_is_red); if (unlikely(!__pyx_tuple__72)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__72);
   __Pyx_GIVEREF(__pyx_tuple__72);
-  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(4, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 327, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_codeobj__73 = (PyObject*)__Pyx_PyCode_New(4, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__72, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 326, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__73)) __PYX_ERR(0, 326, __pyx_L1_error)
 
-  /* "c_tools.pyx":352
+  /* "c_tools.pyx":351
  * 
  * class IntersectionClearanceOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_tuple__74 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_tuple__74 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__74)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__74);
   __Pyx_GIVEREF(__pyx_tuple__74);
-  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 352, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_codeobj__75 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__74, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 351, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__75)) __PYX_ERR(0, 351, __pyx_L1_error)
 
-  /* "c_tools.pyx":354
+  /* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):
  */
-  __pyx_tuple__77 = PyTuple_Pack(38, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_count_agents_in_intersection_ahe, __pyx_n_s_count_agents_in_intersection_ahe, __pyx_n_s_current_state, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_bp_state, __pyx_n_s_x_next_bp, __pyx_n_s_y_next_bp, __pyx_n_s_currently_in_intersection, __pyx_n_s_will_be_in_intersection, __pyx_n_s_bp_will_be_in_intersection, __pyx_n_s_current_subgoal, __pyx_n_s_next_intersection, __pyx_n_s_current_heading, __pyx_n_s_heading_degrees, __pyx_n_s_left_heading_degrees, __pyx_n_s_left_heading, __pyx_n_s_forward, __pyx_n_s_next_tile, __pyx_n_s_reference_state, __pyx_n_s_intersection_gap, __pyx_n_s_lead_agent, __pyx_n_s_width, __pyx_n_s__76, __pyx_n_s_reference_state_bundle_width, __pyx_n_s_num_residual_tiles, __pyx_n_s_clearance, __pyx_n_s_lead_agent_in_intersection, __pyx_n_s_agent_cnt_in_intersection, __pyx_n_s_x_sv, __pyx_n_s_y_sv); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_tuple__77 = PyTuple_Pack(38, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_count_agents_in_intersection_ahe, __pyx_n_s_count_agents_in_intersection_ahe, __pyx_n_s_current_state, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_bp_state, __pyx_n_s_x_next_bp, __pyx_n_s_y_next_bp, __pyx_n_s_currently_in_intersection, __pyx_n_s_will_be_in_intersection, __pyx_n_s_bp_will_be_in_intersection, __pyx_n_s_current_subgoal, __pyx_n_s_next_intersection, __pyx_n_s_current_heading, __pyx_n_s_heading_degrees, __pyx_n_s_left_heading_degrees, __pyx_n_s_left_heading, __pyx_n_s_forward, __pyx_n_s_next_tile, __pyx_n_s_reference_state, __pyx_n_s_intersection_gap, __pyx_n_s_lead_agent, __pyx_n_s_width, __pyx_n_s__76, __pyx_n_s_reference_state_bundle_width, __pyx_n_s_num_residual_tiles, __pyx_n_s_clearance, __pyx_n_s_lead_agent_in_intersection, __pyx_n_s_agent_cnt_in_intersection, __pyx_n_s_x_sv, __pyx_n_s_y_sv); if (unlikely(!__pyx_tuple__77)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__77);
   __Pyx_GIVEREF(__pyx_tuple__77);
-  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(4, 0, 38, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 354, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_codeobj__78 = (PyObject*)__Pyx_PyCode_New(4, 0, 38, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__77, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 353, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__78)) __PYX_ERR(0, 353, __pyx_L1_error)
 
-  /* "c_tools.pyx":455
+  /* "c_tools.pyx":454
  * 
  * class UnprotectedLeftTurnOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  */
-  __pyx_tuple__79 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__79)) __PYX_ERR(0, 455, __pyx_L1_error)
+  __pyx_tuple__79 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__79)) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__79);
   __Pyx_GIVEREF(__pyx_tuple__79);
-  __pyx_codeobj__80 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__79, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 455, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__80)) __PYX_ERR(0, 455, __pyx_L1_error)
+  __pyx_codeobj__80 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__79, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 454, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__80)) __PYX_ERR(0, 454, __pyx_L1_error)
 
-  /* "c_tools.pyx":458
+  /* "c_tools.pyx":457
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  *     def get_conservative_gap(self, lead_agent, N):             # <<<<<<<<<<<<<<
  *         """
  *         compute how much gap is needed for a continuous left turn for N
  */
-  __pyx_tuple__81 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_lead_agent, __pyx_n_s_N, __pyx_n_s_gap, __pyx_n_s_v_init, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__81)) __PYX_ERR(0, 458, __pyx_L1_error)
+  __pyx_tuple__81 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_lead_agent, __pyx_n_s_N, __pyx_n_s_gap, __pyx_n_s_v_init, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__81)) __PYX_ERR(0, 457, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__81);
   __Pyx_GIVEREF(__pyx_tuple__81);
-  __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_get_conservative_gap, 458, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) __PYX_ERR(0, 458, __pyx_L1_error)
+  __pyx_codeobj__82 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__81, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_get_conservative_gap, 457, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__82)) __PYX_ERR(0, 457, __pyx_L1_error)
 
-  /* "c_tools.pyx":470
+  /* "c_tools.pyx":469
  *         return gap
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  */
-  __pyx_tuple__83 = PyTuple_Pack(27, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_bundle, __pyx_n_s_opposing_bundle, __pyx_n_s_relative_occupancy, __pyx_n_s_relative_tiles, __pyx_n_s_current_intersection, __pyx_n_s_traffic_light, __pyx_n_s_light_color, __pyx_n_s_N, __pyx_n_s_occupancy_tile, __pyx_n_s_abs_x, __pyx_n_s_abs_y, __pyx_n_s_fake_state, __pyx_n_s_lead_agent, __pyx_n_s_gap, __pyx_n_s_gap_requirement, __pyx_n_s_gaps, __pyx_n_s_left_turn_gap_arr, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__83)) __PYX_ERR(0, 470, __pyx_L1_error)
+  __pyx_tuple__83 = PyTuple_Pack(27, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_bundle, __pyx_n_s_opposing_bundle, __pyx_n_s_relative_occupancy, __pyx_n_s_relative_tiles, __pyx_n_s_current_intersection, __pyx_n_s_traffic_light, __pyx_n_s_light_color, __pyx_n_s_N, __pyx_n_s_occupancy_tile, __pyx_n_s_abs_x, __pyx_n_s_abs_y, __pyx_n_s_fake_state, __pyx_n_s_lead_agent, __pyx_n_s_gap, __pyx_n_s_gap_requirement, __pyx_n_s_gaps, __pyx_n_s_left_turn_gap_arr, __pyx_n_s_idx); if (unlikely(!__pyx_tuple__83)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__83);
   __Pyx_GIVEREF(__pyx_tuple__83);
-  __pyx_codeobj__84 = (PyObject*)__Pyx_PyCode_New(4, 0, 27, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__83, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 470, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__84)) __PYX_ERR(0, 470, __pyx_L1_error)
+  __pyx_codeobj__84 = (PyObject*)__Pyx_PyCode_New(4, 0, 27, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__83, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 469, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__84)) __PYX_ERR(0, 469, __pyx_L1_error)
 
-  /* "c_tools.pyx":551
+  /* "c_tools.pyx":550
  * 
  * class NoDeadlockOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  */
-  __pyx_tuple__85 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__85)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_tuple__85 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__85)) __PYX_ERR(0, 550, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__85);
   __Pyx_GIVEREF(__pyx_tuple__85);
-  __pyx_codeobj__86 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__85, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 551, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__86)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_codeobj__86 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__85, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 550, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__86)) __PYX_ERR(0, 550, __pyx_L1_error)
 
-  /* "c_tools.pyx":554
+  /* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
  *         ''' action evaluates to True only if action will maintain one-or-two gaps
  *         depending on whether agent is at an intersection and direction agent wants to turn, i.e.
  */
-  __pyx_tuple__87 = PyTuple_Pack(46, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_save_debug, __pyx_n_s_count_agents_ahead, __pyx_n_s_count_agents_ahead, __pyx_n_s_find_left_turn_lead_agent, __pyx_n_s_find_left_turn_lead_agent, __pyx_n_s_get_rel_adjacent_tiles, __pyx_n_s_get_rel_adjacent_tiles, __pyx_n_s_check_clearance_gap_for_lane_cha, __pyx_n_s_check_clearance_gap_for_lane_cha, __pyx_n_s_current_state, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_bp_state, __pyx_n_s_x_next_bp, __pyx_n_s_y_next_bp, __pyx_n_s_current_heading, __pyx_n_s_ctrl_action_str, __pyx_n_s_currently_in_intersection, __pyx_n_s_will_be_in_intersection, __pyx_n_s_bp_will_be_in_intersection, __pyx_n_s_gap_is_enough, __pyx_n_s_gap_cnt, __pyx_n_s_next_intersection, __pyx_n_s_current_subgoal, __pyx_n_s_traffic_light, __pyx_n_s_light_color, __pyx_n_s_left_turn_chk, __pyx_n_s_lead_agent_left, __pyx_n_s_agent_ahead_cnt, __pyx_n_s_ref_state, __pyx_n_s_gap_total, __pyx_n_s_clearance_gaps, __pyx_n_s_directed_tile, __pyx_n_s_in_rightmost_lane, __pyx_n_s_lead_agent_forward, __pyx_n_s_gap_between_agents, __pyx_n_s_agents_ahead, __pyx_n_s_right_turn_state, __pyx_n_s_right_turn_tile); if (unlikely(!__pyx_tuple__87)) __PYX_ERR(0, 554, __pyx_L1_error)
+  __pyx_tuple__87 = PyTuple_Pack(46, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_save_debug, __pyx_n_s_count_agents_ahead, __pyx_n_s_count_agents_ahead, __pyx_n_s_find_left_turn_lead_agent, __pyx_n_s_find_left_turn_lead_agent, __pyx_n_s_get_rel_adjacent_tiles, __pyx_n_s_get_rel_adjacent_tiles, __pyx_n_s_check_clearance_gap_for_lane_cha, __pyx_n_s_check_clearance_gap_for_lane_cha, __pyx_n_s_current_state, __pyx_n_s_x_curr, __pyx_n_s_y_curr, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_bp_state, __pyx_n_s_x_next_bp, __pyx_n_s_y_next_bp, __pyx_n_s_current_heading, __pyx_n_s_ctrl_action_str, __pyx_n_s_currently_in_intersection, __pyx_n_s_will_be_in_intersection, __pyx_n_s_bp_will_be_in_intersection, __pyx_n_s_gap_is_enough, __pyx_n_s_gap_cnt, __pyx_n_s_next_intersection, __pyx_n_s_current_subgoal, __pyx_n_s_traffic_light, __pyx_n_s_light_color, __pyx_n_s_left_turn_chk, __pyx_n_s_lead_agent_left, __pyx_n_s_agent_ahead_cnt, __pyx_n_s_ref_state, __pyx_n_s_gap_total, __pyx_n_s_clearance_gaps, __pyx_n_s_directed_tile, __pyx_n_s_in_rightmost_lane, __pyx_n_s_lead_agent_forward, __pyx_n_s_gap_between_agents, __pyx_n_s_agents_ahead, __pyx_n_s_right_turn_state, __pyx_n_s_right_turn_tile); if (unlikely(!__pyx_tuple__87)) __PYX_ERR(0, 553, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__87);
   __Pyx_GIVEREF(__pyx_tuple__87);
-  __pyx_codeobj__88 = (PyObject*)__Pyx_PyCode_New(5, 0, 46, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__87, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 554, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__88)) __PYX_ERR(0, 554, __pyx_L1_error)
-  __pyx_tuple__89 = PyTuple_Pack(1, ((PyObject *)Py_False)); if (unlikely(!__pyx_tuple__89)) __PYX_ERR(0, 554, __pyx_L1_error)
+  __pyx_codeobj__88 = (PyObject*)__Pyx_PyCode_New(5, 0, 46, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__87, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 553, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__88)) __PYX_ERR(0, 553, __pyx_L1_error)
+  __pyx_tuple__89 = PyTuple_Pack(1, ((PyObject *)Py_False)); if (unlikely(!__pyx_tuple__89)) __PYX_ERR(0, 553, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__89);
   __Pyx_GIVEREF(__pyx_tuple__89);
 
-  /* "c_tools.pyx":842
+  /* "c_tools.pyx":841
  * class ImprovementBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_tuple__90 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__90)) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_tuple__90 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__90)) __PYX_ERR(0, 841, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__90);
   __Pyx_GIVEREF(__pyx_tuple__90);
-  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__90, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 842, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_codeobj__91 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__90, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 841, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__91)) __PYX_ERR(0, 841, __pyx_L1_error)
 
-  /* "c_tools.pyx":844
+  /* "c_tools.pyx":843
  *     def __init__(self):
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  * 
  *         # get current state
  */
-  __pyx_tuple__92 = PyTuple_Pack(25, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_xy, __pyx_n_s_current_dir, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_subgoal, __pyx_n_s_subgoal_bundle, __pyx_n_s_current_bundle, __pyx_n_s_queried_bundle, __pyx_n_s_rel_curr, __pyx_n_s_rel_next, __pyx_n_s_rel_goal, __pyx_n_s_dlong_curr, __pyx_n_s_dlong_next, __pyx_n_s_dlatt_curr, __pyx_n_s_dlatt_next, __pyx_n_s_latt_improves, __pyx_n_s_long_improves, __pyx_n_s_improves); if (unlikely(!__pyx_tuple__92)) __PYX_ERR(0, 844, __pyx_L1_error)
+  __pyx_tuple__92 = PyTuple_Pack(25, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_xy, __pyx_n_s_current_dir, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_subgoal, __pyx_n_s_subgoal_bundle, __pyx_n_s_current_bundle, __pyx_n_s_queried_bundle, __pyx_n_s_rel_curr, __pyx_n_s_rel_next, __pyx_n_s_rel_goal, __pyx_n_s_dlong_curr, __pyx_n_s_dlong_next, __pyx_n_s_dlatt_curr, __pyx_n_s_dlatt_next, __pyx_n_s_latt_improves, __pyx_n_s_long_improves, __pyx_n_s_improves); if (unlikely(!__pyx_tuple__92)) __PYX_ERR(0, 843, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__92);
   __Pyx_GIVEREF(__pyx_tuple__92);
-  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(4, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__92, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 844, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 844, __pyx_L1_error)
+  __pyx_codeobj__93 = (PyObject*)__Pyx_PyCode_New(4, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__92, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 843, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__93)) __PYX_ERR(0, 843, __pyx_L1_error)
 
-  /* "c_tools.pyx":908
+  /* "c_tools.pyx":907
  * class MaintenanceBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_tuple__94 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__94)) __PYX_ERR(0, 908, __pyx_L1_error)
+  __pyx_tuple__94 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__94)) __PYX_ERR(0, 907, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__94);
   __Pyx_GIVEREF(__pyx_tuple__94);
-  __pyx_codeobj__95 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__94, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 908, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__95)) __PYX_ERR(0, 908, __pyx_L1_error)
+  __pyx_codeobj__95 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__94, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 907, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__95)) __PYX_ERR(0, 907, __pyx_L1_error)
 
-  /* "c_tools.pyx":910
+  /* "c_tools.pyx":909
  *     def __init__(self):
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y
  */
-  __pyx_tuple__96 = PyTuple_Pack(25, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_xy, __pyx_n_s_current_dir, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_subgoal, __pyx_n_s_subgoal_bundle, __pyx_n_s_current_bundle, __pyx_n_s_queried_bundle, __pyx_n_s_rel_curr, __pyx_n_s_rel_next, __pyx_n_s_rel_goal, __pyx_n_s_dlong_curr, __pyx_n_s_dlong_next, __pyx_n_s_dlatt_curr, __pyx_n_s_dlatt_next, __pyx_n_s_latt_maintains, __pyx_n_s_long_maintains, __pyx_n_s_maintains); if (unlikely(!__pyx_tuple__96)) __PYX_ERR(0, 910, __pyx_L1_error)
+  __pyx_tuple__96 = PyTuple_Pack(25, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_current_xy, __pyx_n_s_current_dir, __pyx_n_s_current_directed_tile, __pyx_n_s_queried_state, __pyx_n_s_queried_xy, __pyx_n_s_queried_dir, __pyx_n_s_queried_directed_tile, __pyx_n_s_current_subgoal, __pyx_n_s_subgoal_bundle, __pyx_n_s_current_bundle, __pyx_n_s_queried_bundle, __pyx_n_s_rel_curr, __pyx_n_s_rel_next, __pyx_n_s_rel_goal, __pyx_n_s_dlong_curr, __pyx_n_s_dlong_next, __pyx_n_s_dlatt_curr, __pyx_n_s_dlatt_next, __pyx_n_s_latt_maintains, __pyx_n_s_long_maintains, __pyx_n_s_maintains); if (unlikely(!__pyx_tuple__96)) __PYX_ERR(0, 909, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__96);
   __Pyx_GIVEREF(__pyx_tuple__96);
-  __pyx_codeobj__97 = (PyObject*)__Pyx_PyCode_New(4, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__96, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 910, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__97)) __PYX_ERR(0, 910, __pyx_L1_error)
+  __pyx_codeobj__97 = (PyObject*)__Pyx_PyCode_New(4, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__96, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 909, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__97)) __PYX_ERR(0, 909, __pyx_L1_error)
 
-  /* "c_tools.pyx":974
+  /* "c_tools.pyx":973
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_tuple__98 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__98)) __PYX_ERR(0, 974, __pyx_L1_error)
+  __pyx_tuple__98 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__98)) __PYX_ERR(0, 973, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__98);
   __Pyx_GIVEREF(__pyx_tuple__98);
-  __pyx_codeobj__99 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__98, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 974, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__99)) __PYX_ERR(0, 974, __pyx_L1_error)
+  __pyx_codeobj__99 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__98, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 973, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__99)) __PYX_ERR(0, 973, __pyx_L1_error)
 
-  /* "c_tools.pyx":976
+  /* "c_tools.pyx":975
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:
  */
-  __pyx_tuple__100 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_check_heading_matches_bundle_hea, __pyx_n_s_check_heading_matches_bundle_hea, __pyx_n_s_currently_in_intersection, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_will_be_in_intersection, __pyx_n_s_ego_tile, __pyx_n_s_ego_heading, __pyx_n_s_bundles, __pyx_n_s_chk_heading_match); if (unlikely(!__pyx_tuple__100)) __PYX_ERR(0, 976, __pyx_L1_error)
+  __pyx_tuple__100 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_check_heading_matches_bundle_hea, __pyx_n_s_check_heading_matches_bundle_hea, __pyx_n_s_currently_in_intersection, __pyx_n_s_next_state, __pyx_n_s_x_next, __pyx_n_s_y_next, __pyx_n_s_will_be_in_intersection, __pyx_n_s_ego_tile, __pyx_n_s_ego_heading, __pyx_n_s_bundles, __pyx_n_s_chk_heading_match); if (unlikely(!__pyx_tuple__100)) __PYX_ERR(0, 975, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__100);
   __Pyx_GIVEREF(__pyx_tuple__100);
-  __pyx_codeobj__101 = (PyObject*)__Pyx_PyCode_New(4, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__100, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 976, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__101)) __PYX_ERR(0, 976, __pyx_L1_error)
+  __pyx_codeobj__101 = (PyObject*)__Pyx_PyCode_New(4, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__100, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 975, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__101)) __PYX_ERR(0, 975, __pyx_L1_error)
 
-  /* "c_tools.pyx":1025
+  /* "c_tools.pyx":1024
  * 
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_tuple__102 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__102)) __PYX_ERR(0, 1025, __pyx_L1_error)
+  __pyx_tuple__102 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__102)) __PYX_ERR(0, 1024, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__102);
   __Pyx_GIVEREF(__pyx_tuple__102);
-  __pyx_codeobj__103 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__102, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 1025, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__103)) __PYX_ERR(0, 1025, __pyx_L1_error)
+  __pyx_codeobj__103 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__102, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 1024, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__103)) __PYX_ERR(0, 1024, __pyx_L1_error)
 
-  /* "c_tools.pyx":1027
+  /* "c_tools.pyx":1026
  *     def __init__(self):
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  *         final_node = final_state.x, final_state.y
  */
-  __pyx_tuple__104 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_final_state, __pyx_n_s_final_node, __pyx_n_s_legal_headings); if (unlikely(!__pyx_tuple__104)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __pyx_tuple__104 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_final_state, __pyx_n_s_final_node, __pyx_n_s_legal_headings); if (unlikely(!__pyx_tuple__104)) __PYX_ERR(0, 1026, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__104);
   __Pyx_GIVEREF(__pyx_tuple__104);
-  __pyx_codeobj__105 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__104, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 1027, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__105)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __pyx_codeobj__105 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__104, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 1026, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__105)) __PYX_ERR(0, 1026, __pyx_L1_error)
 
-  /* "c_tools.pyx":1040
+  /* "c_tools.pyx":1039
  * 
  * class BackupPlanSafetyOracle(Oracle):
  *     def __init__(self,flag):             # <<<<<<<<<<<<<<
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  */
-  __pyx_tuple__106 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_flag); if (unlikely(!__pyx_tuple__106)) __PYX_ERR(0, 1040, __pyx_L1_error)
+  __pyx_tuple__106 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_flag); if (unlikely(!__pyx_tuple__106)) __PYX_ERR(0, 1039, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__106);
   __Pyx_GIVEREF(__pyx_tuple__106);
-  __pyx_codeobj__107 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__106, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 1040, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__107)) __PYX_ERR(0, 1040, __pyx_L1_error)
+  __pyx_codeobj__107 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__106, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_init, 1039, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__107)) __PYX_ERR(0, 1039, __pyx_L1_error)
 
-  /* "c_tools.pyx":1043
+  /* "c_tools.pyx":1042
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # check if collision occurs by taking that action
  *         collision_chk = plant.check_collision_in_bubble(ctrl_action)
  */
-  __pyx_tuple__108 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_collision_chk, __pyx_n_s_next_state, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_heading, __pyx_n_s_v, __pyx_n_s_lead_agent, __pyx_n_s_x_a, __pyx_n_s_y_a, __pyx_n_s_v_a, __pyx_n_s_gap_curr); if (unlikely(!__pyx_tuple__108)) __PYX_ERR(0, 1043, __pyx_L1_error)
+  __pyx_tuple__108 = PyTuple_Pack(15, __pyx_n_s_self, __pyx_n_s_ctrl_action, __pyx_n_s_plant, __pyx_n_s_game, __pyx_n_s_collision_chk, __pyx_n_s_next_state, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_heading, __pyx_n_s_v, __pyx_n_s_lead_agent, __pyx_n_s_x_a, __pyx_n_s_y_a, __pyx_n_s_v_a, __pyx_n_s_gap_curr); if (unlikely(!__pyx_tuple__108)) __PYX_ERR(0, 1042, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__108);
   __Pyx_GIVEREF(__pyx_tuple__108);
-  __pyx_codeobj__109 = (PyObject*)__Pyx_PyCode_New(4, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__108, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 1043, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__109)) __PYX_ERR(0, 1043, __pyx_L1_error)
+  __pyx_codeobj__109 = (PyObject*)__Pyx_PyCode_New(4, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__108, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_evaluate, 1042, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__109)) __PYX_ERR(0, 1042, __pyx_L1_error)
 
-  /* "c_tools.pyx":1068
+  /* "c_tools.pyx":1067
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
  *     for runnable in runnable_set:
  *         runnable.run()
  */
-  __pyx_tuple__110 = PyTuple_Pack(2, __pyx_n_s_runnable_set, __pyx_n_s_runnable); if (unlikely(!__pyx_tuple__110)) __PYX_ERR(0, 1068, __pyx_L1_error)
+  __pyx_tuple__110 = PyTuple_Pack(2, __pyx_n_s_runnable_set, __pyx_n_s_runnable); if (unlikely(!__pyx_tuple__110)) __PYX_ERR(0, 1067, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__110);
   __Pyx_GIVEREF(__pyx_tuple__110);
-  __pyx_codeobj__111 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__110, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_run, 1068, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__111)) __PYX_ERR(0, 1068, __pyx_L1_error)
+  __pyx_codeobj__111 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__110, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_c_tools_pyx, __pyx_n_s_run, 1067, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__111)) __PYX_ERR(0, 1067, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -27091,7 +27068,7 @@ static int __Pyx_modinit_type_init_code(void) {
     __pyx_type_7c_tools___pyx_scope_struct_1_evaluate.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
   }
   __pyx_ptype_7c_tools___pyx_scope_struct_1_evaluate = &__pyx_type_7c_tools___pyx_scope_struct_1_evaluate;
-  if (PyType_Ready(&__pyx_type_7c_tools___pyx_scope_struct_2_evaluate) < 0) __PYX_ERR(0, 354, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_7c_tools___pyx_scope_struct_2_evaluate) < 0) __PYX_ERR(0, 353, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7c_tools___pyx_scope_struct_2_evaluate.tp_print = 0;
   #endif
@@ -27099,7 +27076,7 @@ static int __Pyx_modinit_type_init_code(void) {
     __pyx_type_7c_tools___pyx_scope_struct_2_evaluate.tp_getattro = __Pyx_PyObject_GenericGetAttrNoDict;
   }
   __pyx_ptype_7c_tools___pyx_scope_struct_2_evaluate = &__pyx_type_7c_tools___pyx_scope_struct_2_evaluate;
-  if (PyType_Ready(&__pyx_type_7c_tools___pyx_scope_struct_3_evaluate) < 0) __PYX_ERR(0, 554, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_7c_tools___pyx_scope_struct_3_evaluate) < 0) __PYX_ERR(0, 553, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7c_tools___pyx_scope_struct_3_evaluate.tp_print = 0;
   #endif
@@ -27828,64 +27805,64 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_tile_sequence_not_running_a_red, __pyx_t_4) < 0) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":295
+  /* "c_tools.pyx":294
  *         return True
  * 
  *     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):             # <<<<<<<<<<<<<<
  *         color = traffic_light.check_directed_light_in_N_turns(direction, N)
  *         return color == 'red'
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_5check_if_light_red_in_N_turns, 0, __pyx_n_s_TrafficLightOracle_check_if_ligh, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__65)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_5check_if_light_red_in_N_turns, 0, __pyx_n_s_TrafficLightOracle_check_if_ligh, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__65)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_check_if_light_red_in_N_turns, __pyx_t_4) < 0) __PYX_ERR(0, 295, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_check_if_light_red_in_N_turns, __pyx_t_4) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":299
+  /* "c_tools.pyx":298
  *         return color == 'red'
  * 
  *     def action_not_running_a_red_light(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         occ_states = plant.query_occupancy(ctrl_action)
  *         occ_tiles = [(state.x, state.y) for state in occ_states]
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_7action_not_running_a_red_light, 0, __pyx_n_s_TrafficLightOracle_action_not_ru, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__67)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_7action_not_running_a_red_light, 0, __pyx_n_s_TrafficLightOracle_action_not_ru, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__67)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_action_not_running_a_red_light, __pyx_t_4) < 0) __PYX_ERR(0, 299, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_action_not_running_a_red_light, __pyx_t_4) < 0) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":304
+  /* "c_tools.pyx":303
  *         return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
  * 
  *     def check_if_crossing(self, light_tile, tiles, direction):             # <<<<<<<<<<<<<<
  *         if direction in ['west', 'east']:
  *             k = 1
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_9check_if_crossing, 0, __pyx_n_s_TrafficLightOracle_check_if_cros, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__69)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_9check_if_crossing, 0, __pyx_n_s_TrafficLightOracle_check_if_cros, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__69)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_check_if_crossing, __pyx_t_4) < 0) __PYX_ERR(0, 304, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_check_if_crossing, __pyx_t_4) < 0) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":316
+  /* "c_tools.pyx":315
  *             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
  * 
  *     def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         next_state = plant.query_occupancy(ctrl_action)[-1]
  *         tile_sequence_chain = plant.query_backup_plan(state=next_state)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_11backup_plant_will_still_be_ok, 0, __pyx_n_s_TrafficLightOracle_backup_plant, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__71)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_11backup_plant_will_still_be_ok, 0, __pyx_n_s_TrafficLightOracle_backup_plant, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__71)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 315, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_backup_plant_will_still_be_ok, __pyx_t_4) < 0) __PYX_ERR(0, 316, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_backup_plant_will_still_be_ok, __pyx_t_4) < 0) __PYX_ERR(0, 315, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":327
+  /* "c_tools.pyx":326
  *         return True
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
  *         backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_13evaluate, 0, __pyx_n_s_TrafficLightOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__73)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 327, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_18TrafficLightOracle_13evaluate, 0, __pyx_n_s_TrafficLightOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__73)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "c_tools.pyx":271
@@ -27903,493 +27880,493 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":351
+  /* "c_tools.pyx":350
  *             return action_not_running_a_red_light and backup_plant_will_still_be_ok
  * 
  * class IntersectionClearanceOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_IntersectionClearanceOracle, __pyx_n_s_IntersectionClearanceOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_IntersectionClearanceOracle, __pyx_n_s_IntersectionClearanceOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":352
+  /* "c_tools.pyx":351
  * 
  * class IntersectionClearanceOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_1__init__, 0, __pyx_n_s_IntersectionClearanceOracle___in, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__75)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 352, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_1__init__, 0, __pyx_n_s_IntersectionClearanceOracle___in, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__75)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 352, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 351, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":354
+  /* "c_tools.pyx":353
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # return count of number of agents ahead of it in interesection
  *         def count_agents_in_intersection_ahead(intersection_gap):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_3evaluate, 0, __pyx_n_s_IntersectionClearanceOracle_eval_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 354, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_27IntersectionClearanceOracle_3evaluate, 0, __pyx_n_s_IntersectionClearanceOracle_eval_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__78)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 354, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":351
+  /* "c_tools.pyx":350
  *             return action_not_running_a_red_light and backup_plant_will_still_be_ok
  * 
  * class IntersectionClearanceOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(IntersectionClearanceOracle, self).__init__(name='intersection_clearance')
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_IntersectionClearanceOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 351, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_IntersectionClearanceOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IntersectionClearanceOracle, __pyx_t_4) < 0) __PYX_ERR(0, 351, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_IntersectionClearanceOracle, __pyx_t_4) < 0) __PYX_ERR(0, 350, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":454
+  /* "c_tools.pyx":453
  *                 return clearance > intersection_gap #TODO: find a better bound
  * 
  * class UnprotectedLeftTurnOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_n_s_UnprotectedLeftTurnOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_n_s_UnprotectedLeftTurnOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":455
+  /* "c_tools.pyx":454
  * 
  * class UnprotectedLeftTurnOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_1__init__, 0, __pyx_n_s_UnprotectedLeftTurnOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__80)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 455, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_1__init__, 0, __pyx_n_s_UnprotectedLeftTurnOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__80)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 455, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":458
+  /* "c_tools.pyx":457
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  * 
  *     def get_conservative_gap(self, lead_agent, N):             # <<<<<<<<<<<<<<
  *         """
  *         compute how much gap is needed for a continuous left turn for N
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_3get_conservative_gap, 0, __pyx_n_s_UnprotectedLeftTurnOracle_get_co, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__82)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 458, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_3get_conservative_gap, 0, __pyx_n_s_UnprotectedLeftTurnOracle_get_co, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__82)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 457, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_get_conservative_gap, __pyx_t_4) < 0) __PYX_ERR(0, 458, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_get_conservative_gap, __pyx_t_4) < 0) __PYX_ERR(0, 457, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":470
+  /* "c_tools.pyx":469
  *         return gap
  * 
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         current_directed_tile = (plant.state.x, plant.state.y), plant.state.heading
  *         queried_state = plant.query_occupancy(ctrl_action)[-1]
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_5evaluate, 0, __pyx_n_s_UnprotectedLeftTurnOracle_evalua, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__84)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 470, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25UnprotectedLeftTurnOracle_5evaluate, 0, __pyx_n_s_UnprotectedLeftTurnOracle_evalua, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__84)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 470, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":454
+  /* "c_tools.pyx":453
  *                 return clearance > intersection_gap #TODO: find a better bound
  * 
  * class UnprotectedLeftTurnOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(UnprotectedLeftTurnOracle, self).__init__(name='unprotected_left_turn')
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 454, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_t_4) < 0) __PYX_ERR(0, 454, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_UnprotectedLeftTurnOracle, __pyx_t_4) < 0) __PYX_ERR(0, 453, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":550
+  /* "c_tools.pyx":549
  *             return True
  * 
  * class NoDeadlockOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_NoDeadlockOracle, __pyx_n_s_NoDeadlockOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_NoDeadlockOracle, __pyx_n_s_NoDeadlockOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":551
+  /* "c_tools.pyx":550
  * 
  * class NoDeadlockOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_1__init__, 0, __pyx_n_s_NoDeadlockOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__86)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_1__init__, 0, __pyx_n_s_NoDeadlockOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__86)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 550, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 551, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 550, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":554
+  /* "c_tools.pyx":553
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  * 
  *     def evaluate(self, ctrl_action, plant, game, save_debug=False):             # <<<<<<<<<<<<<<
  *         ''' action evaluates to True only if action will maintain one-or-two gaps
  *         depending on whether agent is at an intersection and direction agent wants to turn, i.e.
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_3evaluate, 0, __pyx_n_s_NoDeadlockOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__88)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 554, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_16NoDeadlockOracle_3evaluate, 0, __pyx_n_s_NoDeadlockOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__88)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 553, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_4, __pyx_tuple__89);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 554, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 553, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":550
+  /* "c_tools.pyx":549
  *             return True
  * 
  * class NoDeadlockOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(NoDeadlockOracle, self).__init__(name="no_deadlock")
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_NoDeadlockOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 550, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_NoDeadlockOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_NoDeadlockOracle, __pyx_t_4) < 0) __PYX_ERR(0, 550, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_NoDeadlockOracle, __pyx_t_4) < 0) __PYX_ERR(0, 549, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":840
+  /* "c_tools.pyx":839
  * 
  * 
  * class ImprovementBundleProgressOracle(Oracle):             # <<<<<<<<<<<<<<
  *     # requires a supervisor controller
  *     def __init__(self):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 840, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 840, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 840, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_n_s_ImprovementBundleProgressOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 840, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_n_s_ImprovementBundleProgressOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":842
+  /* "c_tools.pyx":841
  * class ImprovementBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31ImprovementBundleProgressOracle_1__init__, 0, __pyx_n_s_ImprovementBundleProgressOracle_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__91)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31ImprovementBundleProgressOracle_1__init__, 0, __pyx_n_s_ImprovementBundleProgressOracle_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__91)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 841, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 842, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 841, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":844
+  /* "c_tools.pyx":843
  *     def __init__(self):
  *         super(ImprovementBundleProgressOracle, self).__init__(name="improve_progress")
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  * 
  *         # get current state
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31ImprovementBundleProgressOracle_3evaluate, 0, __pyx_n_s_ImprovementBundleProgressOracle_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__93)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 844, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31ImprovementBundleProgressOracle_3evaluate, 0, __pyx_n_s_ImprovementBundleProgressOracle_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__93)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 843, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 844, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 843, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":840
+  /* "c_tools.pyx":839
  * 
  * 
  * class ImprovementBundleProgressOracle(Oracle):             # <<<<<<<<<<<<<<
  *     # requires a supervisor controller
  *     def __init__(self):
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 840, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_t_4) < 0) __PYX_ERR(0, 840, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ImprovementBundleProgressOracle, __pyx_t_4) < 0) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":906
+  /* "c_tools.pyx":905
  *                 return False
  * 
  * class MaintenanceBundleProgressOracle(Oracle):             # <<<<<<<<<<<<<<
  *     # requires a supervisor controller
  *     def __init__(self):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_n_s_MaintenanceBundleProgressOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_n_s_MaintenanceBundleProgressOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":908
+  /* "c_tools.pyx":907
  * class MaintenanceBundleProgressOracle(Oracle):
  *     # requires a supervisor controller
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31MaintenanceBundleProgressOracle_1__init__, 0, __pyx_n_s_MaintenanceBundleProgressOracle_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__95)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 908, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31MaintenanceBundleProgressOracle_1__init__, 0, __pyx_n_s_MaintenanceBundleProgressOracle_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__95)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 907, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 908, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 907, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":910
+  /* "c_tools.pyx":909
  *     def __init__(self):
  *         super(MaintenanceBundleProgressOracle, self).__init__(name='maintain_progress')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # get current state
  *         current_xy = plant.state.x, plant.state.y
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31MaintenanceBundleProgressOracle_3evaluate, 0, __pyx_n_s_MaintenanceBundleProgressOracle_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__97)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 910, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_31MaintenanceBundleProgressOracle_3evaluate, 0, __pyx_n_s_MaintenanceBundleProgressOracle_3, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__97)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 909, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 910, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 909, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":906
+  /* "c_tools.pyx":905
  *                 return False
  * 
  * class MaintenanceBundleProgressOracle(Oracle):             # <<<<<<<<<<<<<<
  *     # requires a supervisor controller
  *     def __init__(self):
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_t_4) < 0) __PYX_ERR(0, 906, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_MaintenanceBundleProgressOracle, __pyx_t_4) < 0) __PYX_ERR(0, 905, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":973
+  /* "c_tools.pyx":972
  * # oracle in charge of checking actions of agents if they are in an intersection
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 973, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 973, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 973, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_TrafficIntersectionOracle, __pyx_n_s_TrafficIntersectionOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 973, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_TrafficIntersectionOracle, __pyx_n_s_TrafficIntersectionOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":974
+  /* "c_tools.pyx":973
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_1__init__, 0, __pyx_n_s_TrafficIntersectionOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__99)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 974, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_1__init__, 0, __pyx_n_s_TrafficIntersectionOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__99)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 973, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 974, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 973, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":976
+  /* "c_tools.pyx":975
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         def check_heading_matches_bundle_heading(bundles, heading):
  *             for bundle in bundles:
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_3evaluate, 0, __pyx_n_s_TrafficIntersectionOracle_evalua_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__101)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 976, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_25TrafficIntersectionOracle_3evaluate, 0, __pyx_n_s_TrafficIntersectionOracle_evalua_2, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__101)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 975, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 976, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 975, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":973
+  /* "c_tools.pyx":972
  * # oracle in charge of checking actions of agents if they are in an intersection
  * # action is invalid if agent is in intersection and wants to change lanes
  * class TrafficIntersectionOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self):
  *         super(TrafficIntersectionOracle, self).__init__(name='traffic_intersection')
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_TrafficIntersectionOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 973, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_TrafficIntersectionOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TrafficIntersectionOracle, __pyx_t_4) < 0) __PYX_ERR(0, 973, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_TrafficIntersectionOracle, __pyx_t_4) < 0) __PYX_ERR(0, 972, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":1020
+  /* "c_tools.pyx":1019
  *             return False
  * 
  * class LegalOrientationOracle(Oracle):             # <<<<<<<<<<<<<<
  *     """
  *     check if next heading is legal
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_LegalOrientationOracle, __pyx_n_s_LegalOrientationOracle, (PyObject *) NULL, __pyx_n_s_c_tools, __pyx_kp_s_check_if_next_heading_is_legal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_3, __pyx_n_s_LegalOrientationOracle, __pyx_n_s_LegalOrientationOracle, (PyObject *) NULL, __pyx_n_s_c_tools, __pyx_kp_s_check_if_next_heading_is_legal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":1025
+  /* "c_tools.pyx":1024
  * 
  *     """
  *     def __init__(self):             # <<<<<<<<<<<<<<
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22LegalOrientationOracle_1__init__, 0, __pyx_n_s_LegalOrientationOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__103)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1025, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22LegalOrientationOracle_1__init__, 0, __pyx_n_s_LegalOrientationOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__103)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1024, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1025, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1024, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":1027
+  /* "c_tools.pyx":1026
  *     def __init__(self):
  *         super(LegalOrientationOracle, self).__init__(name='legal_orientation')
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         final_state = plant.query_occupancy(ctrl_action)[-1]
  *         final_node = final_state.x, final_state.y
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22LegalOrientationOracle_3evaluate, 0, __pyx_n_s_LegalOrientationOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__105)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1027, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22LegalOrientationOracle_3evaluate, 0, __pyx_n_s_LegalOrientationOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__105)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1026, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 1027, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 1026, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":1020
+  /* "c_tools.pyx":1019
  *             return False
  * 
  * class LegalOrientationOracle(Oracle):             # <<<<<<<<<<<<<<
  *     """
  *     check if next heading is legal
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_LegalOrientationOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1020, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_LegalOrientationOracle, __pyx_t_3, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_LegalOrientationOracle, __pyx_t_4) < 0) __PYX_ERR(0, 1020, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_LegalOrientationOracle, __pyx_t_4) < 0) __PYX_ERR(0, 1019, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "c_tools.pyx":1039
+  /* "c_tools.pyx":1038
  *             return False # if node is an obstacle or out of bounds
  * 
  * class BackupPlanSafetyOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self,flag):
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1039, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_Oracle); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1039, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1039, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CalculateMetaclass(NULL, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_BackupPlanSafetyOracle, __pyx_n_s_BackupPlanSafetyOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1039, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3MetaclassPrepare(__pyx_t_3, __pyx_t_1, __pyx_n_s_BackupPlanSafetyOracle, __pyx_n_s_BackupPlanSafetyOracle, (PyObject *) NULL, __pyx_n_s_c_tools, (PyObject *) NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "c_tools.pyx":1040
+  /* "c_tools.pyx":1039
  * 
  * class BackupPlanSafetyOracle(Oracle):
  *     def __init__(self,flag):             # <<<<<<<<<<<<<<
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22BackupPlanSafetyOracle_1__init__, 0, __pyx_n_s_BackupPlanSafetyOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__107)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1040, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22BackupPlanSafetyOracle_1__init__, 0, __pyx_n_s_BackupPlanSafetyOracle___init, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__107)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1039, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1040, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1039, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":1043
+  /* "c_tools.pyx":1042
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  *         self.flag = flag
  *     def evaluate(self, ctrl_action, plant, game):             # <<<<<<<<<<<<<<
  *         # check if collision occurs by taking that action
  *         collision_chk = plant.check_collision_in_bubble(ctrl_action)
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22BackupPlanSafetyOracle_3evaluate, 0, __pyx_n_s_BackupPlanSafetyOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__109)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1043, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_7c_tools_22BackupPlanSafetyOracle_3evaluate, 0, __pyx_n_s_BackupPlanSafetyOracle_evaluate, NULL, __pyx_n_s_c_tools, __pyx_d, ((PyObject *)__pyx_codeobj__109)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1042, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 1043, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_2, __pyx_n_s_evaluate, __pyx_t_4) < 0) __PYX_ERR(0, 1042, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "c_tools.pyx":1039
+  /* "c_tools.pyx":1038
  *             return False # if node is an obstacle or out of bounds
  * 
  * class BackupPlanSafetyOracle(Oracle):             # <<<<<<<<<<<<<<
  *     def __init__(self,flag):
  *         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_BackupPlanSafetyOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1039, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_3, __pyx_n_s_BackupPlanSafetyOracle, __pyx_t_1, __pyx_t_2, NULL, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BackupPlanSafetyOracle, __pyx_t_4) < 0) __PYX_ERR(0, 1039, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BackupPlanSafetyOracle, __pyx_t_4) < 0) __PYX_ERR(0, 1038, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "c_tools.pyx":1068
+  /* "c_tools.pyx":1067
  *                 return True
  * 
  * def run(runnable_set):             # <<<<<<<<<<<<<<
  *     for runnable in runnable_set:
  *         runnable.run()
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7c_tools_19run, NULL, __pyx_n_s_c_tools); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1068, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7c_tools_19run, NULL, __pyx_n_s_c_tools); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1067, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run, __pyx_t_1) < 0) __PYX_ERR(0, 1068, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run, __pyx_t_1) < 0) __PYX_ERR(0, 1067, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "c_tools.pyx":1
