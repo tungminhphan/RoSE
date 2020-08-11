@@ -235,7 +235,7 @@ class Gridder(Agent):
 class Car(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Car'
-        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed']
+        attributes = ['v_min', 'v_max', 'a_min', 'a_max','flag','car_count', 'seed']
         state_variable_names = ['x', 'y', 'heading', 'v']
         #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
@@ -611,6 +611,8 @@ class Car(Agent):
             ctrl = Car.get_ctrl_od(self.a_max, 'straight')
             return ctrl
         x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+        v_a_err = cp.deepcopy(v_a)
+        v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
         # try all acceleration values
         ctrl_acc = np.arange(self.a_max, self.a_min-1, -1)
         for acc_val in ctrl_acc:
@@ -965,9 +967,11 @@ class Car(Agent):
             agents_no_bp = []
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                v_a_err = cp.deepcopy(v_a)
+                v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (compute_gap_req_fast(lead_agent.a_min, v_a, self.a_min, v) > gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a_err, self.a_min, v) > gap_curr):
                     is_safe = False
                     agents_no_bp.append(agent.state.__tuple__())
 
@@ -1096,26 +1100,30 @@ class Car(Agent):
         if st_2 is None:
             st_2 = ag_2.state
 
-        #print("safe config check")
-        #print(ag_1.state, ag_2.state, st_1, st_2)
+        st_2ch = cp.deepcopy(st_2)
+        st_2ch.v = add_perception_error(st_2.v, ag_2.v_min, self.flag)
+
+        # print("safe config check")
+        # print(ag_1.state, ag_2.state, st_1, st_2)
         # first check same lane
-        same_lane_chk = self.check_same_lane(st_1, st_2)
-        #print('same lane check')
-        #print(same_lane_chk)
+        same_lane_chk = self.check_same_lane(st_1, st_2ch)
+        # print('same lane check')
+        # print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
         if not same_lane_chk:
-            #print("not same lane check")
+            # print("not same lane check")
             return True
         # then check which agent is lead and which one is behind
-        ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2)
+        ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2ch)
+
         # if None, agents are on top of each other
         if ag_lead is None:
-            #print("agents on top of each other ")
-            #print()
+            # print("agents on top of each other ")
+            # print()
             return False
 
         gap_req = compute_gap_req_fast(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
-        gap_curr = math.sqrt((st_lead.x-st_behind.x)**2+(st_lead.y-st_behind.y)**2)
+        gap_curr = math.sqrt((st_lead.x - st_behind.x) ** 2 + (st_lead.y - st_behind.y) ** 2)
 
         return gap_curr >= gap_req
 
@@ -1628,7 +1636,7 @@ class TrafficGame(Simulation):
     Traffic game class
     """
     # combines scenario + agents for game
-    def __init__(self, game_map, save_debug_info=True, agent_set=[]):
+    def __init__(self, game_map, errors, save_debug_info=True, agent_set=[]):
         super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
@@ -1644,7 +1652,10 @@ class TrafficGame(Simulation):
         #self.no_deadlock_sv = od()
         # save interesting numbers
         self.car_count = 0
-        self.agents_reached_goal_count = 0 
+        self.agents_reached_goal_count = 0
+        self.cert_vel = errors[0].certainty_level / 100
+        self.cert_tf = errors[1].certainty_level / 100
+        self.cert_perc = errors[2].certainty_level / 100
 
     def spawn_agents(self):
         def valid_source_sink(source, sink):
@@ -1663,7 +1674,14 @@ class TrafficGame(Simulation):
                 #print(len(self.map.IO_map.map[source]))
                 sink = self.map.IO_map.map[source][sinks[i]]
                 # check if new car satisfies spawning safety contract
-                new_car = create_default_car(source, sink, self, self.car_count)
+                flag_vel = error_bool(self.cert_vel)
+                # print('vel:',flag_vel)
+                flag_tf = error_bool(self.cert_tf)
+                # print('tf:', flag_tf)
+                flag_perc = error_bool(self.cert_perc)
+                # print('perc:', flag_perc)
+
+                new_car = create_default_car(source, sink, self, self.car_count, flag_vel)
                 spawning_contract = SpawningContract(self, new_car)
                 if spawning_contract.okay_to_spawn_flag:
                     #print(new_car.supervisor.goals)
@@ -1770,9 +1788,11 @@ class TrafficGame(Simulation):
             lead_agent = plant.find_lead_agent(inside_bubble=True)
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                v_a_err = cp.deepcopy(v_a)
+                v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
                 gap_curr = ((x_a-x)**2 + (y_a-y)**2)**0.5
                 # not safe if gap is not large enough for any one of the agents
-                if (compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) >= gap_curr):
+                if (compute_gap_req_fast(lead_agent.a_min, v_a_err, plant.a_min, v) >= gap_curr):
                     return False
         # all agents have backup plan
         return True
@@ -3514,8 +3534,8 @@ class Sink:
     def __init__(self, node):
         self.node = node
 
-def get_default_car_ss():
-    backup_plan_safety_oracle = BackupPlanSafetyOracle()
+def get_default_car_ss(flag_vel):
+    backup_plan_safety_oracle = BackupPlanSafetyOracle(flag_vel)
     static_obstacle_oracle = StaticObstacleOracle()
     traffic_light_oracle = TrafficLightOracle()
     legal_orientation_oracle = LegalOrientationOracle()
@@ -3550,8 +3570,8 @@ def get_default_car_ss():
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
-def create_default_car(source, sink, game, car_count):
-    ss = get_default_car_ss()
+def create_default_car(source, sink, game, car_count,flag_vel):
+    ss = get_default_car_ss(flag_vel)
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start_xy, start_heading = source.node
     end = sink.node
@@ -3562,7 +3582,9 @@ def create_default_car(source, sink, game, car_count):
     car.set_supervisor(supervisor)
     return car
 
-def create_specified_car(attributes, game):
+def create_specified_car(attributes, game,errors):
+    flag_vel = 1#error_bool(errors[0].certainty_level)
+    flag_tf = 0#error_bool(errors[1].certainty_level)
     def parse_goal_string_to_goal_tuple(string):
         string=string.replace(" ", "")
         string=string.replace("(", "")
@@ -3579,7 +3601,7 @@ def create_specified_car(attributes, game):
         attributes['goal'] = a
         
     if 'controller' not in attributes:
-        ss = get_default_car_ss()
+        ss = get_default_car_ss(flag_vel)
         # default to SpecificationStructureController
         controller = SpecificationStructureController(specification_structure=ss)
         attributes['controller'] = controller
@@ -3603,7 +3625,7 @@ def create_specified_car(attributes, game):
     car =  Car(x=attributes['x'], y=attributes['y'],
             heading=attributes['heading'], v=attributes['v'],
             v_min=attributes['v_min'], v_max=attributes['v_max'],
-            a_min=attributes['a_min'],a_max=attributes['a_max'], car_count=0)
+            a_min=attributes['a_min'],a_max=attributes['a_max'], flag = flag_vel, car_count=0)
     # set car color
     car.agent_color = attributes['agent_color']
     car.set_controller(attributes['controller'])
@@ -3612,8 +3634,8 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
-    def __init__(self, game_map, save_debug_info=True):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
+    def __init__(self, game_map, errors, save_debug_info=True):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, errors=errors, save_debug_info=save_debug_info)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         #self.bundle_to_agent_precedence = None
         self.simulated_agents = []
@@ -3822,36 +3844,105 @@ def import_json(infile):
         data = json.load(f, object_pairs_hook=od)
     return data
 
-def create_qs_game_from_config(game_map, config_path):
+def create_qs_game_from_config(game_map, config_path,errors):
     # create game object
-    game = QuasiSimultaneousGame(game_map=the_map)
+    game = QuasiSimultaneousGame(game_map=the_map,errors= errors)
     # create csv config file path
     csv_file_path = config_path + '.csv'
     # create json config file path
     config_file_path = config_path + '.json'
     configs = parse_config(csv_file_path, config_file_path)
     for agent in configs:
-        new_car = create_specified_car(configs[agent], game)
+        if agent is "0":
+            new_car = create_specified_car(configs[agent], game, errors)
+        else:
+            new_car = create_specified_car(configs[agent], game, errors)
+            new_car.set_token_count(10)
         game.agent_set.append(new_car)
     game.update_occupancy_dict()
     return game
 
+
+def error_bool(certainty_level):
+    error_bool = 0
+    rand_int = np.random.random_sample()
+    if certainty_level is 1:
+        return error_bool
+    elif rand_int < certainty_level:
+        error_bool = 0
+    else:
+        error_bool = 1
+    return error_bool
+
+class Error:
+    def __init__(self, error_type, error_category, certainty_level):
+        self.error_type = error_type
+        self.error_category = error_category
+        self.certainty_level = certainty_level
+
+def parse_error_config(config_file_path):
+    def get_errors():
+        errors = od()
+        data = import_json(config_file_path)
+        return data
+
+    def get_number_errors():
+        errors = od()
+        data = import_json(config_file_path)
+        n = len(data)
+        return n
+
+    attrs_errors = get_errors()
+    n = get_number_errors()
+    data_all_errors = od()
+
+    for x in range(n):
+        error = str(x)
+        data_all_errors[error] = od()
+        for attr in attrs_errors[error]:
+            data_all_errors[error][attr] = attrs_errors[error][attr]
+
+    return data_all_errors
+
+def create_qs_with_errors(error_config_path,game_map,config_path):
+    errors = []
+    data = parse_error_config(error_config_path)
+
+    for n in range(len(data)):
+        n_e = str(n)
+        cert = data[n_e]["certainty_level"]
+        cate = data[n_e]["error_category"]
+        type = data[n_e]["error_type"]
+        errors.append(Error(type, cate, cert))
+
+    if config_path is None:
+
+        game = QuasiSimultaneousGame(game_map=game_map,errors = errors)
+        return game
+
+    else:
+        game = create_qs_game_from_config(game_map, config_path, errors)
+        return game
+
 if __name__ == '__main__':
     seed = 99
-    map_name = 'city_blocks_med'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.25, seed=seed)
+    map_name = 'straight_simple'  # 'city_blocks_small'#
+    the_map = Map('./maps/' + map_name, default_spawn_probability=0, seed=seed)
     output_filename = 'game'
+    error_config_path = './configs/error.json'
 
     # create a game from map/initial config files
-    game = QuasiSimultaneousGame(game_map=the_map)
-    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    # game = QuasiSimultaneousGame(game_map=the_map)
+    game = create_qs_with_errors(error_config_path=error_config_path, game_map=the_map,
+                                 config_path='./configs/' + map_name)
+    # game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name, errors = [])
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=300)
-    #game.animate(frequency=0.01)
+    game.play(outfile=output_filename, t_end=7)
+    # game.animate(frequency=0.01)
 
     # print debug info
-    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
+    debug_filename = os.getcwd() + '/saved_traces/' + output_filename + '.p'
     print_debug_info(debug_filename)
 
     # play debugged game
