@@ -3853,7 +3853,7 @@ def create_qs_game_from_config(game_map, config_path,errors):
     config_file_path = config_path + '.json'
     configs = parse_config(csv_file_path, config_file_path)
     for agent in configs:
-        if agent is "1":
+        if agent is "4":
             new_car = create_specified_car(configs[agent], game, errors)
             new_car.set_token_count(10)
         else:
@@ -3926,7 +3926,7 @@ def create_qs_with_errors(error_config_path,game_map,config_path):
 
 if __name__ == '__main__':
     seed = 99
-    map_name = 'straight_simple2'  # 'city_blocks_small'#
+    map_name = 'straight_road2'  # 'city_blocks_small'#
     the_map = Map('./maps/' + map_name, default_spawn_probability=0, seed=seed)
     output_filename = 'game'
     error_config_path = './configs/error.json'
