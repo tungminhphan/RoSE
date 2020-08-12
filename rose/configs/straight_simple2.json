@@ -7,7 +7,7 @@
   },
   "1": {
     "heading": "east",
-    "v": 0,
+    "v": 1,
     "goal": "((3, 39), east)",
     "agent_color": "blue"
   }
