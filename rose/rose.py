@@ -3853,11 +3853,11 @@ def create_qs_game_from_config(game_map, config_path,errors):
     config_file_path = config_path + '.json'
     configs = parse_config(csv_file_path, config_file_path)
     for agent in configs:
-        if agent is "0":
-            new_car = create_specified_car(configs[agent], game, errors)
-        else:
+        if agent is "1":
             new_car = create_specified_car(configs[agent], game, errors)
             new_car.set_token_count(10)
+        else:
+            new_car = create_specified_car(configs[agent], game, errors)
         game.agent_set.append(new_car)
     game.update_occupancy_dict()
     return game
@@ -3926,7 +3926,7 @@ def create_qs_with_errors(error_config_path,game_map,config_path):
 
 if __name__ == '__main__':
     seed = 99
-    map_name = 'straight_simple'  # 'city_blocks_small'#
+    map_name = 'straight_simple2'  # 'city_blocks_small'#
     the_map = Map('./maps/' + map_name, default_spawn_probability=0, seed=seed)
     output_filename = 'game'
     error_config_path = './configs/error.json'
@@ -3938,7 +3938,7 @@ if __name__ == '__main__':
     # game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name, errors = [])
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=7)
+    game.play(outfile=output_filename, t_end=16)
     # game.animate(frequency=0.01)
 
     # print debug info
