@@ -177,6 +177,14 @@ def convert_car_orientation(inp):
     else:
         raise TypeError('Check your input!')
 
+def add_perception_error(v_true, v_min, error):
+    z = v_true - error
+    if z < v_min:
+        v_est = v_min
+    else:
+        v_est = z
+    return v_est
+
 class Oracle():
     def __init__(self, name):
         self.name = name
@@ -1187,8 +1195,9 @@ class LegalOrientationOracle(Oracle):
             return False # if node is an obstacle or out of bounds
 
 class BackupPlanSafetyOracle(Oracle):
-    def __init__(self):
+    def __init__(self,flag):
         super(BackupPlanSafetyOracle, self).__init__(name='backup_plan_safety')
+        self.flag = flag
     def evaluate(self, ctrl_action, plant, game):
         # check if collision occurs by taking that action
         collision_chk = plant.check_collision_in_bubble(ctrl_action)
@@ -1204,12 +1213,14 @@ class BackupPlanSafetyOracle(Oracle):
 
             if lead_agent:
                 x_a, y_a, v_a = lead_agent.state.x, lead_agent.state.y, lead_agent.state.v
+                v_a_err = cp.deepcopy(v_a)
+                v_a_err = add_perception_error(v_a_err, lead_agent.v_min, self.flag)
                 gap_curr = math.sqrt((x_a-x)**2 + (y_a-y)**2)
                 # record lead agent
                 plant.lead_agent = (lead_agent.state.__tuple__(), lead_agent.get_id(), lead_agent.agent_color, gap_curr)
                 # record computed gap
                 plant.gap_curr = gap_curr
-                return compute_gap_req_fast(lead_agent.a_min, v_a, plant.a_min, v) <= gap_curr
+                return compute_gap_req_fast(lead_agent.a_min, v_a_err, plant.a_min, v) <= gap_curr
             else:
                 return True
 

@@ -2,31 +2,31 @@
   "0": {
     "heading": "east",
     "v": 3,
-    "goal": "((7, 93), east)",
+    "goal": "((7, 39), east)",
     "agent_color": "gray"
   },
   "1": {
     "heading": "east",
     "v": 3,
-    "goal": "((8, 93), east)",
+    "goal": "((8, 39), east)",
     "agent_color": "green"
   },
   "2": {
     "heading": "east",
     "v": 3,
-    "goal": "((9, 93), east)",
+    "goal": "((9, 39), east)",
     "agent_color": "orange"
   },
   "3": {
     "heading": "east",
     "v": 3,
-    "goal": "((10, 93), east)",
+    "goal": "((10, 39), east)",
     "agent_color": "yellow"
   },
   "4": {
     "heading": "east",
     "v": 1,
-    "goal": "((7, 93), east)",
+    "goal": "((7, 39), east)",
     "agent_color": "blue"
   }
 }
