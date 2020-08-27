@@ -3847,7 +3847,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=300)
+    game.play(outfile=output_filename, t_end=250)
     #game.animate(frequency=0.01)
 
     # print debug info
