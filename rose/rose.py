@@ -1126,8 +1126,6 @@ class Car(Agent):
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
             chk_valid_actions, flag_a, flag_b = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(), debug=True)
-            if not chk_valid_actions:
-                print("max yield flag is set")
             return not chk_valid_actions, flag_a, flag_b
         else:
             return False, flag_a, flag_b
@@ -1139,10 +1137,6 @@ class Car(Agent):
         def intentions_conflict(agent):
             if agent.state.heading == self.state.heading:
                 chk_valid_actions = self.check_valid_actions(self, self.intention, agent, agent.intention)
-                if not chk_valid_actions:
-                    if agent.state.heading == 'east':
-                        #print(self.state)
-                        print("sending conflict request")
                 return not chk_valid_actions
             else:
                 return False
@@ -1616,11 +1610,8 @@ class TrafficGame(Simulation):
         self.traces = od()
         self.traces['agent_ids'] = []
         self.traces_debug = od()
-<<<<<<< HEAD
         self.occupancy_dict = od()
         self.update_occupancy_dict()
-=======
->>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.car_count = 0
         self.collision_dict = od()
         self.out_of_bounds_dict = od()
@@ -3287,13 +3278,8 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
-<<<<<<< HEAD
     def __init__(self, game_map, save_debug_info=True):
         super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
-=======
-    def __init__(self, game_map):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map)
->>>>>>> 2d2037071d9d53917f6c35d1298f5a40f89ef1b1
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         self.bundle_to_agent_precedence = None
         self.simulated_agents = []
@@ -3495,7 +3481,7 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = 123
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.25, seed=seed)
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.48, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
@@ -3503,7 +3489,7 @@ if __name__ == '__main__':
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=400)
+    game.play(outfile=output_filename, t_end=350)
     #game.animate(frequency=0.01)
 
     # print debug info
