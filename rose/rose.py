@@ -1635,6 +1635,7 @@ class TrafficGame(Simulation):
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
         self.save_debug_info = save_debug_info
+        self.agents_reached_goal_cnt = 0
         #self.no_deadlock_sv = od()
         # save interesting numbers
         self.car_count = 0
@@ -1745,7 +1746,7 @@ class TrafficGame(Simulation):
         self.traces["special_heading_tiles"] = self.map.special_goal_tiles
         self.traces['seed'] = self.map.seed
         self.traces['total_agent_count'] = self.car_count
-        self.traces['agents_reached_goal_count'] = self.agents_reached_goal_count
+        self.traces['agents_reached_goal_count'] = self.agents_reached_goal_cnt
         self.traces['agents_in_map'] = len(self.agent_set)
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
@@ -3085,6 +3086,12 @@ class BundleGoalExit(Supervisor):
             if np.sum(np.abs(np.array([self.plant.state.x,
                 self.plant.state.y]) -
                 np.array([self.current_goal[0][0], self.current_goal[0][1]]))) == 0: # if close enough
+                #print("agent goal reached")
+                #print("agent goal")
+                #print(self.current_goal[0][0], self.current_goal[0][1])
+                #print("agent state")
+                #print(self.plant.state.x, self.plant.state.y)
+                self.game.agents_reached_goal_cnt += 1
                 self.game.agent_set.remove(self.plant)
                 self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
@@ -3284,9 +3291,9 @@ def get_default_car_ss():
                   backup_plan_safety_oracle,
                   unprotected_left_turn_oracle,
                   traffic_intersection_oracle,
-                  intersection_clearance_oracle, 
-                  no_deadlock_oracle] # type: List[Oracle]
-    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 4, 5, 5, 1, 1, 2, 2, 3])
+                  intersection_clearance_oracle]
+                  #no_deadlock_oracle] # type: List[Oracle]
+    specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2, 2])
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
@@ -3558,17 +3565,17 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 123
+    seed = 129
     map_name = 'city_blocks_small'
     the_map = Map('./maps/'+map_name,default_spawn_probability=0.3, seed=seed)
     output_filename = 'game'
 
     # create a game from map/initial config files
-    #game = QuasiSimultaneousGame(game_map=the_map)
-    game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
+    game = QuasiSimultaneousGame(game_map=the_map)
+    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=350)
+    game.play(outfile=output_filename, t_end=300)
     #game.animate(frequency=0.01)
 
     # print debug info
