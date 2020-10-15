@@ -1960,7 +1960,8 @@ class Field:
     def get_grid(self, csv_filename):
         grid = od()
         obstacles = od()
-        with open(csv_filename + '.csv', 'rt') as f:
+        #with open(csv_filename + '.csv', 'rt') as f:
+        with open(csv_filename + '.csv', 'r+', encoding="utf-8") as f:
             graph = csv.reader(f)
             for i, row in enumerate(graph):
                 for j, item in enumerate(row):
@@ -3495,7 +3496,8 @@ def print_debug_info(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
     # print collision dictionary entries
-    print("Collisions")
+    print("Number of Collisions")
+    print(len(traces['collision_dict']))
     for key, value in traces['collision_dict'].items():
         print(key, value)
 
@@ -3565,17 +3567,18 @@ def create_qs_game_from_config(game_map, config_path):
     return game
 
 if __name__ == '__main__':
-    seed = 129
-    map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.3, seed=seed)
-    output_filename = 'game'
 
+    for i in range()
+    seed = 123
+    map_name = 'city_blocks_small'
+    the_map = Map('./maps/'+map_name,default_spawn_probability=0.07, seed=seed)
+    output_filename = 'game'
     # create a game from map/initial config files
     game = QuasiSimultaneousGame(game_map=the_map)
     #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=300)
+    game.play(outfile=output_filename, t_end=50)
     #game.animate(frequency=0.01)
 
     # print debug info

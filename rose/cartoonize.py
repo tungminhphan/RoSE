@@ -14,12 +14,13 @@ from matplotlib.ticker import (AutoMinorLocator, MultipleLocator,
 from matplotlib.collections import PatchCollection
 
 
-main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
+#main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
+main_dir = os.getcwd()
 car_figs = dict()
 for color in CAR_COLORS:
-    car_figs[color] = main_dir + '/rose/cars/' + color + '_car.png'
+    car_figs[color] = main_dir + '/cars/' + color + '_car.png'
 
-nice_blue_color=(0/255, 85/255, 212/255)
+#nice_blue_color=(0/255, 85/255, 212/255)
 
 
 # animate the files completely
@@ -90,7 +91,7 @@ def get_map_corners(map):
     return x_min, x_max, y_min, y_max
 
 # defining a function that plots the map on a figure
-def plot_map(map, grid_on=True):
+def plot_map(map, grid_on=False):
     x_min, x_max, y_min, y_max = get_map_corners(map)
     ax.axis('equal')
     ax.set_xlim(x_min, x_max)
@@ -288,16 +289,11 @@ def argv_to_start_end():
     return start, end
 
 if __name__ == '__main__':
-    output_dir = os.getcwd()+'/imgs/'
+    output_dir = os.getcwd()+'/imgs/' 
+    #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game.p'
+    #traces_file = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, output_dir, start=start, end=end)
-    #animate_images(output_dir)
-
-    # bubbles figure for the paper
-    #for dynamics a:-1,1, v=3
-    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_saved.p'
-    #make_bubble_figure(bubble_file)
-    #make_second_bubble_figure(bubble_file, output_dir)
