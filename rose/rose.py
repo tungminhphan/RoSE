@@ -496,7 +496,7 @@ class Car(Agent):
         # string assumes v_min and a_min are negative
         car_param = 'v_' + 'n' + str(abs(self.v_min)) + '_' + str(self.v_max) + \
             '_a_n' + str(abs(self.a_min)) + '_' + str(self.a_max)+'.p'
-        # check if file exists
+        # check if file existsl
         output_dir = os.getcwd()+'/saved_bubbles/'
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -745,13 +745,13 @@ class Car(Agent):
             # list of all possible scenarios and what action to take
             if agent_type == 'none' and safety_check and max_braking_enough:
                 #print(3)
-                #valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
+                valid_action = safety_oracle.evaluate(self.intention, self, self.supervisor.game)
                 #if valid_action:
                 ctrl = self.intention
                 self.token_count = 0
                 #else:
-                #ctrl = self.get_best_straight_action()
-                #self.token_count = self.token_count+1
+                #    ctrl = self.get_best_straight_action()
+                #    self.token_count = self.token_count+1
 
             elif agent_type == 'none' and not safety_check:
                 # TODO: take straight action, best safe one that aligns with intention
@@ -3458,6 +3458,7 @@ class QuasiSimultaneousGame(TrafficGame):
     def reset_debug_info(self):
         for agent in self.agent_set:
             agent.no_deadlock_sv = od()
+            agent.straight_clearance_info = None
 
     def sys_step(self):
         # set all agent intentions
@@ -3566,23 +3567,24 @@ def create_qs_game_from_config(game_map, config_path):
     game.update_occupancy_dict()
     return game
 
+#def main():
+#    seed = random.randint(1, 1000)
+#    t_end = 50
+#    map_name = 'city_blocks_small'
+#    the_map = Map('./maps/'+map_name, default_spawn_probability=0.075, seed=seed)
+#    game = QuasiSimultaneousGame(game_map=the_map)
+#    output_filename = 'game_seed_'+str(seed)+'_tend_'+str(t_end)
+#    game.play(outfile=output_filename, t_end=t_end)
+#    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
+#    print_debug_info(debug_filename)
+
 if __name__ == '__main__':
-
-    for i in range()
-    seed = 123
+    seed = random.randint(1, 1000)
+    t_end = 250
     map_name = 'city_blocks_small'
-    the_map = Map('./maps/'+map_name,default_spawn_probability=0.07, seed=seed)
-    output_filename = 'game'
-    # create a game from map/initial config files
+    the_map = Map('./maps/'+map_name, default_spawn_probability=0.075, seed=seed)
     game = QuasiSimultaneousGame(game_map=the_map)
-    #game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name)
-
-    # play or animate a normal game
-    game.play(outfile=output_filename, t_end=50)
-    #game.animate(frequency=0.01)
-
-    # print debug info
+    output_filename = 'game_seed_'+str(seed)+'_tend_'+str(t_end)+'_'+map_name
+    game.play(outfile=output_filename, t_end=t_end)
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
     print_debug_info(debug_filename)
-
-    # play debugged game

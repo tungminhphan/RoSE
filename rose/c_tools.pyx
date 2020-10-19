@@ -324,19 +324,19 @@ class TrafficLightOracle(Oracle):
             #print(plant.state.x, plant.state.y, plant.state.heading)
             return False
         # check whether the right-turn action is okay
-        if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
-            try:
-                traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
-                light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
-            except:
-                light_is_red = True # if no traffic light, assume it's red
-            if light_is_red:
+       # if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
+        #    try:
+         #       traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
+         #       light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
+          #  except:
+           #     light_is_red = True # if no traffic light, assume it's red
+            #if light_is_red:
                 # check if right turn is valid
-                return plant.check_right_turn_is_clear(ctrl_action)
-            else:
-                return action_not_running_a_red_light and backup_plant_will_still_be_ok
-        else:
-            return action_not_running_a_red_light and backup_plant_will_still_be_ok
+            #   return plant.check_right_turn_is_clear(ctrl_action)
+            #else:
+            #return action_not_running_a_red_light and backup_plant_will_still_be_ok
+        #else:
+        return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
 class IntersectionClearanceOracle(Oracle):
     def __init__(self):
@@ -355,7 +355,7 @@ class IntersectionClearanceOracle(Oracle):
                     cnt = cnt + 1
             return cnt
 
-        self.clearance_straight_info = None
+        #plant.clearance_straight_info = None
         current_state = plant.state.x, plant.state.y
         x_curr, y_curr = current_state
         next_state = plant.query_next_state(ctrl_action)
@@ -410,6 +410,7 @@ class IntersectionClearanceOracle(Oracle):
                 else:
                     clearance = np.inf
                 return clearance > intersection_gap #TODO: find a better bound
+                #return clearance > 0
 
             else: # going straight
                 lead_agent_in_intersection = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
@@ -438,8 +439,8 @@ class IntersectionClearanceOracle(Oracle):
                     x_sv = lead_agent.state.x
                     y_sv = lead_agent.state.y
 
-                self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
-                return clearance > intersection_gap #TODO: find a better bound
+                plant.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
+                return clearance > intersection_gap//2 #to accomodate for agents changing lanes
 
 class UnprotectedLeftTurnOracle(Oracle):
     def __init__(self):
@@ -453,7 +454,8 @@ class UnprotectedLeftTurnOracle(Oracle):
         gap = 0
         v_init = lead_agent.state.v
         for idx in range(N):
-            v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
+            v_init = lead_agent.v_max
+            #v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
             gap += v_init
         return gap
 
