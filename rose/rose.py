@@ -3581,7 +3581,7 @@ def create_qs_game_from_config(game_map, config_path):
 if __name__ == '__main__':
     seed = random.randint(1, 1000)
     t_end = 250
-    map_name = 'city_blocks_small'
+    map_name = 'straight_road'
     the_map = Map('./maps/'+map_name, default_spawn_probability=0.075, seed=seed)
     game = QuasiSimultaneousGame(game_map=the_map)
     output_filename = 'game_seed_'+str(seed)+'_tend_'+str(t_end)+'_'+map_name

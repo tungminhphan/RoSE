@@ -289,7 +289,7 @@ def argv_to_start_end():
     return start, end
 
 if __name__ == '__main__':
-    filename = 'game_seed_524_tend_250_city_blocks_small'
+    filename = 'game_seed_367_tend_250_city_blocks_dense'
     output_dir = os.getcwd()+'/imgs/'+filename+'/'
     #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
     if not os.path.exists(output_dir):

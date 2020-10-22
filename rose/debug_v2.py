@@ -54,6 +54,11 @@ def write_info(out_file, t, trace):
     out_file.write("action selection strategy flags \n")
     out_file.write(str(trace['action_selection_flags'])+'\n')
 
+    # print out the straight clearance info
+    out_file.write('\n')
+    out_file.write("straight clearance info \n")
+    out_file.write(str(trace['clearance_straight_info'])+'\n')
+
     # straight action eval
     out_file.write("straight action evaluation \n")
     for ctrl, oracle_scores in trace['straight_action_eval'].items():
@@ -213,9 +218,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 
 # test out the debug file
 if __name__ == '__main__':
-    traces_file = os.getcwd()+'/Final_Data/Trial_1_seed290p0_1t300_cbsmall/game_debug.p'
+    traces_file = os.getcwd()+'/saved_traces/game_seed_226_tend_250_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 19, 43, 'north', 284, outfile)
+    print_one_agent_trace(traces_file, 14, 15, 'south', 122, outfile)
 
     #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     #print_all_agents_at_time_t(traces_file, outfile_cc, 108)
