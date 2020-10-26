@@ -15,7 +15,8 @@ RUN apt-get update \
   && cd /usr/local/bin \
   && ln -s /usr/bin/python3 python \
   && pip3 install --upgrade pip \
-  && pip3 install numpy scipy pandas matplotlib ipdb networkx
+  && pip3 install --upgrade cython \
+  && pip3 install numpy scipy pandas matplotlib ipdb networkx 
 
 # tell the port number the container should expose
 #EXPOSE 5000

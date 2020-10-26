@@ -1,7 +1,6 @@
 '''
 
     File name: rose.py
-    Authors: Tung Phan, Karena Cai
     Date created: 1/10/2020
 '''
 import itertools
@@ -3503,9 +3502,9 @@ def print_debug_info(filename):
         print(key, value)
 
     # print out of bounds dictionary entries
-    print("Out of bounds")
-    for key, value in traces['out_of_bounds_dict'].items():
-        print(key, value)
+    #print("Out of bounds")
+    #for key, value in traces['out_of_bounds_dict'].items():
+    #    print(key, value)
     
     print("total agents spawned")
     print(traces['total_agent_count'])
@@ -3578,13 +3577,30 @@ def create_qs_game_from_config(game_map, config_path):
 #    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
 #    print_debug_info(debug_filename)
 
+
+# note, rose.py should be called with the arguments: 
+# python3 rose.py seed t_end map_name p_spawn
 if __name__ == '__main__':
+
+    # check whether user entered an argument and use that as the map input
+    if len(sys.argv) > 1:
+        if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
+            print("map")
+            print(sys.argv[1])
+            map_name = sys.argv[1]
+    else:
+    # otherwise use the default map name
+        map_name = 'city_blocks_small'
+        print("using default city_blocks_small map")
+    
     seed = random.randint(1, 1000)
     t_end = 250
-    map_name = 'straight_road'
-    the_map = Map('./maps/'+map_name, default_spawn_probability=0.075, seed=seed)
+    output_filename = 'game'
+    p_spawn = 0.075
+    the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
     game = QuasiSimultaneousGame(game_map=the_map)
-    output_filename = 'game_seed_'+str(seed)+'_tend_'+str(t_end)+'_'+map_name
     game.play(outfile=output_filename, t_end=t_end)
+    print("seed number")
+    print(seed)
     debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
     print_debug_info(debug_filename)

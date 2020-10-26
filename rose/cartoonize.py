@@ -289,12 +289,11 @@ def argv_to_start_end():
     return start, end
 
 if __name__ == '__main__':
-    filename = 'game_seed_980_tend_250_straight_road'
-    output_dir = os.getcwd()+'/imgs/'+filename+'/'
+    output_dir = os.getcwd()+'/imgs/'
     #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/straight_road/plotting_traces/'+filename+'.p'
+    traces_file = os.getcwd()+'/saved_traces/game.p'
     #traces_file = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, output_dir, start=start, end=end)
