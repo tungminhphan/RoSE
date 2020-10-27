@@ -3926,19 +3926,19 @@ def create_qs_with_errors(error_config_path,game_map,config_path):
 
 if __name__ == '__main__':
     seed = 99
-    map_name = 'straight_road2'  # 'city_blocks_small'#
-    the_map = Map('./maps/' + map_name, default_spawn_probability=0, seed=seed)
+    map_name = 'straight_road'  # 'city_blocks_small'#
+    the_map = Map('./maps/' + map_name, default_spawn_probability=.5, seed=seed)
     output_filename = 'game'
     error_config_path = './configs/error.json'
 
     # create a game from map/initial config files
     # game = QuasiSimultaneousGame(game_map=the_map)
     game = create_qs_with_errors(error_config_path=error_config_path, game_map=the_map,
-                                 config_path='./configs/' + map_name)
+                                 config_path= None) #'./configs/' + map_name)
     # game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name, errors = [])
 
     # play or animate a normal game
-    game.play(outfile=output_filename, t_end=16)
+    game.play(outfile=output_filename, t_end=25)
     # game.animate(frequency=0.01)
 
     # print debug info
