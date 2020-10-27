@@ -3938,8 +3938,13 @@ if __name__ == '__main__':
     # game = create_qs_game_from_config(game_map=the_map, config_path='./configs/'+map_name, errors = [])
 
     # play or animate a normal game
+<<<<<<< HEAD
     game.play(outfile=output_filename, t_end=25)
     # game.animate(frequency=0.01)
+=======
+    game.play(outfile=output_filename, t_end=250)
+    #game.animate(frequency=0.01)
+>>>>>>> 333619d17d9d0167e3187eb0f936825140d3765c
 
     # print debug info
     debug_filename = os.getcwd() + '/saved_traces/' + output_filename + '.p'
