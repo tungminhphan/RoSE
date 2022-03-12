@@ -24,6 +24,7 @@ import json
 import copy as cp
 from c_tools import *
 from global_constants import *
+from csv import writer
 
 
 def set_seed(seed, other_param=0):
@@ -258,6 +259,7 @@ class Car(Agent):
             self.agent_color = self.get_random_color()
 
         # attributes for saving agent info
+        self.num_steps_taken = 0
         self.spec_struct_trace = od()
         self.ctrl_chosen = None
         self.unsafe_joint_state_dict = od()
@@ -277,6 +279,9 @@ class Car(Agent):
         self.agents_checked_for_conflict_sv = []
         self.agents_in_bubble_before_sv = []
 
+        self.cumulative_agents_in_conflict_cluster = 0
+        self.cumulative_agents_in_bubble = 0
+
         #self.lead_vehicle = None
         self.lead_agent = None
         self.prior_state = None
@@ -287,6 +292,7 @@ class Car(Agent):
         # check for collision with any of the other agents
         self.check_collision(ctrl)
         self.state = self.query_next_state(ctrl)
+        self.num_steps_taken += 1
         self.supervisor.game.update_occupancy_dict_for_one_agent(self, self.prior_state)
         # save action that was chosen
         self.ctrl_chosen = ctrl
@@ -432,6 +438,9 @@ class Car(Agent):
     def check_conflict_resolution_winner(self):
         # collect all agents in send and receive requests and find the winner
         conflict_cluster = self.send_conflict_requests_to + self.received_conflict_requests_from + [self]
+        conflict_cluster_size = len(set(conflict_cluster))
+        self.cumulative_agents_in_conflict_cluster += conflict_cluster_size
+
         max_val = 0
         max_agent_list = []
         for agent in conflict_cluster:
@@ -822,6 +831,7 @@ class Car(Agent):
         send_requests_list = []
         # collect all agents in bubble
         agents_in_bubble = self.agents_in_bubble
+        self.cumulative_agents_in_bubble += len(set(self.agents_in_bubble))
 
         # if agent intention is to go straight, it shouldn't send a request
         if self.intention['steer'] == 'straight' or self.intention['steer']=='right-turn' or self.intention['steer'] == 'left-turn':
@@ -1065,7 +1075,7 @@ class Car(Agent):
         except:
             return False
         try:
-            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
+            width_2, bundle_2 = self.supervisor.game.map.directed_tifle_to_relative_width(((st_2.x, st_2.y), st_2.heading))
         except:
             return False
         return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
@@ -1621,7 +1631,7 @@ class TrafficGame(Simulation):
     Traffic game class
     """
     # combines scenario + agents for game
-    def __init__(self, game_map, save_debug_info=True, agent_set=[]):
+    def __init__(self, game_map, save_debug_info=True, agent_set=[], N=10):
         super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
@@ -1634,7 +1644,11 @@ class TrafficGame(Simulation):
         self.out_of_bounds_dict = od()
         self.unsafe_joint_state_dict = od()
         self.save_debug_info = save_debug_info
+        self.N = N
         self.agents_reached_goal_cnt = 0
+        self.total_avg_agents_in_bubble_per_step = 0
+        self.total_avg_agents_in_conflict_cluster_per_step = 0
+        self.total_steps_taken_to_reach_goal = 0 # this number is cumulative steps taken by all agents that reach their goal...
         #self.no_deadlock_sv = od()
         # save interesting numbers
         self.car_count = 0
@@ -1662,11 +1676,11 @@ class TrafficGame(Simulation):
                 new_car = create_default_car(source, sink, self, self.car_count)
                 spawning_contract = SpawningContract(self, new_car)
                 #print('state')
-                #print(new_car.state)
-                #print(spawning_contract.okay_to_spawn_flag)
 
-                if spawning_contract.okay_to_spawn_flag:
-                    #print(new_car.supervisor.goals)
+                max_car_count = self.N
+                exceedsCarCount = self.car_count >= max_car_count
+
+                if spawning_contract.okay_to_spawn_flag and not exceedsCarCount:
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict_for_one_agent(new_car,prior_state=None)
                     self.car_count = self.car_count+1
@@ -1746,6 +1760,9 @@ class TrafficGame(Simulation):
         self.traces['seed'] = self.map.seed
         self.traces['total_agent_count'] = self.car_count
         self.traces['agents_reached_goal_count'] = self.agents_reached_goal_cnt
+        self.traces['avg_num_steps_to_goal'] = self.total_steps_taken_to_reach_goal/self.agents_reached_goal_cnt
+        self.traces['avg_agents_in_bubble_per_time_step_per_agent'] = self.total_avg_agents_in_bubble_per_step/self.agents_reached_goal_cnt
+        self.traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'] = self.total_avg_agents_in_conflict_cluster_per_step/self.agents_reached_goal_cnt
         self.traces['agents_in_map'] = len(self.agent_set)
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
@@ -3086,12 +3103,13 @@ class BundleGoalExit(Supervisor):
             if np.sum(np.abs(np.array([self.plant.state.x,
                 self.plant.state.y]) -
                 np.array([self.current_goal[0][0], self.current_goal[0][1]]))) == 0: # if close enough
-                #print("agent goal reached")
-                #print("agent goal")
-                #print(self.current_goal[0][0], self.current_goal[0][1])
-                #print("agent state")
-                #print(self.plant.state.x, self.plant.state.y)
                 self.game.agents_reached_goal_cnt += 1
+                if (self.game.agents_reached_goal_cnt) >= self.game.N: 
+                    print("all agents reached their destination!!")
+                # add num steps agent took to get to the goal
+                self.game.total_steps_taken_to_reach_goal += self.plant.num_steps_taken
+                self.game.total_avg_agents_in_bubble_per_step += self.plant.cumulative_agents_in_bubble/self.plant.num_steps_taken
+                self.game.total_avg_agents_in_conflict_cluster_per_step += self.plant.cumulative_agents_in_conflict_cluster/self.plant.num_steps_taken
                 self.game.agent_set.remove(self.plant)
                 self.game.update_occupancy_dict_for_one_agent(self.plant,prior_state=None,delete=True)
 
@@ -3302,7 +3320,6 @@ def create_default_car(source, sink, game, car_count):
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start_xy, start_heading = source.node
     end = sink.node
-    #print(end)
     car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
@@ -3359,8 +3376,8 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
-    def __init__(self, game_map, save_debug_info=True):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info)
+    def __init__(self, game_map, save_debug_info=True, N=10):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info, N=N)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
         #self.bundle_to_agent_precedence = None
         self.simulated_agents = []
@@ -3511,10 +3528,25 @@ def print_debug_info(filename):
 
     print("total agents that reached goal")
     print(traces['agents_reached_goal_count'])
+
+    print("average number of steps to reach goal")
+    print(traces['avg_num_steps_to_goal'])
     
     print("agents currently in map at end of game")
     print(traces['agents_in_map'])
 
+    print("avg agents in bubble per time step per agent")
+    print(traces['avg_agents_in_bubble_per_time_step_per_agent'])
+
+    print("avg agents in conflict cluster per time step per agent")
+    print(traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'])
+
+def createDataRow(filename):
+    with open(filename, 'rb') as pckl_file:
+        traces = pickle.load(pckl_file)
+    
+    row = [len(traces['collision_dict']), traces['avg_num_steps_to_goal'],  traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'], traces['avg_agents_in_bubble_per_time_step_per_agent'], traces['agents_reached_goal_count']]
+    return row
 
 def parse_config(csv_file_path, config_file_path):
     """
@@ -3577,30 +3609,68 @@ def create_qs_game_from_config(game_map, config_path):
 #    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
 #    print_debug_info(debug_filename)
 
+def append_list_as_row(file_name, list_of_elem):
+    # Open file in append mode
+    with open(file_name, 'a+', newline='') as write_obj:
+        # Create a writer object from csv module
+        csv_writer = writer(write_obj)
+        # Add contents of list as last row in the csv file
+        csv_writer.writerow(list_of_elem)
 
 # note, rose.py should be called with the arguments: 
 # python3 rose.py seed t_end map_name p_spawn
 if __name__ == '__main__':
 
     # check whether user entered an argument and use that as the map input
-    if len(sys.argv) > 1:
-        if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
-            print("map")
-            print(sys.argv[1])
-            map_name = sys.argv[1]
-    else:
+    #if len(sys.argv) > 1:
+    #    if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
+    #        print("map")
+    #        print(sys.argv[1])
+    #        map_name = sys.argv[1]
+    #else:
     # otherwise use the default map name
-        map_name = 'city_blocks_small'
-        print("using default city_blocks_small map")
+    # map_name = 'straight_simple'
+    # #print("using default city_blocks_small map")
     
-    seed = random.randint(1, 1000)
+    # #seed = random.randint(1, 1000)
+    # seed = 199
+    # t_end = 250
+    # output_filename = 'game'
+    # p_spawn = 0.10
+    # the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
+    # game = QuasiSimultaneousGame(game_map=the_map, N=100)
+    # game.play(outfile=output_filename, t_end=t_end)
+    # print("seed number")
+    # print(seed)
+    # debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
+    # print_debug_info(debug_filename)
+
+    # running the trial many times and saving the data to a csv...
+    num_trials = 2
+    num_agents = 10
+
+    # create a csv file with columns
     t_end = 250
-    output_filename = 'game'
-    p_spawn = 0.075
-    the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
-    game = QuasiSimultaneousGame(game_map=the_map)
-    game.play(outfile=output_filename, t_end=t_end)
-    print("seed number")
-    print(seed)
-    debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
-    print_debug_info(debug_filename)
+    p_spawn = 0.1
+
+    # csv filename
+    output_csv_name = "trials_" + "num_agents_" + str(num_agents) + ".csv"
+    headers = ["map", "seed_number", "num_agents", "num_collisions", "avg_steps_per_agent", "avg_conflict_clusters", "avg_bubble", "num_agents_reach_goal"]
+    append_list_as_row(output_csv_name, headers)
+
+    map_name = "straight_simple"
+
+    # given a seed, a p_spawn, a t_end
+    for i in range(0, num_trials): 
+        # simulate the game for each seed
+        seed = random.randrange(1, 1500, 1)
+        row = [map_name, seed, num_agents]
+        output_filename = 'game_'+str(i)
+        the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
+        game = QuasiSimultaneousGame(game_map=the_map, N=num_agents)
+        game.play(outfile=output_filename, t_end=t_end)
+
+        # process all data from the game...
+        debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
+        row_to_append = row + createDataRow(debug_filename)
+        append_list_as_row(output_csv_name, row_to_append)

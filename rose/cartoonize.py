@@ -4,6 +4,7 @@ from ipdb import set_trace as st
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib
 import os
 import glob
 from rose import Car, Map, CAR_COLORS
@@ -53,6 +54,8 @@ def traces_to_animation(filename, output_dir, start=0, end=-1):
         plot_name = str(t).zfill(5)
         img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)
+        fig = matplotlib.pyplot.gcf()
+        fig.set_size_inches(18.5, 10.5)
         fig.savefig(img_name)
     animate_images(output_dir)
 
