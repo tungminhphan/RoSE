@@ -218,9 +218,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 
 # test out the debug file
 if __name__ == '__main__':
-    traces_file = os.getcwd()+'/saved_traces/game_seed_226_tend_250_debug.p'
+    traces_file = os.getcwd()+'/saved_traces/game_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    print_one_agent_trace(traces_file, 14, 15, 'south', 122, outfile)
+    print_one_agent_trace(traces_file, 22, 12, 'south', 82, outfile)
 
     #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     #print_all_agents_at_time_t(traces_file, outfile_cc, 108)

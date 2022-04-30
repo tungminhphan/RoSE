@@ -643,9 +643,6 @@ class Car(Agent):
             score = 0
             for oracle in self.controller.specification_structure.oracle_set:
                 o_score = oracle.evaluate(ctrl, self, self.supervisor.game)
-                #if oracle.name == 'backup_plan_safety':
-                #    print("backup plan safety")
-                #    print(o_score)
                 o_tier = self.controller.specification_structure.tier[oracle]
                 try:
                     score += int(o_score) * self.controller.specification_structure.tier_weights[o_tier]
@@ -735,11 +732,6 @@ class Car(Agent):
         self.action_selection_flags = flag_dict
 
         # save info about sending and receiving requests
-        #print("======================EVALUATING ACTION FOR AGENT AT STATE ======================")
-        #print(self.state)
-        #print(self.action_selection_flags)
-        #__import__('ipdb').set_trace(context=21)
-
         if not max_braking_enough:
             if (agent_type == 'both' or agent_type == 'receiver') and not cluster_chk:
                 #print(1)
@@ -863,10 +855,17 @@ class Car(Agent):
                 except:
                     print("breaking")
                     break
+                
+                # if (self.id == 0.6254907532044479 and agent.id == 0.7396166921444806):
+                #     print("debugging information!!!!")
+                #     print(agent.state.x, agent.state.y, agent.state.v)
+                #     print(self.intention_bp_conflict(agent))
+
                 if chk_lon and self.state.heading == agent.state.heading:
                     # one last check to see whether agents are in the same lane and the agent behind doesn't also want to switch lanes
                     same_lane_chk = self.check_same_lane(self.state, agent.state)
                     if (not same_lane_chk) or (same_lane_chk and agent.intention['steer'] == 'left-lane' or agent.intention['steer'] == 'right-lane'):
+                        
                         chk_to_send_request = self.check_to_send_conflict_request(agent)
                         # add in check to see if agents are currently in the same lane
                         if chk_to_send_request:
@@ -1048,7 +1047,6 @@ class Car(Agent):
 
     # check if a set of actions is valid for a pair of agents
     def check_valid_actions(self, ag_1, ctrl_1, ag_2, ctrl_2, debug=False):
-        #print("checking valid actions")
         #print(ag_1.state, ctrl_1, ag_2.state, ctrl_2)
         # get occupancy for both actions
         occ_1 = ag_1.query_occupancy(ctrl_1)
@@ -1063,6 +1061,13 @@ class Car(Agent):
         chk_occupancy_intersection = self.check_occupancy_intersection(occ_1, occ_2)
         #print("occupancy check in check valid actions complete")
         chk_safe_end_config = self.check_safe_config(ag_1, ag_2, occ_1[-1], occ_2[-1])
+
+        # if (ag_1.id == 0.6254907532044479 and ag_2.id == 0.7396166921444806):
+            # print("checking valid actions for agents")
+            # print(occ_1[-1], occ_2[-1])
+            # print(chk_occupancy_intersection)
+            # print(chk_safe_end_config)
+
         # return if occupancies don't intersect and safe end config
         if not debug:
             return (not chk_occupancy_intersection) and chk_safe_end_config
@@ -1070,12 +1075,13 @@ class Car(Agent):
             return ((not chk_occupancy_intersection) and chk_safe_end_config), not chk_occupancy_intersection, chk_safe_end_config
 
     def check_same_lane(self, st_1, st_2):
+
         try:
             width_1, bundle_1 = self.supervisor.game.map.directed_tile_to_relative_width(((st_1.x, st_1.y), st_1.heading))
         except:
             return False
         try:
-            width_2, bundle_2 = self.supervisor.game.map.directed_tifle_to_relative_width(((st_2.x, st_2.y), st_2.heading))
+            width_2, bundle_2 = self.supervisor.game.map.directed_tile_to_relative_width(((st_2.x, st_2.y), st_2.heading))
         except:
             return False
         return bundle_1.get_id() == bundle_2.get_id() and width_1 == width_2
@@ -1104,6 +1110,10 @@ class Car(Agent):
             st_1 = ag_1.state
         if st_2 is None:
             st_2 = ag_2.state
+        
+        # if (ag_1.id == 0.6254907532044479 and ag_2.id == 0.7396166921444806):
+        #     print("checking asafe config")
+
 
         #print("safe config check")
         #print(ag_1.state, ag_2.state, st_1, st_2)
@@ -1113,18 +1123,26 @@ class Car(Agent):
         #print(same_lane_chk)
         # TODO: if not in same lane, then agents are in safe config relative to each other?
         if not same_lane_chk:
+            # if (ag_1.id == 0.6254907532044479 and ag_2.id == 0.7396166921444806):
+            #     print("NOT SAME LANE CHECK!")
             #print("not same lane check")
             return True
         # then check which agent is lead and which one is behind
         ag_lead, ag_behind, st_lead, st_behind = sort_agents(st_1, st_2)
         # if None, agents are on top of each other
         if ag_lead is None:
+            # if (ag_1.id == 0.6254907532044479 and ag_2.id == 0.7396166921444806):
+            #     print("AGENTS ON TOP OF EACH OTHER!")
             #print("agents on top of each other ")
             #print()
             return False
 
+        # if (ag_1.id == 0.6254907532044479 and ag_2.id == 0.7396166921444806):
+        #     print("computing gap requirement!")
+
         gap_req = compute_gap_req_fast(ag_lead.a_min, st_lead.v, ag_behind.a_min, st_behind.v)
         gap_curr = math.sqrt((st_lead.x-st_behind.x)**2+(st_lead.y-st_behind.y)**2)
+
 
         return gap_curr >= gap_req
 
@@ -1152,9 +1170,14 @@ class Car(Agent):
     # checks if maximal yield action by receiver is enough...
     def intention_bp_conflict(self, agent):
         if agent.state.heading == self.state.heading:
+            if (self.id == 0.6254907532044479 and agent.id == 0.7396166921444806):
+                print("checking valid actions")
             chk_valid_actions, flag_a, flag_b = self.check_valid_actions(self, self.intention, agent, agent.get_backup_plan_ctrl(), debug=True)
+
             return not chk_valid_actions, flag_a, flag_b
-        else:
+        else: 
+            if (self.id == 0.6254907532044479 and agent.id == 0.7396166921444806):
+                print("NOT checking valid actions")
             return False, flag_a, flag_b
 
     #=== helper methods for computing whether to send conflict request to another agent =====#
@@ -3198,7 +3221,7 @@ class TrafficLight:
     def set_traffic_lights(self, hstate, htimer):
         #traffic_light = self.tile_to_traffic_light_map[traffic_tile]
         assert hstate in ['red', 'yellow', 'green']
-        assert htimer < self.durations[hstate]
+        assert htimer < self.durationss[hstate]
         self.hstate = hstate
         self.htimer = htimer
 
@@ -3211,7 +3234,7 @@ class TrafficLight:
         return state
 
     def ghost_run_N_time_steps(self, N):
-        hstate = self.hstate
+        hstate = self.hstatecheck_light_N_turns_from_now
         htimer = self.htimer
         for i in range(N):
             htimer += 1
@@ -3413,7 +3436,7 @@ class QuasiSimultaneousGame(TrafficGame):
         return bundle_to_agent_precedence
 
     # assuming ego and all agents in agent_set belong to the same bundle
-    def get_agents_with_higher_precedence(self, ego, agent_set):
+    def find_agents_with_higher_precedence(self, ego, agent_set):
         higher_pred = []
         ego_tile = ego.state.x, ego.state.y
         ego_heading = ego.state.heading
@@ -3621,20 +3644,20 @@ def append_list_as_row(file_name, list_of_elem):
 # python3 rose.py seed t_end map_name p_spawn
 if __name__ == '__main__':
 
-    # check whether user entered an argument and use that as the map input
-    #if len(sys.argv) > 1:
+    # # check whether user entered an argument and use that as the map input
+    # if len(sys.argv) > 1:
     #    if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
     #        print("map")
     #        print(sys.argv[1])
     #        map_name = sys.argv[1]
-    #else:
-    # otherwise use the default map name
-    # map_name = 'straight_simple'
+    # else:
+    # # otherwise use the default map name
+    #     map_name = 'city_blocks_small_vid1'
     # #print("using default city_blocks_small map")
     
     # #seed = random.randint(1, 1000)
-    # seed = 199
-    # t_end = 250
+    # seed = 1830
+    # t_end = 450
     # output_filename = 'game'
     # p_spawn = 0.10
     # the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
@@ -3645,25 +3668,26 @@ if __name__ == '__main__':
     # debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
     # print_debug_info(debug_filename)
 
-    # running the trial many times and saving the data to a csv...
-    num_trials = 2
+    # running the trials many times and saving the data to a csv...
+    num_trials = 25
     num_agents = 10
 
     # create a csv file with columns
-    t_end = 250
-    p_spawn = 0.1
+    t_end = 300
+    p_spawn = 0.08
 
     # csv filename
-    output_csv_name = "trials_" + "num_agents_" + str(num_agents) + ".csv"
+    map_name = "city_blocks_small_vid1"
+    output_csv_name = "trials_" + str(num_trials) + "num_agents_" + str(num_agents) + "_" + map_name + "_AA.csv"
     headers = ["map", "seed_number", "num_agents", "num_collisions", "avg_steps_per_agent", "avg_conflict_clusters", "avg_bubble", "num_agents_reach_goal"]
     append_list_as_row(output_csv_name, headers)
 
-    map_name = "straight_simple"
-
-    # given a seed, a p_spawn, a t_end
+    # given a seed, a p_spawn, a 
+    
     for i in range(0, num_trials): 
         # simulate the game for each seed
-        seed = random.randrange(1, 1500, 1)
+        print("==============================ITERATION" + str(i) + "==========================")
+        seed = random.randrange(4000, 5000, 1)
         row = [map_name, seed, num_agents]
         output_filename = 'game_'+str(i)
         the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
@@ -3674,3 +3698,4 @@ if __name__ == '__main__':
         debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
         row_to_append = row + createDataRow(debug_filename)
         append_list_as_row(output_csv_name, row_to_append)
+
