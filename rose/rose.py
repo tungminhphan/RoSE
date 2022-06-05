@@ -3234,7 +3234,7 @@ class TrafficLight:
         return state
 
     def ghost_run_N_time_steps(self, N):
-        hstate = self.hstatecheck_light_N_turns_from_now
+        hstate = self.hstate
         htimer = self.htimer
         for i in range(N):
             htimer += 1
@@ -3670,10 +3670,10 @@ if __name__ == '__main__':
 
     # running the trials many times and saving the data to a csv...
     num_trials = 25
-    num_agents = 10
+    num_agents = 200
 
     # create a csv file with columns
-    t_end = 300
+    t_end = 750
     p_spawn = 0.08
 
     # csv filename
@@ -3689,7 +3689,7 @@ if __name__ == '__main__':
         print("==============================ITERATION" + str(i) + "==========================")
         seed = random.randrange(4000, 5000, 1)
         row = [map_name, seed, num_agents]
-        output_filename = 'game_'+str(i)
+        output_filename = 'game_'+str(i) + 'seed_' + str(seed)
         the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
         game = QuasiSimultaneousGame(game_map=the_map, N=num_agents)
         game.play(outfile=output_filename, t_end=t_end)
