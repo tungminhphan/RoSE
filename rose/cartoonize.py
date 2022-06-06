@@ -297,6 +297,17 @@ if __name__ == '__main__':
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     traces_file = os.getcwd()+'/saved_traces/game_0seed_4446.p'
+    # #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
+    # traces_file = os.getcwd()+'/saved_traces/game_seed36.p'
+    # output_dir = os.getcwd()+'/imgs/seed_36'
+    # #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
+    # traces_file = os.getcwd()+'/saved_traces/game_seed36.p'
     #traces_file = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, output_dir, start=start, end=end)
+    #2, 57, 14, 66
+    # 49, 8

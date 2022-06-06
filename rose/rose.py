@@ -235,7 +235,7 @@ class Gridder(Agent):
 class Car(Agent):
     def __init__(self, **kwargs):
         agent_name = 'Car'
-        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed']
+        attributes = ['v_min', 'v_max', 'a_min', 'a_max', 'car_count', 'seed', 'rogue_car', 'red_lights_to_run']
         state_variable_names = ['x', 'y', 'heading', 'v']
         #self.seed = 1111
         super(Car, self).__init__(attributes=attributes, agent_name=agent_name, state_variable_names=state_variable_names, **kwargs)
@@ -257,6 +257,11 @@ class Car(Agent):
             self.agent_color = kwargs.get('agent_color')
         else:
             self.agent_color = self.get_random_color()
+
+        # attributes for agent going rogue...
+        self.is_running_red_light = False
+        self.running_light_tile = 0
+        self.num_red_lights_ran = 0
 
         # attributes for saving agent info
         self.num_steps_taken = 0
@@ -950,6 +955,11 @@ class Car(Agent):
                         self.intention, ag.get_id(), ag.state.__tuple__(), ag.intention))
                 print(self.state.__tuple__(), self.intention, self.agent_color, ag.state.__tuple__(), ag.intention, ag.agent_color)
             return len(gridpts_intersect) > 0
+    
+    # def check_collision_in_sequence(self, ctrl):
+    #     # record precedence of all agents for each turn...
+    #     # then, if 
+
 
     def check_out_of_bounds(self, agent, prior_state, ctrl, state):
         out_of_bounds_chk = (state.x, state.y) not in self.supervisor.game.map.drivable_nodes
@@ -1654,7 +1664,7 @@ class TrafficGame(Simulation):
     Traffic game class
     """
     # combines scenario + agents for game
-    def __init__(self, game_map, save_debug_info=True, agent_set=[], N=10):
+    def __init__(self, game_map, save_debug_info=True, agent_set=[], N=10, num_rogue_cars_allowed=0):
         super(TrafficGame, self).__init__(the_map=game_map, agent_set=agent_set)
         self.draw_sets = [self.map.drivable_tiles, self.map.traffic_lights, self.agent_set] # list ordering determines draw ordering
         self.traces = od()
@@ -1690,13 +1700,31 @@ class TrafficGame(Simulation):
         for i, source in enumerate(self.map.IO_map.sources):
             #print('source to check')
             #print(source.node)
+
+            # print(sink.node)
+
             if source_spawn_probabilities[i] <= source.p:
                 #print(len(self.map.IO_map.map[source]))
+                make_rogue_car = np.random.binomial(1, 0.9) # n, p
+                # print(sink.node[0][0], sink.node[0][1])
+                is_rogue_car = 0
+                lights_to_run = 0
                 sink = self.map.IO_map.map[source][sinks[i]]
-                # check if new car satisfies spawning safety contract
-                #print('sources and sinks')
-                #print(source.node, sink.node)
-                new_car = create_default_car(source, sink, self, self.car_count)
+
+                isHighestPrecedenceSourceNode = (source.node[0][0] == 13 and source.node[0][1] == 1) 
+
+                if game.num_rogue_cars_cnt < game.num_rogue_cars_allowed:
+                    # if it is rogue, add to num_rogue_cars_cnt
+                    if make_rogue_car and isHighestPrecedenceSourceNode: 
+                        node = ((13, 46),'east')
+                        sink = Sink(node)
+                        is_rogue_car = 1
+                        lights_to_run = 100
+                        # print("creating rogue car!!")
+                
+
+                new_car = create_default_car(source, sink, self, self.car_count, is_rogue_car, lights_to_run)
+                
                 spawning_contract = SpawningContract(self, new_car)
                 #print('state')
 
@@ -1704,6 +1732,14 @@ class TrafficGame(Simulation):
                 exceedsCarCount = self.car_count >= max_car_count
 
                 if spawning_contract.okay_to_spawn_flag and not exceedsCarCount:
+                    if is_rogue_car: 
+                        game.num_rogue_cars_cnt = game.num_rogue_cars_cnt+1
+                        print("CREATING ROGUE CAR!!")
+                        print('source tile: ', source.node)
+                        print("car_count: ", new_car.car_count)
+                        print("car_color: ", new_car.agent_color)
+                        print("car_is_rogue: ", new_car.rogue_car)
+                                  
                     self.agent_set.append(new_car)
                     self.update_occupancy_dict_for_one_agent(new_car,prior_state=None)
                     self.car_count = self.car_count+1
@@ -1746,6 +1782,8 @@ class TrafficGame(Simulation):
                                 'state':prior_state,
                                 'action': agent.ctrl_chosen,
                                 'color':agent.agent_color,
+                                'is_rogue_agent': agent.rogue_car,
+                                'red_lights_to_run': agent.red_lights_to_run,
                                 'bubble':agent.bubble,
                                 'goals': agent.supervisor.goals,
                                 'spec_struct_info':agent.spec_struct_trace,
@@ -1787,6 +1825,7 @@ class TrafficGame(Simulation):
         self.traces['avg_agents_in_bubble_per_time_step_per_agent'] = self.total_avg_agents_in_bubble_per_step/self.agents_reached_goal_cnt
         self.traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'] = self.total_avg_agents_in_conflict_cluster_per_step/self.agents_reached_goal_cnt
         self.traces['agents_in_map'] = len(self.agent_set)
+        self.traces['num_rogue_cars'] = self.num_rogue_cars_cnt
 
     def write_data_to_pckl(self, filename, traces, new_entry=None):
         filename = filename + '.p'
@@ -2050,6 +2089,8 @@ class Map(Field):
         self.left_turn_to_opposing_traffic_bundles = self.get_left_turn_to_opposing_traffic_map()
         self.bundle_plan_cache = self.get_bundle_plan_cache()
         self.IO_map = self.get_IO_map()
+
+        
 
 
     def tile_is_in_intersection(self, xy):
@@ -2526,6 +2567,9 @@ class Map(Field):
                     partitions = self.cluster_projections_to_bundles(cluster_projections)
                     bundles = self.create_subpartitions(cluster_projections, partitions, direction)
                     all_bundles = all_bundles + bundles
+        # print("first bundle")
+        # print(all_bundles[0])
+
         return all_bundles
 
     def create_subpartitions(self, cluster_projections, partitions, direction):
@@ -2540,6 +2584,7 @@ class Map(Field):
         sources, sinks = self.get_sources_sinks()
         IO_map = IOMap(sources=sources,sinks=sinks,map=od())
         for source in IO_map.sources:
+            # print(source.node)
             IO_map.map[source] = []
             for sink in IO_map.sinks:
                 try:
@@ -3177,7 +3222,8 @@ class SpecificationStructure():
         return tier_weights
 
 class TrafficLight:
-    def __init__(self, light_id, htiles, vtiles, seed, count, t_green=20,t_yellow=3,t_buffer=10, random_init=False):
+    # t_green = 20, t_buffer = 10, t_yellow=5
+    def __init__(self, light_id, htiles, vtiles, seed, count, t_green=10,t_yellow=4,t_buffer=5, random_init=False):
         self.id = light_id
         self.count = count
         self.durations = od()
@@ -3208,12 +3254,18 @@ class TrafficLight:
             return 'green'
 
     def check_directed_light_in_N_turns(self, direction, N):
-        future_lights = self.check_light_N_turns_from_now(N)
+        future_lights, wasYellow_h, wasYellow_v, time_red_h, time_red_v, hstates, vstates = self.check_light_N_turns_from_now(N)
         if direction in ['east', 'west']:
             color, _ = future_lights['vertical']
+            wasYellow = wasYellow_v
+            timeRed = time_red_v
+            states = vstates
         elif direction in ['north', 'south']:
             color, _ = future_lights['horizontal']
-        return color
+            wasYellow = wasYellow_h
+            timeRed = time_red_h
+            states = hstates
+        return color, wasYellow, timeRed, states
 
     def get_id(self):
         return id(self)
@@ -3221,27 +3273,83 @@ class TrafficLight:
     def set_traffic_lights(self, hstate, htimer):
         #traffic_light = self.tile_to_traffic_light_map[traffic_tile]
         assert hstate in ['red', 'yellow', 'green']
-        assert htimer < self.durationss[hstate]
+        assert htimer < self.durations[hstate]
         self.hstate = hstate
         self.htimer = htimer
 
     def check_light_N_turns_from_now(self, N):
-        hstate, htimer = self.ghost_run_N_time_steps(N)
+        hstate, htimer, wasYellow_h, wasYellow_v, time_red_h, time_red_v, h_states, v_states = self.ghost_run_N_time_steps(N)
 
         state = od()
         state['horizontal'] = hstate, htimer
         state['vertical'] = self.get_vstate_given_hstate(hstate, htimer)
-        return state
+
+        return state, wasYellow_h, wasYellow_v, time_red_h, time_red_v, h_states, v_states
 
     def ghost_run_N_time_steps(self, N):
+        # print("####ghost RUN TIME STEPS: N########")
         hstate = self.hstate
         htimer = self.htimer
+        wasYellow_h = False
+        wasYellow_v = False
+        time_red_h = 0
+        time_red_v = 0
+        h_states = [[''] for i in range(N+1)]
+        v_states = [[''] for i in range(N+1)]
+        # before iterating forwards
+        if hstate == 'yellow':
+            wasYellow_h = True
+        elif hstate == 'red':
+            time_red_h += 1
+        elif hstate == 'green':
+            time_red_h = 100
+        vstate, vtimer = self.get_vstate_given_hstate(hstate, htimer)
+        if vstate == 'yellow':
+            wasYellow_v = True
+        elif vstate == 'red':
+            time_red_v += 1
+        elif vstate == 'green':
+            time_red_v = 100
+        if (N >= 1):
+            h_states[0] = hstate
+            v_states[0] = vstate
+        # print(hstate, vstate)
+
         for i in range(N):
             htimer += 1
             if htimer >= self.durations[hstate]:
                 hstate = self.get_next_state(hstate)
                 htimer = 0
-        return hstate, htimer
+            # after iterating forwards
+            if hstate == 'yellow':
+                wasYellow_h = True
+            elif hstate == 'red':
+                time_red_h += 1
+            elif hstate == 'green':
+                time_red_h = 100
+            vstate, vtimer = self.get_vstate_given_hstate(hstate, htimer)
+            if vstate == 'yellow':
+                wasYellow_v = True
+            elif vstate == 'red':
+                time_red_v += 1
+            elif vstate == 'green':
+                time_red_v = 100
+
+            # print(hstate, vstate)
+            h_states[i+1] = hstate
+            v_states[i+1] = vstate
+        
+        # if time was red the whole time...
+        if time_red_v > N:
+            time_red_v = 100
+        if time_red_h > N:
+            time_red_h = 100
+
+        # print(N)
+        # print(wasYellow_h, wasYellow_v, time_red_h, time_red_v)
+        # print(h_states, v_states)
+        
+        return hstate, htimer, wasYellow_h, wasYellow_v, time_red_h, time_red_v, h_states, v_states
 
     def get_vstate_given_hstate(self, hstate, htimer):
         if hstate == 'green' or hstate == 'yellow':
@@ -3338,12 +3446,12 @@ def get_default_car_ss():
     #specification_structure = SpecificationStructure(oracle_set, [1, 2, 2, 3, 4, 4, 1, 1, 2])
     return specification_structure
 
-def create_default_car(source, sink, game, car_count):
+def create_default_car(source, sink, game, car_count, is_rogue_car, red_lights_to_run):
     ss = get_default_car_ss()
     spec_struct_controller = SpecificationStructureController(specification_structure=ss)
     start_xy, start_heading = source.node
     end = sink.node
-    car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed)
+    car = Car(x=start_xy[0],y=start_xy[1],heading=start_heading,v=0,v_min=0,v_max=3, a_min=-1,a_max=1, car_count=car_count, seed=game.map.seed, rogue_car=is_rogue_car, red_lights_to_run=red_lights_to_run)
     car.set_controller(spec_struct_controller)
     supervisor = BundleGoalExit(game=game, goals=[end])
     car.set_supervisor(supervisor)
@@ -3399,9 +3507,11 @@ def create_specified_car(attributes, game):
     return car
 
 class QuasiSimultaneousGame(TrafficGame):
-    def __init__(self, game_map, save_debug_info=True, N=10):
-        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info, N=N)
+    def __init__(self, game_map, save_debug_info=True, N=10, num_rogue_cars_allowed=0):
+        super(QuasiSimultaneousGame, self).__init__(game_map=game_map, save_debug_info=save_debug_info, N=N, num_rogue_cars_allowed=num_rogue_cars_allowed)
         self.bundle_to_agent_precedence = self.get_bundle_to_agent_precedence()
+        self.num_rogue_cars_allowed=num_rogue_cars_allowed
+        self.num_rogue_cars_cnt = 0
         #self.bundle_to_agent_precedence = None
         self.simulated_agents = []
 
@@ -3428,6 +3538,8 @@ class QuasiSimultaneousGame(TrafficGame):
             except:
                 bundles = []
             for bundle in bundles:
+                # print("ALL TILES")
+                # print(bundle.tiles)
                 if bundle.direction == heading:
                     longitudinal_precedence = bundle.tile_to_relative_length((x,y))
                     append_or_create_new_list(bundle_to_agent_precedence[bundle], \
@@ -3511,6 +3623,11 @@ class QuasiSimultaneousGame(TrafficGame):
         # resolve precedence
         self.resolve_precedence()
         all_occupancy_gridpts = []
+        # sort all the bundless
+        # print("=====TAKING A SYSTEM STEP=======")
+        # for bundle in self.map.bundles:
+        #     print("=====new bundle=======")
+        #     print(bundle.tiles)
         for bundle in self.map.bundles:
             precedence_list = list(self.bundle_to_agent_precedence[bundle].keys())
             precedence_list.sort(reverse=True)
@@ -3564,11 +3681,14 @@ def print_debug_info(filename):
     print("avg agents in conflict cluster per time step per agent")
     print(traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'])
 
+    print("number of rogue cars")
+    print(traces['num_rogue_cars'])
+
 def createDataRow(filename):
     with open(filename, 'rb') as pckl_file:
         traces = pickle.load(pckl_file)
     
-    row = [len(traces['collision_dict']), traces['avg_num_steps_to_goal'],  traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'], traces['avg_agents_in_bubble_per_time_step_per_agent'], traces['agents_reached_goal_count']]
+    row = [len(traces['collision_dict']), traces['avg_num_steps_to_goal'],  traces['avg_agents_in_conflict_cluster_per_time_step_per_agent'], traces['avg_agents_in_bubble_per_time_step_per_agent'], traces['agents_reached_goal_count'], traces['num_rogue_cars']]
     return row
 
 def parse_config(csv_file_path, config_file_path):
@@ -3644,54 +3764,75 @@ def append_list_as_row(file_name, list_of_elem):
 # python3 rose.py seed t_end map_name p_spawn
 if __name__ == '__main__':
 
-    # # check whether user entered an argument and use that as the map input
-    # if len(sys.argv) > 1:
-    #    if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
-    #        print("map")
-    #        print(sys.argv[1])
-    #        map_name = sys.argv[1]
-    # else:
-    # # otherwise use the default map name
-    #     map_name = 'city_blocks_small_vid1'
-    # #print("using default city_blocks_small map")
+#     # # check whether user entered an argument and use that as the map input
+#     # if len(sys.argv) > 1:
+#     #    if (sys.argv[1] == 'city_blocks') or (sys.argv[1] == 'city_blocks_small') or (sys.argv[1] == 'straight_road'):
+#     #        print("map")
+#     #        print(sys.argv[1])
+#     #        map_name = sys.argv[1]
+#     # else:
+#     # # otherwise use the default map name
+#     #     map_name = 'city_blocks_small_vid1'
+#     # #print("using default city_blocks_small map")
     
-    # #seed = random.randint(1, 1000)
-    # seed = 1830
-    # t_end = 450
-    # output_filename = 'game'
-    # p_spawn = 0.10
-    # the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
-    # game = QuasiSimultaneousGame(game_map=the_map, N=100)
-    # game.play(outfile=output_filename, t_end=t_end)
-    # print("seed number")
-    # print(seed)
+#     # #seed = random.randint(1, 1000)
+#     # seed = 1830
+#     # t_end = 450
+#     # output_filename = 'game'
+#     # p_spawn = 0.10
+#     # the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
+#     # game = QuasiSimultaneousGame(game_map=the_map, N=100)
+#     # game.play(outfile=output_filename, t_end=t_end)
+#     print("seed number")
+#     print(seed)
     # debug_filename = os.getcwd()+'/saved_traces/'+ output_filename + '.p'
     # print_debug_info(debug_filename)
 
     # running the trials many times and saving the data to a csv...
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     num_trials = 25
     num_agents = 200
 
     # create a csv file with columns
     t_end = 750
-    p_spawn = 0.08
+=======
+=======
+>>>>>>> Stashed changes
+    num_trials = 5
+    num_agents = 200
 
-    # csv filename
+    # create a csv file with columns
+    t_end = 1000
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+    p_spawn = 0.08
+    p_rogue = 0.2
+    num_rogue = num_agents*p_rogue
+
+    # csv filenam
     map_name = "city_blocks_small_vid1"
-    output_csv_name = "trials_" + str(num_trials) + "num_agents_" + str(num_agents) + "_" + map_name + "_AA.csv"
-    headers = ["map", "seed_number", "num_agents", "num_collisions", "avg_steps_per_agent", "avg_conflict_clusters", "avg_bubble", "num_agents_reach_goal"]
+    output_csv_name = "trials_" + str(num_trials) + "num_agents_" + str(num_agents) + "_ROGUE_" + str(num_rogue) + "_A.csv"
+    headers = ["map", "seed_number", "num_agents", "num_collisions", "avg_steps_per_agent", "avg_conflict_clusters", "avg_bubble", "num_agents_reach_goal", "num_spoofed_cars"]
     append_list_as_row(output_csv_name, headers)
 
     # given a seed, a p_spawn, a 
     
     for i in range(0, num_trials): 
         # simulate the game for each seed
-        print("==============================ITERATION" + str(i) + "==========================")
-        seed = random.randrange(4000, 5000, 1)
+        # print("==============================ITERATION" + str(i) + "==========================")
+        seed = random.randrange(0, 100, 1)
+        # seed = 2
+        print("seed number: ")
+        print(seed)
         row = [map_name, seed, num_agents]
-        output_filename = 'game_'+str(i) + 'seed_' + str(seed)
+
+        output_filename = 'game_seed' + str(seed)
         the_map = Map('./maps/'+map_name, default_spawn_probability=p_spawn, seed=seed)
-        game = QuasiSimultaneousGame(game_map=the_map, N=num_agents)
+        print("NUM ROGUE:", num_rogue)
+        game = QuasiSimultaneousGame(game_map=the_map, N=num_agents, num_rogue_cars_allowed = 0)
         game.play(outfile=output_filename, t_end=t_end)
 
         # process all data from the game...
@@ -3699,3 +3840,4 @@ if __name__ == '__main__':
         row_to_append = row + createDataRow(debug_filename)
         append_list_as_row(output_csv_name, row_to_append)
 
+        # del game
