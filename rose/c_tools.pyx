@@ -263,9 +263,16 @@ class BackUpPlanBundleProgressOracle(Oracle):
 class TrafficLightOracle(Oracle):
     def __init__(self):
         super(TrafficLightOracle, self).__init__(name='traffic_light')
+    
+    def isRogueTile(self, tile_to_check):
+        #print(tile_to_check)
+        tile_a = (tile_to_check[0] == 13 and tile_to_check[1] == 11)
+        tile_c = (tile_to_check[0] == 13 and tile_to_check[1] == 30)
+        return tile_a or tile_c
 
-    def tile_sequence_not_running_a_red_light_on_N_turn(self, tile_sequence, game, N):
+    def tile_sequence_not_running_a_red_light_on_N_turn(self, plant, tile_sequence, game, ctrl_action, N):
         light_checks = []
+        isSpoofed = False
         for tile in tile_sequence:
             if tile in game.map.tile_to_traffic_light_map:
                 # figure out traffic_light orientation
@@ -278,18 +285,37 @@ class TrafficLightOracle(Oracle):
             # get traffic light
             traffic_light = game.map.tile_to_traffic_light_map[light_tile]
             red_light_on = self.check_if_light_red_in_N_turns(traffic_light, legal_orientation, N)
-            if will_be_crossing and red_light_on:
-                return False
-        return True
+            was_yellow_light_on, time_red, states = self.check_if_light_was_yellow_in_N_turns(traffic_light, legal_orientation, N)
+
+            #print(plant.state.v)
+            #if will_be_crossing and (was_yellow_light_on and time_red <=3) and plant.state.v <=2:
+                #print(ctrl_action['steer'])
+            #    if (plant.rogue_car and self.isRogueTile(light_tile)):
+            #        print("=====warning! spoofing traffic light!!=====")
+            #        print(states)
+            #        print(plant.agent_color)
+            #        print(light_tile)
+            #        print(time_red, was_yellow_light_on)
+            #        isSpoofed = True
+            #        return True, isSpoofed
+
+            if will_be_crossing and red_light_on: 
+                return False, isSpoofed
+        return True, isSpoofed
 
     def check_if_light_red_in_N_turns(self, traffic_light, direction, N):
-        color = traffic_light.check_directed_light_in_N_turns(direction, N)
+        color, wasYellow, timeRed, states = traffic_light.check_directed_light_in_N_turns(direction, N)
         return color == 'red'
+    
+    def check_if_light_was_yellow_in_N_turns(self, traffic_light, direction, N):
+        color, wasYellow, timeRed, states = traffic_light.check_directed_light_in_N_turns(direction, N)
+        return wasYellow, timeRed, states
 
     def action_not_running_a_red_light(self, ctrl_action, plant, game):
         occ_states = plant.query_occupancy(ctrl_action)
         occ_tiles = [(state.x, state.y) for state in occ_states]
-        return self.tile_sequence_not_running_a_red_light_on_N_turn(occ_tiles, game, N=1)
+        notRunningRed, isSpoofed = self.tile_sequence_not_running_a_red_light_on_N_turn(plant, occ_tiles, game, ctrl_action, N=1)
+        return notRunningRed, isSpoofed
 
     def check_if_crossing(self, light_tile, tiles, direction):
         if direction in ['west', 'east']:
@@ -303,20 +329,24 @@ class TrafficLightOracle(Oracle):
         elif direction in ['west', 'north']:
             return min(tile_projections) < light_tile_projection and max(tile_projections) >= light_tile_projection
 
-    def backup_plant_will_still_be_ok(self, ctrl_action, plant, game):
+    def backup_plant_will_still_be_ok(self, ctrl_action, plant, game, isSpoofed):
         next_state = plant.query_occupancy(ctrl_action)[-1]
         tile_sequence_chain = plant.query_backup_plan(state=next_state)
+        if isSpoofed:
+            return True
         for tile_sequence in tile_sequence_chain:
             N, required_tiles = tile_sequence
-            if self.tile_sequence_not_running_a_red_light_on_N_turn(required_tiles, game, N=N):
+            #print(ctrl_action)
+            notRunningRed, isSpoofed = self.tile_sequence_not_running_a_red_light_on_N_turn(plant, required_tiles, game, ctrl_action, N=N)
+            if notRunningRed:
                 pass
             else:
                 return False
         return True
 
     def evaluate(self, ctrl_action, plant, game):
-        action_not_running_a_red_light = self.action_not_running_a_red_light(ctrl_action, plant, game)
-        backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game)
+        action_not_running_a_red_light, isSpoofed = self.action_not_running_a_red_light(ctrl_action, plant, game)
+        backup_plant_will_still_be_ok = self.backup_plant_will_still_be_ok(ctrl_action, plant, game, isSpoofed)
         # if you're at the critical right-turn tile and red light
         bundle = game.map.directed_tile_to_bundle(((plant.state.x, plant.state.y), plant.state.heading))
         # special left turn lane bandage
@@ -324,19 +354,19 @@ class TrafficLightOracle(Oracle):
             #print(plant.state.x, plant.state.y, plant.state.heading)
             return False
         # check whether the right-turn action is okay
-        if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
-            try:
-                traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
-                light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
-            except:
-                light_is_red = True # if no traffic light, assume it's red
-            if light_is_red:
-                # check if right turn is valid
-                return plant.check_right_turn_is_clear(ctrl_action)
-            else:
-                return action_not_running_a_red_light and backup_plant_will_still_be_ok
-        else:
-            return action_not_running_a_red_light and backup_plant_will_still_be_ok
+        #if ((plant.state.x, plant.state.y), plant.state.heading) in game.map.right_turn_tiles[bundle] and ctrl_action['steer'] == 'right-turn':
+        #    try:
+        #        traffic_light = game.map.tile_to_traffic_light_map[(plant.state.x, plant.state.y)]
+        #        light_is_red = self.check_if_light_red_in_N_turns(traffic_light, plant.state.heading, 0) # N=0
+        #    except:
+        #        light_is_red = True # if no traffic light, assume it's red
+        #    if light_is_red:
+        #        # check if right turn is valid
+        #        return plant.check_right_turn_is_clear(ctrl_action)
+        #    else:
+        #        return action_not_running_a_red_light and backup_plant_will_still_be_ok
+        #else:
+        return action_not_running_a_red_light and backup_plant_will_still_be_ok
 
 class IntersectionClearanceOracle(Oracle):
     def __init__(self):
@@ -355,7 +385,7 @@ class IntersectionClearanceOracle(Oracle):
                     cnt = cnt + 1
             return cnt
 
-        self.clearance_straight_info = None
+        #plant.clearance_straight_info = None
         current_state = plant.state.x, plant.state.y
         x_curr, y_curr = current_state
         next_state = plant.query_next_state(ctrl_action)
@@ -410,6 +440,7 @@ class IntersectionClearanceOracle(Oracle):
                 else:
                     clearance = np.inf
                 return clearance > intersection_gap #TODO: find a better bound
+                #return clearance > 0
 
             else: # going straight
                 lead_agent_in_intersection = plant.find_lead_agent(plant.state, must_not_be_in_intersection=False, same_heading_required=False)
@@ -438,8 +469,8 @@ class IntersectionClearanceOracle(Oracle):
                     x_sv = lead_agent.state.x
                     y_sv = lead_agent.state.y
 
-                self.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
-                return clearance > intersection_gap #TODO: find a better bound
+                plant.clearance_straight_info = (x_curr, y_curr, x_sv, y_sv, intersection_gap, agent_cnt_in_intersection, clearance)
+                return clearance > intersection_gap//2 #to accomodate for agents changing lanes
 
 class UnprotectedLeftTurnOracle(Oracle):
     def __init__(self):
@@ -453,7 +484,8 @@ class UnprotectedLeftTurnOracle(Oracle):
         gap = 0
         v_init = lead_agent.state.v
         for idx in range(N):
-            v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
+            v_init = lead_agent.v_max
+            #v_init = min(lead_agent.v_max, v_init + lead_agent.a_max)
             gap += v_init
         return gap
 
@@ -477,7 +509,7 @@ class UnprotectedLeftTurnOracle(Oracle):
                 current_intersection = game.map.tile_to_intersection_map[current_directed_tile[0]]
                 # get traffic light
                 traffic_light = game.map.intersection_to_traffic_light_map[current_intersection]
-                light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
+                light_color, wasYellow, timeRed, states = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
                 if light_color == 'red':
                     # find agents in intersection to check if collision might occur during red light
                     for N, occupancy_tile in enumerate(relative_tiles):
@@ -695,9 +727,9 @@ class NoDeadlockOracle(Oracle):
 
             # get traffic light information
             current_subgoal = plant.supervisor.subgoals[0]
-            #print(current_subgoal)
+            #print(current_subgoal),
             traffic_light = game.map.intersection_to_traffic_light_map[next_intersection]
-            light_color = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
+            light_color, wasYellow, timeRed, states = traffic_light.check_directed_light_in_N_turns(plant.state.heading, 0)
             
             # TODO: need to generalize to more types of intersections
             # specific left turn check, need to generalize 

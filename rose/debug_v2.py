@@ -20,6 +20,10 @@ def write_info(out_file, t, trace):
     out_file.write("AGENT COLOR: \n")
     out_file.write(str(trace['color'])+'\n')
 
+    # print whether the agent is a rogue agent
+    out_file.write("AGENT IS ROGUE: \n")
+    out_file.write(str(trace['is_rogue_agent'])+'\n')
+
     # agent token count before resolution
     out_file.write("AGENT TOKEN COUNT BEFORE: \n")
     out_file.write(str(trace['token_count_before'])+'\n')
@@ -53,6 +57,11 @@ def write_info(out_file, t, trace):
     out_file.write('\n')
     out_file.write("action selection strategy flags \n")
     out_file.write(str(trace['action_selection_flags'])+'\n')
+
+    # print out the straight clearance info
+    out_file.write('\n')
+    out_file.write("straight clearance info \n")
+    out_file.write(str(trace['clearance_straight_info'])+'\n')
 
     # straight action eval
     out_file.write("straight action evaluation \n")
@@ -161,6 +170,7 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
         out_file.write("======================AGENT IS LOCATED ATTTT==================\n")
         out_file.write(str(agent_trace['state'])+'\n')
         out_file.write(str(agent_trace['color'])+'\n')
+        out_file.write(str(agent_trace['is_rogue_agent'])+'\n')
 
         out_file.write("AGENT GOAL IS:\n")
         out_file.write(str((agent_trace['goals']))+'\n')
@@ -213,10 +223,9 @@ def print_all_agents_at_time_t(filename, outfile, time_step=None):
 
 # test out the debug file
 if __name__ == '__main__':
-    traces_file = os.getcwd()+'/saved_traces/game_debug.p'
+    traces_file = os.getcwd()+'/saved_traces/game_seed34_debug.p'
     outfile = os.getcwd()+'/saved_traces/debug.txt'
-    #print_one_agent_trace(traces_file, 24, 65, 'west', 67, outfile)
-    print_one_agent_trace(traces_file, 31, 46, 'west', 32, outfile)
+    print_one_agent_trace(traces_file, 13, 11, 'east', 50, outfile)
 
     #outfile_cc = os.getcwd()+'/saved_traces/debug_cc.txt'
     #print_all_agents_at_time_t(traces_file, outfile_cc, 108)

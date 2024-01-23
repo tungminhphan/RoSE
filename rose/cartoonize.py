@@ -4,6 +4,7 @@ from ipdb import set_trace as st
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib
 import os
 import glob
 from rose import Car, Map, CAR_COLORS
@@ -14,12 +15,13 @@ from matplotlib.ticker import (AutoMinorLocator, MultipleLocator,
 from matplotlib.collections import PatchCollection
 
 
-main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
+#main_dir = os.path.dirname(os.path.dirname(os.path.realpath("__file__")))
+main_dir = os.getcwd()
 car_figs = dict()
 for color in CAR_COLORS:
-    car_figs[color] = main_dir + '/rose/cars/' + color + '_car.png'
+    car_figs[color] = main_dir + '/cars/' + color + '_car.png'
 
-nice_blue_color=(0/255, 85/255, 212/255)
+#nice_blue_color=(0/255, 85/255, 212/255)
 
 
 # animate the files completely
@@ -52,6 +54,8 @@ def traces_to_animation(filename, output_dir, start=0, end=-1):
         plot_name = str(t).zfill(5)
         img_name = output_dir+'/plot_'+plot_name+'.png'
         #plt.show(1)
+        fig = matplotlib.pyplot.gcf()
+        fig.set_size_inches(18.5, 10.5)
         fig.savefig(img_name)
     animate_images(output_dir)
 
@@ -288,16 +292,22 @@ def argv_to_start_end():
     return start, end
 
 if __name__ == '__main__':
-    output_dir = os.getcwd()+'/imgs/'
+    output_dir = os.getcwd()+'/imgs/seed_4446'
+    #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    traces_file = os.getcwd()+'/saved_traces/game.p'
+    traces_file = os.getcwd()+'/saved_traces/game_0seed_4446.p'
+    # #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
+    # traces_file = os.getcwd()+'/saved_traces/game_seed36.p'
+    # output_dir = os.getcwd()+'/imgs/seed_36'
+    # #output_dir = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
+    # traces_file = os.getcwd()+'/saved_traces/game_seed36.p'
+    #traces_file = os.getcwd()+'/Final_Data/Trial_5_seed999p0_1t300_cb/game.p'
     start, end = argv_to_start_end()
     traces_to_animation(traces_file, output_dir, start=start, end=end)
-    #animate_images(output_dir)
-
-    # bubbles figure for the paper
-    #for dynamics a:-1,1, v=3
-    #bubble_file = os.getcwd()+'/saved_bubbles/v_n0_3_a_n1_1_saved.p'
-    #make_bubble_figure(bubble_file)
-    #make_second_bubble_figure(bubble_file, output_dir)
+    #2, 57, 14, 66
+    # 49, 8
